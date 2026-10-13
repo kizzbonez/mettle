@@ -7,7 +7,7 @@ import { devEnv } from './scripts/dev-env.mjs';
 const dev = devEnv('mettle_test');
 const keys = [
   'DATABASE_URL', 'MIGRATIONS_DIR', 'CONTENT_DIR', 'RUNNER_URL', 'RUNNER_TOKEN', 'JWT_SECRET', 'DATA_KEY',
-  'SMTP_HOST', 'SMTP_PORT', 'PUBLIC_ORIGIN',
+  'SMTP_HOST', 'SMTP_PORT', 'SMTP_SECURE', 'SMTP_USER', 'SMTP_PASS', 'PUBLIC_ORIGIN',
 ] as const;
 
 export default defineConfig({

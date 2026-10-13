@@ -28,8 +28,12 @@ export function devEnv(database = 'mettle') {
     MIGRATIONS_DIR: `${root}apps/api/migrations`,
     CONTENT_DIR: `${root}content`,
     RUNNER_URL: 'http://127.0.0.1:4101',
+    // Development and tests always use the local mailbox, whatever mail account .env configures for the live site.
     SMTP_HOST: '127.0.0.1',
     SMTP_PORT: '4326',
+    SMTP_SECURE: 'false',
+    SMTP_USER: '',
+    SMTP_PASS: '',
     API_HOST: '127.0.0.1',
     API_PORT: '4311',
   };
