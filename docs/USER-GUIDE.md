@@ -31,7 +31,8 @@ passwords match.*
 ## 2. Tracks, levels and marks
 
 A track is a subject. Each track has up to four levels, and every level is built the same way:
-**its lessons, one mock exam, one lab**.
+**its lessons, one mock exam, one lab**. In some levels each lesson also has a short **practice
+lab**, so you can try what you have just read.
 
 | Level | Name | Mark color |
 | --- | --- | --- |
@@ -74,6 +75,10 @@ end.
 ![A lesson with its objectives and a code example](../apps/web/public/guide-shots/06-lesson.png)
 
 At the end, choose **Mark as read and continue**. The lesson stays readable afterwards.
+
+Where a lesson has a **practice lab**, it is offered at the end: choose **Try it now**, or
+**Mark as read and practice**. It is a ten-minute task in the editor, checked by tests like any
+other lab, and passing it takes you on to the next lesson. Practice labs count toward the level.
 
 Most lessons end with a **Practice** section. Try the exercises before you open **Show the
 answers**: the answers stay folded until you ask for them. **Further reading** links to the

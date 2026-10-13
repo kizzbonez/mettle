@@ -69,12 +69,17 @@ export function answerKey(trackSlug, level) {
   };
 }
 
-/** How many lessons a level has, and how many questions one attempt at its exam draws. */
+/**
+ * The shape of a level, read from its files: the lesson slugs in order, which
+ * of them have a practice lab, and how many questions one exam attempt draws.
+ */
 export function levelShape(trackSlug, level) {
   const dir = `${root}content/tracks/${trackSlug}/${level}`;
   const bank = parse(readFileSync(`${dir}/questions.yaml`, 'utf8')).length;
   const drawn = parse(readFileSync(`${dir}/course.yaml`, 'utf8')).exam.questionCount ?? 10;
-  return { lessons: readdirSync(`${dir}/lessons`).filter((name) => name.endsWith('.md')).length, questions: Math.min(bank, drawn) };
+  const lessons = readdirSync(`${dir}/lessons`).filter((name) => name.endsWith('.md')).sort().map((name) => name.slice(name.indexOf('-') + 1, -'.md'.length));
+  const practice = lessons.filter((slug) => existsSync(`${dir}/practice/${slug}/lab.yaml`));
+  return { dir, lessons, practice, questions: Math.min(bank, drawn) };
 }
 
 export { plain };

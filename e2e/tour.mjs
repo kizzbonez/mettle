@@ -66,22 +66,45 @@ async function signUp(page, shot) {
   check(!page.url().includes('/login'), 'an expired access token is renewed without signing the learner out');
 }
 
+/** Puts a reference solution in the editor on screen and submits it. */
+async function submitSolution(page, file) {
+  await page.locator('.monaco-editor').first().waitFor({ timeout: 45_000 });
+  // Editors of labs visited earlier may still exist; the one on screen is the newest.
+  await page.evaluate((code) => window.monaco.editor.getEditors().at(-1).setValue(code), readFileSync(file, 'utf8'));
+  // A learner may run code fifteen times a minute. A person never gets there; the tour does, so it waits and tries again.
+  const passed = page.getByText('Every test passed');
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await passed.or(page.getByText('Too many requests')).first().waitFor({ timeout: 120_000 });
+    if (await passed.isVisible()) return;
+    await page.waitForTimeout(15_000);
+  }
+  throw new Error('The submission was still being rate limited after several tries');
+}
+
 async function lessons(page, shot) {
   await page.goto(`${BASE}/courses`);
   await page.getByRole('link', { name: /Rust Foundations/ }).first().click();
   await page.getByText('Syllabus').waitFor();
   await page.getByRole('link', { name: /Lesson 01/ }).click();
-  for (let lesson = 1; lesson <= LEVEL.lessons; lesson += 1) {
-    await page.getByText(`Lesson ${lesson} of ${LEVEL.lessons}`).waitFor();
-    if (lesson === 1) await shot('06-lesson');
+  const total = LEVEL.lessons.length;
+  for (const [index, slug] of LEVEL.lessons.entries()) {
+    await page.getByText(`Lesson ${index + 1} of ${total}`).waitFor();
+    if (index === 0) await shot('06-lesson');
     const here = page.url();
     await page.getByRole('button', { name: /Mark as read/ }).click();
-    // The next lesson, or after the last one the level page.
     await page.waitForURL((url) => url.toString() !== here);
+    if (!LEVEL.practice.includes(slug)) continue;
+    // A lesson leads to its practice lab, and passing that leads to the next lesson.
+    await submitSolution(page, `${LEVEL.dir}/practice/${slug}/solution.rs`);
+    await page.getByText('This practice lab is done').waitFor();
+    await page.getByRole('link', { name: index + 1 < total ? 'Next lesson' : 'Back to the level', exact: true }).click();
   }
   await page.waitForURL('**/courses/**');
-  // A level is its lessons plus one exam and one lab.
-  const progress = `${LEVEL.lessons} of ${LEVEL.lessons + 2} done`;
+  if (LEVEL.practice.length > 0) check(true, `${LEVEL.practice.length} practice labs passed in the sandbox, each reached from its lesson`);
+  // A level is its lessons and their practice labs, plus one exam and one lab.
+  const done = total + LEVEL.practice.length;
+  const progress = `${done} of ${done + 2} done`;
   await page.getByText(progress).waitFor();
   check(true, `every lesson read: the level shows ${progress}`);
   await shot('05-course');
@@ -125,11 +148,8 @@ async function lab(page, shot) {
   await page.getByText(/0 \/ 1 passed/).waitFor({ timeout: 90_000 });
   check(true, 'running the starter code fails the sample test');
   await shot('11-lab-run');
-  const solution = readFileSync(`${root}content/tracks/rust/basic/lab/solution.rs`, 'utf8');
-  await page.evaluate((code) => window.monaco.editor.getModels()[0].setValue(code), solution);
   await page.getByRole('tab', { name: /Tests/ }).click();
-  await page.getByRole('button', { name: 'Submit' }).click();
-  await page.getByText('Every test passed').waitFor({ timeout: 120_000 });
+  await submitSolution(page, `${LEVEL.dir}/lab/solution.rs`);
   check(await page.getByText(/3 \/ 3 passed/).isVisible(), 'the reference solution passes all three tests in the sandbox');
   await shot('12-lab-passed');
 }
@@ -180,8 +200,10 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const problems = [];
 page.on('pageerror', (error) => problems.push(`page error: ${error.message}`));
 page.on('console', (message) => {
-  // A 401 followed by a silent token refresh is the designed behavior, not a fault.
-  if (message.type() === 'error' && !message.text().includes('401')) problems.push(`console: ${message.text().slice(0, 200)}`);
+  // A 401 followed by a silent token refresh is the designed behavior, not a fault. So is a 429
+  // when the tour runs code faster than the limit allows: it waits and tries again.
+  const expected = ['401', '429'].some((status) => message.text().includes(status));
+  if (message.type() === 'error' && !expected) problems.push(`console: ${message.text().slice(0, 200)}`);
 });
 const shot = shooter(page, shots);
 const steps = [['Setup', setup], ['Sign up', signUp], ['Lessons', lessons], ['Exam', exam], ['Lab', lab], ['Profile', profile], ['Password reset', passwordReset]];

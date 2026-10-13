@@ -79,6 +79,11 @@ export function Lessons() {
           lesson stays readable after you mark it; you can come back before the exam.
         </p>
         <p>
+          Where a lesson has a <strong>practice lab</strong>, it is offered at the end: choose <strong>Try it now</strong>, or{' '}
+          <strong>Mark as read and practice</strong>. It is a ten-minute task in the editor, checked by tests like any other lab, and
+          passing it takes you on to the next lesson. Practice labs count toward the level.
+        </p>
+        <p>
           Most lessons end with a <strong>Practice</strong> section. Try the exercises before you open <strong>Show the answers</strong>:
           the answers stay folded until you ask for them. <strong>Further reading</strong> links to the official documentation the
           lesson is based on, and opens in a new tab.
