@@ -19,7 +19,7 @@
     "tailwindcss": "^4.3.3"
   },
   "dependencies": {
-    "@mettle/shared": "^0.1.0",
+    "@mettle/shared": "*",
     "@monaco-editor/react": "^4.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^1.56.0",
