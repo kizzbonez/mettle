@@ -16,6 +16,9 @@ RUN npm run build --workspace @mettle/runner
 
 FROM node:24-alpine
 ENV NODE_ENV=production
+# Apply the security updates published since the base image was built.
+RUN apk upgrade --no-cache
+
 # The runtime needs Node, not a package manager. Removing npm and yarn also
 # removes the libraries bundled inside them, which image scanners report.
 RUN rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx     /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-*
