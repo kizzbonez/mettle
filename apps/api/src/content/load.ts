@@ -43,12 +43,30 @@ function loadTrack(dir: string, slug: string): ContentTrack {
   return { ...readYaml(join(dir, 'track.yaml'), trackFile), slug, courses };
 }
 
+/** The slugs of the tracks under `<contentDir>/tracks`: every folder with a `track.yaml`. */
+export function listTrackSlugs(contentDir: string): string[] {
+  const tracksDir = join(contentDir, 'tracks');
+  return listDirs(tracksDir).filter((slug) => existsSync(join(tracksDir, slug, 'track.yaml')));
+}
+
+export interface ShippedTrack {
+  slug: string;
+  revision: number;
+}
+
+/** Each shipped track and its revision, read from `track.yaml` alone. */
+export function listShippedTracks(contentDir: string): ShippedTrack[] {
+  return listTrackSlugs(contentDir).map((slug) => ({
+    slug,
+    revision: readYaml(join(contentDir, 'tracks', slug, 'track.yaml'), trackFile).revision,
+  }));
+}
+
 /** Loads the tracks under `<contentDir>/tracks` (all of them, or just `only`), in display order. */
 export function loadContent(contentDir: string, only?: string[]): ContentTrack[] {
   const tracksDir = join(contentDir, 'tracks');
-  return listDirs(tracksDir)
+  return listTrackSlugs(contentDir)
     .filter((slug) => !only || only.includes(slug))
-    .filter((slug) => existsSync(join(tracksDir, slug, 'track.yaml')))
     .map((slug) => loadTrack(join(tracksDir, slug), slug))
     .sort((a, b) => a.sortOrder - b.sortOrder);
 }

@@ -1,5 +1,5 @@
 import { DIFFICULTIES, levelInfo, type Difficulty } from '@mettle/shared';
-import { count, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { db, type Tx } from '../db/client';
 import { examRules, exams } from '../db/schema/assessment';
 import { courses, lessons, tracks } from '../db/schema/catalog';
@@ -79,12 +79,15 @@ async function seedCourse(trackId: string, track: ContentTrack, course: ContentC
   }
   if (course.lab) await upsertLab(row.id, course.lab, tx);
   if (course.questions.length > 0) {
-    await upsertExam({ trackId, courseId: row.id, slug: `${course.level}-mock-exam`, ...course.exam, rules: [{ difficulty: course.level, count: course.questions.length }] }, tx);
+    const { questionCount, ...exam } = course.exam;
+    const count = Math.min(course.questions.length, questionCount);
+    await upsertExam({ trackId, courseId: row.id, slug: `${course.level}-mock-exam`, ...exam, rules: [{ difficulty: course.level, count }] }, tx);
   }
 }
 
 async function seedTrack(track: ContentTrack, tx: Tx, categories: Map<string, string>): Promise<void> {
   const values = { slug: track.slug, title: track.title, tagline: track.tagline, description: track.description, icon: track.icon, status: published, sortOrder: track.sortOrder };
+  // `format` and `revision` describe the files, not the track: they are read by the checker and the sync.
   const [row] = await tx
     .insert(tracks)
     .values(values)
@@ -112,9 +115,4 @@ export async function seedContent(contentDir: string, only?: string[]): Promise<
     for (const track of content) await seedTrack(track, tx, categories);
   });
   return { tracks: content.length, courses: content.reduce((n, track) => n + track.courses.length, 0) };
-}
-
-export async function hasAnyTrack(): Promise<boolean> {
-  const [row] = await db.select({ n: count() }).from(tracks);
-  return Number(row?.n ?? 0) > 0;
 }

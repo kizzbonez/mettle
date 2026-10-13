@@ -26,3 +26,6 @@ Thumbs.db
 # browser tour state and failure captures
 e2e/.state.json
 e2e/failure.png
+
+# tracks being written, not yet part of the curriculum
+.drafts/

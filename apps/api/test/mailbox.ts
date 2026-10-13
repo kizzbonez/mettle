@@ -1,6 +1,7 @@
 /** Reads mail caught by the Mailpit container that `npm run dev:services` starts. */
 
-const MAILPIT = 'http://127.0.0.1:4325/api/v1';
+// MAILPIT_URL points the tests at another mailbox, for a second stack beside a running install.
+const MAILPIT = `${process.env.MAILPIT_URL ?? 'http://127.0.0.1:4325'}/api/v1`;
 
 export interface CaughtEmail {
   subject: string;

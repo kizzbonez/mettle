@@ -10,6 +10,10 @@ export const trackFile = z.object({
   icon: z.string().min(1),
   category: z.string().regex(/^[a-z0-9-]+$/),
   sortOrder: z.number().int().default(0),
+  /** `course` is a full course from zero; `outline` is the original three-lesson format. */
+  format: z.enum(['outline', 'course']).default('outline'),
+  /** Raise this when the shipped track changes, so installs that already have it take the new version. */
+  revision: z.number().int().min(1).default(1),
 });
 
 export const courseFile = z.object({
@@ -21,6 +25,8 @@ export const courseFile = z.object({
     description: z.string().default(''),
     timeLimitMinutes: z.number().int().min(1).max(240).default(10),
     passPercent: z.number().int().min(1).max(100).default(70),
+    /** How many questions an attempt draws from the level's bank (all of them, if the bank is smaller). */
+    questionCount: z.number().int().min(1).max(50).default(10),
   }),
 });
 
