@@ -104,17 +104,12 @@ const STARTER_FINDING: Record<VerifyRun['status'], string> = {
 /** The outcome of a sandbox check: the verdict, then the two runs it rests on. */
 export function VerifyVerdict({ verdict }: { verdict: LabVerdict }) {
   const { solution, starter } = verdict;
-  // The API calls a lab sound when the starter merely did not pass, which includes the sandbox failing to run it.
-  const unchecked = verdict.sound && starter.status === 'error';
-  const summary = !verdict.sound
-    ? 'A lab is sound when the reference solution passes every test and the starter builds but does not pass. See below for what fell short.'
-    : unchecked
-      ? 'The reference solution passes every test.'
-      : 'The reference solution passes every test, and the starter builds but does not pass. The lab can be solved, and is not solved already.';
+  const summary = verdict.sound
+    ? 'The reference solution passes every test, and the starter builds but does not pass. The lab can be solved, and is not solved already.'
+    : 'A lab is sound when the reference solution passes every test and the starter builds but does not pass. See below for what fell short.';
   return (
     <div className="space-y-5">
       <Notice tone={verdict.sound ? 'success' : 'error'} title={verdict.sound ? 'Sound' : 'Not sound'}>{summary}</Notice>
-      {unchecked ? <Notice tone="warning">The starter could not be run, so this verdict rests on the solution alone. Verify again before relying on it.</Notice> : null}
       <div className="grid gap-5 xl:grid-cols-2">
         <RunPanel title="Reference solution" run={solution} ok={solution.status === 'passed'} finding={SOLUTION_FINDING[solution.status]} expanded />
         <RunPanel title="Starter code" run={starter} ok={starter.status === 'failed' || starter.status === 'timeout'} finding={STARTER_FINDING[starter.status]} expanded={false} />

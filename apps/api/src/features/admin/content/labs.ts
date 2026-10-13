@@ -11,6 +11,7 @@ import { parse, uuidParam } from '../../../lib/validate';
 import { audit } from '../../audit/log';
 import { runInSandbox } from '../../labs/runner-client';
 import { markdownField, slugField, sortOrderField, statusField, titleField } from './fields';
+import { labIsSound } from './lab-soundness';
 
 const codeField = z.string().max(100 * 1024);
 
@@ -109,8 +110,8 @@ export async function deleteLab(request: FastifyRequest) {
 }
 
 /**
- * Runs the reference solution and the starter in the sandbox. A lab is sound
- * when the solution passes every test and the starter builds but does not.
+ * Runs the reference solution and the starter in the sandbox, and says whether
+ * the lab is sound.
  */
 export async function verifyLab(request: FastifyRequest) {
   const { lab, tests } = await labWithTests(parse(uuidParam, request.params).id);
@@ -130,7 +131,7 @@ export async function verifyLab(request: FastifyRequest) {
     tests: outcome.tests.map((t) => ({ name: names.get(t.id) ?? t.id, passed: t.passed, durationMs: t.durationMs, stderr: t.stderr, stdout: t.stdout, timedOut: t.timedOut })),
   });
   return {
-    sound: solution.status === 'passed' && starter.status !== 'passed' && starter.status !== 'compile_error',
+    sound: labIsSound(solution.status, starter.status),
     solution: describe(solution),
     starter: describe(starter),
   };
