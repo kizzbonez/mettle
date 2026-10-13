@@ -1,0 +1,17 @@
+slug: attention-reference-implementation
+title: The Attention Reference Implementation
+summary: Write the readable NumPy reference for masked multi-head attention that an optimized inference engine is tested against.
+language: python
+minutes: 60
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reproduces the worked examples
+    file: 01-worked-examples.py
+    hidden: false
+  - name: Stays finite, honors every mask and never looks ahead
+    file: 02-stability-and-masks.py
+    hidden: true
+  - name: Splits, runs and merges attention heads correctly
+    file: 03-multi-head.py
+    hidden: true

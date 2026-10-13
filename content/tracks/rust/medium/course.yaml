@@ -1,0 +1,16 @@
+title: Idiomatic Rust
+summary: >-
+  The tools that make Rust code reusable and concise: traits and generics for abstraction,
+  iterators and closures for data processing, and the collections, module system and test
+  support you use every day.
+outcomes:
+  - Define traits and write generic code bounded by them
+  - Choose between static dispatch with generics and dynamic dispatch with `dyn`
+  - Build lazy iterator pipelines and explain how closures capture their environment
+  - Pick the right collection and use the entry API to update it in place
+  - Organize code into modules with deliberate visibility and cover it with unit tests
+exam:
+  title: Idiomatic Rust Mock Exam
+  description: Five questions on traits, generics, iterators, closures, collections and testing.
+  timeLimitMinutes: 12
+  passPercent: 70

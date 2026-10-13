@@ -1,0 +1,15 @@
+title: Building with LLMs
+summary: >-
+  Connect a model to your own data and your own code: retrieval-augmented generation,
+  structured output and tool calling, and the evaluation practice that tells you whether a
+  change made things better.
+outcomes:
+  - Design a retrieval pipeline that chunks, embeds, retrieves and grounds an answer in its sources
+  - Describe a tool with a schema and validate a model's arguments before acting on them
+  - Build an evaluation set and choose metrics that fit the task
+  - Use a model as a judge while accounting for its noise and bias
+exam:
+  title: Building with LLMs Mock Exam
+  description: Five questions on retrieval, tool calling, validation and evaluation.
+  timeLimitMinutes: 12
+  passPercent: 70

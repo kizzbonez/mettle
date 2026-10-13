@@ -1,0 +1,14 @@
+title: AI Foundations
+summary: >-
+  How machine learning models and large language models work, how to write a prompt that gets
+  a dependable answer, and how text becomes vectors that can be searched by meaning.
+outcomes:
+  - Distinguish training from inference and say what a language model predicts
+  - Explain tokens, the context window and how temperature changes sampling
+  - Write a structured prompt with instructions, context, examples and an output format
+  - Compute cosine similarity and rank documents against a query embedding
+exam:
+  title: AI Foundations Mock Exam
+  description: Five questions on training and inference, tokens and sampling, prompting, and embeddings.
+  timeLimitMinutes: 10
+  passPercent: 70

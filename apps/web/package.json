@@ -1,6 +1,6 @@
 {
   "name": "@mettle/web",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -30,6 +30,7 @@
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
+    "server-only": "^0.0.1",
     "swr": "^2.5.1"
   }
 }

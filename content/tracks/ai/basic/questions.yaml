@@ -1,0 +1,119 @@
+- key: ai-basic-01
+  type: single
+  category: ai
+  tags: [training, inference]
+  prompt: |
+    A user tells a chat assistant: "Our office is in Lisbon, not Madrid." The assistant uses
+    Lisbon for the rest of that conversation. The next day, in a new conversation, it says
+    Madrid again. What explains this?
+  options:
+    - text: The model needs several hours to retrain on yesterday's conversations before the correction takes effect
+    - text: The model's weights do not change during inference; the correction existed only in the text of the first conversation
+      correct: true
+    - text: The temperature was too high, so the model forgot the correction
+    - text: The correction was too short to be stored as a token
+  explanation: |
+    Using a model is **inference**: the weights are read, never written. The assistant "knew"
+    about Lisbon only because the application kept sending the earlier messages back as part of
+    each request. A new conversation starts without that text, so the correction is gone.
+
+    Models are not retrained on each conversation as it happens, which rules out the retraining
+    answer. Temperature affects how the next token is picked from the model's probabilities; it
+    has nothing to do with memory.
+
+- key: ai-basic-02
+  type: single
+  category: ai
+  tags: [tokens, context-window]
+  prompt: |
+    A request fails with an error saying the context limit was exceeded. The prompt contains
+    short instructions and a very long document, and it asks for a long, detailed report.
+    Which statement is correct?
+  options:
+    - text: The limit counts characters, so removing spaces and line breaks is the dependable fix
+    - text: Only the document counts toward the limit; instructions and the generated answer are separate
+    - text: Lowering the temperature makes the request smaller
+    - text: The instructions, the document and the generated report all count toward the same token limit, so shortening the document or the requested report can fix it
+      correct: true
+  explanation: |
+    The context window is a budget of **tokens** shared by everything in the request: the
+    instructions, any documents and history, and the tokens the model generates in reply. Making
+    either the input or the requested output smaller frees room.
+
+    The limit is measured in tokens, not characters, and stripping whitespace saves very
+    little, because the words themselves account for nearly all of the tokens. Temperature
+    changes which tokens are chosen, not how many there are.
+
+- key: ai-basic-03
+  type: true_false
+  category: ai
+  tags: [sampling, temperature]
+  prompt: |
+    Setting the temperature to its lowest value guarantees that a model's answers are factually
+    correct.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    A low temperature makes the model pick its most probable next token nearly every time, so
+    the same prompt gives nearly the same answer. That is **consistency**. If the most probable
+    continuation is wrong, a low temperature produces the same wrong answer every time.
+
+    Correctness depends on what the model learned and on the information in the prompt. People
+    often lower the temperature to "stop hallucinations". It makes the output less varied, but
+    it does not add missing facts.
+
+- key: ai-basic-04
+  type: multiple
+  category: ai
+  tags: [prompting]
+  prompt: |
+    A prompt consists of the words "Summarize this." followed by a three-page incident report.
+    The summaries differ in length and focus from run to run, and none is quite what the team
+    wants. Which changes are likely to help? Select all that apply.
+  options:
+    - text: Say who the summary is for and what they will do with it
+      correct: true
+    - text: Raise the temperature so the model considers more possible summaries
+    - text: Specify the format and length, for example five bullet points
+      correct: true
+    - text: Repeat "summarize" several times so the model takes the instruction seriously
+  explanation: |
+    The prompt is underspecified, so the model has to guess the audience, the focus and the
+    shape of the answer, and it guesses differently each time. Naming the **audience and
+    purpose** tells it what to keep and what to drop. Naming the **format and length** removes
+    the remaining guesswork.
+
+    Raising the temperature makes output more varied, which is the opposite of what is wanted.
+    Repeating a word adds no information: the model already understood that a summary was
+    requested. What it lacked was a description of a good one.
+
+- key: ai-basic-05
+  type: single
+  category: ai
+  tags: [embeddings, cosine-similarity]
+  prompt: |
+    Three embedding vectors:
+
+    ```text
+    A = [1, 0]
+    B = [3, 0]
+    C = [0, 2]
+    ```
+
+    Using cosine similarity, which statement is true?
+  options:
+    - text: A and B score 1.0; A and C score 0.0
+      correct: true
+    - text: A and B score 3.0, because their dot product is 3
+    - text: A is more similar to C than to B, because C is nearer to A in length
+    - text: A and B score about 0.33, because B is three times as long as A
+  explanation: |
+    Cosine similarity divides the dot product by the lengths of both vectors, so only
+    **direction** is left. A and B point the same way: 3 / (1 × 3) = 1.0. A and C are at right
+    angles: 0 / (1 × 2) = 0.0.
+
+    The answer 3.0 is the raw dot product, with the division forgotten; a cosine can never
+    exceed 1. The other two answers treat length as if it mattered. It does not: stretching a
+    vector changes neither its direction nor its cosine similarity to anything else.

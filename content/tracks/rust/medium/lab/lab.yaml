@@ -1,0 +1,17 @@
+slug: latency-rollup
+title: Latency Roll-up
+summary: Build a generic, trait-driven component that groups request latencies by endpoint and merges reports from several hosts.
+language: rust
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Summarizes the sample traffic from the instructions
+    file: 01-sample-traffic.rs
+    hidden: false
+  - name: Ranks endpoints predictably and handles empty and extreme input
+    file: 02-ranking-and-edges.rs
+    hidden: true
+  - name: Merges roll-ups from two hosts and accepts a custom summary
+    file: 03-merge-and-custom-summary.rs
+    hidden: true

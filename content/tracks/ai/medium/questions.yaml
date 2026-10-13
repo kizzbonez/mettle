@@ -1,0 +1,132 @@
+- key: ai-medium-01
+  type: single
+  category: ai
+  tags: [rag, chunking]
+  prompt: |
+    A RAG system over a policy manual cuts every document into fixed 200-word chunks with no
+    overlap. One question keeps getting a wrong answer. The manual does contain the answer, in
+    two consecutive sentences: the first says remote employees may expense a monitor, and the
+    second gives the spending limit and says a manager must approve it.
+
+    What is the most likely cause, and the first thing to try?
+  options:
+    - text: The temperature is too low for the model to combine information; raise it
+    - text: The embedding vectors have too many dimensions to tell the sentences apart; use shorter vectors
+    - text: A chunk boundary falls between the two sentences, so no retrieved chunk states the whole rule; add overlap or split on paragraph boundaries
+      correct: true
+    - text: The model was trained before the manual was written; fine-tune it on the manual
+  explanation: |
+    With fixed-length chunks and no overlap, some pairs of neighboring sentences are bound to be
+    separated. Each half is then embedded alone. The half that matches the question may be
+    retrieved without the half that completes the rule, and the model answers from an
+    incomplete passage. **Overlap** repeats the end of one chunk at the start of the next, and
+    splitting on paragraphs keeps a complete thought together.
+
+    Temperature controls how tokens are sampled; it cannot supply text that was never
+    retrieved. Fine-tuning is a heavy answer to a retrieval problem, and it would not help the
+    next time the manual changes.
+
+- key: ai-medium-02
+  type: multiple
+  category: ai
+  tags: [tool-calling, validation]
+  prompt: |
+    A support assistant has the tool `issue_refund(order_id: string, amount: number)`. The model
+    returns this tool call:
+
+    ```json
+    {
+      "name": "issue_refund",
+      "arguments": "{\"order_id\": \"A-1042\", \"amount\": \"all of it\"}"
+    }
+    ```
+
+    What should the application do? Select all that apply.
+  options:
+    - text: Parse the arguments and check them against the tool's schema before any refund code runs
+      correct: true
+    - text: Run the refund for the full order total, because that is clearly what the model meant
+    - text: Send the validation error back to the model as the tool result, so it can try again, up to a retry limit
+      correct: true
+    - text: Check that the current user is allowed to refund this order, even when the arguments are well formed
+      correct: true
+  explanation: |
+    A tool call is a **request** written by a model, and it deserves the same suspicion as any
+    other untrusted input. Here `amount` is a string where a number is required, so the call
+    fails the **shape** check and must not run. Returning the error as the tool result gives the
+    model a chance to correct itself; the retry limit stops it from looping.
+
+    **Permission** is a separate check that applies to well-formed calls too: a valid order id
+    may belong to another customer.
+
+    Guessing the intent is the tempting mistake. Code that quietly repairs bad arguments is
+    moving money on the strength of a guess, and nobody approved the amount it chose.
+
+- key: ai-medium-03
+  type: true_false
+  category: ai
+  tags: [evaluation, statistics]
+  prompt: |
+    On an evaluation set of 20 examples, prompt A scores 80% and prompt B scores 85%. This is
+    strong evidence that prompt B is the better prompt.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    On 20 examples each example is worth five points, so the whole difference is **one
+    answer**: 16 correct against 17. A single flipped example can come from sampling noise in
+    the model, or from one case that happens to suit prompt B.
+
+    To claim that B is better you need more examples, repeated runs, or both, and you should
+    look at which cases changed. If B fixed one case and broke none, that is mildly encouraging.
+    If it fixed three and broke two, the totals hide a trade you need to know about.
+
+- key: ai-medium-04
+  type: single
+  category: ai
+  tags: [evaluation, llm-as-judge]
+  prompt: |
+    A team uses an LLM judge to compare answers from the old and new versions of an assistant.
+    The judge always sees the old answer first and the new answer second, and it prefers the new
+    answer in 70% of cases. Before trusting this result, what matters most?
+  options:
+    - text: Raise the judge's temperature so that its verdicts are more varied
+    - text: Show each pair in both orders, and compare the judge's verdicts with human labels on a sample
+      correct: true
+    - text: Use the assistant's own model as the judge, so that both apply the same standards
+    - text: Nothing; 70% is far enough above 50% to be conclusive
+  explanation: |
+    LLM judges show **position bias**: they can favor whichever answer appears in a particular
+    slot. Because the new answer was always second, the 70% mixes a real preference with a
+    possible preference for the second position, and the two cannot be separated. Showing each
+    pair in both orders removes that confound. Checking a sample against human labels tells you
+    whether the judge measures what you care about at all.
+
+    More randomness adds noise without removing bias. Using the same model as judge and
+    assistant makes shared blind spots more likely, not less. And 70% says nothing until you
+    know how much of it is an artifact of the setup.
+
+- key: ai-medium-05
+  type: single
+  category: ai
+  tags: [rag, evaluation, retrieval]
+  prompt: |
+    A RAG assistant gives too many wrong answers. You want to know whether the retrieval step
+    or the generation step is responsible. Which measurement isolates retrieval?
+  options:
+    - text: The average cosine similarity of the retrieved chunks to the question
+    - text: A judge model's score for how fluent and complete the final answers are
+    - text: The number of tokens in the assembled prompt
+    - text: For questions whose source passage is known, the fraction where that passage appears among the top k retrieved chunks
+      correct: true
+  explanation: |
+    **Recall at k** asks the one question that matters about retrieval: did the passage that
+    contains the answer reach the model? It needs a set of questions labeled with their source
+    passages, and it ignores generation completely. If recall is low, fix chunking, the query or
+    the embedding step. If recall is high and answers are still wrong, the problem is in how
+    the model uses the passages.
+
+    Average similarity is the tempting choice, but a chunk can be highly similar to the question
+    and still be the wrong chunk; similarity measures topic, not whether the answer is there.
+    Fluency scores measure the final text, where both stages are mixed together.

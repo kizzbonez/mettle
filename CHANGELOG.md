@@ -4,6 +4,30 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-13
+
+The curriculum: two complete tracks, verified end to end.
+
+### Added
+
+- **Rust Development**, four levels: Rust Foundations, Idiomatic Rust, Concurrency and Systems,
+  Production Rust. Labs: a loading-dock ledger parser, a generic latency roll-up, a worker
+  pool, and an O(1) LRU page cache. Standard library only.
+- **AI Development**, four levels: AI Foundations, Building with LLMs, Models Under the Hood,
+  Production AI Systems. Labs: semantic search, grounded retrieval with citations, attention in
+  NumPy, and a guarded tool-calling agent. Every lab runs offline against a deterministic
+  stand-in for the model.
+- In total 27 lessons, 45 exam questions with explanations, and 9 labs with 27 test cases. Each
+  lab's reference solution passes its tests in the sandbox and its boilerplate does not.
+- A track-wide assessment per track that draws three questions at random from each level.
+- `docs/CURRICULUM.md`, generated from the content files by `npm run docs:curriculum`: every
+  lesson outline, question, answer, explanation, lab brief, boilerplate and test case.
+
+### Fixed
+
+- `content:verify <track>` no longer loads the other tracks, so one unfinished track cannot
+  stop another from being verified.
+
 ## [0.2.0] - 2026-10-13
 
 The API: everything the platform does, behind a tested HTTP interface.

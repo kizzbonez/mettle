@@ -1,0 +1,16 @@
+title: Production AI Systems
+summary: >-
+  What it takes to run a model-driven system that acts on its own: the agent loop and its stop
+  conditions, defenses that still hold when a model has been fooled, and the operational
+  discipline of measuring latency, cost and quality on every change.
+outcomes:
+  - Implement an agent loop with explicit state, budgets and stop conditions
+  - Limit the damage of prompt injection with least privilege, checks in code and human approval
+  - Trade latency, cost and quality against each other with caching, routing and shorter loops
+  - Trace an LLM system well enough to replay a failure
+  - Gate releases on regression evaluations that tolerate noise
+exam:
+  title: Production AI Systems Mock Exam
+  description: Five questions on agent design, prompt injection, caching, evaluation gates and safe retries.
+  timeLimitMinutes: 15
+  passPercent: 70

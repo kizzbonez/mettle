@@ -1,0 +1,17 @@
+slug: lru-page-cache
+title: LRU Page Cache
+summary: Replace a linear-scan cache with a generic LRU cache whose every operation is O(1), which hands evicted entries back and reports its own hit rate.
+language: rust
+minutes: 90
+timeLimitMs: 3000
+memoryMb: 256
+tests:
+  - name: Follows the walkthrough from the instructions
+    file: 01-walkthrough.rs
+    hidden: false
+  - name: Handles replacement, removal, borrowed keys and ownership of values
+    file: 02-semantics.rs
+    hidden: true
+  - name: Stays correct and constant-time with 100,000 entries
+    file: 03-scale.rs
+    hidden: true

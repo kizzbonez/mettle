@@ -1,0 +1,182 @@
+- key: rust-professional-01
+  type: single
+  category: rust
+  tags: [unsafe, soundness, panic-safety]
+  prompt: |
+    A crate exports this safe function:
+
+    ```rust
+    pub fn map_in_place<T>(items: &mut Vec<T>, f: impl Fn(T) -> T) {
+        for i in 0..items.len() {
+            unsafe {
+                let slot = items.as_mut_ptr().add(i);
+                let old = std::ptr::read(slot);
+                std::ptr::write(slot, f(old));
+            }
+        }
+    }
+    ```
+
+    Which statement about it is correct?
+  options:
+    - text: "It is sound: every `read` is paired with a `write`, so each element is dropped exactly once"
+    - text: "It is unsound: if `f` panics, the element it was given is dropped during unwinding while the `Vec` still owns that slot, so it is dropped twice"
+      correct: true
+    - text: "It does not compile for types such as `String`, because `ptr::read` requires `T: Copy`"
+    - text: "It is unsound only because `add(i)` can leave the buffer; indexing with `get_unchecked_mut(i)` would fix it"
+  explanation: |
+    `ptr::read` makes a bitwise copy without moving anything out as far as the `Vec` is
+    concerned, so between the `read` and the `write` the element has two owners. That is fine
+    only if nothing in between can fail, and `f` is arbitrary caller code. If `f` panics, `old`
+    is dropped while the panic unwinds, and the `Vec`, whose length never changed, drops the
+    same element again when it is dropped itself: a double free for a `String`. Safe code
+    alone can trigger this, so the function is unsound. The pairing argument in the first
+    option ignores panics. `ptr::read` accepts any `T`, and `i < len` keeps `add(i)` in
+    bounds. Fixes include a drop guard that repairs or truncates the vector on unwind, or
+    taking `f: impl Fn(&mut T)` so that no element is ever moved out.
+
+- key: rust-professional-02
+  type: multiple
+  category: rust
+  tags: [semver, api-design, compatibility]
+  prompt: |
+    This is part of the public API of a library at version 1.4.0:
+
+    ```rust
+    pub struct Config {
+        pub retries: u32,
+        pub timeout_ms: u64,
+    }
+
+    #[non_exhaustive]
+    pub enum Error {
+        Timeout,
+        Refused,
+    }
+
+    pub trait Transport {
+        fn send(&mut self, bytes: &[u8]) -> Result<(), Error>;
+    }
+    ```
+
+    Which changes can stop a downstream crate from compiling, and so need version 2.0.0?
+    Select all that apply.
+  options:
+    - text: "Adding the field `pub verbose: bool` to `Config`"
+      correct: true
+    - text: "Adding the variant `Reset` to `Error`"
+    - text: "Adding `fn flush(&mut self) -> Result<(), Error>;` to `Transport`, with no default body"
+      correct: true
+    - text: "Adding a new public function `pub fn connect(config: &Config) -> Result<(), Error>`"
+  explanation: |
+    Every field of `Config` is public and the struct is not `#[non_exhaustive]`, so users can
+    and do write `Config { retries: 3, timeout_ms: 500 }`. A new field makes each of those
+    literals fail with "missing field". A trait method without a default body breaks every
+    downstream `impl Transport`, which no longer provides all items; giving `flush` a default
+    body would have made it a minor change. `Error` is `#[non_exhaustive]`, so other crates
+    were already forced to write a wildcard arm when matching it, and a new variant lands
+    there. A new function is the standard example of a minor change. The lesson for 1.0:
+    decide which types must be able to grow, and mark them or hide their fields before you
+    publish.
+
+- key: rust-professional-03
+  type: single
+  category: rust
+  tags: [performance, iterators, bounds-checks]
+  prompt: |
+    Two implementations of a dot product:
+
+    ```rust
+    pub fn dot_indexed(a: &[f32], b: &[f32]) -> f32 {
+        let mut sum = 0.0;
+        for i in 0..a.len() {
+            sum += a[i] * b[i];
+        }
+        sum
+    }
+
+    pub fn dot_zipped(a: &[f32], b: &[f32]) -> f32 {
+        a.iter().zip(b).map(|(x, y)| x * y).sum()
+    }
+    ```
+
+    Which statement is accurate?
+  options:
+    - text: They always behave the same, and the iterator version pays a small run-time cost for the extra abstraction
+    - text: "`dot_indexed` panics if `b` is shorter than `a`, and `b[i]` needs a bounds check on every iteration unless the optimizer can prove it away; `dot_zipped` stops at the shorter slice and needs no per-element check"
+      correct: true
+    - text: "`dot_zipped` is slower, because every element goes through an indirect call to the closure"
+    - text: "`dot_zipped` allocates a temporary `Vec` of pairs before it starts summing"
+  explanation: |
+    The two functions differ in behavior first: with a shorter `b`, indexing panics and `zip`
+    silently stops. They also differ in what the optimizer has to prove. `a[i]` is known to be
+    in range because `i < a.len()` is the loop condition, but nothing relates `i` to
+    `b.len()`, so `b[i]` keeps its check and its panic path inside the loop. `zip` works out
+    the common length once and then needs no checks. Closures are monomorphized and inlined,
+    not called through a pointer, and iterator adapters are lazy: no intermediate collection
+    exists. If you want indexing, slice first with `let b = &b[..a.len()];` so the check
+    happens once, outside the loop.
+
+- key: rust-professional-04
+  type: single
+  category: rust
+  tags: [traits, dyn-compatibility, api-design]
+  prompt: |
+    What happens when this library code is compiled?
+
+    ```rust
+    pub trait Store {
+        fn get(&self, key: &str) -> Option<String>;
+        fn put<V: Into<String>>(&mut self, key: &str, value: V);
+    }
+
+    pub fn open() -> Box<dyn Store> {
+        unimplemented!()
+    }
+    ```
+  options:
+    - text: It compiles; `put` is dispatched through the vtable like any other method
+    - text: "It fails to compile: `Store` cannot be used as `dyn Store`, because `put` has a generic type parameter"
+      correct: true
+    - text: "It fails to compile, but only because `unimplemented!()` does not produce a `Box<dyn Store>`"
+    - text: It compiles, but calling `put` through the box panics at run time
+  explanation: |
+    A vtable has one slot per method. A generic method is not one function but a family, one
+    per `V`, and the compiler cannot know which instances a caller of `dyn Store` will need, so
+    the trait is not **dyn compatible** (older compilers say "object safe") and error E0038 is
+    reported where `dyn Store` is written. `unimplemented!()` has type `!`, which coerces to
+    any return type, so it is not the problem. Two fixes: take a concrete type such as
+    `String`, or add `where Self: Sized` to `put`, which keeps the method for concrete types
+    and leaves it out of the trait object. Whether a trait can be used as `dyn` is part of its
+    public contract: adding a generic method later breaks everyone who wrote `dyn Store`.
+
+- key: rust-professional-05
+  type: single
+  category: rust
+  tags: [ffi, cstring, dangling-pointer]
+  prompt: |
+    A C library will read the string behind the pointer this function returns. What is wrong
+    with the function?
+
+    ```rust
+    use std::ffi::{c_char, CString};
+
+    fn service_name() -> *const c_char {
+        CString::new("ledger").unwrap().as_ptr()
+    }
+    ```
+  options:
+    - text: "Nothing: `as_ptr` passes ownership of the buffer to whoever holds the pointer"
+    - text: "The pointer dangles: the temporary `CString` is dropped, and its buffer freed, at the end of the statement"
+      correct: true
+    - text: "It does not compile, because a safe function cannot return a raw pointer"
+    - text: "The buffer has no terminating NUL byte, because Rust strings are not NUL-terminated"
+  explanation: |
+    `as_ptr` only borrows. The `CString` here is a temporary that is dropped at the end of the
+    statement, which frees the buffer, so the function returns a pointer to freed memory and
+    the C side reads it: a use after free. Creating and returning a raw pointer is safe (only
+    dereferencing one is `unsafe`), so the compiler accepts the code, although it does emit a
+    warning for this exact pattern. `CString::new` does append the NUL byte. To hand ownership
+    to C, call `into_raw()`, and take the pointer back later with `CString::from_raw` so that
+    Rust frees what Rust allocated. Otherwise, keep the `CString` alive in something that
+    outlives every use of the pointer.

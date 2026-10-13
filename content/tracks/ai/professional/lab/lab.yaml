@@ -1,0 +1,17 @@
+slug: refund-desk-agent
+title: The Refund Desk Agent
+summary: Rewrite the loop between a model and its tools so that allow-lists, argument checks, approvals and stop conditions are enforced by code, and prove it against a scripted model.
+language: python
+minutes: 75
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Completes the refund and blocks the injected tool call
+    file: 01-refund-walkthrough.py
+    hidden: false
+  - name: Enforces the allow-list, argument checks and approvals in code
+    file: 02-guardrails.py
+    hidden: true
+  - name: Survives failing tools and always stops
+    file: 03-failures-and-limits.py
+    hidden: true

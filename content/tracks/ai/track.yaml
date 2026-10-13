@@ -1,0 +1,10 @@
+title: AI Development
+tagline: Build on language models, and know what is happening underneath.
+description: >-
+  Tokens, prompts and embeddings; retrieval, tool calling and evaluation; the mathematics of
+  attention; and agents that are safe to run in production. Every lab runs offline in Python.
+  Where a real system would call a model, the lab takes a deterministic stand-in, so what gets
+  tested is the engineering around the model.
+icon: BrainCircuit
+category: ai
+sortOrder: 2

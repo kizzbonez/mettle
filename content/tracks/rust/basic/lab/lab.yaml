@@ -1,0 +1,17 @@
+slug: loading-dock-ledger
+title: Loading Dock Ledger
+summary: Parse scanner uploads into typed stock movements and report exactly which line is wrong, and why.
+language: rust
+minutes: 40
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Parses the sample upload from the instructions
+    file: 01-sample-upload.rs
+    hidden: false
+  - name: Rejects each kind of malformed line with the right error
+    file: 02-validation-rules.rs
+    hidden: true
+  - name: Reports the first bad line by number and handles quiet uploads
+    file: 03-ledger-edge-cases.rs
+    hidden: true

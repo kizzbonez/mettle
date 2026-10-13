@@ -1,0 +1,16 @@
+title: Models Under the Hood
+summary: >-
+  What happens inside the model: how a neural network learns by backpropagation, how
+  attention lets a transformer use context, and how to choose between prompting, retrieval and
+  fine-tuning when a model's behavior has to change.
+outcomes:
+  - Trace a forward and a backward pass and apply the chain rule to a weight
+  - Explain scaled dot-product attention, masking and the need for position information
+  - Implement stable softmax and masked multi-head attention in NumPy
+  - Choose between prompting, retrieval and fine-tuning for a stated problem
+  - Recognize overfitting and data leakage from training and validation results
+exam:
+  title: Models Under the Hood Mock Exam
+  description: Five questions on neural networks, attention and masking, and adapting models.
+  timeLimitMinutes: 12
+  passPercent: 70

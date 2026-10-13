@@ -1,0 +1,17 @@
+slug: grounded-handbook-answers
+title: Grounded Handbook Answers
+summary: Build a retrieval pipeline that chunks a handbook, finds the relevant passages and accepts a model's answer only when its citations check out.
+language: python
+minutes: 45
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Chunks the handbook, retrieves the right passages and returns a cited answer
+    file: 01-handbook-example.py
+    hidden: false
+  - name: Gets chunk boundaries, thresholds and embedding calls exactly right
+    file: 02-chunking-and-retrieval.py
+    hidden: true
+  - name: Refuses to answer without sources and rejects replies it cannot verify
+    file: 03-grounding-and-citations.py
+    hidden: true

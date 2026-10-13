@@ -86,7 +86,8 @@ async function checkTrack(track: ContentTrack): Promise<void> {
   }
 }
 
-const tracks = loadContent(contentDir).filter((track) => !filterTrack || track.slug === filterTrack);
+// Load only the track being verified, so a half-written neighbor cannot break the run.
+const tracks = loadContent(contentDir, filterTrack ? [filterTrack] : undefined);
 if (tracks.length === 0) problems.push(`No track matches "${filterTrack}"`);
 console.log(`Verifying ${tracks.length} track(s)\n`);
 for (const track of tracks) await checkTrack(track);

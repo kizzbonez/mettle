@@ -1,0 +1,8 @@
+[
+  {"id": "kb-101", "title": "Reset your password", "embedding": [0.9, 0.1, 0.0, 0.1]},
+  {"id": "kb-102", "title": "Turn on two-step sign-in", "embedding": [0.7, 0.0, 0.1, 0.5]},
+  {"id": "kb-201", "title": "Download an invoice", "embedding": [0.1, 0.9, 0.2, 0.0]},
+  {"id": "kb-202", "title": "Update your payment card", "embedding": [0.2, 0.8, 0.0, 0.1]},
+  {"id": "kb-301", "title": "Export data to a spreadsheet", "embedding": [0.0, 0.2, 0.9, 0.1]},
+  {"id": "kb-401", "title": "Invite a teammate", "embedding": [0.2, 0.0, 0.1, 0.9]}
+]

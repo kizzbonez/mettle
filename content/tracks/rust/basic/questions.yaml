@@ -1,0 +1,151 @@
+- key: rust-basic-01
+  type: single
+  category: rust
+  tags: [ownership, moves]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    fn main() {
+        let first = String::from("dock-7");
+        let second = first;
+        println!("{first} {second}");
+    }
+    ```
+  options:
+    - text: It prints `dock-7 dock-7`
+    - text: "It fails to compile: `first` was moved into `second` and can no longer be used"
+      correct: true
+    - text: It compiles, but panics at run time when `first` is read
+    - text: It prints ` dock-7`, because the move leaves `first` as an empty string
+  explanation: |
+    `String` owns heap memory and is not `Copy`, so `let second = first;` **moves** ownership
+    to `second`. The compiler rejects the later use of `first` with error E0382, "borrow of
+    moved value". Nothing is checked at run time, and `first` is not left behind as an empty
+    string: unlike C++, Rust does not let you touch a moved-from variable at all. The program
+    would print `dock-7 dock-7` only if the second line were `let second = first.clone();`.
+
+- key: rust-basic-02
+  type: multiple
+  category: rust
+  tags: [borrowing, references]
+  prompt: |
+    Which statements can replace the comment without causing a compile error?
+    Select all that apply.
+
+    ```rust
+    fn main() {
+        let mut bins = vec![3, 1, 4];
+        let first = &bins[0];
+        // HERE
+        println!("{first}");
+    }
+    ```
+  options:
+    - text: "`let count = bins.len();`"
+      correct: true
+    - text: "`bins.push(1);`"
+    - text: "`let last = &bins[2];`"
+      correct: true
+    - text: "`bins.clear();`"
+  explanation: |
+    `first` is a shared borrow of `bins`, and it is still in use on the `println!` line. While
+    it is alive, other **shared** uses are fine: `len` takes `&self`, and `&bins[2]` is one
+    more shared reference. `push` and `clear` take `&mut self`, which needs exclusive access,
+    so the compiler rejects both with E0502. The rule is not pedantry: `push` may move the
+    vector's buffer to a larger allocation, which would leave `first` pointing at freed memory.
+
+- key: rust-basic-03
+  type: single
+  category: rust
+  tags: [enums, pattern-matching]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    enum Status {
+        Active,
+        Suspended,
+        Closed,
+    }
+
+    fn label(status: &Status) -> &'static str {
+        match status {
+            Status::Active => "active",
+            Status::Suspended => "suspended",
+        }
+    }
+
+    fn main() {
+        println!("{}", label(&Status::Active));
+    }
+    ```
+  options:
+    - text: It prints `active`; the missing arm matters only if `Closed` is ever passed
+    - text: "It fails to compile: the `match` does not cover `Status::Closed`"
+      correct: true
+    - text: It compiles with a warning, and `label` returns an empty string for `Closed`
+    - text: It compiles, and panics at run time if `label` is called with `Closed`
+  explanation: |
+    A `match` must be **exhaustive**. The compiler reports E0004, "non-exhaustive patterns:
+    `&Status::Closed` not covered", whether or not `Closed` is ever constructed. There is no
+    implicit fall-through and no run-time check. This is deliberate: add a variant to an enum
+    and the compiler lists every `match` that has to be updated. A wildcard arm (`_ => ...`)
+    would make this compile, at the price of losing that help.
+
+- key: rust-basic-04
+  type: single
+  category: rust
+  tags: [option, question-mark]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn parse_pair(text: &str) -> Option<(u32, u32)> {
+        let (left, right) = text.split_once(':')?;
+        let a = left.parse().ok()?;
+        let b = right.parse().ok()?;
+        Some((a, b))
+    }
+
+    fn main() {
+        println!("{:?} {:?}", parse_pair("4:x"), parse_pair("4:15"));
+    }
+    ```
+  options:
+    - text: "`None Some((4, 15))`"
+      correct: true
+    - text: "`Some((4, 0)) Some((4, 15))`"
+    - text: Nothing useful; it panics while parsing `x`
+    - text: Nothing; it fails to compile because `?` can only be used on a `Result`
+  explanation: |
+    `?` works on `Option` as well as `Result`: on `None` it returns `None` from the function
+    immediately. `right.parse()` returns an `Err` for `"x"`, `.ok()` turns that into `None`,
+    and `?` returns it, so the first call gives `None`. A failed parse never becomes `0`, and
+    `?` never panics; that would be `unwrap()`. What you cannot do is mix the two in one
+    function without converting, which is why `.ok()` is there.
+
+- key: rust-basic-05
+  type: true_false
+  category: rust
+  tags: [lifetimes]
+  prompt: |
+    True or false: this function compiles as written, because the compiler works out the
+    lifetime of the returned reference by looking at the function body.
+
+    ```rust
+    fn longer(a: &str, b: &str) -> &str {
+        if a.len() >= b.len() { a } else { b }
+    }
+    ```
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    It fails with E0106, "missing lifetime specifier". The compiler fills in lifetimes from the
+    **signature** alone, never from the body: when there is exactly one reference parameter, or
+    a `&self`, the result borrows from that. Here there are two candidates, so you must say
+    which: `fn longer<'a>(a: &'a str, b: &'a str) -> &'a str`. Reading the body would make the
+    function's contract change whenever its implementation did, which is exactly what a
+    signature is meant to prevent.

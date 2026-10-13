@@ -1,0 +1,161 @@
+- key: rust-medium-01
+  type: single
+  category: rust
+  tags: [iterators, laziness]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let ids = vec![1, 2, 3];
+        ids.iter().map(|id| println!("checking {id}"));
+        println!("done");
+    }
+    ```
+  options:
+    - text: "`checking 1`, `checking 2`, `checking 3`, then `done`"
+    - text: Only `done`
+      correct: true
+    - text: Nothing; it fails to compile because the closure passed to `map` returns `()`
+    - text: "`done` first, then the three `checking` lines when `ids` is dropped"
+  explanation: |
+    `map` is an **adapter**: it wraps the iterator in a new one and runs nothing. Only a
+    consumer such as a `for` loop, `for_each`, `collect` or `count` pulls items through, and
+    this pipeline has none, so the closure is never called. The compiler says as much in a
+    warning: "iterators are lazy and do nothing unless consumed". It is a warning, not an
+    error, so the program still builds and prints `done`. To run a side effect per item, write
+    a `for` loop or use `for_each`.
+
+- key: rust-medium-02
+  type: single
+  category: rust
+  tags: [closures, move, copy]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let mut count = 0;
+        let mut bump = move || {
+            count += 1;
+            count
+        };
+        bump();
+        let seen = bump();
+        println!("{seen} {count}");
+    }
+    ```
+  options:
+    - text: "`2 2`"
+    - text: "`2 0`"
+      correct: true
+    - text: "`1 0`"
+    - text: Nothing; it fails to compile because `count` is used after it was moved into the closure
+  explanation: |
+    `move` makes the closure capture `count` by value. An `i32` is `Copy`, so "moving" it
+    copies it: the closure owns a separate `count` that goes to 1 and then 2, while the
+    variable in `main` stays 0. The closure keeps its state between calls, which is why `seen`
+    is 2 and not 1. Remove `move` and the closure borrows `count` mutably, giving `2 2`. The
+    "used after move" error would appear only for a type that is not `Copy`, such as `String`.
+
+- key: rust-medium-03
+  type: multiple
+  category: rust
+  tags: [traits, generics, dispatch]
+  prompt: |
+    Two ways to add up the areas of some shapes:
+
+    ```rust
+    trait Shape {
+        fn area(&self) -> f64;
+    }
+
+    fn total_generic<T: Shape>(shapes: &[T]) -> f64 {
+        shapes.iter().map(|s| s.area()).sum()
+    }
+
+    fn total_dyn(shapes: &[Box<dyn Shape>]) -> f64 {
+        shapes.iter().map(|s| s.area()).sum()
+    }
+    ```
+
+    Which statements are true? Select all that apply.
+  options:
+    - text: "`total_dyn` can sum a slice that mixes circles and squares; `total_generic` cannot"
+      correct: true
+    - text: The compiler emits a separate copy of `total_generic` for each concrete `T` it is called with
+      correct: true
+    - text: Inside `total_dyn`, the call to `area` is resolved at compile time and can be inlined, as it is in `total_generic`
+    - text: "`total_generic` is the slower of the two, because generic code looks methods up in a table at run time"
+  explanation: |
+    A generic function is **monomorphized**: one copy per concrete type, each with direct calls
+    the optimizer can inline. Within one call `T` is a single type, so every element of the
+    slice must be the same shape. `dyn Shape` erases the concrete type. Each `Box<dyn Shape>`
+    carries a pointer to a vtable, and `area` is found there at run time, which is what lets
+    one slice hold different shapes and also what prevents inlining. The table lookup belongs
+    to `dyn`, not to generics; the last option has it backwards.
+
+- key: rust-medium-04
+  type: single
+  category: rust
+  tags: [collections, btreemap, entry-api]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    use std::collections::BTreeMap;
+
+    fn main() {
+        let mut counts = BTreeMap::new();
+        for word in "pear apple fig apple pear apple".split(' ') {
+            *counts.entry(word).or_insert(0) += 1;
+        }
+        let line: Vec<String> = counts.iter().map(|(w, n)| format!("{w}={n}")).collect();
+        println!("{}", line.join(" "));
+    }
+    ```
+  options:
+    - text: "`pear=2 apple=3 fig=1`"
+    - text: "`apple=3 fig=1 pear=2`"
+      correct: true
+    - text: "`apple=3 pear=2 fig=1`"
+    - text: The three counts in an order that can change from one run to the next
+  explanation: |
+    `entry(word).or_insert(0)` returns a mutable reference to the count, inserting `0` the
+    first time a word is seen, so the counts are apple 3, fig 1, pear 2. A `BTreeMap` always
+    iterates in **key order**, which gives `apple=3 fig=1 pear=2` on every run. It does not
+    remember insertion order (the first option) and it does not sort by value (the third). The
+    last option describes a `HashMap`, whose iteration order is unspecified.
+
+- key: rust-medium-05
+  type: true_false
+  category: rust
+  tags: [modules, visibility, testing]
+  prompt: |
+    True or false: the test below can call `normalize` even though `normalize` is private.
+
+    ```rust
+    fn normalize(word: &str) -> String {
+        word.trim().to_lowercase()
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn trims_and_lowercases() {
+            assert_eq!(normalize(" NUT "), "nut");
+        }
+    }
+    ```
+  options:
+    - text: "True"
+      correct: true
+    - text: "False"
+  explanation: |
+    Privacy in Rust follows the module tree: a private item is visible in the module that
+    defines it **and in all of that module's descendants**. `tests` is a child module, so
+    `use super::*;` brings `normalize` into scope. This is why unit tests are written next to
+    the code. Integration tests in a `tests/` directory are a different matter: each one is
+    compiled as a separate crate and sees only the public API.

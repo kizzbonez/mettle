@@ -1,0 +1,156 @@
+- key: rust-advanced-01
+  type: single
+  category: rust
+  tags: [refcell, interior-mutability]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    use std::cell::RefCell;
+
+    fn main() {
+        let log = RefCell::new(vec!["boot"]);
+        let view = log.borrow();
+        log.borrow_mut().push("ready");
+        println!("{}", view.len());
+    }
+    ```
+  options:
+    - text: "It fails to compile: `log` is borrowed mutably while `view` still borrows it"
+    - text: It compiles, and panics at run time on the `borrow_mut` line
+      correct: true
+    - text: It prints `1`
+    - text: It prints `2`
+  explanation: |
+    `borrow` and `borrow_mut` both take `&self`, so as far as the compiler is concerned nothing
+    here conflicts, and the program builds. `RefCell` enforces the same "many readers or one
+    writer" rule, but **at run time**: `view` is a guard that keeps a shared borrow open until
+    it is dropped, so `borrow_mut` finds the cell already borrowed and panics. Nothing is
+    printed. The fix is to end the first borrow before starting the second, for example with
+    `drop(view)`, or to use `try_borrow_mut` and handle the `Err`.
+
+- key: rust-advanced-02
+  type: single
+  category: rust
+  tags: [threads, scoped-threads, borrowing]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    use std::thread;
+
+    fn main() {
+        let mut totals = vec![0u32; 4];
+        thread::scope(|s| {
+            for (i, slot) in totals.iter_mut().enumerate() {
+                s.spawn(move || *slot = i as u32 * 10);
+            }
+        });
+        println!("{totals:?}");
+    }
+    ```
+  options:
+    - text: "It fails to compile: a spawned thread's closure must be `'static`, and `slot` borrows from `main`"
+    - text: "It fails to compile: `totals` is mutably borrowed by four threads at once"
+    - text: "It always prints `[0, 10, 20, 30]`"
+      correct: true
+    - text: It compiles, but the printed values depend on how the threads are scheduled
+  explanation: |
+    The `'static` requirement belongs to `thread::spawn`, whose thread may outlive the caller.
+    `thread::scope` joins every thread it spawned before it returns, so those threads may
+    borrow locals such as `totals`. `iter_mut` hands out four **disjoint** `&mut u32`
+    references, one per element, and each is moved into exactly one thread, so there is no
+    aliasing for the borrow checker to reject. Each thread writes only its own element, and
+    the print happens after all of them have been joined, so scheduling cannot change the
+    result.
+
+- key: rust-advanced-03
+  type: single
+  category: rust
+  tags: [channels, mpsc, deadlock]
+  prompt: |
+    What happens when this program runs?
+
+    ```rust
+    use std::sync::mpsc;
+    use std::thread;
+
+    fn main() {
+        let (tx, rx) = mpsc::channel();
+        for id in 1..=3 {
+            let tx = tx.clone();
+            thread::spawn(move || tx.send(id * 10).unwrap());
+        }
+        let total: i32 = rx.iter().sum();
+        println!("{total}");
+    }
+    ```
+  options:
+    - text: It prints `60`
+    - text: It never prints anything, because `main` blocks forever
+      correct: true
+    - text: It prints a total that can differ from run to run, because the sends race
+    - text: It panics, because a `send` fails once its worker thread has finished
+  explanation: |
+    `rx.iter()` ends only when **every** `Sender` has been dropped. The three clones are
+    dropped as their threads finish, but the original `tx` is still alive in `main`, and
+    `main` is the thread waiting for the channel to close. All three values arrive, and then
+    the program waits for a fourth that can never come. Adding `drop(tx);` after the loop
+    fixes it, and the program then prints `60` on every run: the order of arrival varies, but
+    a sum does not depend on order. `send` fails only when the receiver is gone.
+
+- key: rust-advanced-04
+  type: multiple
+  category: rust
+  tags: [send, sync, thread-safety]
+  prompt: |
+    Which statements about `Send` and `Sync` are true? Select all that apply.
+  options:
+    - text: "`Arc<Mutex<T>>` can be shared between threads whenever `T` is `Send`, even if `T` is not `Sync`"
+      correct: true
+    - text: "`Arc<RefCell<T>>` can be shared between threads, because `Arc` makes whatever it wraps thread-safe"
+    - text: A type `T` is `Sync` exactly when `&T` is `Send`
+      correct: true
+    - text: "A type has neither trait until its author writes `impl Send` and `impl Sync` for it"
+  explanation: |
+    `Sync` is defined in terms of `Send`: `T` is `Sync` if and only if a shared reference to it
+    can be sent to another thread. A `Mutex<T>` lets only one thread reach the `T` at a time,
+    so it is `Sync` as long as `T` is `Send`; that is how `Arc<Mutex<Cell<i32>>>` is fine even
+    though `Cell` is not `Sync`. `Arc` adds nothing of the kind. It makes the *reference count*
+    atomic and requires its contents to be `Send + Sync` already, so `Arc<RefCell<T>>` is
+    rejected: the borrow flag of a `RefCell` is not synchronized. Finally, both are **auto
+    traits**. The compiler implements them for any type whose fields have them; you write an
+    `unsafe impl` only when you are vouching for something it cannot check, such as a raw
+    pointer.
+
+- key: rust-advanced-05
+  type: single
+  category: rust
+  tags: [async, futures]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    async fn load() -> u32 {
+        println!("loading");
+        42
+    }
+
+    fn main() {
+        let pending = load();
+        println!("created");
+        drop(pending);
+    }
+    ```
+  options:
+    - text: "`loading`, then `created`"
+    - text: Only `created`
+      correct: true
+    - text: "`created`, then `loading` when the future is dropped"
+    - text: Nothing; it fails to compile because an `async fn` can be called only from async code
+  explanation: |
+    Calling an `async fn` builds a future and runs **none** of the body. The body runs only
+    when the future is polled, which is what an executor does (directly, or through an
+    `.await` inside another future that it is driving). Nothing polls `pending`, so `loading`
+    is never printed, and dropping a future simply discards its state machine. Calling an
+    `async fn` from ordinary code is allowed; it is `.await` that needs an async context.

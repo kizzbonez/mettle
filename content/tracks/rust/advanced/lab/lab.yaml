@@ -1,0 +1,17 @@
+slug: artifact-fingerprint-pool
+title: Artifact Fingerprint Pool
+summary: Build a fixed-size worker pool from threads and channels that returns results in order and shuts down without losing queued work.
+language: rust
+minutes: 60
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Fingerprints the release artifacts in manifest order
+    file: 01-release-manifest.rs
+    hidden: false
+  - name: Keeps results in order and runs every job exactly once, on pool threads only
+    file: 02-order-and-accounting.rs
+    hidden: true
+  - name: Runs jobs concurrently and drains the queue on shutdown and on drop
+    file: 03-concurrency-and-shutdown.rs
+    hidden: true

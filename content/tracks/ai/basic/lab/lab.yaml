@@ -1,0 +1,17 @@
+slug: help-center-semantic-search
+title: Help Center Semantic Search
+summary: Rank help-center articles against a customer's question by comparing embedding vectors with cosine similarity.
+language: python
+minutes: 30
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Ranks the sample articles for the sample question
+    file: 01-sample-search.py
+    hidden: false
+  - name: Measures direction, not length, and survives awkward vectors
+    file: 02-cosine-properties.py
+    hidden: true
+  - name: Orders ties predictably and respects k
+    file: 03-ranking-edge-cases.py
+    hidden: true

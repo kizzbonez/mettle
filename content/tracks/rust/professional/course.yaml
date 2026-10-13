@@ -1,0 +1,16 @@
+title: Production Rust
+summary: >-
+  What separates code that works from code you can ship and maintain: sound `unsafe` behind
+  safe interfaces, public APIs and error types that can evolve without breaking their users,
+  and performance work that starts from a measurement.
+outcomes:
+  - Wrap unsafe code in a safe abstraction and state the invariants that make it sound
+  - Pass data across an FFI boundary without leaking it or leaving a dangling pointer
+  - Design error types and public APIs that can grow without a breaking release
+  - Find and remove unnecessary allocation and dispatch, guided by a profiler
+  - Build a generic cache with constant-time operations and a production-ready interface
+exam:
+  title: Production Rust Mock Exam
+  description: Five questions on unsafe code, FFI, API compatibility, trait objects and performance.
+  timeLimitMinutes: 15
+  passPercent: 70

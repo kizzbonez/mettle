@@ -1,0 +1,14 @@
+title: Rust Foundations
+summary: >-
+  The rules that make Rust different: who owns a value, how it may be borrowed, how data is
+  modeled with structs and enums, and how failure is expressed in types instead of exceptions.
+outcomes:
+  - Predict when a value is moved, copied or borrowed, and fix the compiler errors that follow
+  - Model data with structs and enums and take it apart with exhaustive pattern matching
+  - Return `Option` and `Result` instead of panicking, and propagate errors with `?`
+  - Write a parser that turns untrusted text into validated, typed values
+exam:
+  title: Rust Foundations Mock Exam
+  description: Five questions on ownership, borrowing, lifetimes, pattern matching and error handling.
+  timeLimitMinutes: 10
+  passPercent: 70
