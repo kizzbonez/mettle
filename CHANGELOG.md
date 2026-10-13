@@ -4,6 +4,43 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-10-13
+
+The admin panel.
+
+### Added
+
+- **Overview**: active users, total submissions, exam and lab pass rates, thirty days of graded
+  work and sign-ups as charts with hover details and a table view, the most enrolled levels,
+  the newest accounts, and whether the sandbox is online.
+- **Users**: a table that pages, sorts, filters and searches on the server, with its state in
+  the URL. Edit a name or role, suspend and reinstate, create an account, and email one person
+  or every selected row.
+- **Email log** and **Settings** (site name, open or closed registration).
+- **Content management**: tracks and courses; lessons with a Markdown editor and live preview;
+  a question bank with filters for track, category, difficulty, type and status, an options
+  editor that follows the question type, and bulk import; exams as fixed papers or rule-based
+  blueprints that show how many questions each rule can draw from; and labs with code editors
+  for the starter and the reference solution, fixtures, test cases, and a "verify in sandbox"
+  check.
+- Staff pages explain themselves: a learner is told the area is for staff, and an administrator
+  without two-factor is told to set it up.
+- `npm run seed:demo` fills a development database with fifty learners and a month of activity.
+
+### Changed
+
+- Dark surfaces no longer use a grid backdrop. They show tempered steel instead: a bloom in the
+  four temper colors of the level marks over brushed hairlines, and a field of faint hallmark
+  punches behind "How it works".
+
+### Fixed
+
+- Changing one field of a track, course or lesson no longer resets the fields that were not
+  sent. A partial update used to write the defaults back over the tagline, description, icon,
+  order, summary, objectives and lesson body.
+- The API learns the client's real address from the web server instead of seeing the web
+  container for everyone, so per-address limits and the audit log refer to the right machine.
+
 ## [0.4.0] - 2026-10-13
 
 The web app: the public site, sign-in, and everything a learner does.
