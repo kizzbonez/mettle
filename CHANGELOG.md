@@ -4,6 +4,59 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-10-13
+
+The first complete release: documented, scanned, and checked end to end in a production build.
+
+### Added
+
+- **User guide** at `/guide` in the app and in [docs/USER-GUIDE.md](docs/USER-GUIDE.md): getting
+  started, levels and marks, the dashboard, lessons, exams, labs, profile and security, and a
+  section for instructors and administrators, with a screenshot of every screen.
+- **README** with screenshots, a quick start, configuration, development commands and known
+  limits.
+- **Browser tour** (`npm run e2e`): a real browser goes through first-run setup, sign-up, three
+  lessons, a graded exam, a lab compiled and tested in the sandbox, a password reset by email,
+  and the admin panel signed in with a second factor. `npm run screenshots` runs the same tour
+  and writes the pictures used by the guide and the README.
+- A favicon, and designed 404 and error pages.
+- Security scan targets for the project (`security/secsuite/targets.yml`).
+
+### Security
+
+A scan with semgrep, gitleaks, trivy and checkov, plus OWASP HTTP checks and an accessibility
+audit of the running site, found no committed secrets and no vulnerable dependencies. What it
+did find is fixed:
+
+- AES-GCM now states its tag length, so a shortened authentication tag is refused.
+- The sandbox runner no longer runs as root. It is an unprivileged user that reaches the Docker
+  socket through one supplementary group (`DOCKER_GID`).
+- Runtime images no longer contain npm or yarn. Every image finding was inside a library
+  bundled with the package manager, which those images never use.
+- Runtime images apply the operating-system security updates published since their base image
+  was built. The last finding left in them was a patched zlib waiting to be installed.
+- Password-reset emails are limited to one per account every two minutes, whatever address the
+  requests come from.
+- `npm audit` is clean: a development-only transitive `esbuild` is overridden to a patched
+  version.
+- The development launcher no longer starts its child through a shell.
+
+### Changed
+
+- Text colors meet WCAG AA (4.5:1) on every surface they are used on: the two grays, brass,
+  patina, the level labels, and dim text on dark surfaces were adjusted after measuring each
+  pairing.
+- The logo mark is drawn instead of typed, so links that contain it have an accurate
+  accessible name.
+- The code editor's files and the guide's screenshots carry a version in their URL, so a CDN in
+  front of the site cannot serve a previous release's copy.
+- Sandbox images declare `HEALTHCHECK NONE`: a sandbox lives for one submission.
+
+### Fixed
+
+- "Verify in sandbox" calls a lab sound only when its starter code was run and fell short. It
+  used to say sound when the sandbox had failed to run the starter at all.
+
 ## [0.5.0] - 2026-10-13
 
 The admin panel.
