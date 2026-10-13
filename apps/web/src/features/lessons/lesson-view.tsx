@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowRight, Check, Clock, Target } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { LoadState } from '@/design/patterns/load-state';
-import { Markdown } from '@/design/patterns/markdown';
 import { Breadcrumbs } from '@/design/patterns/page-header';
 import { Badge } from '@/design/primitives/badge';
 import { Button, ButtonLink } from '@/design/primitives/button';
@@ -13,6 +12,7 @@ import { useToast } from '@/design/primitives/toast';
 import { api, errorMessage } from '@/lib/api';
 import { refreshProgress, useApi } from '@/lib/use-api';
 import type { LessonDetail } from '@/types/catalog';
+import { LessonBody } from './lesson-body';
 
 function Objectives({ items }: { items: string[] }) {
   return (
@@ -95,7 +95,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
           </div>
           <p className="mt-5 text-xl leading-relaxed text-steel">{lesson.lesson.summary}</p>
           <Objectives items={lesson.lesson.objectives} />
-          <Markdown>{lesson.lesson.bodyMd}</Markdown>
+          <LessonBody markdown={lesson.lesson.bodyMd} />
           <Footer data={lesson} onDone={() => void mutate()} />
         </article>
       )}
