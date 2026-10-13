@@ -171,6 +171,36 @@ describe('labs', () => {
     expect(verdict.solution.tests[0].stderr).toContain('1 + 2 + 3');
   });
 
+  const otherLanguages = [
+    {
+      language: 'cpp', slug: 'sum-cpp',
+      starterCode: '#include <vector>\n\nint total(const std::vector<int>& xs) { return 0; }\n',
+      solutionCode: '#include <numeric>\n#include <vector>\n\nint total(const std::vector<int>& xs) { return std::accumulate(xs.begin(), xs.end(), 0); }\n',
+      test: 'CHECK_EQ(total({1, 2, 3}), 6, "1 + 2 + 3");',
+    },
+    {
+      language: 'csharp', slug: 'sum-csharp', memoryMb: 512,
+      starterCode: 'public static class Sums\n{\n    public static int Total(IEnumerable<int> xs) => 0;\n}\n',
+      solutionCode: 'public static class Sums\n{\n    public static int Total(IEnumerable<int> xs) => xs.Sum();\n}\n',
+      test: 'Check.Equal(Sums.Total(new[] { 1, 2, 3 }), 6, "1 + 2 + 3");',
+    },
+    {
+      language: 'yaml', slug: 'sum-yaml',
+      starterCode: 'numbers: []\n',
+      solutionCode: 'numbers:\n  - 1\n  - 2\n  - 3\n',
+      test: 'assert sum(doc["numbers"]) == 6, "the numbers add up to six"',
+    },
+  ];
+
+  it.each(otherLanguages)('creates and verifies a $language lab', async ({ test, ...fields }) => {
+    const created = await staff.post('/admin/labs', { ...lab(), ...fields, tests: [{ name: 'adds three numbers', code: test, hidden: false }] });
+    expect(created.status).toBe(201);
+    const verdict = (await staff.post(`/admin/labs/${created.body.id}/verify`)).body;
+    expect(verdict.solution.status).toBe('passed');
+    expect(verdict.starter.status).toBe('failed');
+    expect(verdict.sound).toBe(true);
+  });
+
   it('refuses a fixture path outside data/', async () => {
     const bad = await staff.post('/admin/labs', { ...lab(), slug: 'sum-evil', fixtures: [{ path: '../solution.py', content: 'x' }] });
     expect(bad.status).toBe(400);

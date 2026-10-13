@@ -7,14 +7,14 @@ export const LABS = '/admin/content/labs';
 export const MAX_FIXTURES = 16;
 export const MAX_TESTS = 24;
 
-/** The learner's file, as the sandbox names it. */
-export const SOLUTION_FILE: Record<LabLanguage, string> = { rust: 'solution.rs', python: 'solution.py', bash: 'solution.sh' };
-
 /** What a test case is in each language; the runner wraps it in a harness. */
 export const TEST_HELP: Record<LabLanguage, string> = {
   rust: 'Each test is the body of a function. solution.rs is compiled as a module with everything public in it in scope, so write assert! and assert_eq! with a message that says what was checked.',
   python: 'Each test is a script that begins with "from solution import *". Write plain assert statements, each with a message that says what was checked.',
   bash: 'Each test is a script that runs solution.sh and checks what it printed. Two helpers are available: assert_eq ACTUAL EXPECTED [MESSAGE] and fail MESSAGE.',
+  cpp: 'Each test is the body of a function. solution.cpp is included above it, so everything it declares is in scope, along with the common standard headers. Use CHECK(condition, message), CHECK_EQ(actual, expected, message) and CHECK_THROWS(expression, Type, message). A memory error or a leak fails the test.',
+  csharp: 'Each test is the body of an async method, so it may await. Declare types without a namespace so the test can name them. Use Check.True(condition, message), Check.Equal(actual, expected, message), Check.SequenceEqual, Check.Throws<T> and Check.ThrowsAsync<T>.',
+  yaml: 'Each test is a Python script. solution.yaml is already parsed: doc is the first document, docs is all of them, RAW is the text, and at(doc, "a.b.0") follows a path. Write plain assert statements, each with a message that says what was checked.',
 };
 
 export interface FixtureDraft {

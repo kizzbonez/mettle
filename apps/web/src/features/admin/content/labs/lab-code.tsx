@@ -1,12 +1,12 @@
 'use client';
 
-import type { LabLanguage } from '@mettle/shared';
+import { LAB_SOLUTION_FILE, type LabLanguage } from '@mettle/shared';
 import dynamic from 'next/dynamic';
 import { Spinner } from '@/design/primitives/spinner';
 import { fieldErrors } from '@/lib/api';
 import { RowError } from '../shared/bare-field';
 import type { FormDraft } from '../shared/use-editor';
-import { SOLUTION_FILE, type LabForm } from './lab-model';
+import type { LabForm } from './lab-model';
 
 // Monaco touches `window` as it loads, so it is only ever rendered in the browser.
 const CodeEditor = dynamic(() => import('@/features/labs/code-editor').then((module) => module.CodeEditor), {
@@ -31,7 +31,7 @@ function CodePane({ title, note, language, value, onChange, error }: CodePanePro
     <section aria-label={title} className="min-w-0 space-y-1.5">
       <h3 className="label-spec text-ink-2">{title}</h3>
       <div className="overflow-hidden rounded-plate border border-forge-rule bg-forge">
-        <p className="label-spec border-b border-forge-rule bg-forge-2 px-4 py-2 text-forge-muted normal-case">{SOLUTION_FILE[language]}</p>
+        <p className="label-spec border-b border-forge-rule bg-forge-2 px-4 py-2 text-forge-muted normal-case">{LAB_SOLUTION_FILE[language]}</p>
         <div className="h-[28rem]">
           <CodeEditor language={language} value={value} onChange={onChange} onRun={nothing} onSubmit={nothing} />
         </div>

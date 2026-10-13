@@ -1,15 +1,15 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import type { LabLanguage } from '@mettle/shared';
+import { LAB_SOLUTION_FILE } from '@mettle/shared';
 import { listFiles, readText, readYaml } from './files';
 import { labFile, type ContentLab } from './types';
 
-export const LAB_EXTENSION: Record<LabLanguage, string> = { rust: 'rs', python: 'py', bash: 'sh' };
 
 export function loadLab(dir: string): ContentLab | null {
   if (!existsSync(join(dir, 'lab.yaml'))) return null;
   const meta = readYaml(join(dir, 'lab.yaml'), labFile);
-  const ext = LAB_EXTENSION[meta.language];
+  // starter.rs sits beside solution.rs, starter.yaml beside solution.yaml, and so on.
+  const ext = LAB_SOLUTION_FILE[meta.language].split('.').pop();
   const dataDir = join(dir, 'data');
   return {
     ...meta,

@@ -63,6 +63,25 @@ describe('failureMessage', () => {
     expect(failureMessage('rust', result({ exitCode: 0 }), 5000)).toMatch(/exited before the test finished/);
   });
 
+  it('takes the check message from a C++ or C# failure, without the compared values', () => {
+    const stderr = ['FAIL: the queue keeps arrival order', '  expected: [1, 2, 3]', '  actual:   [1, 3, 2]'].join('\n');
+    expect(failureMessage('cpp', result({ stderr }), 5000)).toBe('the queue keeps arrival order');
+    expect(failureMessage('csharp', result({ stderr }), 5000)).toBe('the queue keeps arrival order');
+  });
+
+  it('names what a C++ sanitizer caught', () => {
+    const useAfterFree = ['==39==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x5b2b', 'READ of size 4'].join('\n');
+    expect(failureMessage('cpp', result({ stderr: useAfterFree }), 5000)).toBe('Memory error: heap-use-after-free.');
+    const leak = ['', '==47==ERROR: LeakSanitizer: detected memory leaks', '', 'Direct leak of 32 byte(s) in 1 object(s)'].join('\n');
+    expect(failureMessage('cpp', result({ stderr: leak }), 5000)).toMatch(/^Memory leak/);
+    const overflow = "solution.cpp:16:34: runtime error: signed integer overflow: 2147483647 + 1 cannot be represented in type 'int'";
+    expect(failureMessage('cpp', result({ stderr: overflow }), 5000)).toMatch(/^Undefined behaviour: signed integer overflow/);
+  });
+
+  it('explains a crash that printed nothing', () => {
+    expect(failureMessage('cpp', result({ exitCode: 139 }), 5000)).toMatch(/segmentation fault/);
+  });
+
   it('caps very long messages', () => {
     const stderr = `AssertionError: ${'x'.repeat(2000)}`;
     expect(failureMessage('python', result({ stderr }), 5000)?.length).toBe(240);

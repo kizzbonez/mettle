@@ -1,5 +1,6 @@
 'use client';
 
+import { LAB_SOLUTION_FILE } from '@mettle/shared';
 import { ArrowRight, Terminal } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useCallback, useState } from 'react';
@@ -22,8 +23,6 @@ const CodeEditor = dynamic(() => import('./code-editor').then((module) => module
   ssr: false,
   loading: () => <div className="grid h-full place-items-center"><Spinner className="text-ember" label="Loading the editor" /></div>,
 });
-
-const FILE_NAME = { rust: 'solution.rs', python: 'solution.py', bash: 'solution.sh' } as const;
 
 function PassedBanner({ data }: { data: LabDetail }) {
   return (
@@ -76,7 +75,7 @@ function Workspace({ data }: { data: LabDetail }) {
           <SplitPane direction="vertical" initial={62} min={25} max={85} className="h-[80dvh] lg:h-full"
             first={
               <div className="flex h-full flex-col">
-                <p className="label-spec shrink-0 border-b border-forge-rule bg-forge-2 px-4 py-2 text-forge-muted">{FILE_NAME[lab.language]}</p>
+                <p className="label-spec shrink-0 border-b border-forge-rule bg-forge-2 px-4 py-2 text-forge-muted">{LAB_SOLUTION_FILE[lab.language]}</p>
                 <div className="min-h-0 flex-1">
                   <CodeEditor language={lab.language} value={draft.code} onChange={draft.update} onRun={() => void start('run')} onSubmit={() => void start('submit')} />
                 </div>

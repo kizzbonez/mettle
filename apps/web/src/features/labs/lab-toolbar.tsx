@@ -1,5 +1,6 @@
 'use client';
 
+import { LAB_LANGUAGE_LABEL } from '@mettle/shared';
 import { ArrowLeft, Check, CloudOff, Play, RotateCcw, Send } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/design/primitives/button';
@@ -48,7 +49,7 @@ export function LabToolbar({ data, passed, draft, pending, onRun, onSubmit, onRe
         <h1 className="truncate text-[15px] font-semibold text-white">{data.lab.title}</h1>
       </div>
       {passed ? <span className="label-spec hidden items-center gap-1 border border-patina bg-patina/20 px-2 py-1 text-[#4fc3a1] sm:flex"><Check className="size-3.5" strokeWidth={3} /> Passed</span> : null}
-      <span className="label-spec hidden border border-forge-rule px-2 py-1 text-[#ff9d5c] sm:block">{data.lab.language}</span>
+      <span className="label-spec hidden border border-forge-rule px-2 py-1 text-[#ff9d5c] sm:block">{LAB_LANGUAGE_LABEL[data.lab.language]}</span>
       <DraftIndicator status={draft} />
       <Button variant="forge" size="sm" onClick={onReset} disabled={busy} icon={<RotateCcw className="size-4" />} title="Reset to the starter code">
         <span className="hidden xl:inline">Reset</span>

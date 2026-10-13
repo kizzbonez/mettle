@@ -1,6 +1,6 @@
 import {
   Binary, Bot, Boxes, Braces, BrainCircuit, Bug, Cloud, Code, Cog, Cpu, Database, FlaskConical, GitBranch,
-  Globe, Layers, Lock, Network, Server, ShieldCheck, Sparkles, Terminal, Workflow, type LucideIcon,
+  Globe, Hash, Layers, ListTree, Lock, Network, Server, ShieldCheck, Sparkles, Terminal, Workflow, type LucideIcon,
 } from 'lucide-react';
 
 /**
@@ -9,7 +9,7 @@ import {
  */
 const ICONS: Record<string, LucideIcon> = {
   Binary, Bot, Boxes, Braces, BrainCircuit, Bug, Cloud, Code, Cog, Cpu, Database, FlaskConical, GitBranch,
-  Globe, Layers, Lock, Network, Server, ShieldCheck, Sparkles, Terminal, Workflow,
+  Globe, Hash, Layers, ListTree, Lock, Network, Server, ShieldCheck, Sparkles, Terminal, Workflow,
 };
 
 export const TRACK_ICON_NAMES = Object.keys(ICONS);

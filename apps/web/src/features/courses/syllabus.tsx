@@ -1,3 +1,4 @@
+import { LAB_LANGUAGE_LABEL } from '@mettle/shared';
 import { BookOpenText, Check, ChevronRight, ClipboardList, FlaskConical, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -78,7 +79,7 @@ export function Syllabus({ course }: { course: CourseDetail }) {
           key={lab.id}
           href={`/labs/${lab.id}`}
           icon={FlaskConical}
-          kind={`Lab · ${lab.language}`}
+          kind={`Lab · ${LAB_LANGUAGE_LABEL[lab.language]}`}
           title={lab.title}
           meta={`About ${lab.estMinutes} min · ${lab.summary}`}
           done={lab.done}

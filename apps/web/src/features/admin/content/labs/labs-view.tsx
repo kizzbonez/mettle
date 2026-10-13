@@ -1,5 +1,6 @@
 'use client';
 
+import { LAB_LANGUAGE_LABEL } from '@mettle/shared';
 import { FlaskConical, Pencil, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -16,7 +17,6 @@ import { timeAgo } from '@/lib/format';
 import { useApi } from '@/lib/use-api';
 import type { LabRow } from '@/types/content-admin';
 import { IconButton, IconLink } from '../shared/icon-button';
-import { LANGUAGE_LABEL } from '../shared/labels';
 import { PlainTable } from '../shared/plain-table';
 import { DeleteLabDialog } from './delete-lab';
 import { LABS } from './lab-model';
@@ -44,7 +44,7 @@ function columns(onDelete: (lab: LabRow) => void): Column<LabRow>[] {
         </div>
       ),
     },
-    { key: 'language', header: 'Language', render: (lab) => <Badge>{LANGUAGE_LABEL[lab.language]}</Badge> },
+    { key: 'language', header: 'Language', render: (lab) => <Badge>{LAB_LANGUAGE_LABEL[lab.language]}</Badge> },
     { key: 'minutes', header: 'Minutes', render: (lab) => <span className="text-steel tabular-nums">{lab.estMinutes}</span> },
     { key: 'status', header: 'Status', render: (lab) => <StatusBadge status={lab.status} /> },
     { key: 'updated', header: 'Updated', render: (lab) => <span className="text-[13px] whitespace-nowrap text-steel">{timeAgo(lab.updatedAt)}</span> },

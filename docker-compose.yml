@@ -111,6 +111,9 @@ services:
       sandbox-rust: { condition: service_completed_successfully }
       sandbox-python: { condition: service_completed_successfully }
       sandbox-bash: { condition: service_completed_successfully }
+      sandbox-cpp: { condition: service_completed_successfully }
+      sandbox-csharp: { condition: service_completed_successfully }
+      sandbox-yaml: { condition: service_completed_successfully }
 
   # The sandbox images. These services exist so that `up --build` builds them;
   # each container exits at once. The runner starts sandboxes from the images.
@@ -127,6 +130,21 @@ services:
   sandbox-bash:
     build: ./sandbox/bash
     image: mettle-sandbox-bash:1
+    network_mode: none
+    restart: 'no'
+  sandbox-cpp:
+    build: ./sandbox/cpp
+    image: mettle-sandbox-cpp:1
+    network_mode: none
+    restart: 'no'
+  sandbox-csharp:
+    build: ./sandbox/csharp
+    image: mettle-sandbox-csharp:1
+    network_mode: none
+    restart: 'no'
+  sandbox-yaml:
+    build: ./sandbox/yaml
+    image: mettle-sandbox-yaml:1
     network_mode: none
     restart: 'no'
 

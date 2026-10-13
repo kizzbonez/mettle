@@ -10,7 +10,9 @@ import { Spinner } from '@/design/primitives/spinner';
 // so the Content Security Policy never has to allow a third-party host.
 loader.config({ paths: { vs: `/monaco/${monacoManifest.version}/vs` } });
 
-const MONACO_LANGUAGE: Record<LabLanguage, string> = { rust: 'rust', python: 'python', bash: 'shell' };
+const MONACO_LANGUAGE: Record<LabLanguage, string> = {
+  rust: 'rust', python: 'python', bash: 'shell', cpp: 'cpp', csharp: 'csharp', yaml: 'yaml',
+};
 const THEME = 'mettle-forge';
 
 const defineTheme: BeforeMount = (monaco) => {
@@ -85,7 +87,7 @@ export function CodeEditor({ language, value, onChange, onRun, onSubmit, readOnl
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
         smoothScrolling: true,
-        tabSize: language === 'bash' ? 2 : 4,
+        tabSize: language === 'bash' || language === 'yaml' ? 2 : 4,
         insertSpaces: true,
         renderWhitespace: 'selection',
         padding: { top: 14, bottom: 14 },

@@ -34,5 +34,8 @@ export const config = {
     rust: process.env.SANDBOX_IMAGE_RUST ?? 'mettle-sandbox-rust:1',
     python: process.env.SANDBOX_IMAGE_PYTHON ?? 'mettle-sandbox-python:1',
     bash: process.env.SANDBOX_IMAGE_BASH ?? 'mettle-sandbox-bash:1',
+    cpp: process.env.SANDBOX_IMAGE_CPP ?? 'mettle-sandbox-cpp:1',
+    csharp: process.env.SANDBOX_IMAGE_CSHARP ?? 'mettle-sandbox-csharp:1',
+    yaml: process.env.SANDBOX_IMAGE_YAML ?? 'mettle-sandbox-yaml:1',
   },
 } as const;

@@ -4,8 +4,7 @@
 //   npm run docs:curriculum
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { levelInfo } from '@mettle/shared';
-import { LAB_EXTENSION } from '../apps/api/src/content/load-lab';
+import { LAB_LANGUAGE_LABEL, LAB_SOLUTION_FILE, levelInfo, type LabLanguage } from '@mettle/shared';
 import { loadContent } from '../apps/api/src/content/load';
 import type { ContentCourse, ContentLab, ContentLesson, ContentQuestion, ContentTrack } from '../apps/api/src/content/types';
 
@@ -58,16 +57,19 @@ function questionSection(question: ContentQuestion, index: number): string {
   ].join('\n');
 }
 
+/** The language a lab's tests are written in. A YAML lab is checked by Python. */
+const TEST_FENCE: Record<LabLanguage, string> = { rust: 'rust', python: 'python', bash: 'bash', cpp: 'cpp', csharp: 'csharp', yaml: 'python' };
+
 function labSection(lab: ContentLab, where: string): string {
-  const ext = LAB_EXTENSION[lab.language];
-  const fence = lab.language === 'bash' ? 'bash' : lab.language;
+  const ext = LAB_SOLUTION_FILE[lab.language].split('.').pop();
+  const fence = lab.language;
   const tests = lab.tests.map((test, i) =>
-    [`**Test ${i + 1}: ${test.name}** (${test.hidden ? 'hidden' : 'visible'})`, '', `\`\`\`${fence}`, test.code, '```', ''].join('\n'),
+    [`**Test ${i + 1}: ${test.name}** (${test.hidden ? 'hidden' : 'visible'})`, '', `\`\`\`${TEST_FENCE[lab.language]}`, test.code, '```', ''].join('\n'),
   );
   return [
     `#### Lab: ${lab.title}`,
     '',
-    `*${lab.language} · about ${lab.minutes} minutes · ${lab.timeLimitMs / 1000} s per test.* ${lab.summary}`,
+    `*${LAB_LANGUAGE_LABEL[lab.language]} · about ${lab.minutes} minutes · ${lab.timeLimitMs / 1000} s per test.* ${lab.summary}`,
     '',
     '**Scenario**',
     '',

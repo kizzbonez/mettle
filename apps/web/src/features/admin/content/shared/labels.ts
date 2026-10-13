@@ -1,4 +1,4 @@
-import type { LabLanguage, PublishStatus, QuestionType } from '@mettle/shared';
+import type { PublishStatus, QuestionType } from '@mettle/shared';
 
 export const STATUS_LABEL: Record<PublishStatus, string> = { draft: 'Draft', published: 'Published', archived: 'Archived' };
 
@@ -8,7 +8,6 @@ export const TYPE_LABEL: Record<QuestionType, string> = {
   true_false: 'True or false',
 };
 
-export const LANGUAGE_LABEL: Record<LabLanguage, string> = { rust: 'Rust', python: 'Python', bash: 'Bash' };
 
 /** The non-empty lines of a text box: one outcome or objective per line. */
 export function toLines(text: string): string[] {

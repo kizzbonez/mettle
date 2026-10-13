@@ -1,6 +1,6 @@
-import { LAB_LANGUAGES, LEVELS, levelInfo, PUBLISH_STATUSES, QUESTION_TYPES } from '@mettle/shared';
+import { LAB_LANGUAGE_LABEL, LAB_LANGUAGES, LEVELS, levelInfo, PUBLISH_STATUSES, QUESTION_TYPES } from '@mettle/shared';
 import type { AdminCourse, AdminTrack, Category } from '@/types/content-admin';
-import { LANGUAGE_LABEL, STATUS_LABEL, TYPE_LABEL } from './labels';
+import { STATUS_LABEL, TYPE_LABEL } from './labels';
 
 /** `<option>` lists shared by the forms and the table filters. */
 
@@ -17,7 +17,7 @@ export function TypeOptions() {
 }
 
 export function LanguageOptions() {
-  return <>{LAB_LANGUAGES.map((language) => <option key={language} value={language}>{LANGUAGE_LABEL[language]}</option>)}</>;
+  return <>{LAB_LANGUAGES.map((language) => <option key={language} value={language}>{LAB_LANGUAGE_LABEL[language]}</option>)}</>;
 }
 
 export function TrackOptions({ tracks }: { tracks: AdminTrack[] }) {
