@@ -6,10 +6,14 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
-const packageDir = dirname(require.resolve('monaco-editor/package.json'));
+const manifestPath = require.resolve('monaco-editor/package.json');
+const packageDir = dirname(manifestPath);
+const { version } = require(manifestPath);
 const source = join(packageDir, 'min', 'vs');
-const target = fileURLToPath(new URL('../public/monaco/vs', import.meta.url));
+// The version is part of the path, so an upgrade can never be mixed with cached files of the old one.
+const base = fileURLToPath(new URL('../public/monaco', import.meta.url));
+const target = join(base, version, 'vs');
 
-if (existsSync(target)) rmSync(target, { recursive: true });
+if (existsSync(base)) rmSync(base, { recursive: true });
 cpSync(source, target, { recursive: true });
 console.info(`Copied Monaco to ${target}`);

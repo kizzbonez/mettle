@@ -2,12 +2,13 @@
 
 import Editor, { loader, type BeforeMount, type OnMount } from '@monaco-editor/react';
 import type { LabLanguage } from '@mettle/shared';
+import monacoManifest from 'monaco-editor/package.json';
 import { useRef } from 'react';
 import { Spinner } from '@/design/primitives/spinner';
 
 // Monaco is served from this origin (see scripts/copy-monaco.mjs), not a CDN,
 // so the Content Security Policy never has to allow a third-party host.
-loader.config({ paths: { vs: '/monaco/vs' } });
+loader.config({ paths: { vs: `/monaco/${monacoManifest.version}/vs` } });
 
 const MONACO_LANGUAGE: Record<LabLanguage, string> = { rust: 'rust', python: 'python', bash: 'shell' };
 const THEME = 'mettle-forge';
