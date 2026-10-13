@@ -1,0 +1,19 @@
+title: Weather Station
+summary: Split minutes with integer division, stop a u8 rain gauge at its limit, average an array as a float and cast a tuple's difference to a whole number.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Splits minutes into hours and minutes at every edge
+    file: 02-hours-and-minutes.rs
+    hidden: true
+  - name: Stops the rain gauge at its limit
+    file: 03-rain-gauge.rs
+    hidden: true
+  - name: Keeps the fraction of an average and drops the fraction of a span
+    file: 04-average-and-span.rs
+    hidden: true

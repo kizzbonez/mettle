@@ -1,0 +1,19 @@
+title: Watering Log
+summary: Parse a community garden's watering log line by line into structs, report the first bad line by its number, and total the water one plant received.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Parses the sample log from the instructions
+    file: 01-sample-log.rs
+    hidden: false
+  - name: Rejects each kind of malformed line with the right error
+    file: 02-line-rules.rs
+    hidden: true
+  - name: Numbers the lines from 1 and reports the first bad one
+    file: 03-log-rules.rs
+    hidden: true
+  - name: Totals the water for one plant
+    file: 04-totals.rs
+    hidden: true

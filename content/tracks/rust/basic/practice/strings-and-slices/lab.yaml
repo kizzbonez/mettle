@@ -1,0 +1,19 @@
+title: Name Badges
+summary: Clean up and build text for conference badges with string methods, count characters instead of bytes, and return a slice of a ticket code.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Builds the badge line from untidy input
+    file: 02-badge-line.rs
+    hidden: true
+  - name: Counts characters, not bytes
+    file: 03-letter-count.rs
+    hidden: true
+  - name: Slices the ticket kind and counts the sessions
+    file: 04-kind-and-sessions.rs
+    hidden: true

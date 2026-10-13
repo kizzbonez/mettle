@@ -1,0 +1,19 @@
+title: Waiting Room
+summary: Change and filter a Vec of waiting times, then count a pet clinic's visitors by species in a HashMap and look the counts up.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Updates and filters the waiting times
+    file: 02-waiting-times.rs
+    hidden: true
+  - name: Counts every species under its own key
+    file: 03-count-by-species.rs
+    hidden: true
+  - name: Looks up a count and answers 0 for a missing key
+    file: 04-visits.rs
+    hidden: true

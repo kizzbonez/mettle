@@ -1,0 +1,19 @@
+title: Luggage Tags
+summary: Create, change, copy and pass on luggage tags as owned String values, moving each one to wherever it is needed next.
+language: rust
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Creates a tag for any destination
+    file: 02-new-tag.rs
+    hidden: true
+  - name: Marks a tag and makes an independent copy
+    file: 03-mark-and-copy.rs
+    hidden: true
+  - name: Prepares tags with and without the fragile mark
+    file: 04-prepare.rs
+    hidden: true

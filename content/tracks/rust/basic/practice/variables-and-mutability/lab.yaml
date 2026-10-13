@@ -1,0 +1,19 @@
+title: Pay Station
+summary: Use a constant, a mutable variable and shadowing in a parking garage's pay station, then print a ticket line with exact formatting.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Charges by the hour and keeps count of the free spaces
+    file: 02-fee-and-spaces.rs
+    hidden: true
+  - name: Accepts only the exact answer as paid
+    file: 03-is-paid.rs
+    hidden: true
+  - name: Formats every part of the ticket line
+    file: 04-ticket-line.rs
+    hidden: true

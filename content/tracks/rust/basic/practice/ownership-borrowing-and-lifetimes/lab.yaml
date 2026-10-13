@@ -1,0 +1,19 @@
+title: Quiz Night
+summary: Read team names through shared references and change a score and a roster through mutable ones, without taking ownership of anything.
+language: rust
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Adds points to the caller's score
+    file: 02-add-points.rs
+    hidden: true
+  - name: Builds the roster and measures a banner
+    file: 03-roster-and-banner.rs
+    hidden: true
+  - name: Returns a reference to the leading team's name
+    file: 04-leader.rs
+    hidden: true

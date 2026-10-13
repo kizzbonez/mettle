@@ -1,0 +1,19 @@
+title: First Run
+summary: Change one line of a complete Rust program, run it, read what the test reports, and submit it.
+language: rust
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the line from the instructions
+    file: 01-fourth-basket.rs
+    hidden: false
+  - name: Counts four baskets
+    file: 02-basket-count.rs
+    hidden: true
+  - name: Adds up the apples in every basket
+    file: 03-apple-total.rs
+    hidden: true
+  - name: Prints one line and keeps its wording
+    file: 04-one-line.rs
+    hidden: true

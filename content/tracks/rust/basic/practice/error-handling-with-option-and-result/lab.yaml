@@ -1,0 +1,19 @@
+title: Race Registration
+summary: Validate what runners type at a registration desk, report each problem as a typed error or a None, and pass failures on with the question mark operator.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Rejects each kind of bad age with the right error
+    file: 02-parse-age.rs
+    hidden: true
+  - name: Sets the fee and passes errors on unchanged
+    file: 03-entry-fee.rs
+    hidden: true
+  - name: Reads a finishing time or answers None
+    file: 04-finish-minutes.rs
+    hidden: true

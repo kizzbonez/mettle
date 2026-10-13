@@ -1,0 +1,19 @@
+title: Bike Rental
+summary: Give a Rental struct its fields, then write an associated function and three methods that read, change and consume a rental.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Builds a rental with the two fields and prices it
+    file: 02-new-and-price.rs
+    hidden: true
+  - name: Extends a rental in place
+    file: 03-extend.rs
+    hidden: true
+  - name: Turns a rental into its receipt line
+    file: 04-receipt.rs
+    hidden: true

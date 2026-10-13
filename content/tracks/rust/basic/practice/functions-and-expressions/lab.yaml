@@ -1,0 +1,19 @@
+title: Recipe Card
+summary: Write four small functions for a recipe, each one an expression that turns its typed parameters into a return value.
+language: rust
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Adds up times in minutes
+    file: 02-times.rs
+    hidden: true
+  - name: Scales amounts in whole grams
+    file: 03-scaled-grams.rs
+    hidden: true
+  - name: Decides when a second tray is needed
+    file: 04-second-tray.rs
+    hidden: true

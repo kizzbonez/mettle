@@ -160,6 +160,28 @@ tests:
 signatures or output format the tests rely on. Convention: the first test is visible and the
 other two are hidden.
 
+### Practice labs
+
+A level can also give a lesson a small lab of its own, so what the lesson taught is tried at
+once instead of at the end of the level:
+
+```
+content/tracks/<track>/<level>/practice/<lesson-slug>/
+  lab.yaml          as above, without `slug` (the folder name supplies it)
+  instructions.md
+  scenario.md       optional; one or two sentences
+  starter.<ext>, solution.<ext>, tests/, data/     as for any lab
+```
+
+- The folder is named after the lesson: its file name without the number and `.md`.
+- A practice lab takes about ten minutes and uses **only what its own lesson and the lessons
+  before it have taught**. In the first lessons that means a starter that is nearly complete,
+  with one clearly marked place to write.
+- It is held to the same proof as any lab: three or more tests with the first one visible, a
+  reference solution that passes, and a starter that builds but does not pass.
+- The learner reaches it from the end of the lesson and from the level page. Practice labs
+  count toward the level like any other lab.
+
 ### How a test body runs
 
 Each test file is a *body*, not a whole program. The runner wraps it in a harness:
@@ -174,6 +196,9 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
 | YAML     | `solution.yaml` | a **Python** script. The file is already parsed: `doc` (first document), `docs` (all of them), `RAW` (the text), `at(doc, 'a.b.0')`, and the `yaml` module. | `assert`, raising |
 
 - Rust is compiled with `rustc --edition 2024`, standard library only. No crates.
+  A Rust test can read what the code printed: `printed_by(|| greet("Ada"))` returns the text,
+  so a lab about `println!` can check the output itself. To call a `main` in the learner's
+  file, write `printed_by(solution::main)`; a bare `main` is the test program's own.
 - Python is 3.12 with NumPy. No other packages, no network.
 - C++ is GCC 14 with `-std=c++20 -Wall -Wextra -pthread`, standard library only, built with the
   address and undefined-behaviour sanitizers. A use-after-free, an out-of-bounds access, a

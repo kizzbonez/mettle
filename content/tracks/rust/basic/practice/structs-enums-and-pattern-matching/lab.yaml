@@ -1,0 +1,19 @@
+title: Library Loans
+summary: Take a Loan enum apart with match, range patterns, if let and let else, and answer with an Option when a value may be missing.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Describes every kind of loan
+    file: 02-status-line.rs
+    hidden: true
+  - name: Charges the late fee at every boundary
+    file: 03-late-fee.rs
+    hidden: true
+  - name: Answers with an Option and charges only overdue loans
+    file: 04-remaining-and-fee.rs
+    hidden: true

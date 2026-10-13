@@ -1,0 +1,19 @@
+title: Lobby Screen
+summary: Write println! and print! statements that put a cinema's welcome, its showings and a seat label on the screen, character for character.
+language: rust
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the screen from the instructions
+    file: 01-whole-screen.rs
+    hidden: false
+  - name: Prints the welcome on a line of its own
+    file: 02-welcome.rs
+    hidden: true
+  - name: Prints the two showings, one per line
+    file: 03-showings.rs
+    hidden: true
+  - name: Leaves the seat label's line open
+    file: 04-seat-label.rs
+    hidden: true

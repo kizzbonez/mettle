@@ -1,0 +1,19 @@
+title: Pool Day
+summary: Branch on a swimmer's age, loop over lanes and ranges, and repeat until a pool is full, with every boundary in the right place.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Charges the right price at every age boundary
+    file: 02-entry-price.rs
+    hidden: true
+  - name: Counts busy lanes and pyramid lengths
+    file: 03-lanes-and-pyramid.rs
+    hidden: true
+  - name: Counts the hours until the pool is full
+    file: 04-hours-to-fill.rs
+    hidden: true
