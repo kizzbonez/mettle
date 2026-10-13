@@ -1,0 +1,19 @@
+title: Repair Cafe
+summary: Pick the right collection for four small reports, a queue with two ends, a set of names already seen, a sorted map filled through the entry API, and a stable sort.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Queues ordinary and urgent items
+    file: 02-serving-order.rs
+    hidden: true
+  - name: Lists each visitor once and totals minutes by kind
+    file: 03-visits-and-minutes.rs
+    hidden: true
+  - name: Sorts the slowest repairs first and keeps ties in order
+    file: 04-slowest-first.rs
+    hidden: true

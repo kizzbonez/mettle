@@ -1,0 +1,19 @@
+title: Drain Before Deploy
+summary: Drive a service through graceful shutdown as a small state machine that stops intake, drains, gives up at a deadline, and reports a gauge and three counters as one structured event.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the two walkthroughs from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Takes requests only while running and counts every refusal
+    file: 02-intake.rs
+    hidden: true
+  - name: Drains until the last request ends and ignores stray signals
+    file: 03-drain.rs
+    hidden: true
+  - name: Abandons what is left at the deadline and reports it as a warning
+    file: 04-deadline.rs
+    hidden: true

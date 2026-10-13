@@ -1,0 +1,19 @@
+title: Three Pull Requests
+summary: Write a seeded generator, a property and a runner that together expose the bugs in three faulty implementations and in others you have not seen.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Generates the same inputs from the same seed, with repeats, empty and long ones
+    file: 02-generator.rs
+    hidden: true
+  - name: Accepts the right output and rejects each kind of wrong one
+    file: 03-property.rs
+    hidden: true
+  - name: Finds the first failing seed of seen and unseen candidates
+    file: 04-runner.rs
+    hidden: true

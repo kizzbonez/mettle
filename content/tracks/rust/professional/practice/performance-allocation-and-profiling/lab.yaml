@@ -1,0 +1,19 @@
+title: Night Export
+summary: Count the allocations of three hot functions and remove them by reserving capacity once, borrowing with Cow when nothing changes, and reusing the caller's buffer.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Joins any number of ids with a single allocation
+    file: 02-join-ids.rs
+    hidden: true
+  - name: Borrows a SKU that needs no change and copies one that does
+    file: 03-clean-sku.rs
+    hidden: true
+  - name: Writes a thousand lines into one buffer without allocating
+    file: 04-write-line.rs
+    hidden: true

@@ -1,0 +1,19 @@
+title: Playlist
+summary: Answer three questions about a playlist with iterator pipelines that sum, filter and collect, then write an iterator of your own for a fade-out.
+language: rust
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Totals the lengths and picks out the long tracks
+    file: 02-totals-and-titles.rs
+    hidden: true
+  - name: Collects typed lengths into a Result
+    file: 03-parse-lengths.rs
+    hidden: true
+  - name: Steps a fade-out down as an iterator
+    file: 04-fade-out.rs
+    hidden: true

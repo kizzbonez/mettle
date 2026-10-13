@@ -1,0 +1,19 @@
+title: Away Game
+summary: Write three tests for a finished function that counts buses, so that they pass for every correct version and catch versions with a bug in a full bus, the last bus or an edge case.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Passes for the correct function and catches the three faulty ones in the starter
+    file: 01-example.rs
+    hidden: false
+  - name: Raises no false alarm for other correct versions
+    file: 02-no-false-alarms.rs
+    hidden: true
+  - name: Catches bugs with full buses and with the last bus
+    file: 03-full-and-last-bus.rs
+    hidden: true
+  - name: Catches bugs in the edge cases
+    file: 04-edge-cases.rs
+    hidden: true

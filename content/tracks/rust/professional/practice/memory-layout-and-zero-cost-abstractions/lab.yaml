@@ -1,0 +1,19 @@
+title: Flow Table
+summary: Compute the layout of a C struct by hand, then shrink three types by reordering fields, using a niche and boxing a large enum variant.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Lays out structs exactly as the compiler does
+    file: 02-calculator.rs
+    hidden: true
+  - name: Orders the fields of the record so that no padding is left
+    file: 03-flow-record.rs
+    hidden: true
+  - name: Fits an optional id in four bytes and an event in sixteen
+    file: 04-niche-and-box.rs
+    hidden: true

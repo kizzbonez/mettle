@@ -1,0 +1,19 @@
+title: Pedal Board
+summary: Look functions up in a table of fn pointers, write a function that never returns and use it in a match arm, and return a choice of closures as Box<dyn Fn>.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Finds the four stomp boxes by name as fn pointers
+    file: 02-pedal.rs
+    hidden: true
+  - name: Plays a row of pedals and blows the fuse on an unknown one
+    file: 03-play-and-fuse.rs
+    hidden: true
+  - name: Builds dial pedals as closures that keep their setting
+    file: 04-dial.rs
+    hidden: true

@@ -1,0 +1,19 @@
+title: Step Counter
+summary: Give three functions the closure bound each one needs, then return two closures of your own, one that only reads its capture and one that keeps a running count.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Calls each closure the right number of times
+    file: 02-passing-closures.rs
+    hidden: true
+  - name: Returns a closure that remembers the goal
+    file: 03-goal-checker.rs
+    hidden: true
+  - name: Returns a closure that keeps its own streak
+    file: 04-streak-counter.rs
+    hidden: true

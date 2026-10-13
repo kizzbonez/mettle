@@ -1,0 +1,19 @@
+title: Parcel SDK
+summary: Finish a small public API whose shape leaves room to grow, with a validated newtype, a builder with defaults, and a map that returns what it replaces and lets lookups borrow.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Builds parcels from defaults, named settings and a cloned template
+    file: 02-builder.rs
+    hidden: true
+  - name: Accepts only valid tracking codes and borrows them as text
+    file: 03-tracking-code.rs
+    hidden: true
+  - name: Hands back replaced parcels and finds them by any borrowed key
+    file: 04-manifest.rs
+    hidden: true

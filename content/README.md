@@ -174,7 +174,7 @@ content/tracks/<track>/<level>/practice/<lesson-slug>/
 ```
 
 - The folder is named after the lesson: its file name without the number and `.md`.
-- A practice lab takes about ten minutes and uses **only what its own lesson and the lessons
+- A practice lab takes ten to twenty minutes and uses **only what its own lesson and the lessons
   before it have taught**. In the first lessons that means a starter that is nearly complete,
   with one clearly marked place to write.
 - It is held to the same proof as any lab: three or more tests with the first one visible, a

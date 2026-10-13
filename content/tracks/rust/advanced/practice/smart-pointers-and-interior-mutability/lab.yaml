@@ -1,0 +1,19 @@
+title: Flat Share
+summary: Give one shopping list several owners with Rc, change it and count through a shared reference with RefCell and Cell, and refer to it without owning it through Weak.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Keeps one list that every flatmate owns
+    file: 02-one-shared-list.rs
+    hidden: true
+  - name: Adds each item once and counts for each flatmate
+    file: 03-add-and-count.rs
+    hidden: true
+  - name: Writes a fridge note that never keeps the list alive
+    file: 04-fridge-note.rs
+    hidden: true

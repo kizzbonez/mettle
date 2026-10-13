@@ -1,0 +1,19 @@
+title: Tile Map
+summary: Put unchecked raw-pointer reads and writes of a tile grid behind safe methods, and hand out two mutable tiles at once without ever aliasing them.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Refuses every coordinate outside the map without a panic
+    file: 02-bounds.rs
+    hidden: true
+  - name: Keeps each tile in its own place, row after row
+    file: 03-rows.rs
+    hidden: true
+  - name: Hands out two tiles at once only when they are different tiles
+    file: 04-pair.rs
+    hidden: true

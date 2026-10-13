@@ -1,0 +1,19 @@
+title: Bird Count
+summary: Collect reports from several threads over one channel that closes properly, share a tally between threads behind a lock, and work through a locked pile without holding the lock.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Gathers every report and stops when the last watcher is done
+    file: 02-gather.rs
+    hidden: true
+  - name: Keeps one tally that several threads record on
+    file: 03-tally-board.rs
+    hidden: true
+  - name: Reads the pile to the end without holding its lock
+    file: 04-read-pile.rs
+    hidden: true

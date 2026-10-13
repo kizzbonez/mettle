@@ -1,0 +1,19 @@
+title: Update Day
+summary: Code the rules Cargo applies to a manifest, which versions a requirement allows, which release an update would pick, and which features of a dependency end up switched on.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Finds the first version a requirement no longer allows
+    file: 02-upper-bound.rs
+    hidden: true
+  - name: Decides whether a requirement allows a version
+    file: 03-allows.rs
+    hidden: true
+  - name: Picks the release for an update and the enabled features
+    file: 04-update-and-features.rs
+    hidden: true

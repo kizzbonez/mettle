@@ -1,0 +1,19 @@
+title: Parcel Counter
+summary: Fill in a small tree of modules for a post office, keeping a field and a helper private, reaching across modules by path and re-exporting one function.
+language: rust
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Puts every weight in the right band
+    file: 02-bands-and-postage.rs
+    hidden: true
+  - name: Writes the receipt line at the desk
+    file: 03-receipt.rs
+    hidden: true
+  - name: Re-exports the postage and keeps the helper private
+    file: 04-paths-and-privacy.rs
+    hidden: true

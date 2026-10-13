@@ -1,0 +1,19 @@
+title: Radio Guide
+summary: Turn functions that copy text into functions that lend out slices of their arguments, with lifetime annotations on two functions and on a struct that holds a reference.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Returns the line that starts first, without copying it
+    file: 02-earlier.rs
+    hidden: true
+  - name: Lends out the text after a marker
+    file: 03-host.rs
+    hidden: true
+  - name: Reads the time and the title through a struct that borrows
+    file: 04-programme.rs
+    hidden: true

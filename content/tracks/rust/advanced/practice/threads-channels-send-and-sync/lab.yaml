@@ -1,0 +1,19 @@
+title: Election Night
+summary: Spawn a thread that owns its data, join threads in order and survive one that panicked, and let two scoped threads borrow the halves of a slice.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Counts one candidate's ballots on a thread that owns its data
+    file: 02-count-for.rs
+    hidden: true
+  - name: Collects every count in order, with None for a thread that panicked
+    file: 03-collect-counts.rs
+    hidden: true
+  - name: Checks each half of the ballots on a scoped thread of its own
+    file: 04-count-valid.rs
+    hidden: true

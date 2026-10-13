@@ -1,0 +1,19 @@
+title: Taxi Meter
+summary: Price trips, name routes and describe rides for a taxi meter with match arms that destructure enums, structs and slices and use ranges, alternatives, bindings and a guard.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Prices every kind of trip at its boundaries
+    file: 02-fares.rs
+    hidden: true
+  - name: Names a route from any number of stops
+    file: 03-routes.rs
+    hidden: true
+  - name: Describes a ride by the first rule that applies
+    file: 04-describe.rs
+    hidden: true

@@ -1,0 +1,19 @@
+title: Ledger Import
+summary: Write a typed error by hand with Display, source and From, wrap it in context that names the failing line, and report the whole chain of causes.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Gives the line error a message, a source and a conversion
+    file: 02-line-error.rs
+    hidden: true
+  - name: Adds the line number as context and keeps the typed error below it
+    file: 03-context.rs
+    hidden: true
+  - name: Reports every cause of any chain, outermost first
+    file: 04-report.rs
+    hidden: true

@@ -1,0 +1,19 @@
+title: Front Desk Kiosk
+summary: Export a visitor log to C firmware with an opaque handle, C strings in both directions, status codes in place of panics, and every allocation returned to the side that made it.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Reports null pointers, bad text and a panic as status codes
+    file: 02-status-codes.rs
+    hidden: true
+  - name: Lends names, gives badges away and accepts null in both free functions
+    file: 03-ownership.rs
+    hidden: true
+  - name: Leaves no memory behind once everything is freed
+    file: 04-nothing-left.rs
+    hidden: true

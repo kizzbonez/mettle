@@ -1,0 +1,19 @@
+title: Task Filter
+summary: Build the testable core of a command-line tool that lists the tasks with a given tag, from checked arguments to standard output, standard error and the exit code.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Turns the arguments into a checked Config
+    file: 02-config.rs
+    hidden: true
+  - name: Finds the tagged tasks with their line numbers
+    file: 03-tagged.rs
+    hidden: true
+  - name: Sends results and errors to the right stream with the right exit code
+    file: 04-run.rs
+    hidden: true

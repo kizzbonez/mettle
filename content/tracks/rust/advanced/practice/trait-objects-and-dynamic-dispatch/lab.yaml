@@ -1,0 +1,19 @@
+title: Toll Plaza
+summary: Implement one trait for two vehicle types, keep them in a single lane as Box<dyn Vehicle>, build them from text, and chain boxed closures as discounts.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Labels and charges cars and trucks
+    file: 02-cars-and-trucks.rs
+    hidden: true
+  - name: Builds a vehicle from the kind the camera reports
+    file: 03-arrive.rs
+    hidden: true
+  - name: Charges a lane of any vehicle types and applies discounts in order
+    file: 04-lane-and-discounts.rs
+    hidden: true

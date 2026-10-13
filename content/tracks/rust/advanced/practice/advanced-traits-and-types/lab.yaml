@@ -1,0 +1,19 @@
+title: Mixtape
+summary: Overload + and * for a newtype of seconds, choose the associated type of a trait when implementing it, and write a default method that relies on a supertrait.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Adds playing times and repeats them
+    file: 02-operators.rs
+    hidden: true
+  - name: Measures a side in seconds
+    file: 03-measure.rs
+    hidden: true
+  - name: Builds the spine label from Display for any type
+    file: 04-spine.rs
+    hidden: true

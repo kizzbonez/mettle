@@ -1,0 +1,19 @@
+title: Sports Day
+summary: Write three macro_rules! macros that average any number of arguments, build a map from name => points pairs, and declare a variable under a name the caller supplies.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Averages any number of times and evaluates each once
+    file: 02-average.rs
+    hidden: true
+  - name: Builds a scoreboard from pairs and adds up repeated names
+    file: 03-scoreboard.rs
+    hidden: true
+  - name: Declares the caller's variable with the sum
+    file: 04-tally.rs
+    hidden: true

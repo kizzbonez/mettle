@@ -1,0 +1,19 @@
+title: Tram Tickets
+summary: Give a Ticket trait its default methods, implement it for two kinds of ticket, write generic functions with the bounds they need, and add a supertrait for refunds.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Uses the default methods and lets a type replace one
+    file: 02-defaults-and-overrides.rs
+    hidden: true
+  - name: Totals a queue and compares a pass with single tickets
+    file: 03-generic-functions.rs
+    hidden: true
+  - name: Refunds unused tickets through the supertrait
+    file: 04-refunds.rs
+    hidden: true

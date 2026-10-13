@@ -1,0 +1,19 @@
+title: Dice Bag
+summary: Finish an error enum for reading dice from text, convert into it with From and the question mark operator, and write the fallible conversions TryFrom and FromStr.
+language: rust
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Accepts only real dice and words each error
+    file: 02-try-from-and-display.rs
+    hidden: true
+  - name: Parses a die and reports the first thing wrong with it
+    file: 03-from-str.rs
+    hidden: true
+  - name: Opens a whole bag and passes any error on
+    file: 04-open-bag.rs
+    hidden: true

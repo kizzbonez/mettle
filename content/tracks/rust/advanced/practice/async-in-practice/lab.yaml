@@ -1,0 +1,19 @@
+title: Quiz Night
+summary: Join a list of pinned, boxed futures so that they all make progress on every poll, and race two futures so that the first one ready wins and the other is cancelled by dropping it.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Polls every unfinished sheet on each poll and keeps the answers in order
+    file: 02-collect-sheets.rs
+    hidden: true
+  - name: Lets the first ready future win and cancels the other
+    file: 03-first-buzz.rs
+    hidden: true
+  - name: Handles empty and nested cases and passes wake-ups on
+    file: 04-edges-and-wake-ups.rs
+    hidden: true

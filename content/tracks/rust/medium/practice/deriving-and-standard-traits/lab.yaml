@@ -1,0 +1,19 @@
+title: Scoop Shop
+summary: Make the derived ordering and default of two ice cream types come out right, then write Display and From for them by hand.
+language: rust
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Orders cones by size first and by flavour second
+    file: 02-ordering.rs
+    hidden: true
+  - name: Prints sizes and cones for the customer
+    file: 03-display.rs
+    hidden: true
+  - name: Fills in defaults and converts a flavour into a cone
+    file: 04-default-and-from.rs
+    hidden: true

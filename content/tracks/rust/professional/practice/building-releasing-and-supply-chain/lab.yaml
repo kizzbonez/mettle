@@ -1,0 +1,19 @@
+title: Feature Audit
+summary: Compute what Cargo's feature unification builds for a workspace, expand features that enable other features, and trace a feature back to the crates that switched it on.
+language: rust
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.rs
+    hidden: false
+  - name: Expands features through every step, and through a cycle
+    file: 02-expand.rs
+    hidden: true
+  - name: Builds each dependency once with the union of all requests
+    file: 03-unify.rs
+    hidden: true
+  - name: Names every crate that switches a feature on, directly or not
+    file: 04-blame.rs
+    hidden: true
