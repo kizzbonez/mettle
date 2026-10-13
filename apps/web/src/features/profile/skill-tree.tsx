@@ -9,7 +9,7 @@ import { Hallmark, temperBg } from '@/design/primitives/hallmark';
 import { Plate } from '@/design/primitives/plate';
 import { TrackIcon } from '@/design/primitives/track-icon';
 import { cn } from '@/lib/cn';
-import { formatPercent } from '@/lib/format';
+import { formatPercent, plural } from '@/lib/format';
 import { useApi } from '@/lib/use-api';
 import type { LearnerStats, SkillTree as Tree } from '@/types/catalog';
 
@@ -64,9 +64,9 @@ function TrackRow({ track }: { track: Tree['tracks'][number] }) {
 function StatsRow({ stats }: { stats: LearnerStats }) {
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <StatTile label="Marks earned" value={stats.coursesCompleted} hint={`Of ${stats.coursesEnrolled} levels started`} />
+      <StatTile label="Marks earned" value={stats.coursesCompleted} hint={`Of ${plural(stats.coursesEnrolled, 'level')} started`} />
       <StatTile label="Lessons read" value={stats.lessonsCompleted} />
-      <StatTile label="Average exam score" value={formatPercent(stats.averageScore)} hint={`${stats.examsPassed} exams passed`} />
+      <StatTile label="Average exam score" value={formatPercent(stats.averageScore)} hint={`${plural(stats.examsPassed, 'exam')} passed`} />
       <StatTile label="Labs passed" value={stats.labsPassed} />
     </div>
   );

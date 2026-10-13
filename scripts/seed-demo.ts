@@ -62,8 +62,8 @@ const unusable = await hashPassword(randomBytes(24).toString('hex'));
 const people = Array.from({ length: 52 }, (_, i) => {
   const first = FIRST[i % FIRST.length] as string;
   const last = LAST[(i * 5 + Math.floor(i / FIRST.length)) % LAST.length] as string;
-  // More sign-ups recently than a month ago.
-  const createdAt = new Date(Date.now() - random() ** 1.6 * 29 * DAY - between(1, 20) * 3_600_000);
+  // Slightly more sign-ups recently than a month ago.
+  const createdAt = new Date(Date.now() - (0.03 + 0.97 * random() ** 1.15) * 29 * DAY);
   return {
     email: `${first}.${last}.${i}`.toLowerCase().normalize('NFD').replace(/[^a-z0-9.]/g, '') + DOMAIN,
     displayName: `${first} ${last}`,
@@ -89,7 +89,7 @@ for (const user of created) {
   let cursor = user.createdAt;
 
   for (const { course } of inTrack.slice(0, depth)) {
-    const enrolledAt = after(cursor, 2);
+    const enrolledAt = after(cursor, 1);
     const odds = PASS_ODDS[course.level];
     const events: { kind: string; title: string; href: string; createdAt: Date; meta?: Record<string, unknown> }[] = [
       { kind: 'enrolled', title: course.title, href: `/courses/${course.id}`, createdAt: enrolledAt },
@@ -99,7 +99,7 @@ for (const user of created) {
     const courseLessons = allLessons.filter((lesson) => lesson.courseId === course.id).sort((a, b) => a.sortOrder - b.sortOrder);
     const read = courseLessons.slice(0, chance(0.75) ? courseLessons.length : between(0, 2));
     for (const lesson of read) {
-      cursor = after(cursor, 1.5);
+      cursor = after(cursor, 1);
       await db.insert(lessonProgress).values({ userId: user.id, lessonId: lesson.id, completedAt: cursor });
       events.push({ kind: 'lesson_completed', title: lesson.title, href: `/lessons/${lesson.id}`, createdAt: cursor });
     }

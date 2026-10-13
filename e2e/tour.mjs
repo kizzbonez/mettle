@@ -16,7 +16,8 @@ import { totp } from './totp.mjs';
 
 const shots = process.argv.includes('--shots');
 const ADMIN = { name: 'Ada Okafor', email: 'ada@mettle.test', password: 'forge-and-anvil-42' };
-const LEARNER = { name: 'Maya Reyes', email: `maya.reyes+${Date.now()}@mettle.test`, password: 'quench-and-temper-7' };
+// A clean install (the screenshot run) gets a tidy address; a reused one needs a unique address.
+const LEARNER = { name: 'Maya Reyes', email: shots ? 'maya.reyes@mettle.test' : `maya.reyes+${Date.now()}@mettle.test`, password: 'quench-and-temper-7' };
 
 async function setup(page, shot) {
   await page.goto(`${BASE}/`);

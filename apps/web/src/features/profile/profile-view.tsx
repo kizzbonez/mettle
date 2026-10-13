@@ -64,7 +64,7 @@ export function ProfileView() {
       {tab === 'security' ? (
         <div className="grid gap-6 xl:grid-cols-2">
           <div className="space-y-6"><TwoFactorPanel /><PasswordPanel /></div>
-          <SessionsPanel />
+          <div className="self-start"><SessionsPanel /></div>
         </div>
       ) : null}
     </>
