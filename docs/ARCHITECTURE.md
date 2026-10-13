@@ -59,7 +59,7 @@ cookies are first-party and there is no CORS surface.
   revoked and its user is not banned. Revoking a session or banning a user therefore takes
   effect on the next request, not when the token expires.
 - **Two-factor** (TOTP, RFC 6238) with single-use recovery codes. The TOTP secret is encrypted
-  at rest with AES-256-GCM. Administrators must enrol before they can use the admin panel.
+  at rest with AES-256-GCM. Administrators must enroll before they can use the admin panel.
 - **Lockout**: repeated failed sign-ins lock the account for a growing interval.
 - **CSRF**: state-changing requests must carry an `X-Mettle-Request` header. A cross-site form
   cannot set it, and a cross-origin `fetch` that tries triggers a preflight the API refuses.

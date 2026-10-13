@@ -20,6 +20,47 @@ services:
       timeout: 3s
       retries: 20
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: mettle-api:local
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://mettle:${POSTGRES_PASSWORD}@db:5432/mettle
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:4310}
+      JWT_SECRET: ${JWT_SECRET:?run `npm run init:env` first}
+      DATA_KEY: ${DATA_KEY:?run `npm run init:env` first}
+      RUNNER_URL: http://runner:4100
+      RUNNER_TOKEN: ${RUNNER_TOKEN}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-Mettle <noreply@mettle.local>}
+      SEED_CONTENT: ${SEED_CONTENT:-true}
+      SETUP_TOKEN: ${SETUP_TOKEN:-}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    networks: [edge, data, sandbox-ctl]
+    depends_on:
+      db: { condition: service_healthy }
+      runner: { condition: service_started }
+
+  # Catches outgoing mail so sign-up and password-reset emails can be read
+  # locally. For real delivery, point SMTP_* at a mail server and remove this.
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    environment:
+      MP_MAX_MESSAGES: 500
+    ports:
+      - '127.0.0.1:${MAILPIT_PORT:-4325}:8025'
+    networks: [edge]
+
   # Executes learner code. The only service that can reach the Docker socket,
   # and it sits on an internal network: no published port, no internet.
   runner:
@@ -63,6 +104,8 @@ services:
     restart: 'no'
 
 networks:
+  # Web, API and mail. The only network with a route out.
+  edge: {}
   # Database traffic only.
   data:
     internal: true

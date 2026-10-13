@@ -1,0 +1,19 @@
+# Development overlay: lets processes on the host (the API under tsx, tests,
+# scripts) reach the database, the runner and the mailbox. Loopback only.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d db runner mailpit
+#
+# Never use this file on a server: internal services gain a host port.
+
+services:
+  db:
+    ports: ['127.0.0.1:54329:5432']
+    networks: [data, dev]
+  runner:
+    ports: ['127.0.0.1:4101:4100']
+    networks: [sandbox-ctl, dev]
+  mailpit:
+    ports: ['127.0.0.1:4326:1025']
+
+networks:
+  dev: {}

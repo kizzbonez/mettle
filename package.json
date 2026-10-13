@@ -1,6 +1,6 @@
 {
   "name": "mettle",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Mettle: competency exams and hands-on labs with sandboxed code execution.",
   "license": "MIT",
@@ -23,7 +23,12 @@
     "sandbox:build": "docker compose --profile sandbox build",
     "up": "docker compose up -d --build",
     "down": "docker compose down",
-    "test:sandbox": "vitest run -c vitest.sandbox.config.ts"
+    "test:sandbox": "vitest run -c vitest.sandbox.config.ts",
+    "content:verify": "tsx scripts/verify-content.ts",
+    "dev:services": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d db runner mailpit",
+    "dev:api": "node scripts/dev-api.mjs",
+    "dev:web": "npm run dev -w @mettle/web",
+    "test:api": "vitest run -c vitest.api.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

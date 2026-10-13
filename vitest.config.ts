@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     include: ['apps/*/src/**/*.test.ts', 'packages/*/src/**/*.test.ts'],
-    exclude: ['**/node_modules/**', '**/*.integration.test.ts'],
+    exclude: ['**/node_modules/**', '**/*.integration.test.ts', '**/*.api.test.ts'],
     env: {
       RUNNER_TOKEN: 'unit-test-token',
       JWT_SECRET: 'unit-test-secret-unit-test-secret-0000',

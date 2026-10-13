@@ -11,7 +11,7 @@ import { executeSchema } from './request-schema';
 const app = Fastify({ logger: true, bodyLimit: 4 * 1024 * 1024 });
 const gate = new Gate(config.maxConcurrency, config.maxQueue);
 
-function authorised(request: FastifyRequest): boolean {
+function authorized(request: FastifyRequest): boolean {
   const presented = Buffer.from(request.headers.authorization ?? '');
   const expected = Buffer.from(`Bearer ${config.token}`);
   return presented.length === expected.length && timingSafeEqual(presented, expected);
@@ -38,7 +38,7 @@ app.get('/health', async (_request, reply) => {
 });
 
 app.post('/execute', async (request: FastifyRequest, reply: FastifyReply) => {
-  if (!authorised(request)) return reply.code(401).send({ error: 'unauthorised' });
+  if (!authorized(request)) return reply.code(401).send({ error: 'unauthorized' });
   const parsed = executeSchema.safeParse(request.body);
   if (!parsed.success) return reply.code(400).send({ error: parsed.error.issues[0]?.message });
   try {

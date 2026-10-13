@@ -34,7 +34,7 @@ export const lessonProgress = pgTable(
 
 /**
  * Append-only feed behind "recent activity". Exam and lab outcomes are still
- * read from their own tables; this is a denormalised timeline, not the record.
+ * read from their own tables; this is a denormalized timeline, not the record.
  */
 export const activityEvents = pgTable(
   'activity_events',

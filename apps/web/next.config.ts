@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { NextConfig } from 'next';
 
-const apiOrigin = process.env.API_ORIGIN ?? 'http://127.0.0.1:4000';
+const apiOrigin = process.env.API_ORIGIN ?? 'http://127.0.0.1:4311';
 
 const config: NextConfig = {
   output: 'standalone',

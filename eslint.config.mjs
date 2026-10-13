@@ -48,7 +48,12 @@ export default tseslint.config(
   },
   {
     // A `describe` block is a list of cases, not one function.
-    files: ['**/*.test.ts', '**/*.test.tsx', 'e2e/**', 'scripts/**'],
-    rules: { 'max-lines-per-function': 'off', 'no-console': 'off' },
+    files: ['**/*.test.ts', '**/*.test.tsx', '**/test/**', 'e2e/**', 'scripts/**'],
+    rules: {
+      'max-lines-per-function': 'off',
+      'max-lines': ['error', { max: 300, ...budget }],
+      'no-console': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
   },
 );

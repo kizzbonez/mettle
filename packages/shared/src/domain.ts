@@ -39,7 +39,7 @@ export interface LevelInfo {
   key: Difficulty;
   rank: number;
   label: string;
-  /** The temper colour a steel blade shows at this heat; used as the level mark. */
+  /** The temper color a steel blade shows at this heat; used as the level mark. */
   temper: string;
   mark: string;
 }

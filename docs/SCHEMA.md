@@ -11,7 +11,7 @@ is the authoritative DDL. The API applies pending migrations when it starts.
 | ----------------------------------- | --------------------------------------------------------------------------------------------- |
 | Add a subject without a code change | A subject is a row in `tracks`. Courses, lessons, exams and labs hang off it by foreign key.   |
 | Dynamic exam generation             | Questions live in a bank, not in exams. `exam_rules` describes what to draw; `attempt_questions` records what one attempt was dealt. |
-| Thousands of categorised questions  | `questions` is indexed on the columns the generator filters by (`status, track_id, difficulty`), on `category_id`, and with a GIN index on `tags`. |
+| Thousands of categorized questions  | `questions` is indexed on the columns the generator filters by (`status, track_id, difficulty`), on `category_id`, and with a GIN index on `tags`. |
 | User roles                          | `users.role` is an enum: `learner`, `instructor`, `admin`.                                     |
 | Lab tracking                        | Every Run and Submit is a row in `lab_submissions` with one `submission_results` row per test. |
 | Progress                            | `enrollments`, `lesson_progress`, passed attempts and passed submissions.                     |
@@ -23,7 +23,7 @@ erDiagram
   users ||--o{ sessions : has
   users ||--o{ recovery_codes : has
   users ||--o{ auth_tokens : has
-  users ||--o{ enrollments : enrols
+  users ||--o{ enrollments : enrolls
   users ||--o{ lesson_progress : completes
   users ||--o{ exam_attempts : sits
   users ||--o{ lab_submissions : submits

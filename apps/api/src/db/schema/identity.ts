@@ -13,7 +13,7 @@ export const users = pgTable(
     role: userRole('role').notNull().default('learner'),
     status: userStatus('status').notNull().default('active'),
     banReason: text('ban_reason'),
-    /** AES-256-GCM ciphertext of the TOTP secret; null until enrolment starts. */
+    /** AES-256-GCM ciphertext of the TOTP secret; null until enrollment starts. */
     totpSecret: text('totp_secret'),
     totpEnabledAt: ts('totp_enabled_at'),
     failedLogins: integer('failed_logins').notNull().default(0),
