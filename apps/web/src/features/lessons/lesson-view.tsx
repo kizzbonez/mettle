@@ -13,6 +13,7 @@ import { api, errorMessage } from '@/lib/api';
 import { refreshProgress, useApi } from '@/lib/use-api';
 import type { LessonDetail } from '@/types/catalog';
 import { LessonBody } from './lesson-body';
+import { PracticeCard } from './practice-card';
 
 function Objectives({ items }: { items: string[] }) {
   return (
@@ -32,11 +33,18 @@ function Objectives({ items }: { items: string[] }) {
   );
 }
 
+/** Where a lesson leads: to its practice lab while that is still to do, then to the next lesson, then back to the level. */
+function wayOnward(data: LessonDetail) {
+  if (data.practice && !data.practice.done) return { href: `/labs/${data.practice.id}`, read: 'Mark as read and practice', go: 'Go to the practice lab' };
+  if (data.next) return { href: `/lessons/${data.next.id}`, read: 'Mark as read and continue', go: 'Next lesson' };
+  return { href: `/courses/${data.course.id}`, read: 'Mark as read', go: 'Back to the level' };
+}
+
 function Footer({ data, onDone }: { data: LessonDetail; onDone: () => void }) {
   const router = useRouter();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
-  const onward = data.next ? `/lessons/${data.next.id}` : `/courses/${data.course.id}`;
+  const onward = wayOnward(data);
 
   async function complete() {
     setBusy(true);
@@ -44,7 +52,7 @@ function Footer({ data, onDone }: { data: LessonDetail; onDone: () => void }) {
       await api.post(`/lessons/${data.lesson.id}/complete`);
       await refreshProgress();
       onDone();
-      router.push(onward);
+      router.push(onward.href);
     } catch (error) {
       toast.error(errorMessage(error));
       setBusy(false);
@@ -61,12 +69,12 @@ function Footer({ data, onDone }: { data: LessonDetail; onDone: () => void }) {
         <ButtonLink href={`/courses/${data.course.id}`} variant="ghost" icon={<ArrowLeft className="size-4" />}>Back to the syllabus</ButtonLink>
       )}
       {data.done ? (
-        <ButtonLink href={onward} variant="secondary" size="lg" icon={<ArrowRight className="order-last size-4" />}>
-          {data.next ? 'Next lesson' : 'Back to the level'}
+        <ButtonLink href={onward.href} variant="secondary" size="lg" icon={<ArrowRight className="order-last size-4" />}>
+          {onward.go}
         </ButtonLink>
       ) : (
         <Button size="lg" loading={busy} onClick={complete} icon={busy ? undefined : <Check className="size-4" strokeWidth={3} />}>
-          {data.next ? 'Mark as read and continue' : 'Mark as read'}
+          {onward.read}
         </Button>
       )}
     </footer>
@@ -96,6 +104,7 @@ export function LessonView({ lessonId }: { lessonId: string }) {
           <p className="mt-5 text-xl leading-relaxed text-steel">{lesson.lesson.summary}</p>
           <Objectives items={lesson.lesson.objectives} />
           <LessonBody markdown={lesson.lesson.bodyMd} />
+          {lesson.practice ? <PracticeCard practice={lesson.practice} /> : null}
           <Footer data={lesson} onDone={() => void mutate()} />
         </article>
       )}

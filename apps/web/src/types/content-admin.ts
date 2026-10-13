@@ -155,6 +155,8 @@ export interface LabRow {
   courseTitle: string;
   level: Difficulty;
   trackTitle: string;
+  /** Set when the lab is a lesson's practice lab. */
+  lessonTitle: string | null;
 }
 
 export interface LabFixture {
@@ -165,6 +167,7 @@ export interface LabFixture {
 export interface AdminLab {
   id: string;
   courseId: string;
+  lessonId: string | null;
   slug: string;
   title: string;
   summary: string;

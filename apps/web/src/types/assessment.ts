@@ -97,6 +97,9 @@ export interface LabDetail {
   };
   course: { id: string; title: string; level: Difficulty };
   track: { id: string; title: string };
+  /** Set for a practice lab: the lesson it belongs to, and the one to read next. */
+  lesson: { id: string; title: string } | null;
+  nextLesson: { id: string; title: string } | null;
   code: string;
   passed: boolean;
 }

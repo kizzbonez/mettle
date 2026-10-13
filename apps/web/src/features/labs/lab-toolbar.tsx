@@ -38,9 +38,11 @@ interface LabToolbarProps {
 /** The bar across the top of the workspace: where you are, and the two actions that matter. */
 export function LabToolbar({ data, passed, draft, pending, onRun, onSubmit, onReset }: LabToolbarProps) {
   const busy = pending !== null;
+  // A practice lab belongs to a lesson, so its way back is the lesson.
+  const back = data.lesson ? { href: `/lessons/${data.lesson.id}`, label: 'Back to the lesson' } : { href: `/courses/${data.course.id}`, label: 'Back to the level' };
   return (
     <header className="flex shrink-0 items-center gap-3 border-b border-forge-rule bg-forge-2 px-3 py-2.5 sm:px-4">
-      <Link href={`/courses/${data.course.id}`} className="grid size-9 shrink-0 place-items-center text-forge-muted hover:bg-forge-3 hover:text-white" aria-label="Back to the level" title="Back to the level">
+      <Link href={back.href} className="grid size-9 shrink-0 place-items-center text-forge-muted hover:bg-forge-3 hover:text-white" aria-label={back.label} title={back.label}>
         <ArrowLeft className="size-5" />
       </Link>
       <Hallmark level={data.course.level} size="sm" muted={!passed} className={passed ? 'animate-stamp' : undefined} />

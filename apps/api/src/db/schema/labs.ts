@@ -9,7 +9,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { courses } from './catalog';
+import { courses, lessons } from './catalog';
 import { createdAt, id, ts, updatedAt } from './columns';
 import { labLanguage, publishStatus, submissionKind, submissionStatus } from './enums';
 import { users } from './identity';
@@ -26,6 +26,8 @@ export const labs = pgTable(
     courseId: uuid('course_id')
       .notNull()
       .references(() => courses.id, { onDelete: 'cascade' }),
+    /** Set on a practice lab: the lesson whose material it lets the learner try. Null for the level's own lab. */
+    lessonId: uuid('lesson_id').references(() => lessons.id, { onDelete: 'set null' }),
     slug: text('slug').notNull(),
     title: text('title').notNull(),
     summary: text('summary').notNull().default(''),
@@ -45,7 +47,7 @@ export const labs = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [uniqueIndex('labs_course_slug_key').on(t.courseId, t.slug)],
+  (t) => [uniqueIndex('labs_course_slug_key').on(t.courseId, t.slug), index('labs_lesson_idx').on(t.lessonId)],
 );
 
 export const labTestCases = pgTable(

@@ -3,10 +3,10 @@ import { asc, eq } from 'drizzle-orm';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { db, type Tx } from '../../../db/client';
-import { courses, tracks } from '../../../db/schema/catalog';
+import { courses, lessons, tracks } from '../../../db/schema/catalog';
 import { labs, labTestCases } from '../../../db/schema/labs';
 import { uniqueOrConflict } from '../../../lib/db-errors';
-import { notFound } from '../../../lib/errors';
+import { HttpError, notFound } from '../../../lib/errors';
 import { parse, uuidParam } from '../../../lib/validate';
 import { audit } from '../../audit/log';
 import { runInSandbox } from '../../labs/runner-client';
@@ -17,6 +17,8 @@ const codeField = z.string().max(100 * 1024);
 
 const labBody = z.object({
   courseId: z.uuid(),
+  /** Attaches the lab to a lesson of the same course, as its practice lab. */
+  lessonId: z.uuid().nullable().default(null),
   slug: slugField,
   title: titleField,
   summary: z.string().trim().max(500).default(''),
@@ -41,6 +43,15 @@ const labBody = z.object({
 });
 
 type LabInput = z.infer<typeof labBody>;
+
+/** A practice lab has to sit under a lesson of its own course. */
+async function checkLesson({ lessonId, courseId }: Pick<LabInput, 'lessonId' | 'courseId'>): Promise<void> {
+  if (!lessonId) return;
+  const [lesson] = await db.select({ courseId: lessons.courseId }).from(lessons).where(eq(lessons.id, lessonId)).limit(1);
+  if (lesson?.courseId !== courseId) {
+    throw new HttpError(400, 'validation_failed', 'Please check the highlighted fields.', { fields: { lessonId: 'Choose a lesson of this course.' } });
+  }
+}
 const SLUG_TAKEN = 'This course already has a lab with that slug.';
 
 async function replaceTests(labId: string, tests: LabInput['tests'], tx: Tx): Promise<void> {
@@ -60,9 +71,11 @@ export async function listLabs() {
     .select({
       id: labs.id, title: labs.title, slug: labs.slug, language: labs.language, status: labs.status,
       estMinutes: labs.estMinutes, updatedAt: labs.updatedAt, courseTitle: courses.title, level: courses.level, trackTitle: tracks.title,
+      lessonTitle: lessons.title,
     })
     .from(labs)
     .innerJoin(courses, eq(courses.id, labs.courseId))
+    .leftJoin(lessons, eq(lessons.id, labs.lessonId))
     .innerJoin(tracks, eq(tracks.id, courses.trackId))
     .orderBy(asc(tracks.sortOrder), asc(courses.sortOrder), asc(labs.sortOrder));
   return { labs: rows };
@@ -74,6 +87,7 @@ export async function getLab(request: FastifyRequest) {
 
 export async function createLab(request: FastifyRequest, reply: FastifyReply) {
   const { tests, ...values } = parse(labBody, request.body);
+  await checkLesson(values);
   const id = await uniqueOrConflict(
     () => db.transaction(async (tx) => {
       const [lab] = await tx.insert(labs).values(values).returning({ id: labs.id });
@@ -90,6 +104,7 @@ export async function createLab(request: FastifyRequest, reply: FastifyReply) {
 export async function updateLab(request: FastifyRequest) {
   const { id } = parse(uuidParam, request.params);
   const { tests, ...values } = parse(labBody, request.body);
+  await checkLesson(values);
   await uniqueOrConflict(
     () => db.transaction(async (tx) => {
       const updated = await tx.update(labs).set({ ...values, updatedAt: new Date() }).where(eq(labs.id, id)).returning({ id: labs.id });

@@ -24,15 +24,22 @@ const CodeEditor = dynamic(() => import('./code-editor').then((module) => module
   loading: () => <div className="grid h-full place-items-center"><Spinner className="text-ember" label="Loading the editor" /></div>,
 });
 
+/** Where a passed lab leads: a practice lab to the next lesson, the level's own lab back to the level. */
+function onwardFrom(data: LabDetail) {
+  if (data.lesson && data.nextLesson) return { href: `/lessons/${data.nextLesson.id}`, label: 'Next lesson' };
+  return { href: `/courses/${data.course.id}`, label: 'Back to the level' };
+}
+
 function PassedBanner({ data }: { data: LabDetail }) {
+  const onward = onwardFrom(data);
   return (
     <div className="flex shrink-0 animate-rise items-center gap-4 border-b border-patina bg-patina px-5 py-3 text-white">
       <Hallmark level={data.course.level} size="md" className="animate-stamp" />
       <div className="min-w-0 flex-1">
-        <p className="font-semibold">Every test passed. This lab is done.</p>
+        <p className="font-semibold">{data.lesson ? 'Every test passed. This practice lab is done.' : 'Every test passed. This lab is done.'}</p>
         <p className="text-[13px] opacity-85">Your solution is saved. You can keep improving it; the pass stays.</p>
       </div>
-      <ButtonLink href={`/courses/${data.course.id}`} variant="secondary" size="sm" icon={<ArrowRight className="order-last size-4" />}>Back to the level</ButtonLink>
+      <ButtonLink href={onward.href} variant="secondary" size="sm" icon={<ArrowRight className="order-last size-4" />}>{onward.label}</ButtonLink>
     </div>
   );
 }

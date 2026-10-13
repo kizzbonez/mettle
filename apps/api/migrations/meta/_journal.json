@@ -15,6 +15,13 @@
       "when": 1791884379542,
       "tag": "0001_lab_languages",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791895851689,
+      "tag": "0002_lab_lesson",
+      "breakpoints": true
     }
   ]
 }

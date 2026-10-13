@@ -72,6 +72,7 @@ async function labItems(userId: string, courseId: string) {
   const byLab = new Map(stats.map((s) => [s.labId, s]));
   return rows.map((lab) => ({
     id: lab.id,
+    lessonId: lab.lessonId,
     title: lab.title,
     summary: lab.summary,
     language: lab.language,
@@ -88,7 +89,17 @@ export async function courseSyllabus(userId: string, courseId: string) {
     examItems(userId, courseId),
     labItems(userId, courseId),
   ]);
-  return { lessons: lessonList, exams: examList, labs: labList };
+  // A lab attached to a lesson here is that lesson's practice; the others are the level's own labs.
+  const practice = new Map<string, (typeof labList)[number]>();
+  for (const lab of labList) {
+    if (lab.lessonId && lessonList.some((lesson) => lesson.id === lab.lessonId) && !practice.has(lab.lessonId)) practice.set(lab.lessonId, lab);
+  }
+  const attached = new Set([...practice.values()].map((lab) => lab.id));
+  return {
+    lessons: lessonList.map((lesson) => ({ ...lesson, practice: practice.get(lesson.id) ?? null })),
+    exams: examList,
+    labs: labList.filter((lab) => !attached.has(lab.id)),
+  };
 }
 
 export type Syllabus = Awaited<ReturnType<typeof courseSyllabus>>;
@@ -100,10 +111,13 @@ export interface NextItem {
   href: string;
 }
 
-/** The first thing not yet done: lessons first, then the exam, then the lab. */
+/** The first thing not yet done: each lesson and then its practice lab, then the exam, then the level's lab. */
 export function nextItem(syllabus: Syllabus): NextItem | null {
-  const lesson = syllabus.lessons.find((item) => !item.done);
-  if (lesson) return { kind: 'lesson', id: lesson.id, title: lesson.title, href: `/lessons/${lesson.id}` };
+  for (const lesson of syllabus.lessons) {
+    if (!lesson.done) return { kind: 'lesson', id: lesson.id, title: lesson.title, href: `/lessons/${lesson.id}` };
+    const { practice } = lesson;
+    if (practice && !practice.done) return { kind: 'lab', id: practice.id, title: practice.title, href: `/labs/${practice.id}` };
+  }
   const exam = syllabus.exams.find((item) => !item.done);
   if (exam) return { kind: 'exam', id: exam.id, title: exam.title, href: `/exams/${exam.id}` };
   const lab = syllabus.labs.find((item) => !item.done);

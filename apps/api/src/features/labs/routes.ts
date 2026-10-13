@@ -11,6 +11,7 @@ import { ensureEnrolled } from '../catalog/enrollment';
 import { presentCompileOutput } from './compile-output';
 import { enqueueSubmission } from './jobs';
 import { presentResult } from './mask';
+import { hasPassed, lessonAround } from './practice';
 
 const MAX_CODE_BYTES = 100 * 1024;
 const PENDING_WINDOW_MS = 3 * 60_000;
@@ -32,24 +33,16 @@ async function publishedLab(labId: string) {
   return row;
 }
 
-async function hasPassed(userId: string, labId: string): Promise<boolean> {
-  const rows = await db
-    .select({ id: labSubmissions.id })
-    .from(labSubmissions)
-    .where(and(eq(labSubmissions.userId, userId), eq(labSubmissions.labId, labId), eq(labSubmissions.kind, 'submit'), eq(labSubmissions.status, 'passed')))
-    .limit(1);
-  return rows.length > 0;
-}
-
 async function getLab(request: FastifyRequest) {
   const { id } = parse(uuidParam, request.params);
   const userId = me(request).id;
   const { lab, course, track } = await publishedLab(id);
   await ensureEnrolled(userId, course);
-  const [tests, draft, passed] = await Promise.all([
+  const [tests, draft, passed, around] = await Promise.all([
     db.select().from(labTestCases).where(eq(labTestCases.labId, id)).orderBy(asc(labTestCases.sortOrder)),
     db.select().from(labDrafts).where(and(eq(labDrafts.labId, id), eq(labDrafts.userId, userId))).limit(1),
     hasPassed(userId, id),
+    lessonAround(lab.lessonId),
   ]);
   return {
     lab: {
@@ -61,6 +54,8 @@ async function getLab(request: FastifyRequest) {
     },
     course: { id: course.id, title: course.title, level: course.level },
     track: { id: track.id, title: track.title },
+    // Set for a practice lab: the lesson it belongs to, and the one to read next.
+    ...around,
     code: draft[0]?.code ?? lab.starterCode,
     passed,
   };

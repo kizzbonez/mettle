@@ -3,6 +3,7 @@
 //   npm run content:verify                 everything
 //   npm run content:verify -- rust         one track
 //   npm run content:verify -- rust/basic   one level
+//   npm run content:verify -- rust/basic/control-flow   one lesson's practice lab
 //
 // Needs Docker and the sandbox images (`npm run sandbox:build`).
 import { fileURLToPath } from 'node:url';
@@ -14,7 +15,7 @@ process.env.RUNNER_TOKEN ??= 'content-verify';
 const { execute } = await import('../apps/runner/src/execute');
 
 const contentDir = fileURLToPath(new URL('../content', import.meta.url));
-const [filterTrack, filterLevel] = (process.argv[2] ?? '').split('/');
+const [filterTrack, filterLevel, filterLesson] = (process.argv[2] ?? '').split('/');
 const problems: string[] = [];
 const seenKeys = new Set<string>();
 
@@ -104,13 +105,28 @@ async function checkLab(where: string, lab: ContentLab): Promise<string> {
   return `solution ${solution.status} in ${solution.durationMs} ms; starter passes ${passed}/${lab.tests.length}`;
 }
 
+/** Practice labs: each belongs to a lesson of the level and is held to the same proof as any lab. */
+async function checkPractice(where: string, course: ContentCourse): Promise<void> {
+  for (const lab of course.practice) {
+    if (filterLesson && lab.lesson !== filterLesson) continue;
+    const at = `${where}/${lab.lesson}`;
+    expect(course.lessons.some((lesson) => lesson.slug === lab.lesson), `${at}: practice lab for a lesson that does not exist`);
+    expect(lab.tests.length >= 3, `${at}: practice lab has ${lab.tests.length} tests (want at least 3)`);
+    expect(lab.tests.some((t) => !t.hidden), `${at}: practice lab has no visible test`);
+    console.log(`    practice ${lab.lesson.padEnd(40)} ${await checkLab(at, lab)}`);
+  }
+}
+
 async function checkTrack(track: ContentTrack): Promise<void> {
   for (const course of track.courses) {
     if (filterLevel && course.level !== filterLevel) continue;
     const where = `${track.slug}/${course.level}`;
-    checkStructure(where, track, course);
-    const labNote = course.lab ? await checkLab(where, course.lab) : 'no lab';
-    console.log(`  ${where.padEnd(34)} ${course.lessons.length} lessons, ${course.questions.length} questions, ${labNote}`);
+    if (!filterLesson) {
+      checkStructure(where, track, course);
+      const labNote = course.lab ? await checkLab(where, course.lab) : 'no lab';
+      console.log(`  ${where.padEnd(34)} ${course.lessons.length} lessons, ${course.questions.length} questions, ${labNote}`);
+    }
+    await checkPractice(where, course);
   }
 }
 

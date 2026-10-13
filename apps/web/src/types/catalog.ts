@@ -46,6 +46,8 @@ export interface SyllabusLesson {
   summary: string;
   estMinutes: number;
   done: boolean;
+  /** The lab attached to this lesson, if it has one. */
+  practice: SyllabusLab | null;
 }
 
 export interface SyllabusExam {
@@ -87,6 +89,7 @@ export interface LessonDetail {
   course: { id: string; title: string; level: Difficulty };
   track: { id: string; title: string; slug: string };
   done: boolean;
+  practice: { id: string; title: string; summary: string; estMinutes: number; done: boolean } | null;
   position: number;
   count: number;
   previous: { id: string; title: string } | null;

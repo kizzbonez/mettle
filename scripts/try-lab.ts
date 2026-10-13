@@ -2,6 +2,7 @@
 // Use it while writing a lab, to check that a wrong answer is caught:
 //
 //   npm run content:try -- rust/basic path/to/attempt.rs
+//   npm run content:try -- rust/basic/control-flow path/to/attempt.rs   (a lesson's practice lab)
 //
 // Needs Docker and the sandbox images (`npm run sandbox:build`).
 import { readFileSync } from 'node:fs';
@@ -13,11 +14,12 @@ process.env.RUNNER_TOKEN ??= 'content-try';
 const { execute } = await import('../apps/runner/src/execute');
 
 const [where = '', file] = process.argv.slice(2);
-const [trackSlug = '', level] = where.split('/');
+const [trackSlug = '', level, lesson] = where.split('/');
 const contentDir = fileURLToPath(new URL('../content', import.meta.url));
-const lab = loadContent(contentDir, [trackSlug])[0]?.courses.find((course) => course.level === level)?.lab;
+const course = loadContent(contentDir, [trackSlug])[0]?.courses.find((item) => item.level === level);
+const lab = lesson ? course?.practice.find((item) => item.lesson === lesson) : course?.lab;
 if (!lab || !file) {
-  console.error('Usage: npm run content:try -- <track>/<level> <file>');
+  console.error('Usage: npm run content:try -- <track>/<level>[/<lesson>] <file>');
   process.exit(2);
 }
 

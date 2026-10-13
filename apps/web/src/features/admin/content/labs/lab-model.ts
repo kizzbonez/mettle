@@ -33,6 +33,8 @@ export interface TestDraft {
 
 export interface LabForm {
   courseId: string;
+  /** The lesson this lab is practice for; empty for the level's own lab. */
+  lessonId: string;
   slug: string;
   title: string;
   summary: string;
@@ -58,7 +60,7 @@ export const newTest = (hidden: boolean): TestDraft => ({ key: nextKey(), name: 
 
 export function blankLab(courseId: string): LabForm {
   return {
-    courseId, slug: '', title: '', summary: '', scenarioMd: '', instructionsMd: '', language: 'python', starterCode: '', solutionCode: '',
+    courseId, lessonId: '', slug: '', title: '', summary: '', scenarioMd: '', instructionsMd: '', language: 'python', starterCode: '', solutionCode: '',
     fixtures: [], timeLimitMs: '5000', memoryMb: '256', estMinutes: '30', status: 'draft', sortOrder: '0', tests: [newTest(false)],
   };
 }
@@ -66,6 +68,7 @@ export function blankLab(courseId: string): LabForm {
 export function labFormOf({ lab, tests }: AdminLabDetail): LabForm {
   return {
     courseId: lab.courseId,
+    lessonId: lab.lessonId ?? '',
     slug: lab.slug,
     title: lab.title,
     summary: lab.summary,
@@ -94,6 +97,7 @@ const withLf = (code: string) => code.replace(/\r\n?/g, '\n');
 export function labBodyOf(form: LabForm) {
   return {
     ...form,
+    lessonId: form.lessonId || null,
     starterCode: withLf(form.starterCode),
     solutionCode: withLf(form.solutionCode),
     timeLimitMs: toInt(form.timeLimitMs),
@@ -106,7 +110,7 @@ export function labBodyOf(form: LabForm) {
 }
 
 export const LAB_FIELDS = [
-  'courseId', 'slug', 'title', 'summary', 'scenarioMd', 'instructionsMd', 'language', 'starterCode', 'solutionCode', 'fixtures',
+  'courseId', 'lessonId', 'slug', 'title', 'summary', 'scenarioMd', 'instructionsMd', 'language', 'starterCode', 'solutionCode', 'fixtures',
   'timeLimitMs', 'memoryMb', 'estMinutes', 'status', 'sortOrder', 'tests',
 ];
 

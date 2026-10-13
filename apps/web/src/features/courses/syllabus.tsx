@@ -1,7 +1,7 @@
 import { LAB_LANGUAGE_LABEL } from '@mettle/shared';
 import { BookOpenText, Check, ChevronRight, ClipboardList, FlaskConical, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { Badge } from '@/design/primitives/badge';
 import { cn } from '@/lib/cn';
 import { formatPercent, plural } from '@/lib/format';
@@ -17,12 +17,14 @@ interface RowProps {
   /** The first unfinished item: where "Continue" leads. */
   current: boolean;
   aside?: ReactNode;
+  /** A lesson's practice lab sits under its lesson, set in from the edge. */
+  nested?: boolean;
 }
 
-function Row({ href, icon: Icon, kind, title, meta, done, current, aside }: RowProps) {
+function Row({ href, icon: Icon, kind, title, meta, done, current, aside, nested }: RowProps) {
   return (
     <li>
-      <Link href={href} className={cn('group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-white', current && 'bg-white')}>
+      <Link href={href} className={cn('group flex items-center gap-4 py-4 pr-5 transition-colors hover:bg-white', nested ? 'bg-rule-soft/50 pl-14' : 'pl-5', current && 'bg-white')}>
         <span
           className={cn(
             'grid size-9 shrink-0 place-items-center border',
@@ -44,22 +46,35 @@ function Row({ href, icon: Icon, kind, title, meta, done, current, aside }: RowP
   );
 }
 
-/** The contents of a level in study order: lessons, then the exam, then the lab. */
+/** The contents of a level in study order: each lesson with its practice lab, then the exam, then the lab. */
 export function Syllabus({ course }: { course: CourseDetail }) {
   const nextId = course.next?.id;
   return (
     <ol className="divide-y divide-rule-soft">
       {course.lessons.map((lesson, index) => (
-        <Row
-          key={lesson.id}
-          href={`/lessons/${lesson.id}`}
-          icon={BookOpenText}
-          kind={`Lesson ${String(index + 1).padStart(2, '0')}`}
-          title={lesson.title}
-          meta={`${lesson.estMinutes} min · ${lesson.summary}`}
-          done={lesson.done}
-          current={lesson.id === nextId}
-        />
+        <Fragment key={lesson.id}>
+          <Row
+            href={`/lessons/${lesson.id}`}
+            icon={BookOpenText}
+            kind={`Lesson ${String(index + 1).padStart(2, '0')}`}
+            title={lesson.title}
+            meta={`${lesson.estMinutes} min · ${lesson.summary}`}
+            done={lesson.done}
+            current={lesson.id === nextId}
+          />
+          {lesson.practice ? (
+            <Row
+              nested
+              href={`/labs/${lesson.practice.id}`}
+              icon={FlaskConical}
+              kind="Practice lab"
+              title={lesson.practice.title}
+              meta={`About ${lesson.practice.estMinutes} min · ${lesson.practice.summary}`}
+              done={lesson.practice.done}
+              current={lesson.practice.id === nextId}
+            />
+          ) : null}
+        </Fragment>
       ))}
       {course.exams.map((exam) => (
         <Row

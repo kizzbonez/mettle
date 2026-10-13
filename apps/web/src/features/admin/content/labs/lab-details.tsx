@@ -9,6 +9,7 @@ import { MarkdownEditor } from '../shared/markdown-editor';
 import { CourseOptions, LanguageOptions, StatusOptions } from '../shared/options';
 import type { FormDraft } from '../shared/use-editor';
 import { slugError } from '../shared/use-save';
+import { LabLessonSelect } from './lab-lesson-select';
 import type { LabForm } from './lab-model';
 
 interface LabDetailsProps {
@@ -26,7 +27,7 @@ export function LabDetails({ draft, courses, error, creating }: LabDetailsProps)
     <div className="space-y-5">
       <div className="grid gap-5 md:grid-cols-2">
         <TextField label="Title" value={form.title} onChange={(event) => setForm(followTitle(form, event.target.value, creating))} error={fields.title} maxLength={160} />
-        <SelectField label="Course" value={form.courseId} onChange={(event) => set({ courseId: event.target.value })} error={fields.courseId ? 'Choose a course.' : undefined}>
+        <SelectField label="Course" value={form.courseId} onChange={(event) => set({ courseId: event.target.value, lessonId: '' })} error={fields.courseId ? 'Choose a course.' : undefined}>
           <option value="">Choose a course</option>
           <CourseOptions courses={courses} />
         </SelectField>
@@ -41,6 +42,7 @@ export function LabDetails({ draft, courses, error, creating }: LabDetailsProps)
           </SelectField>
         </div>
       </div>
+      <LabLessonSelect courseId={form.courseId} value={form.lessonId} onChange={(lessonId) => set({ lessonId })} error={fields.lessonId} />
       <TextAreaField label="Summary" value={form.summary} onChange={(event) => set({ summary: event.target.value })} error={fields.summary} maxLength={500}
         className="min-h-20" hint="One or two sentences, shown in the course outline." />
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -71,6 +71,9 @@ export const labFile = z.object({
     .min(1),
 });
 
+/** A practice lab takes its slug from the lesson folder it sits in. */
+export const practiceFile = labFile.omit({ slug: true });
+
 export interface ContentLesson extends z.infer<typeof lessonFrontMatter> {
   slug: string;
   body: string;
@@ -87,11 +90,18 @@ export interface ContentLab extends Omit<z.infer<typeof labFile>, 'tests'> {
   tests: { name: string; hidden: boolean; code: string }[];
 }
 
+/** A small lab attached to one lesson, so what the lesson taught can be tried at once. */
+export interface ContentPractice extends ContentLab {
+  /** Slug of the lesson it belongs to. */
+  lesson: string;
+}
+
 export interface ContentCourse extends z.infer<typeof courseFile> {
   level: Difficulty;
   lessons: ContentLesson[];
   questions: ContentQuestion[];
   lab: ContentLab | null;
+  practice: ContentPractice[];
 }
 
 export interface ContentTrack extends z.infer<typeof trackFile> {

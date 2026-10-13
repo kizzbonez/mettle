@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { DIFFICULTIES, type Difficulty } from '@mettle/shared';
 import { z } from 'zod';
 import { listDirs, listFiles, readYaml, slugFromFile, splitFrontMatter } from './files';
-import { loadLab } from './load-lab';
+import { loadLab, loadPractice } from './load-lab';
 import {
   courseFile,
   lessonFrontMatter,
@@ -33,6 +33,7 @@ function loadCourse(dir: string, level: Difficulty): ContentCourse {
       .map((name) => loadLesson(lessonDir, name)),
     questions: existsSync(questionsPath) ? readYaml(questionsPath, z.array(questionFile)) : [],
     lab: loadLab(join(dir, 'lab')),
+    practice: loadPractice(dir),
   };
 }
 

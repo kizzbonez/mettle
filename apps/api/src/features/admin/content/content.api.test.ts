@@ -201,6 +201,46 @@ describe('labs', () => {
     expect(verdict.sound).toBe(true);
   });
 
+  describe('practice labs', () => {
+    let lessonId = '';
+    let practiceId = '';
+
+    it('attaches a lab to a lesson, and only to a lesson of the same course', async () => {
+      lessonId = (await staff.get(`/admin/lessons?courseId=${courseId}`)).body.items[0].id;
+      const created = await staff.post('/admin/labs', { ...lab(), slug: 'practice-hello', title: 'Try Hello', lessonId });
+      expect(created.status).toBe(201);
+      practiceId = created.body.id;
+      const elsewhere = (await staff.get('/admin/courses')).body.courses.find((c: { id: string }) => c.id !== courseId);
+      const foreignLesson = (await staff.get(`/admin/lessons?courseId=${elsewhere.id}`)).body.items[0].id;
+      const refused = await staff.post('/admin/labs', { ...lab(), slug: 'practice-foreign', lessonId: foreignLesson });
+      expect(refused.status).toBe(400);
+      expect(refused.body.error.details.fields.lessonId).toMatch(/lesson of this course/);
+    });
+
+    it('lists it under its lesson, not among the labs of the level', async () => {
+      const course = (await learner.get(`/courses/${courseId}`)).body;
+      expect(course.lessons[0].practice).toMatchObject({ id: practiceId, title: 'Try Hello', done: false });
+      expect(course.labs.map((item: { id: string }) => item.id)).not.toContain(practiceId);
+      expect(course.labs.length).toBeGreaterThan(0);
+    });
+
+    it('offers it from the lesson, and makes it the next step once the lesson is read', async () => {
+      const { client } = await registerLearner(app);
+      expect((await client.get(`/lessons/${lessonId}`)).body.practice).toMatchObject({ id: practiceId, done: false });
+      expect((await client.get(`/courses/${courseId}`)).body.next).toMatchObject({ kind: 'lesson', id: lessonId });
+      await client.post(`/lessons/${lessonId}/complete`);
+      expect((await client.get(`/courses/${courseId}`)).body.next).toMatchObject({ kind: 'lab', id: practiceId });
+    });
+
+    it('tells the workspace which lesson it belongs to', async () => {
+      const detail = (await learner.get(`/labs/${practiceId}`)).body;
+      expect(detail.lesson).toMatchObject({ id: lessonId, title: 'Hello, Go' });
+      expect(detail.nextLesson).toBeNull();
+      const levelLab = (await learner.get(`/courses/${courseId}`)).body.labs[0].id;
+      expect((await learner.get(`/labs/${levelLab}`)).body.lesson).toBeNull();
+    });
+  });
+
   it('refuses a fixture path outside data/', async () => {
     const bad = await staff.post('/admin/labs', { ...lab(), slug: 'sum-evil', fixtures: [{ path: '../solution.py', content: 'x' }] });
     expect(bad.status).toBe(400);

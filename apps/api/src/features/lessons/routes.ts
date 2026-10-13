@@ -7,6 +7,7 @@ import { notFound } from '../../lib/errors';
 import { parse, uuidParam } from '../../lib/validate';
 import { authenticated, me } from '../../plugins/auth';
 import { ensureEnrolled } from '../catalog/enrollment';
+import { practiceOfLesson } from '../labs/practice';
 import { recordActivity } from '../progress/activity';
 import { refreshCourseCompletion } from '../progress/course-progress';
 
@@ -46,7 +47,11 @@ async function readLesson(request: FastifyRequest) {
   const { lesson, course, track } = await publishedLesson(id);
   await ensureEnrolled(userId, course);
   const mine = and(eq(lessonProgress.lessonId, id), eq(lessonProgress.userId, userId));
-  const [nav, done] = await Promise.all([neighbors(course.id, id), db.select().from(lessonProgress).where(mine).limit(1)]);
+  const [nav, done, practice] = await Promise.all([
+    neighbors(course.id, id),
+    db.select().from(lessonProgress).where(mine).limit(1),
+    practiceOfLesson(userId, id),
+  ]);
   return {
     lesson: {
       id: lesson.id,
@@ -59,6 +64,7 @@ async function readLesson(request: FastifyRequest) {
     course: { id: course.id, title: course.title, level: course.level },
     track: { id: track.id, title: track.title, slug: track.slug },
     done: done.length > 0,
+    practice,
     ...nav,
   };
 }

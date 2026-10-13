@@ -29,6 +29,7 @@ function columns(onDelete: (lab: LabRow) => void): Column<LabRow>[] {
         <div className="max-w-72">
           <Link href={`${LABS}/${lab.id}`} onClick={(event) => event.stopPropagation()} title={lab.title} className="block truncate font-medium hover:underline">{lab.title}</Link>
           <p className="truncate font-mono text-xs text-steel">/{lab.slug}</p>
+          {lab.lessonTitle ? <p className="truncate text-[13px] text-steel">Practice for: {lab.lessonTitle}</p> : null}
         </div>
       ),
     },

@@ -21,9 +21,15 @@ async function upsertLessons(courseId: string, course: ContentCourse, tx: Tx): P
   }
 }
 
-async function upsertLab(courseId: string, lab: ContentLab, tx: Tx): Promise<void> {
+/** Where a lab sits: on its own at the end of the level, or attached to one lesson as practice. */
+interface LabPlace {
+  lessonId: string | null;
+  sortOrder: number;
+}
+
+async function upsertLab(courseId: string, lab: ContentLab, tx: Tx, place: LabPlace = { lessonId: null, sortOrder: 0 }): Promise<void> {
   const values = {
-    courseId, slug: lab.slug, title: lab.title, summary: lab.summary, scenarioMd: lab.scenario,
+    courseId, ...place, slug: lab.slug, title: lab.title, summary: lab.summary, scenarioMd: lab.scenario,
     instructionsMd: lab.instructions, language: lab.language, starterCode: lab.starter, solutionCode: lab.solution,
     fixtures: lab.fixtures, timeLimitMs: lab.timeLimitMs, memoryMb: lab.memoryMb, estMinutes: lab.minutes, status: published,
   };
@@ -35,6 +41,17 @@ async function upsertLab(courseId: string, lab: ContentLab, tx: Tx): Promise<voi
   if (!row) throw new Error(`Could not save lab ${lab.slug}`);
   await tx.delete(labTestCases).where(eq(labTestCases.labId, row.id));
   await tx.insert(labTestCases).values(lab.tests.map((test, sortOrder) => ({ labId: row.id, ...test, sortOrder })));
+}
+
+/** Practice labs, each attached to its lesson and listed in lesson order. */
+async function upsertPractice(courseId: string, course: ContentCourse, tx: Tx): Promise<void> {
+  if (course.practice.length === 0) return;
+  const rows = await tx.select({ id: lessons.id, slug: lessons.slug, sortOrder: lessons.sortOrder }).from(lessons).where(eq(lessons.courseId, courseId));
+  for (const lab of course.practice) {
+    const lesson = rows.find((row) => row.slug === lab.lesson);
+    if (!lesson) throw new Error(`Practice lab ${lab.slug} names a lesson that does not exist: ${lab.lesson}`);
+    await upsertLab(courseId, lab, tx, { lessonId: lesson.id, sortOrder: lesson.sortOrder + 1 });
+  }
 }
 
 interface ExamSeed {
@@ -78,6 +95,7 @@ async function seedCourse(trackId: string, track: ContentTrack, course: ContentC
     await upsertQuestion(question, { trackId, difficulty: course.level, defaultCategory: track.category, categories }, tx);
   }
   if (course.lab) await upsertLab(row.id, course.lab, tx);
+  await upsertPractice(row.id, course, tx);
   if (course.questions.length > 0) {
     const { questionCount, ...exam } = course.exam;
     const count = Math.min(course.questions.length, questionCount);
