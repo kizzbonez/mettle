@@ -40,6 +40,8 @@ const after = (start: Date, maxDays: number) => {
   const room = Math.max(0, Date.now() - 60_000 - start.getTime());
   return new Date(start.getTime() + random() * Math.min(maxDays * DAY, room));
 };
+// Someone whose story has reached today has not done the rest of it yet.
+const caughtUp = (cursor: Date) => Date.now() - cursor.getTime() < 0.75 * DAY;
 
 if (process.argv.includes('--clear')) {
   const removed = await db.delete(users).where(like(users.email, `%${DOMAIN}`)).returning({ id: users.id });
@@ -98,7 +100,10 @@ for (const user of created) {
 
     const courseLessons = allLessons.filter((lesson) => lesson.courseId === course.id).sort((a, b) => a.sortOrder - b.sortOrder);
     const read = courseLessons.slice(0, chance(0.75) ? courseLessons.length : between(0, 2));
+    let lessonsRead = 0;
     for (const lesson of read) {
+      if (caughtUp(cursor)) break;
+      lessonsRead += 1;
       cursor = after(cursor, 1);
       await db.insert(lessonProgress).values({ userId: user.id, lessonId: lesson.id, completedAt: cursor });
       events.push({ kind: 'lesson_completed', title: lesson.title, href: `/lessons/${lesson.id}`, createdAt: cursor });
@@ -106,8 +111,8 @@ for (const user of created) {
 
     let examPassed = false;
     const exam = allExams.find((item) => item.courseId === course.id);
-    if (exam && read.length > 0 && chance(0.85)) {
-      for (let attempt = 0; attempt < between(1, 3) && !examPassed; attempt += 1) {
+    if (exam && lessonsRead > 0 && chance(0.85)) {
+      for (let attempt = 0; attempt < between(1, 3) && !examPassed && !caughtUp(cursor); attempt += 1) {
         cursor = after(cursor, 1);
         examPassed = chance(odds + attempt * 0.12);
         const correct = examPassed ? between(4, 5) : between(1, 3);
@@ -123,7 +128,7 @@ for (const user of created) {
     let labPassed = false;
     const lab = allLabs.find((item) => item.courseId === course.id);
     if (lab && examPassed && chance(0.8)) {
-      for (let attempt = 0; attempt < between(1, 4) && !labPassed; attempt += 1) {
+      for (let attempt = 0; attempt < between(1, 4) && !labPassed && !caughtUp(cursor); attempt += 1) {
         cursor = after(cursor, 1);
         labPassed = chance(odds * 0.75 + attempt * 0.15);
         const row = { labId: lab.id, userId: user.id, code: '// demo data', totalCount: 3, durationMs: between(700, 2600), createdAt: cursor, finishedAt: cursor };
@@ -134,7 +139,7 @@ for (const user of created) {
       if (labPassed) events.push({ kind: 'lab_passed', title: lab.title, href: `/labs/${lab.id}`, createdAt: cursor });
     }
 
-    const completed = read.length === courseLessons.length && examPassed && labPassed;
+    const completed = lessonsRead === courseLessons.length && examPassed && labPassed;
     if (completed) events.push({ kind: 'course_completed', title: course.title, href: `/courses/${course.id}`, createdAt: cursor });
     await db.insert(enrollments).values({ userId: user.id, courseId: course.id, enrolledAt, completedAt: completed ? cursor : null });
     await db.insert(activityEvents).values(events.map((event) => ({ userId: user.id, ...event, meta: event.meta ?? {} })));
