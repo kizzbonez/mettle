@@ -23,7 +23,8 @@ export function devEnv(database = 'mettle') {
     ...process.env,
     ...file,
     NODE_ENV: 'development',
-    DATABASE_URL: `postgres://mettle:${file.POSTGRES_PASSWORD}@127.0.0.1:54329/${database}`,
+    // DEV_DB_PORT points the tools at a second stack, such as the one the screenshots are taken from.
+    DATABASE_URL: `postgres://mettle:${file.POSTGRES_PASSWORD}@127.0.0.1:${process.env.DEV_DB_PORT ?? '54329'}/${database}`,
     MIGRATIONS_DIR: `${root}apps/api/migrations`,
     CONTENT_DIR: `${root}content`,
     RUNNER_URL: 'http://127.0.0.1:4101',

@@ -53,9 +53,10 @@ async function content(page, shot) {
   await page.getByText('Loading Dock Ledger').first().click();
   await page.getByRole('button', { name: /Verify in sandbox/ }).waitFor({ timeout: 30_000 });
   await page.getByRole('button', { name: /Verify in sandbox/ }).click();
-  await page.getByText(/sound/i).first().waitFor({ timeout: 120_000 });
-  check(true, 'verifying a lab runs its solution and starter in the sandbox');
-  await page.getByRole('button', { name: /Verify in sandbox/ }).scrollIntoViewIfNeeded();
+  // The verdict heading, not the sentence that explains what "sound" means.
+  await page.getByText('Sound', { exact: true }).waitFor({ timeout: 180_000 });
+  check(true, 'verifying a lab runs its solution and starter in the sandbox, and finds it sound');
+  await page.getByText('Sound', { exact: true }).scrollIntoViewIfNeeded();
   await shot('18-admin-lab');
 }
 
