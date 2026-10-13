@@ -85,7 +85,8 @@ A full course that a beginner can follow from zero.
 - **Research before writing.** Read the official documentation and the tables of contents of two
   or three respected courses, and build the lesson list so that no basic topic is missing. Check
   every fact against the official source, and run every example. Write in your own words.
-- **Each lesson is 700 to 1,300 words** with these sections, in this order:
+- **Each lesson is about 1,000 words of prose** (the checker counts code as well and accepts 600
+  to 1,600 in all) with these sections, in this order:
   `## Outline`, the teaching sections (at least three code examples, each showing its output),
   `## Common mistakes`, `## Practice` (three small exercises, then `### Answers`, which the
   reader keeps folded until asked), `## Key takeaways`, and `## Further reading` with two to four
@@ -172,7 +173,7 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
 | C#       | `solution.cs` | the body of an `async Task` method, so it may `await`. Declare the lab's types without a namespace so the test can name them. | `Check.True`, `Check.Equal`, `Check.SequenceEqual`, `Check.Throws<T>`, `Check.ThrowsAsync<T>`, an escaping exception |
 | YAML     | `solution.yaml` | a **Python** script. The file is already parsed: `doc` (first document), `docs` (all of them), `RAW` (the text), `at(doc, 'a.b.0')`, and the `yaml` module. | `assert`, raising |
 
-- Rust is compiled with `rustc --edition 2021`, standard library only. No crates.
+- Rust is compiled with `rustc --edition 2024`, standard library only. No crates.
 - Python is 3.12 with NumPy. No other packages, no network.
 - C++ is GCC 14 with `-std=c++20 -Wall -Wextra -pthread`, standard library only, built with the
   address and undefined-behaviour sanitizers. A use-after-free, an out-of-bounds access, a

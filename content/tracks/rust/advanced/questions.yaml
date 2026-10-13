@@ -154,3 +154,578 @@
     `.await` inside another future that it is driving). Nothing polls `pending`, so `loading`
     is never printed, and dropping a future simply discards its state machine. Calling an
     `async fn` from ordinary code is allowed; it is `.await` that needs an async context.
+
+- key: rust-advanced-06
+  type: single
+  category: rust
+  tags: [drop, box, ownership]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    struct Step(&'static str);
+
+    impl Drop for Step {
+        fn drop(&mut self) {
+            print!("{} ", self.0);
+        }
+    }
+
+    struct Pipeline {
+        first: Step,
+        second: Step,
+    }
+
+    fn main() {
+        let _log = Step("log");
+        let pipeline = Pipeline { first: Step("fetch"), second: Step("parse") };
+        let temp = Step("temp");
+        drop(temp);
+        print!("[{}+{}] ", pipeline.first.0, pipeline.second.0);
+    }
+    ```
+  options:
+    - text: "`temp [fetch+parse] fetch parse log`"
+      correct: true
+    - text: "`temp [fetch+parse] parse fetch log`"
+    - text: "`[fetch+parse] temp fetch parse log`"
+    - text: "`temp [fetch+parse] log fetch parse`"
+  explanation: |
+    `drop(temp)` takes ownership of `temp`, so its destructor runs on that line, before the
+    `print!`. It is not a request that takes effect at the end of the scope. When `main`
+    ends, the remaining local variables are dropped in **reverse** order of declaration:
+    `pipeline`, then `_log`. Dropping a struct drops its fields in **declaration** order, so
+    `fetch` comes before `parse`. The reverse rule is for local variables only, because a
+    later variable may borrow from an earlier one.
+
+- key: rust-advanced-07
+  type: multiple
+  category: rust
+  tags: [deref, coercion, smart-pointers]
+  prompt: |
+    Two functions are defined:
+
+    ```rust
+    fn show(text: &str) -> usize {
+        text.len()
+    }
+
+    fn grow(text: &mut String) {
+        text.push('!');
+    }
+    ```
+
+    Which statements about deref coercion are true? Select all that apply.
+  options:
+    - text: "`show(&boxed)` compiles when `boxed` is a `Box<String>`: the compiler turns `&Box<String>` into `&String` and then into `&str`"
+      correct: true
+    - text: "`show(&mut owned)` compiles when `owned` is a `String`: a `&mut String` may be coerced to a shared `&str`"
+      correct: true
+    - text: "`grow(shared)` compiles when `shared` is a `&String`: a shared reference is coerced to a mutable one when the function needs it"
+    - text: "Each coercion costs a little at run time, because the chain of `deref` calls is worked out while the program runs"
+  explanation: |
+    Deref coercion inserts calls to `deref` until the reference type matches, and it can chain:
+    `Box<String>` dereferences to `String`, and `String` dereferences to `str`. A mutable
+    reference may also be weakened to a shared one, so `&mut String` is accepted where `&str`
+    is wanted. The opposite direction never happens: turning `&String` into `&mut String`
+    would create a mutable reference while other shared references may exist, so
+    `grow(shared)` is a "types differ in mutability" error. The whole process is resolved by
+    the compiler from the types, so there is nothing to discover at run time and no extra
+    cost.
+
+- key: rust-advanced-08
+  type: single
+  category: rust
+  tags: [rc, weak, reference-counting]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    use std::rc::Rc;
+
+    fn main() {
+        let a = Rc::new(String::from("config"));
+        let weak = Rc::downgrade(&a);
+        let b = Rc::clone(&a);
+        drop(a);
+        println!("{} {} {}", Rc::strong_count(&b), Rc::weak_count(&b), weak.upgrade().is_some());
+    }
+    ```
+  options:
+    - text: "`1 1 true`"
+      correct: true
+    - text: "`2 1 true`"
+    - text: "`1 1 false`"
+    - text: "`1 0 true`"
+  explanation: |
+    `a` and `b` are two equal owners of one allocation; neither is "the original".
+    `Rc::clone` raised the strong count to 2 and `drop(a)` lowered it to 1, so the string is
+    still alive and `upgrade` returns `Some`. The value would be freed only when the strong
+    count reached zero. `Rc::downgrade` raised the *weak* count to 1. A `Weak` belongs to the
+    allocation, not to the particular `Rc` it was made from, so dropping `a` does not change
+    it.
+
+- key: rust-advanced-09
+  type: multiple
+  category: rust
+  tags: [trait-objects, dyn-compatibility]
+  prompt: |
+    Which of these traits can be used as a trait object, for example as `&dyn Trait`?
+    Select all that apply.
+  options:
+    - text: "`trait Named { fn name(&self) -> String; }`"
+      correct: true
+    - text: "`trait Duplicate { fn dup(&self) -> Self; }`"
+    - text: "`trait Store { fn put<T: Display>(&self, item: T); }`"
+    - text: "`trait Scalable { fn area(&self) -> f64; fn scaled(&self, k: f64) -> Self where Self: Sized; }`"
+      correct: true
+  explanation: |
+    A trait is dyn compatible when the compiler can build one table of method addresses (a
+    vtable) for it. `Named` is fine: its method needs nothing but `&self`. `Duplicate` is not:
+    `dup` returns `Self`, whose size is unknown once the concrete type is hidden. `Store` is
+    not either: a generic method stands for a different function for every `T`, and a vtable
+    cannot list them all. `Scalable` has the same problem as `Duplicate`, but
+    `where Self: Sized` takes `scaled` out of the trait object, so the trait is usable as
+    `dyn Scalable` and only `area` can be called through it.
+
+- key: rust-advanced-10
+  type: single
+  category: rust
+  tags: [trait-objects, dispatch, generics]
+  prompt: |
+    `Ping` and `DiskSpace` both implement `Check`, and both functions below are called once
+    with each type.
+
+    ```rust
+    fn run_generic<C: Check>(check: &C) -> bool {
+        check.passed()
+    }
+
+    fn run_dyn(check: &dyn Check) -> bool {
+        check.passed()
+    }
+    ```
+
+    Which statement is true?
+  options:
+    - text: "The compiler generates two copies of `run_generic`, one per type, and one copy of `run_dyn`, which finds `passed` through a vtable at run time"
+      correct: true
+    - text: The compiler generates one copy of each function; generics and trait objects differ only in how they are written
+    - text: "`run_dyn` makes the faster calls, because the generic version has to look the method up every time it runs"
+    - text: "A `&dyn Check` is the same size as a `&Ping`, because the method table is stored inside the value it points to"
+  explanation: |
+    Generics use static dispatch: the function is compiled once for every concrete type it is
+    used with, and each copy calls the right `passed` directly, so the call can be inlined. A
+    trait object uses dynamic dispatch: a single copy of `run_dyn` exists, and each call reads
+    the method's address from a vtable. That lookup is the slower of the two, not the faster.
+    The vtable pointer travels in the reference, not in the value: a `&dyn Check` is two
+    pointers wide (16 bytes on a 64-bit machine) where a `&Ping` is one.
+
+- key: rust-advanced-11
+  type: single
+  category: rust
+  tags: [mutex, deadlock, guards]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    use std::sync::Mutex;
+
+    fn main() {
+        let counter = Mutex::new(0);
+        let mut first = counter.lock().unwrap();
+        *first += 1;
+        let mut second = counter.lock().unwrap();
+        *second += 1;
+        println!("{}", *second);
+    }
+    ```
+  options:
+    - text: "It fails to compile: `counter` is borrowed mutably twice"
+    - text: "It prints `2`, because the first guard is released as soon as `first` is no longer used"
+    - text: "It compiles, but `2` is never printed: the second `lock` cannot succeed while `first` is still alive"
+      correct: true
+    - text: "It prints `1`, because each call to `lock` hands out a separate copy of the number"
+  explanation: |
+    `lock` takes `&self`, so the borrow checker sees two shared borrows and accepts the
+    program. A guard has a destructor, and a value with a destructor lives until the end of
+    its scope, not until its last use. So `first` still holds the lock when the same thread
+    asks for it again, and that call can never return. The standard library leaves the exact
+    outcome unspecified (the thread deadlocks or panics), and on Linux the program simply
+    hangs. Release the first guard before locking again, with `drop(first)` or an inner
+    block. Deadlocks are logic errors that the compiler does not catch.
+
+- key: rust-advanced-12
+  type: single
+  category: rust
+  tags: [atomics, race-condition, shared-state]
+  prompt: |
+    What can you say about the number this program prints?
+
+    ```rust
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::thread;
+
+    fn main() {
+        let hits = AtomicUsize::new(0);
+        thread::scope(|s| {
+            for _ in 0..4 {
+                s.spawn(|| {
+                    for _ in 0..100_000 {
+                        let seen = hits.load(Ordering::SeqCst);
+                        hits.store(seen + 1, Ordering::SeqCst);
+                    }
+                });
+            }
+        });
+        println!("{}", hits.load(Ordering::SeqCst));
+    }
+    ```
+  options:
+    - text: "It is always `400000`: every operation on an atomic is indivisible, so no update can be lost"
+    - text: "It is at most `400000` and usually less: `load` and `store` are each atomic, but another thread can run between them"
+      correct: true
+    - text: "Nothing is printed. The program does not compile, because `hits` is changed from several threads without `mut` or a `Mutex`"
+    - text: "It could be anything: unsynchronized access from several threads is a data race, which is undefined behaviour"
+  explanation: |
+    Each `load` and each `store` is indivisible, but the pair is not. Two threads can both
+    read 41 and both write 42, and one increment is lost. A test run printed `130939`. This
+    is a race condition in the program's logic, not a data race in the language sense: every
+    access goes through an atomic, so the behaviour is defined and the value can never exceed
+    400000. It compiles because atomic methods take `&self`. The fix is a single atomic
+    operation, `hits.fetch_add(1, Ordering::SeqCst)`, which always gives `400000`.
+
+- key: rust-advanced-13
+  type: single
+  category: rust
+  tags: [async, futures, waker]
+  prompt: |
+    A hand-written future's `poll` method returns `Poll::Pending` without storing or calling
+    the waker from `cx`, and nothing else will wake the task. It runs on an executor that,
+    after a `Pending`, sleeps until the waker is called. What happens?
+  options:
+    - text: The executor polls it again after a short pause, so the future only finishes a little late
+    - text: "The task is never polled again and the program hangs"
+      correct: true
+    - text: "The compiler rejects the `poll` method, because every path that returns `Pending` must use `cx`"
+    - text: The executor notices the missing wake-up and panics
+  explanation: |
+    Executors do not poll on a timer. The contract is that a future returning `Pending` has
+    arranged for `waker.wake()` to be called when it can make progress, and the executor polls
+    again only then. Nothing checks this contract: the compiler cannot see it, and the
+    executor has no way to tell "still waiting" from "forgot". A future that breaks it is
+    simply never polled again. The busy-waiting alternative, `cx.waker().wake_by_ref()` before
+    returning, keeps the task alive at the cost of spinning the processor.
+
+- key: rust-advanced-14
+  type: single
+  category: rust
+  tags: [async, await, laziness]
+  prompt: |
+    `sleep(d)` returns a future that becomes ready a time `d` after it is created. An
+    executor runs `both()`:
+
+    ```rust
+    async fn fetch(id: u32) -> u32 {
+        sleep(Duration::from_millis(100)).await;
+        id
+    }
+
+    async fn both() -> u32 {
+        let a = fetch(1);
+        let b = fetch(2);
+        a.await + b.await
+    }
+    ```
+
+    Roughly how long does `both()` take?
+  options:
+    - text: "About 100 ms: both futures exist before the first `.await`, so their timers run side by side"
+    - text: "About 200 ms: creating `b` runs none of its body, so its timer starts only when `b` is first polled, after `a` has finished"
+      correct: true
+    - text: "Almost no time: futures are lazy, so a sleep that is not spawned is skipped"
+    - text: It depends on how many worker threads the executor has
+  explanation: |
+    Calling `fetch(2)` builds a future and runs nothing, so no timer exists for `b` yet. The
+    expression `a.await + b.await` polls `a` to completion first and only then polls `b` for
+    the first time, which is when its `sleep` is created. The two waits happen one after the
+    other, on any executor. This differs from languages in which a promise starts running
+    the moment it is created. To overlap the waits, poll both futures together with a join
+    operation, or spawn them as separate tasks.
+
+- key: rust-advanced-15
+  type: multiple
+  category: rust
+  tags: [async, cancellation, pin, blocking]
+  prompt: |
+    Which statements about async Rust are true? Select all that apply.
+  options:
+    - text: "Dropping a future cancels it: it stops at the `.await` where it last paused, and its local variables are dropped"
+      correct: true
+    - text: "Calling `std::thread::sleep` inside an `async fn` pauses only that task, and the executor runs other tasks in the meantime"
+    - text: "`Pin` promises that the value behind the pointer will not be moved again, which keeps a future's references into itself valid"
+      correct: true
+    - text: The standard library includes a basic executor, so a runtime crate is needed only for network I/O
+  explanation: |
+    A future makes progress only while it is being polled, so dropping it is all it takes to
+    cancel it. Its destructors run, and the code after the current `.await` never does.
+    `Pin` exists because the state machine behind an `async fn` may hold references to its
+    own local variables, and moving it would leave them pointing at the old address.
+    `std::thread::sleep` blocks the whole thread: the executor regains control only when
+    `poll` returns, so every task on that thread stops. Finally, the standard library
+    defines `Future`, `Waker` and `Pin` but contains no executor. That is what a runtime
+    such as Tokio supplies.
+
+- key: rust-advanced-16
+  type: single
+  category: rust
+  tags: [operators, traits, orphan-rule]
+  prompt: |
+    Why does the last line fail to compile?
+
+    ```rust
+    use std::ops::Mul;
+
+    #[derive(Debug, Clone, Copy)]
+    struct Vec2 {
+        x: f64,
+        y: f64,
+    }
+
+    impl Mul<f64> for Vec2 {
+        type Output = Vec2;
+
+        fn mul(self, k: f64) -> Vec2 {
+            Vec2 { x: self.x * k, y: self.y * k }
+        }
+    }
+
+    fn main() {
+        let v = Vec2 { x: 1.0, y: 2.0 };
+        println!("{:?}", v * 2.0);
+        println!("{:?}", 2.0 * v);
+    }
+    ```
+  options:
+    - text: "`impl Mul<f64> for Vec2` covers `Vec2 * f64` only. `f64 * Vec2` needs its own `impl Mul<Vec2> for f64`"
+      correct: true
+    - text: Operators can be overloaded only when both operands have the same type
+    - text: "The orphan rule forbids implementing `Mul` for `f64` outside the standard library, so `2.0 * v` can never be made to work"
+    - text: "When the left operand is an `f64`, the `Output` type must be `f64` as well"
+  explanation: |
+    `a * b` is a call to `Mul::mul(a, b)`, and the trait is looked up on the type of the
+    **left** operand with the right operand as its type parameter. `2.0 * v` therefore needs
+    `f64: Mul<Vec2>`, which nobody has written; the compiler says "cannot multiply `{float}`
+    by `Vec2`". Operands of different types are fine, as the working first line shows, and
+    `Output` may be any type. The orphan rule does not stand in the way either: `Vec2` is a
+    local type and appears in the trait's parameters, so `impl Mul<Vec2> for f64` is allowed
+    in your crate.
+
+- key: rust-advanced-17
+  type: single
+  category: rust
+  tags: [type-alias, newtype]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    type Meters = f64;
+    type Feet = f64;
+
+    fn climb(height: Meters) -> String {
+        format!("climbing {height} m")
+    }
+
+    fn main() {
+        let height: Feet = 300.0;
+        println!("{}", climb(height));
+    }
+    ```
+  options:
+    - text: "It prints `climbing 300 m`"
+      correct: true
+    - text: "It fails to compile: expected `Meters`, found `Feet`"
+    - text: It compiles, with a warning that two different aliases are being mixed
+    - text: "It fails to compile until the argument is converted with `height as Meters`"
+  explanation: |
+    A type alias is a second name for an existing type, not a new type. `Meters`, `Feet` and
+    `f64` are one and the same to the compiler, so the call is accepted without an error or
+    a warning and a height in feet is silently treated as metres. To make the compiler tell
+    them apart, use the newtype pattern: `struct Meters(f64);` and `struct Feet(f64);` are
+    distinct types, and passing one where the other is expected is a "mismatched types"
+    error.
+
+- key: rust-advanced-18
+  type: single
+  category: rust
+  tags: [function-pointers, closures]
+  prompt: |
+    What happens when this program is compiled?
+
+    ```rust
+    fn apply(f: fn(i32) -> i32, n: i32) -> i32 {
+        f(n)
+    }
+
+    fn main() {
+        let offset = 10;
+        println!("{}", apply(|n| n + 1, 1)); // A
+        println!("{}", apply(i32::abs, -1)); // B
+        println!("{}", apply(|n| n + offset, 1)); // C
+    }
+    ```
+  options:
+    - text: "Only line C is rejected: a closure that captures a variable cannot become a `fn` pointer"
+      correct: true
+    - text: "Lines A and C are rejected: only named functions are `fn` pointers, never closures"
+    - text: "Line B is rejected: `i32::abs` is a method, not a function"
+    - text: "It compiles: a `fn` parameter accepts anything that implements `Fn`"
+  explanation: |
+    `fn(i32) -> i32` is a concrete pointer type with room for an address and nothing else. A
+    named function coerces to it, and so does a method path such as `i32::abs`, which is an
+    ordinary function taking the receiver as its first argument. A closure that captures
+    nothing (line A) has no data to carry, so it coerces too. The closure on line C captures
+    `offset` and needs somewhere to keep it, so the compiler reports "expected fn pointer,
+    found closure". Declaring the parameter as `impl Fn(i32) -> i32` would accept all three.
+
+- key: rust-advanced-19
+  type: single
+  category: rust
+  tags: [macros, macro-rules]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    macro_rules! twice {
+        ($value:expr) => {
+            $value + $value
+        };
+    }
+
+    fn main() {
+        let mut calls = 0;
+        let mut next = || {
+            calls += 1;
+            10
+        };
+        let total = twice!(next());
+        println!("{total} {calls}");
+    }
+    ```
+  options:
+    - text: "`20 2`"
+      correct: true
+    - text: "`20 1`"
+    - text: "`10 1`"
+    - text: "Nothing: it fails to compile, because `calls` is still borrowed by the closure when `println!` reads it"
+  explanation: |
+    A macro does not evaluate its arguments. It places the captured expression in the
+    expansion wherever the metavariable appears, so `twice!(next())` becomes
+    `next() + next()` and the closure runs twice. A function would have evaluated its
+    argument once, which is the tempting wrong answer. The borrow is not a problem: the
+    closure is not used after the macro call, so its borrow of `calls` has ended by the time
+    `println!` runs. A macro that must not repeat side effects binds the argument first:
+    `{ let value = $value; value + value }`.
+
+- key: rust-advanced-20
+  type: single
+  category: rust
+  tags: [macros, hygiene]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    macro_rules! make_total {
+        ($value:expr) => {
+            let total = $value;
+        };
+    }
+
+    fn main() {
+        let total = 1;
+        make_total!(50);
+        println!("{total}");
+    }
+    ```
+  options:
+    - text: "`1`"
+      correct: true
+    - text: "`50`"
+    - text: "Nothing: it fails to compile with \"cannot find value `total` in this scope\""
+    - text: "Nothing: it fails to compile, because `total` is declared twice in one scope"
+  explanation: |
+    `macro_rules!` macros are hygienic for local variables: a name introduced inside the
+    macro belongs to the macro's own context and is a different variable from one with the
+    same spelling at the call site. The `total` created by the expansion does not shadow the
+    caller's `total`, so `1` is printed (and the compiler warns that the macro's variable is
+    unused). The "cannot find value" error is what you would get if `main` had no `total` of
+    its own. To let a macro define a variable the caller can see, pass the name in:
+    `($name:ident, $value:expr) => { let $name = $value; }`.
+
+- key: rust-advanced-21
+  type: multiple
+  category: rust
+  tags: [macros, procedural-macros]
+  prompt: |
+    Which statements about procedural macros are true? Select all that apply.
+  options:
+    - text: A procedural macro is a function from token streams to a token stream that the compiler runs while it builds your program
+      correct: true
+    - text: "Procedural macros must be defined in a separate crate whose type is `proc-macro`"
+      correct: true
+    - text: A derive macro can rewrite the fields of the struct it is attached to
+    - text: "Like `macro_rules!` macros, procedural macros are hygienic, so the names they generate cannot clash with the caller's"
+  explanation: |
+    All three kinds (derive, attribute and function-like) are Rust functions that take a
+    `TokenStream` and return a `TokenStream`, and they run inside the compiler, which is why
+    they live in a crate of their own with `proc-macro = true`. A derive macro only *adds*
+    items after the type it is applied to and cannot change the type itself. Replacing the
+    item is what an attribute macro does. Procedural macros are not hygienic: their output
+    behaves as if it had been written by hand at the call site, so careful authors use full
+    paths such as `::std::option::Option` and unusual names for generated helpers.
+
+- key: rust-advanced-22
+  type: true_false
+  category: rust
+  tags: [send, sync, cell]
+  prompt: |
+    True or false: a `Cell<i32>` can be moved into a spawned thread, but a `&Cell<i32>`
+    cannot be handed to another thread.
+  options:
+    - text: "True"
+      correct: true
+    - text: "False"
+  explanation: |
+    `Cell<T>` is `Send` when `T` is: moving it gives the new thread the only access, so
+    nothing can race. It is not `Sync`, because `set` changes the value through a shared
+    reference without any synchronization, and two threads holding `&Cell<i32>` could write
+    at the same moment. Since `&T` is `Send` only when `T` is `Sync`, a `&Cell<i32>` cannot
+    cross threads, and the compiler says that `Cell<i32>` "cannot be shared between threads
+    safely". For a shared counter use an atomic or a `Mutex`.
+
+- key: rust-advanced-23
+  type: true_false
+  category: rust
+  tags: [sized, dynamically-sized-types, generics]
+  prompt: |
+    True or false: with the function below, the call `show("text")` compiles, with `T`
+    inferred as `str`.
+
+    ```rust
+    use std::fmt::Debug;
+
+    fn show<T: Debug>(value: &T) -> String {
+        format!("{value:?}")
+    }
+    ```
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    Every generic parameter has an implicit `Sized` bound, and `str` is a dynamically sized
+    type: its size is not known at compile time. `T` would have to be `str`, so the call is
+    rejected with "the size for values of type `str` cannot be known at compilation time".
+    The function only uses `T` behind a reference, so the bound can be relaxed safely by
+    writing `T: Debug + ?Sized`. After that the same function accepts `str`, slices and
+    `dyn Debug` as well as ordinary sized types.

@@ -1,14 +1,18 @@
 title: Rust Foundations
 summary: >-
-  The rules that make Rust different: who owns a value, how it may be borrowed, how data is
-  modeled with structs and enums, and how failure is expressed in types instead of exceptions.
+  Rust from zero. Install the toolchain and run a first program, learn variables, types,
+  functions and control flow, then the ideas that set Rust apart, which are ownership,
+  borrowing, enums with pattern matching and errors as values, and finish by parsing real
+  input into typed data.
 outcomes:
+  - Set up Rust with rustup and create, build and run a project with Cargo
+  - Write programs with variables, the built-in types, functions, conditions and loops
   - Predict when a value is moved, copied or borrowed, and fix the compiler errors that follow
-  - Model data with structs and enums and take it apart with exhaustive pattern matching
-  - Return `Option` and `Result` instead of panicking, and propagate errors with `?`
-  - Write a parser that turns untrusted text into validated, typed values
+  - Model data with structs and enums, and take it apart with exhaustive pattern matching
+  - Work with strings, vectors and hash maps, and return `Option` and `Result` instead of panicking
 exam:
   title: Rust Foundations Mock Exam
-  description: Five questions on ownership, borrowing, lifetimes, pattern matching and error handling.
-  timeLimitMinutes: 10
+  description: Ten questions drawn from the level's bank, from first programs and data types to ownership, pattern matching and error handling.
+  timeLimitMinutes: 20
   passPercent: 70
+  questionCount: 10

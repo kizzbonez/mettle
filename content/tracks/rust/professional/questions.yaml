@@ -180,3 +180,526 @@
     to C, call `into_raw()`, and take the pointer back later with `CString::from_raw` so that
     Rust frees what Rust allocated. Otherwise, keep the `CString` alive in something that
     outlives every use of the pointer.
+
+- key: rust-professional-06
+  type: single
+  category: rust
+  tags: [unsafe, soundness, invariants]
+  prompt: |
+    A crate exports this type. The comment states the invariant that `last` relies on, and
+    every constructor establishes it.
+
+    ```rust
+    pub struct Samples {
+        pub len: usize,
+        data: Box<[f32]>,
+    }
+
+    impl Samples {
+        pub fn last(&self) -> f32 {
+            // SAFETY: `len` is at least 1 and at most `data.len()`.
+            unsafe { *self.data.get_unchecked(self.len - 1) }
+        }
+    }
+    ```
+
+    Which statement is correct?
+  options:
+    - text: "`last` is sound: only code inside an `unsafe` block can cause undefined behaviour, and callers of `last` write none"
+    - text: "`last` is sound, because the `SAFETY` comment documents the invariant and the constructors establish it"
+    - text: "`last` is unsound: `len` is public, so safe code in another crate can set it to a value that makes `get_unchecked` read out of bounds"
+      correct: true
+    - text: "`last` is unsound only for an empty `Samples`; taking `&mut self` instead of `&self` would repair it"
+  explanation: |
+    A safe function is sound only if no safe caller can trigger undefined behaviour through
+    it. Here any caller can write `samples.len = 1_000_000;` without a single `unsafe`, and
+    the next `last()` reads far outside the buffer. The unsafe block is where the damage
+    happens, but the mistake is the `pub` on `len`. An invariant that unsafe code relies on
+    must be protected by privacy, so that only the module that owns it can change it. That is
+    why the unit to review is the module, not the block. A `SAFETY` comment is a claim to be
+    checked, not a mechanism, and this claim is false for code the author does not control.
+    `&mut self` changes nothing, because the bad value arrives through the public field. The
+    repair is a private `len` with a read-only accessor.
+
+- key: rust-professional-07
+  type: multiple
+  category: rust
+  tags: [unsafe, miri, verification]
+  prompt: |
+    Which statements about Miri are accurate? Select all that apply.
+  options:
+    - text: It reports undefined behaviour only on the code paths that the test or program actually executes
+      correct: true
+    - text: "A test suite that passes under Miri proves that the crate's safe API is sound"
+    - text: It also checks the C libraries the program calls, because it interprets their machine code
+    - text: It can report a use after free or a read of uninitialized memory that shows no symptom at all when the program runs natively
+      correct: true
+  explanation: |
+    Miri is an interpreter for Rust code. It executes the program step by step and tracks
+    facts that real hardware does not, such as whether memory is still allocated and whether
+    a byte was ever initialized, so it catches errors that happen to "work" natively. Both of
+    its limits follow from the same design. It is a dynamic tool, so it sees only the
+    executions your tests produce: a clean run says nothing about inputs and interleavings
+    that never ran, and soundness is a claim about every possible safe caller. And it
+    interprets Rust, not machine code, so the C libraries a program links against are outside
+    its view. For foreign code, use a sanitizer such as AddressSanitizer. Treat Miri as a
+    multiplier for a good test suite, not as a proof.
+
+- key: rust-professional-08
+  type: single
+  category: rust
+  tags: [ffi, panic, unwinding]
+  prompt: |
+    A Rust library built with the default `panic = "unwind"` exports this function:
+
+    ```rust
+    #[unsafe(no_mangle)]
+    pub extern "C" fn parse_level(value: i32) -> u8 {
+        u8::try_from(value).expect("level out of range")
+    }
+    ```
+
+    A C program calls `parse_level(300)`. What happens?
+  options:
+    - text: "The panic unwinds through the C caller's frames until a Rust `catch_unwind` further up the stack catches it"
+    - text: The function returns 0 to C and the panic message is printed as a warning
+    - text: "The Rust thread ends quietly and the C caller continues, because a panic only ever ends the thread it happens in"
+    - text: 'The panic cannot unwind out of an `extern "C"` function, so the process aborts'
+      correct: true
+  explanation: |
+    300 does not fit in a `u8`, so `expect` panics. The `"C"` ABI does not permit unwinding,
+    and Rust enforces that at the edge of the function: the panic message is printed, then
+    the runtime reports "panic in a function that cannot unwind" and aborts the whole process.
+    That is defined behaviour, but it takes the host application down with it. Nothing is
+    returned to C, and no `catch_unwind` above the C frames gets a chance. "A panic ends only
+    its thread" describes unwinding inside Rust, and here the thread belongs to the C program.
+    The repair is to keep the panic inside Rust: validate the input and return an error code,
+    or wrap the body in `std::panic::catch_unwind` and translate `Err` into one. Use the
+    `"C-unwind"` ABI only when unwinding across the boundary is intended.
+
+- key: rust-professional-09
+  type: single
+  category: rust
+  tags: [ffi, ownership, cstring]
+  prompt: |
+    A Rust library exports a function to C:
+
+    ```rust
+    #[unsafe(no_mangle)]
+    pub extern "C" fn version() -> *mut c_char {
+        CString::new("2.4.1").unwrap().into_raw()
+    }
+    ```
+
+    How must the C caller release the string when it has finished with it?
+  options:
+    - text: "By calling C's `free()` on it, because `into_raw` allocates with `malloc`"
+    - text: "It must not release it: Rust frees the buffer when the `CString` goes out of scope at the end of `version`"
+    - text: "By passing it to another function exported by the Rust library, which calls `CString::from_raw` and drops the result"
+      correct: true
+    - text: "It need not release it: `into_raw` gives the buffer the `'static` lifetime, so it is not a leak"
+  explanation: |
+    `into_raw` consumes the `CString` without running its destructor, so nothing is freed at
+    the end of `version` and the pointer stays valid: ownership has moved to the caller. The
+    buffer came from Rust's allocator, which is not guaranteed to be the allocator behind C's
+    `malloc` and `free`, so calling `free()` on it is undefined behaviour. Memory goes back
+    to the side that allocated it: the library should export something like
+    `version_free(ptr)`, which rebuilds the owner with `CString::from_raw` and lets it drop.
+    Doing nothing is a leak: a raw pointer carries no lifetime, and memory that is never
+    released is exactly what a leak is. The same rule holds in the other direction: a pointer
+    from C's `strdup` goes to `free`, never to `CString::from_raw` or `Box::from_raw`.
+
+- key: rust-professional-10
+  type: single
+  category: rust
+  tags: [layout, niche, option]
+  prompt: |
+    What does this program print on a 64-bit target?
+
+    ```rust
+    use std::mem::size_of;
+    use std::num::NonZeroU32;
+
+    fn main() {
+        println!(
+            "{} {} {}",
+            size_of::<Option<u32>>(),
+            size_of::<Option<NonZeroU32>>(),
+            size_of::<Option<Box<u32>>>(),
+        );
+    }
+    ```
+  options:
+    - text: "`8 4 8`"
+      correct: true
+    - text: "`5 5 9`"
+    - text: "`8 8 16`"
+    - text: "`4 4 8`"
+  explanation: |
+    An `Option` has to record whether it is `Some` or `None`. Every bit pattern of a `u32` is
+    a valid number, so `Option<u32>` needs a separate tag, and because size is always a
+    multiple of alignment the total is 8. `NonZeroU32` can never be 0 and a `Box` can never
+    be null, so each has a spare bit pattern, a niche, and the compiler uses it to mean
+    `None`: those options are exactly as large as their payloads, 4 and 8 bytes. The standard library guarantees this for
+    references, `Box`, `NonNull`, function pointers and the `NonZero` integers. `5 5 9`
+    forgets that size is always a multiple of alignment, `8 8 16` assumes a tag is always
+    added, and `4 4 8` assumes it never is. This is why a capacity of type `NonZeroUsize`
+    costs nothing extra when it is made optional.
+
+- key: rust-professional-11
+  type: multiple
+  category: rust
+  tags: [dispatch, monomorphization, trait-objects]
+  prompt: |
+    A library offers the same operation in two forms:
+
+    ```rust
+    pub fn render_static<T: Draw>(shape: &T) -> String { shape.draw() }
+    pub fn render_dynamic(shape: &dyn Draw) -> String { shape.draw() }
+    ```
+
+    Which statements are accurate? Select all that apply.
+  options:
+    - text: "`render_dynamic` is slower because the compiler inserts a run-time type check before each call to `draw`"
+    - text: "`render_static` is compiled once for every concrete type it is used with, which can increase compile time and binary size"
+      correct: true
+    - text: "`render_static` cannot be called with a type defined in another crate, because its copies are generated when the library itself is compiled"
+    - text: "A `&dyn Draw` is two machine words: a pointer to the value and a pointer to a vtable"
+      correct: true
+  explanation: |
+    Generic functions are monomorphized: the compiler emits a separate copy for each concrete
+    `T`, with the call to `draw` resolved at compile time and open to inlining. The price is
+    paid in compile time and code size, not at run time. That work happens in whichever crate
+    uses the function with a new type, so types from other crates are fine. A `&dyn Draw` is
+    a wide pointer: the address of the value and the address of a vtable that holds the
+    type's size, alignment, destructor and method addresses. A dynamic call loads the method
+    address from that table and makes an indirect call. No type is checked at run time. The
+    real cost is that the optimizer usually cannot inline through the indirection. Choose
+    `dyn` for mixed collections and smaller code, generics for the hottest paths.
+
+- key: rust-professional-12
+  type: single
+  category: rust
+  tags: [api-design, sealed-trait, compatibility]
+  prompt: |
+    A library's public API contains:
+
+    ```rust
+    mod private {
+        pub trait Sealed {}
+    }
+
+    pub trait Format: private::Sealed {
+        fn extension(&self) -> &'static str;
+    }
+    ```
+
+    What does this arrangement achieve?
+  options:
+    - text: "Other crates cannot name `Format` at all, so the trait is effectively private"
+    - text: "It makes `Format` usable as `dyn Format`, which a trait with a supertrait otherwise is not"
+    - text: "Other crates must implement `Sealed` as well as `Format`, which makes them opt in to future methods"
+    - text: "Other crates can use `Format` but cannot implement it, so the library can add methods to it without breaking them"
+      correct: true
+  explanation: |
+    This is the sealed trait pattern. `Format` is public, so other crates can call its
+    methods, use it as a bound and write `dyn Format`. To implement it they would also have
+    to implement its supertrait `Sealed`, and they cannot name `Sealed`, because the module
+    it lives in is private. Every implementation therefore lives in the defining crate. That
+    turns "add a method without a default body", normally a breaking change because every
+    implementor stops compiling, into a safe one: the library updates its own implementations
+    in the same release. The cost is that users cannot supply their own formats, so seal only
+    traits that are not meant as extension points. A marker supertrait such as `Sealed` has
+    no effect on whether a trait can be used as `dyn`.
+
+- key: rust-professional-13
+  type: true_false
+  category: rust
+  tags: [api-design, non-exhaustive, compatibility]
+  prompt: |
+    A crate defines `#[non_exhaustive] pub enum Mode { Fast, Safe }`.
+
+    True or false: because of the attribute, every `match` on a `Mode` must include a
+    wildcard arm, including a `match` written inside the crate that defines the enum.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    `#[non_exhaustive]` restricts other crates only. Downstream code must add a wildcard arm
+    when matching the enum (error E0004 otherwise) and cannot build a marked struct with a
+    struct literal, which is what lets the author add variants or fields in a minor release.
+    Inside the defining crate the attribute has no effect: a `match` with one arm per variant
+    compiles, and the compiler still reports every place that needs updating when a variant
+    is added. That is the useful half of the bargain. The other half is the price: your
+    users lose that exhaustiveness check, so mark only types that are really expected to
+    grow, and decide before publishing, since adding the attribute later is itself a breaking
+    change.
+
+- key: rust-professional-14
+  type: multiple
+  category: rust
+  tags: [errors, api-design, error-source]
+  prompt: |
+    A library crate is about to publish this error type:
+
+    ```rust
+    #[derive(Debug)]
+    pub enum StoreError {
+        NotFound(String),
+        Io(std::io::Error),
+    }
+    ```
+
+    Which of the following are good practice? Select all that apply.
+  options:
+    - text: "Return the inner `io::Error` from `Error::source()` for the `Io` variant, and keep its text out of that variant's `Display` message"
+      correct: true
+    - text: "Mark the enum `#[non_exhaustive]` before the first release if more kinds of failure are likely to be added"
+      correct: true
+    - text: "Print the inner error in `Display` for `Io` and also return it from `source()`, so that no error reporter can miss it"
+    - text: "Replace the enum with `Box<dyn Error>` in every public signature, so that callers never have to update a `match`"
+  explanation: |
+    The standard library's rule is that a wrapped cause is exposed through `source()` or
+    rendered in `Display`, not both. Reporters such as the `report` function in the lesson,
+    or `anyhow`, print the message and then walk the chain of sources, so a cause that
+    appears in both places is printed twice. `#[non_exhaustive]` forces downstream matches
+    to carry a wildcard arm, which makes a new variant a minor change, and it has to be there
+    from the first release because adding it later is breaking. An opaque boxed error is the
+    right choice for an application, where errors are mostly logged, but a library that
+    returns one has taken away its callers' ability to tell "not found" from "disk failed"
+    without comparing text. Give callers a type they can match on.
+
+- key: rust-professional-15
+  type: single
+  category: rust
+  tags: [errors, main, reporting]
+  prompt: |
+    What does this program write to standard error, and what is its exit status?
+
+    ```rust
+    use std::fmt;
+
+    #[derive(Debug)]
+    struct Offline {
+        host: String,
+    }
+
+    impl fmt::Display for Offline {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "cannot reach {}", self.host)
+        }
+    }
+
+    impl std::error::Error for Offline {}
+
+    fn main() -> Result<(), Box<dyn std::error::Error>> {
+        Err(Offline { host: "db".to_string() })?;
+        Ok(())
+    }
+    ```
+  options:
+    - text: "`Error: cannot reach db`, and the exit status is 1"
+    - text: "`Error: Offline { host: \"db\" }`, and the exit status is 1"
+      correct: true
+    - text: "A panic message containing `cannot reach db`, and the exit status is 101"
+    - text: "Nothing: it does not compile, because `?` cannot convert `Offline` into `Box<dyn Error>` without a hand-written `From` implementation"
+  explanation: |
+    When `main` returns `Err`, the runtime prints `Error: ` followed by the error formatted
+    with `{:?}`, its `Debug` form, and exits with status 1. The careful `Display` message is
+    never used, which surprises people who expect the readable text. The conversion compiles
+    because the standard library provides `From<E> for Box<dyn Error>` for every `E: Error`,
+    which is exactly what `?` calls. No panic is involved: status 101 and a `panicked at`
+    line are what `unwrap()` on the same error would produce. To show users a readable
+    message, handle the error yourself: let `main` return `ExitCode`, print the error with
+    `{}` and walk `source()` for the causes. This is one of the things `anyhow` does for you,
+    since its error type's `Debug` output is the readable chain.
+
+- key: rust-professional-16
+  type: single
+  category: rust
+  tags: [performance, allocation, iterators]
+  prompt: |
+    Both functions are called with a slice of 1,000 elements:
+
+    ```rust
+    fn squares_a(input: &[u32]) -> Vec<u32> {
+        let mut out = Vec::new();
+        for &n in input {
+            out.push(n * n);
+        }
+        out
+    }
+
+    fn squares_b(input: &[u32]) -> Vec<u32> {
+        input.iter().map(|&n| n * n).collect()
+    }
+    ```
+
+    Which statement about their heap allocations is accurate?
+  options:
+    - text: "Both allocate exactly once: `Vec::new()` reserves room for the whole input on the first `push`"
+    - text: "`squares_b` allocates twice: once for the intermediate results of `map` and once for the final vector"
+    - text: "`squares_a` allocates 1,000 times, once per `push`, and `squares_b` allocates once"
+    - text: "`squares_a` asks the allocator several times as the vector grows, and `squares_b` allocates once, because the iterator tells `collect` its exact length"
+      correct: true
+  explanation: |
+    `Vec::new()` allocates nothing, and `push` grows the buffer geometrically: 4, 8, 16 and so
+    on. Counting with a wrapper around the system allocator shows 9 requests for 1,000
+    pushes, each of which may have to copy everything stored so far. That is far fewer than
+    one per element, but it is still eight more than necessary. An iterator over a slice
+    knows how many items remain, `map` passes that on unchanged, and `collect` uses it to
+    allocate the result once. Iterator adapters are lazy: `map` produces each value on demand
+    and stores nothing in between. To keep the loop form, write
+    `Vec::with_capacity(input.len())`. Measuring allocations like this, before and after a
+    change, is more reliable than reasoning about them.
+
+- key: rust-professional-17
+  type: multiple
+  category: rust
+  tags: [testing, property-testing, fuzzing]
+  prompt: |
+    Which statements about property-based testing and fuzzing are accurate? Select all that
+    apply.
+  options:
+    - text: If 10,000 generated cases pass, the property holds for every possible input
+    - text: "A property-based test checks a general statement, such as `decode(encode(x)) == x`, against many generated inputs"
+      correct: true
+    - text: A coverage-guided fuzzer keeps the inputs that reach new code and mutates them, so it can reach branches that purely random input is unlikely to hit
+      correct: true
+    - text: Shrinking speeds a test up by generating small inputs first
+  explanation: |
+    A property replaces "this input gives that output" with a statement that must hold for
+    all inputs, and the framework supplies the inputs. That finds cases nobody thought to
+    write, but it is still sampling: the lesson's faulty encoder passed 500 cases because
+    its bug needed a run longer than any generated input, so passing cases never amount to a
+    proof, and the choice of generator matters as much as the property. A fuzzer improves
+    the odds by using feedback. It records which branches each input reaches, keeps the
+    inputs that discover new ones as its corpus, and mutates those. Shrinking has nothing to
+    do with speed: it runs after a failure and searches for a smaller input that still
+    fails, so that you debug the minimal case.
+
+- key: rust-professional-18
+  type: single
+  category: rust
+  tags: [ci, msrv, cargo]
+  prompt: |
+    A library's `Cargo.toml` declares `rust-version = "1.85"`. What makes that claim
+    trustworthy?
+  options:
+    - text: "Nothing more is needed: with that field set, Cargo rejects any code that uses language or library features newer than 1.85"
+    - text: "Committing `Cargo.lock`, which pins the compiler version along with the dependencies"
+    - text: A CI job that builds and tests the crate with the 1.85 toolchain itself
+      correct: true
+    - text: Running the test suite under Miri on the nightly toolchain
+  explanation: |
+    `rust-version` states the minimum supported Rust version. Cargo uses it in one direction
+    only: someone with an older compiler gets a clear error instead of a confusing one. It
+    does not stop you, on a current compiler, from using a newer API or syntax, and the
+    moment you do, the declared version is wrong without anything failing. The only real
+    check is to compile with exactly that version on every change, for example
+    `cargo +1.85 check --locked` in CI. `Cargo.lock` pins dependency versions, not the
+    compiler, though a dependency update can raise the real minimum too, which the same CI
+    job catches. Miri looks for undefined behaviour and says nothing about compiler
+    versions.
+
+- key: rust-professional-19
+  type: single
+  category: rust
+  tags: [panic, threads, operations]
+  prompt: |
+    What does this program do when built with the default settings?
+
+    ```rust
+    use std::thread;
+
+    fn main() {
+        let worker = thread::spawn(|| {
+            let numbers: Vec<u32> = Vec::new();
+            numbers[0]
+        });
+        let outcome = worker.join();
+        println!("joined: {}", outcome.is_err());
+    }
+    ```
+  options:
+    - text: "The whole process aborts when the worker panics, so `main` prints nothing"
+    - text: "`main` panics as well, because a panic in a spawned thread is raised again in the thread that joins it"
+    - text: "The panic message goes to standard error, only the worker thread ends, and `main` prints `joined: true`"
+      correct: true
+    - text: "`main` prints `joined: false`, because `join` reports only that the thread has finished, not how"
+  explanation: |
+    Indexing an empty vector panics. With the default `panic = "unwind"`, the panic hook
+    prints the message, the worker's stack unwinds and that thread ends. Other threads keep
+    running. `join` returns `Err` carrying the panic payload, so the program prints
+    `joined: true` and exits normally. Nothing is raised in `main` unless you ask for it:
+    `join().unwrap()` is what turns a worker's panic into a panic of the joining thread. A
+    service therefore has to decide what a dead worker means: catch panics at the unit of
+    work, or supervise the threads and restart or shut down when `join` returns `Err`. The
+    first option describes `panic = "abort"`, where the first panic anywhere ends the
+    process and an external supervisor restarts it.
+
+- key: rust-professional-20
+  type: single
+  category: rust
+  tags: [cargo, features, workspaces]
+  prompt: |
+    An application depends on crates `a` and `b`. Their manifests contain:
+
+    ```toml
+    # a/Cargo.toml
+    [dependencies]
+    codec = { version = "1", features = ["json"] }
+
+    # b/Cargo.toml
+    [dependencies]
+    codec = { version = "1", features = ["metrics"] }
+    ```
+
+    How is `codec` built for the application?
+  options:
+    - text: "Once, with both `json` and `metrics` enabled"
+      correct: true
+    - text: "Twice: one copy with `json` for `a` and one copy with `metrics` for `b`"
+    - text: "Once, with neither feature, unless the application enables them itself"
+    - text: The build fails, because two dependents request different feature sets
+  explanation: |
+    Both requirements are satisfied by the same version of `codec`, so Cargo builds it once,
+    with the union of every feature its dependents request. This is feature unification, and
+    it means `a` gets a `codec` with `metrics` switched on although it never asked for it.
+    That is harmless only if features are additive: a feature may add functions, types or
+    implementations, and must never remove or change what exists. A feature that swaps an
+    algorithm, or two features that exclude each other, will be switched on in somebody's
+    build by a crate they do not control. The classic example is a `no_std` feature that
+    removes functionality; the additive form is a `std` feature that adds it. Run
+    `cargo tree -e features` to see which crate enabled what.
+
+- key: rust-professional-21
+  type: single
+  category: rust
+  tags: [cargo, profiles, panic]
+  prompt: |
+    A service sets this in the manifest at its workspace root:
+
+    ```toml
+    [profile.release]
+    panic = "abort"
+    ```
+
+    Which statement about the release build is accurate?
+  options:
+    - text: "`std::panic::catch_unwind` no longer catches anything: the first panic in any thread ends the whole process"
+      correct: true
+    - text: "Only a panic in the main thread aborts; worker threads still unwind and can be joined"
+    - text: "Each panic is turned into an `Err` at the nearest function that returns a `Result`"
+    - text: Only the size of the binary changes; the behaviour of the running program is the same
+  explanation: |
+    With `panic = "abort"` there is no unwinding. A panic still runs the panic hook, so the
+    message is printed, and then the process aborts: no destructors run, `catch_unwind` has
+    nothing to catch, and `join` never gets to return `Err`, whichever thread panicked. The
+    setting is chosen on purpose in some services, because no half-updated state can
+    survive a panic and an external supervisor restarts the process, and it can make the
+    binary a little smaller. The cost is that every request in flight is lost and any design
+    that isolates a failing job with `catch_unwind` silently stops working. A panic is never
+    converted into a `Result`. Note also that `cargo test` ignores the setting, because the
+    test harness needs unwinding.

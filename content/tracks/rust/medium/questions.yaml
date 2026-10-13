@@ -159,3 +159,795 @@
     `use super::*;` brings `normalize` into scope. This is why unit tests are written next to
     the code. Integration tests in a `tests/` directory are a different matter: each one is
     compiled as a separate crate and sees only the public API.
+
+- key: rust-medium-06
+  type: single
+  category: rust
+  tags: [modules, visibility]
+  prompt: |
+    Which line does the compiler reject?
+
+    ```rust
+    mod bank {
+        pub struct Account {
+            pub owner: String,
+            balance: i64,
+        }
+
+        impl Account {
+            pub fn open(owner: &str) -> Account {
+                Account { owner: owner.to_string(), balance: 0 }
+            }
+
+            pub fn balance(&self) -> i64 {
+                self.balance
+            }
+        }
+    }
+
+    fn main() {
+        let mut account = bank::Account::open("ada"); // A
+        account.owner = String::from("grace"); // B
+        account.balance = 100; // C
+        println!("{} {}", account.owner, account.balance()); // D
+    }
+    ```
+  options:
+    - text: Line A, because a struct with a private field cannot be created outside its module
+    - text: Line B, because a field can only be changed by a method of the struct
+    - text: Line C, because the field `balance` is private to the module `bank`
+      correct: true
+    - text: Line D, because `balance` is private, so the method with the same name is private too
+  explanation: |
+    Making a struct `pub` does not make its fields public: each field has its own visibility.
+    `owner` is `pub`, so line B is fine. `balance` is not, so code outside `bank` can neither
+    read nor write it, and line C fails with "field `balance` of struct `Account` is private".
+    Line A works because it goes through the public function `open`, which runs inside the
+    module. That is the purpose of a private field: outside code must use the functions you
+    provide. Line D calls the *method* `balance`, which is declared `pub`; a field and a method
+    may share a name and have different visibility.
+
+- key: rust-medium-07
+  type: single
+  category: rust
+  tags: [modules, files]
+  prompt: |
+    A binary crate has this in `src/main.rs`:
+
+    ```rust
+    mod network;
+    ```
+
+    and this in `src/network.rs`:
+
+    ```rust
+    pub mod client;
+    ```
+
+    In which file does the compiler look for the code of the module `client`?
+  options:
+    - text: "`src/client.rs`"
+    - text: "`src/network/client.rs`"
+      correct: true
+    - text: "`src/main/network/client.rs`"
+    - text: It looks in every `.rs` file under `src` for one that starts with `mod client`
+  explanation: |
+    The folders mirror the module tree. `network` is declared in the crate root, so its code is
+    in `src/network.rs`. `client` is declared *inside* `network`, so it lives one folder down:
+    `src/network/client.rs` (the older style `src/network/client/mod.rs` is also accepted).
+    `src/client.rs` would be the place for a module declared in the crate root itself. The
+    crate root file does not get a folder of its own, so there is no `src/main/`. And the
+    compiler never searches: a file is part of the crate only if a `mod` declaration leads to it.
+
+- key: rust-medium-08
+  type: single
+  category: rust
+  tags: [generics, trait-bounds]
+  prompt: |
+    Why does this function fail to compile?
+
+    ```rust
+    fn largest<T>(items: &[T]) -> &T {
+        let mut largest = &items[0];
+        for item in items {
+            if item > largest {
+                largest = item;
+            }
+        }
+        largest
+    }
+    ```
+  options:
+    - text: "`T` has no bound, so the compiler cannot assume that two values of type `T` can be compared with `>`"
+      correct: true
+    - text: A generic function cannot return a reference
+    - text: The return type needs an explicit lifetime annotation
+    - text: The name `largest` is used for both the function and a variable
+  explanation: |
+    The body of a generic function may only do what is possible for *every* type `T` could be.
+    With no bound, that is very little: not every type supports `>`. The compiler reports
+    "binary operation `>` cannot be applied to type `&T`" and suggests the fix, the bound
+    `T: PartialOrd`. No lifetime annotation is needed: there is exactly one reference
+    parameter, so the elision rules give its lifetime to the result. Reusing the name `largest`
+    for a local variable is legal; the variable simply shadows the function inside the body.
+
+- key: rust-medium-09
+  type: multiple
+  category: rust
+  tags: [generics, impl, monomorphization]
+  prompt: |
+    ```rust
+    struct Pair<A, B> {
+        first: A,
+        second: B,
+    }
+
+    impl<A, B> Pair<A, B> {
+        fn swap(self) -> Pair<B, A> {
+            Pair { first: self.second, second: self.first }
+        }
+    }
+
+    impl Pair<f64, f64> {
+        fn total(&self) -> f64 {
+            self.first + self.second
+        }
+    }
+    ```
+
+    Which statements are true? Select all that apply.
+  options:
+    - text: "`swap` can be called on any `Pair`, whatever the types `A` and `B` are"
+      correct: true
+    - text: "`total` can be called on a `Pair<i32, i32>`, because integers can be added too"
+    - text: If a program calls `swap` on a `Pair<&str, i32>` and on a `Pair<f64, f64>`, the compiler generates two separate copies of `swap`
+      correct: true
+    - text: Calling `swap` is slower than calling an equivalent function written for one concrete type, because the types are worked out while the program runs
+  explanation: |
+    `impl<A, B> Pair<A, B>` declares its own type parameters, so its methods exist for every
+    `Pair`. `impl Pair<f64, f64>` names concrete types, so `total` exists for that one type
+    only. For a `Pair<i32, i32>` the compiler reports that no method named `total` was found,
+    and adds "the method was found for `Pair<f64, f64>`". Generics are resolved entirely at
+    compile time: through **monomorphization** the compiler emits one specialized copy of
+    `swap` per concrete type it is used with. Nothing about the types is looked up at run time,
+    so the generic version is as fast as hand-written code. The cost is a larger executable and
+    a longer compile.
+
+- key: rust-medium-10
+  type: single
+  category: rust
+  tags: [traits, default-methods]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    trait Greet {
+        fn name(&self) -> String;
+
+        fn hello(&self) -> String {
+            format!("Hello, {}!", self.name())
+        }
+    }
+
+    struct Cat;
+    struct Robot;
+
+    impl Greet for Cat {
+        fn name(&self) -> String {
+            String::from("cat")
+        }
+    }
+
+    impl Greet for Robot {
+        fn name(&self) -> String {
+            String::from("robot")
+        }
+
+        fn hello(&self) -> String {
+            String::from("BEEP")
+        }
+    }
+
+    fn main() {
+        println!("{} {}", Cat.hello(), Robot.hello());
+    }
+    ```
+  options:
+    - text: "`Hello, cat! Hello, robot!`"
+    - text: "`Hello, cat! BEEP`"
+      correct: true
+    - text: "Nothing; it fails to compile because `Cat` does not implement `hello`"
+    - text: "Nothing; it fails to compile because `hello` is defined twice for `Robot`"
+  explanation: |
+    `name` has no body in the trait, so it is **required**: both types must write it. `hello`
+    has a body, so it is a **default** method. `Cat` does not mention `hello` and receives the
+    default, which calls `Cat`'s own `name` and produces `Hello, cat!`. `Robot` supplies its
+    own `hello`, which replaces the default for that type only, so it prints `BEEP`. Overriding
+    a default is not a duplicate definition, and leaving a default out is not an error. Only a
+    missing *required* method stops the build ("not all trait items implemented").
+
+- key: rust-medium-11
+  type: multiple
+  category: rust
+  tags: [derive, standard-traits]
+  prompt: |
+    ```rust
+    #[derive(Debug, Clone, PartialEq)]
+    struct Reading {
+        sensor: String,
+        celsius: f64,
+    }
+    ```
+
+    Which statements are true? Select all that apply.
+  options:
+    - text: Two `Reading` values can be compared with `==`
+      correct: true
+    - text: "Adding `Copy` to the list would not compile, because the field `sensor` is a `String`"
+      correct: true
+    - text: "Adding `Eq` to the list would not compile, because the field `celsius` is an `f64`"
+      correct: true
+    - text: "`println!(\"{}\", reading)` works, because `Debug` was derived"
+  explanation: |
+    A derive generates code that applies the trait to every field, so it works only if every
+    field's type has that trait. `String` and `f64` both implement `PartialEq`, which gives
+    `==`. `String` is not `Copy`, because copying its bits would give two owners of one heap
+    buffer, so the struct cannot be `Copy` either. `f64` is not `Eq`, because `NaN` is not equal
+    to itself, so the struct cannot be `Eq`. Finally, `{}` asks for `Display`, not `Debug`.
+    `Display` cannot be derived: you implement it by hand, or print with `{:?}` instead.
+
+- key: rust-medium-12
+  type: single
+  category: rust
+  tags: [derive, ordering, sorting]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+    struct Version {
+        major: u32,
+        minor: u32,
+    }
+
+    fn main() {
+        let mut versions = vec![
+            Version { major: 1, minor: 9 },
+            Version { major: 2, minor: 0 },
+            Version { major: 1, minor: 10 },
+        ];
+        versions.sort();
+        let last = versions.last().unwrap();
+        println!("{}.{}", last.major, last.minor);
+    }
+    ```
+  options:
+    - text: "`1.10`"
+    - text: "`1.9`"
+    - text: "`2.0`"
+      correct: true
+    - text: "Nothing; it fails to compile because `sort` needs a closure that compares two versions"
+  explanation: |
+    A derived `Ord` compares the fields in the order they are declared: `major` first, and
+    `minor` only to break a tie. The sorted order is therefore 1.9, 1.10, 2.0, and the last
+    element is `2.0`. `1.10` is the last element before sorting, and would also be last if
+    `minor` were compared first. `1.9` would be last only if `sort` put the largest element
+    first, but it sorts in ascending order. `sort()` needs no closure when the element type
+    implements `Ord`; `sort_by` and `sort_by_key` are for any other order.
+
+- key: rust-medium-13
+  type: single
+  category: rust
+  tags: [lifetimes, elision]
+  prompt: |
+    Exactly one of these functions compiles as written. Which one?
+  options:
+    - text: "`fn first(a: &str, b: &str) -> &str { a }`"
+    - text: "`fn first_word(text: &str) -> &str { text.split(' ').next().unwrap_or(\"\") }`"
+      correct: true
+    - text: "`fn make() -> &str { let s = String::from(\"x\"); &s }`"
+    - text: "`fn pick(a: &str, b: &str, use_a: bool) -> &str { if use_a { a } else { b } }`"
+  explanation: |
+    The compiler fills in missing lifetimes with fixed rules. Each reference parameter gets its
+    own lifetime, and **if there is exactly one input lifetime, the result gets it**. That is
+    the case for `first_word`. `first` and `pick` have two reference parameters and no `self`,
+    so the rules cannot decide what the result borrows from: "missing lifetime specifier". It
+    does not matter that the body of `first` only ever returns `a`, because the compiler
+    checks callers against the signature alone. `make` has no reference parameter at all, and
+    it tries to return a reference to a local `String` that is dropped when the function
+    returns. It should return the `String` itself.
+
+- key: rust-medium-14
+  type: single
+  category: rust
+  tags: [lifetimes, borrow-checker]
+  prompt: |
+    What happens when you build and run this program?
+
+    ```rust
+    fn longer<'a>(a: &'a str, b: &'a str) -> &'a str {
+        if a.len() >= b.len() { a } else { b }
+    }
+
+    fn main() {
+        let outer = String::from("a long string");
+        let result;
+        {
+            let inner = String::from("short");
+            result = longer(&outer, &inner);
+        }
+        println!("{result}");
+    }
+    ```
+  options:
+    - text: "It prints `a long string`, because that is the string `longer` returns"
+    - text: "It does not compile: `inner` does not live long enough"
+      correct: true
+    - text: It compiles, but `println!` may read memory that has already been freed
+    - text: "It does not compile: `longer` must declare two lifetime parameters, one for each argument"
+  explanation: |
+    The signature of `longer` says that the result is valid only while *both* arguments are,
+    because it may borrow from either. The compiler checks `main` against that signature and
+    does not look at which branch would run. `inner` is dropped at the closing brace, while
+    `result` is used after it, so the build fails with E0597. At run time the result would
+    indeed be `outer`, but the borrow checker works without running the code. Safe Rust never
+    compiles a program that reads freed memory. Two lifetime parameters would not help: the
+    result still has to be tied to both inputs.
+
+- key: rust-medium-15
+  type: single
+  category: rust
+  tags: [closures, fn-traits]
+  prompt: |
+    You are writing a function that calls the closure it receives **exactly once**, and you
+    want callers to be able to pass as many different closures as possible. Which bound should
+    the closure parameter `F` have?
+  options:
+    - text: "`F: Fn()`"
+    - text: "`F: FnMut()`"
+    - text: "`F: FnOnce()`"
+      correct: true
+    - text: "No generic parameter: take a function pointer, `fn()`"
+  explanation: |
+    The three traits describe what a call does to the closure's captured values. Every closure
+    can be called at least once, so every closure implements `FnOnce`. Only closures that do
+    not move their captures out are `FnMut`, and only those that also do not change them are
+    `Fn`. A bound is a demand on the caller: `Fn` is the *strictest* demand and `FnOnce` the
+    loosest. If you call the closure once, ask for `FnOnce`, as `Option::unwrap_or_else` does.
+    A plain function pointer `fn()` is stricter still: it accepts functions and closures that
+    capture nothing.
+
+- key: rust-medium-16
+  type: multiple
+  category: rust
+  tags: [iterators, ownership]
+  prompt: |
+    ```rust
+    let words = vec![String::from("pear"), String::from("fig")];
+    ```
+
+    Which statements about iterating over `words` are true? Select all that apply.
+  options:
+    - text: "`words.iter()` yields `&String` items, and `words` can still be used afterwards"
+      correct: true
+    - text: "`words.into_iter()` yields `String` items, and `words` cannot be used afterwards"
+      correct: true
+    - text: "`words.iter_mut()` compiles only if `words` is declared with `let mut`"
+      correct: true
+    - text: "`for w in &words` does the same as `for w in words.into_iter()`"
+  explanation: |
+    The three methods differ in what they hand out. `iter()` lends each item as `&T` and leaves
+    the collection alone. `iter_mut()` lends each item as `&mut T`, which needs a mutable
+    borrow of the vector, so the variable must be `mut`. `into_iter()` takes the vector by
+    value and gives each item as an owned `T`; the vector has been moved, and using it again is
+    a "borrow of moved value" error. `for w in &words` is shorthand for `words.iter()`, the
+    borrowing form. The loop that consumes the vector is `for w in words`.
+
+- key: rust-medium-17
+  type: single
+  category: rust
+  tags: [iterators, collect, result]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let parsed: Result<Vec<i32>, _> = ["1", "2", "x", "4"]
+            .iter()
+            .map(|s| s.parse::<i32>())
+            .collect();
+        match parsed {
+            Ok(numbers) => println!("{}", numbers.len()),
+            Err(_) => println!("error"),
+        }
+    }
+    ```
+  options:
+    - text: "`3`"
+    - text: "`4`"
+    - text: "`2`"
+    - text: "`error`"
+      correct: true
+  explanation: |
+    `collect` builds whatever type you name. Asked for a `Result<Vec<i32>, _>` from an iterator
+    of `Result` values, it gathers the `Ok` values into the vector and stops at the first
+    `Err`, which becomes the result of the whole expression. `"x"` does not parse, so `parsed`
+    is an `Err` and the program prints `error`. It is all or nothing: you do not get the two
+    numbers that came before the failure, and the bad item is not skipped. To skip failures
+    instead, use `filter_map(|s| s.parse().ok())` and collect into a plain `Vec<i32>`, which
+    would hold three numbers.
+
+- key: rust-medium-18
+  type: single
+  category: rust
+  tags: [collections, vec, dedup]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let mut v = vec![2, 1, 2, 2, 3, 1];
+        v.dedup();
+        println!("{v:?}");
+    }
+    ```
+  options:
+    - text: "`[2, 1, 3]`"
+    - text: "`[1, 2, 3]`"
+    - text: "`[2, 1, 2, 3, 1]`"
+      correct: true
+    - text: "`[2, 1, 2, 2, 3, 1]`"
+  explanation: |
+    `dedup` removes **consecutive** repeated elements only. The single pair of neighbours that
+    are equal is the `2, 2` in the middle, so one of those goes and everything else stays:
+    `[2, 1, 2, 3, 1]`. It does not hunt for duplicates across the whole vector (the first
+    option) and it never sorts (the second). To remove every duplicate, sort first so that
+    equal values become neighbours: `v.sort(); v.dedup();` gives `[1, 2, 3]`. When the original
+    order matters, track what you have seen in a `HashSet` instead.
+
+- key: rust-medium-19
+  type: single
+  category: rust
+  tags: [collections, sorting, stability]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let mut staff = vec![("bo", 41), ("ada", 36), ("cy", 41), ("di", 29)];
+        staff.sort_by(|a, b| b.1.cmp(&a.1));
+        let names: Vec<&str> = staff.iter().map(|(name, _)| *name).collect();
+        println!("{names:?}");
+    }
+    ```
+  options:
+    - text: "`[\"bo\", \"cy\", \"ada\", \"di\"]`"
+      correct: true
+    - text: "`[\"cy\", \"bo\", \"ada\", \"di\"]`"
+    - text: "`[\"di\", \"ada\", \"bo\", \"cy\"]`"
+    - text: "`bo` and `cy` first in an order that is not defined, then `ada`, then `di`"
+  explanation: |
+    The closure compares `b` with `a`, the reverse of the usual `a.cmp(b)`, so the largest
+    number comes first: the two 41s, then 36, then 29. `bo` and `cy` compare as equal, and
+    `sort_by` is a **stable** sort: equal elements keep the order they had before. `bo` was
+    ahead of `cy` in the input, so it stays ahead. Reversing the comparison reverses the order
+    of *unequal* elements only; it does not flip ties. The order of ties would be unspecified
+    with `sort_unstable_by`, which gives up stability in exchange for speed.
+
+- key: rust-medium-20
+  type: single
+  category: rust
+  tags: [patterns, match, shadowing]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let limit = 5;
+        let value = Some(9);
+
+        match value {
+            Some(limit) => println!("at the limit: {limit}"),
+            None => println!("none"),
+        }
+        println!("limit is {limit}");
+    }
+    ```
+  options:
+    - text: "`at the limit: 9`, then `limit is 5`"
+      correct: true
+    - text: "`at the limit: 5`, then `limit is 5`"
+    - text: "Only `limit is 5`, because 9 is not equal to the limit"
+    - text: "`at the limit: 9`, then `limit is 9`"
+  explanation: |
+    A name inside a pattern never compares with an existing variable. It always creates a
+    **new** variable and binds it to whatever is there. `Some(limit)` matches every `Some` and
+    binds a new `limit` to 9, which shadows the outer one inside that arm. After the `match`
+    the outer `limit` is visible again and is still 5. To match only when the value equals the
+    outer variable, bind a different name and add a guard: `Some(n) if n == limit`. Had the
+    outer `limit` not been used in the last line, the compiler would have warned that it is
+    an unused variable, which is often the first clue to this mistake.
+
+- key: rust-medium-21
+  type: multiple
+  category: rust
+  tags: [patterns, refutability]
+  prompt: |
+    Assume these two variables inside a function that returns `()`:
+
+    ```rust
+    let pair = (1, 2);
+    let maybe: Option<i32> = Some(3);
+    ```
+
+    Which of the following statements compile? Select all that apply.
+  options:
+    - text: "`let (a, b) = pair;`"
+      correct: true
+    - text: "`let Some(x) = maybe;`"
+    - text: "`if let Some(x) = maybe { println!(\"{x}\"); }`"
+      correct: true
+    - text: "`let Some(x) = maybe else { return; };`"
+      correct: true
+  explanation: |
+    A plain `let` accepts only an **irrefutable** pattern, one that matches every possible
+    value. `(a, b)` matches every pair, so the first statement is fine. `Some(x)` is
+    **refutable**: it does not match `None`, and a plain `let` has no way to carry on, so the
+    second statement fails with "refutable pattern in local binding ... pattern `None` not
+    covered". `if let` and `let ... else` exist for refutable patterns. The first simply skips
+    its block when the pattern does not match. The second runs its `else` block, which must
+    leave the current scope, here with `return`.
+
+- key: rust-medium-22
+  type: single
+  category: rust
+  tags: [errors, from, question-mark]
+  prompt: |
+    This code does not compile: the compiler says that `?` could not convert the error.
+
+    ```rust
+    use std::num::ParseIntError;
+
+    #[derive(Debug)]
+    enum AppError {
+        BadNumber(ParseIntError),
+    }
+
+    fn double(text: &str) -> Result<i32, AppError> {
+        let n = text.parse::<i32>()?;
+        Ok(n * 2)
+    }
+    ```
+
+    What has to be added?
+  options:
+    - text: "`impl std::fmt::Display for AppError`"
+    - text: "`impl std::error::Error for AppError`"
+    - text: "`impl From<ParseIntError> for AppError`"
+      correct: true
+    - text: "Nothing can be added: `?` only works when the two error types are identical, so a `match` is required"
+  explanation: |
+    On an `Err(e)`, the `?` operator returns `Err(From::from(e))`. It converts the error into
+    the function's error type through the `From` trait. `parse` fails with a `ParseIntError`
+    and the function returns `AppError`, so the compiler needs
+    `impl From<ParseIntError> for AppError`, typically
+    `fn from(e: ParseIntError) -> AppError { AppError::BadNumber(e) }`. `Display` and `Error`
+    are worth implementing on any error type, but they describe the error; they do not convert
+    one. A `match` or `map_err` would also work, but with the `From` impl every `?` in the
+    crate does the conversion for free.
+
+- key: rust-medium-23
+  type: single
+  category: rust
+  tags: [conversions, tryfrom]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let big: i32 = 300;
+        let a = big as u8;
+        let b = u8::try_from(big);
+        println!("{a} {}", b.is_ok());
+    }
+    ```
+  options:
+    - text: "`300 true`"
+    - text: "`255 false`"
+    - text: "Nothing; it panics at `big as u8` because 300 does not fit in a `u8`"
+    - text: "`44 false`"
+      correct: true
+  explanation: |
+    A `u8` holds 0 to 255. An `as` cast between integer types never fails and never panics: it
+    keeps the low bits and throws the rest away. 300 is 256 + 44, so `a` is `44`. It does not
+    clamp to 255. `TryFrom` is the checked alternative: `u8::try_from(300)` returns an `Err`,
+    so `is_ok()` is `false`. Use `try_from` (or `try_into`) whenever the value might not fit,
+    and keep `as` for cases where truncation is what you want.
+
+- key: rust-medium-24
+  type: single
+  category: rust
+  tags: [testing, should-panic]
+  prompt: |
+    What does `cargo test` report for these two tests?
+
+    ```rust
+    pub fn divide(a: i32, b: i32) -> i32 {
+        if b == 0 {
+            panic!("division by zero");
+        }
+        a / b
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        #[should_panic(expected = "by zero")]
+        fn rejects_zero() {
+            divide(1, 0);
+        }
+
+        #[test]
+        #[should_panic(expected = "by zero")]
+        fn accepts_two() {
+            divide(4, 2);
+        }
+    }
+    ```
+  options:
+    - text: Both tests pass
+    - text: "`rejects_zero` passes and `accepts_two` fails"
+      correct: true
+    - text: "`rejects_zero` fails, because a test that panics always fails"
+    - text: "Both fail, because `expected` must be the complete panic message"
+  explanation: |
+    `#[should_panic]` turns the rule around: the test passes only if the code panics.
+    `divide(1, 0)` panics with "division by zero", and `expected` asks only that the message
+    **contains** the given text, so `rejects_zero` passes. `divide(4, 2)` returns 2 without
+    panicking, so `accepts_two` fails with "test did not panic as expected". Giving `expected`
+    is good practice: without it the test would also pass on a panic from an unrelated bug.
+
+- key: rust-medium-25
+  type: single
+  category: rust
+  tags: [testing, integration-tests, visibility]
+  prompt: |
+    A library crate named `pricing` has a private function in `src/lib.rs`:
+
+    ```rust
+    fn round_to_five(cents: u64) -> u64 {
+        (cents + 2) / 5 * 5
+    }
+    ```
+
+    Where can a test call `round_to_five` directly?
+  options:
+    - text: "In a `#[cfg(test)] mod tests` inside `src/lib.rs`, after `use super::*;`"
+      correct: true
+    - text: "In `tests/rounding.rs`, after `use pricing::round_to_five;`"
+    - text: "In `tests/rounding.rs`, after `use super::*;`"
+    - text: "In a documentation test written in a `///` comment above the function"
+  explanation: |
+    A private item is visible in its own module and in the modules nested inside it. A `tests`
+    module in the same file is such a nested module, so a unit test can reach the function.
+    Every file in the `tests/` folder is compiled as a **separate crate** that uses the library
+    from outside, so it sees `pub` items only: importing the function fails with "function
+    `round_to_five` is private", and there is no `super` leading into the library.
+    Documentation tests are compiled the same way, as outside users of the crate. Test private
+    helpers with unit tests, and the public surface with integration tests.
+
+- key: rust-medium-26
+  type: single
+  category: rust
+  tags: [cargo, semver, dependencies]
+  prompt: |
+    A `Cargo.toml` contains this dependency:
+
+    ```toml
+    [dependencies]
+    rand = "0.8.3"
+    ```
+
+    Which versions of `rand` is Cargo allowed to use?
+  options:
+    - text: Only 0.8.3
+    - text: 0.8.3 or any later version, including 1.0.0 and beyond
+    - text: 0.8.3 or later, but below 0.9.0
+      correct: true
+    - text: 0.8.3 or later, but below 1.0.0
+  explanation: |
+    A bare version string is a **requirement**, not an exact version. Cargo accepts any later
+    version that is compatible under semantic versioning, and its rule is that the leftmost
+    non-zero number must stay the same. For 0.8.3 that number is the 8, so the range is
+    `>=0.8.3, <0.9.0`: before 1.0, a change in the minor number counts as breaking. A
+    requirement of `"1.2.3"` would allow everything below 2.0.0. To demand exactly one version
+    you would write `"=0.8.3"`. Which version in the range is really used is recorded in
+    `Cargo.lock` and stays put until you run `cargo update`.
+
+- key: rust-medium-27
+  type: single
+  category: rust
+  tags: [cargo, profiles, overflow]
+  prompt: |
+    A package with Cargo's default settings contains this program:
+
+    ```rust
+    fn main() {
+        let text = std::env::args().nth(1).unwrap();
+        let small: u8 = text.parse().unwrap();
+        println!("{}", small + 1);
+    }
+    ```
+
+    It is run twice with the argument `255`: first with `cargo run -- 255`, then with
+    `cargo run --release -- 255`. What happens?
+  options:
+    - text: Both runs print `256`
+    - text: Both runs panic with "attempt to add with overflow"
+    - text: The first run prints `0`; the second panics with "attempt to add with overflow"
+    - text: The first run panics with "attempt to add with overflow"; the second prints `0`
+      correct: true
+  explanation: |
+    A `u8` cannot hold 256, so the addition overflows. What happens next depends on the build
+    **profile**. `cargo run` uses the `dev` profile, where `overflow-checks` is on and an
+    overflow panics. `--release` selects the `release` profile, where the check is off by
+    default and the value wraps around to 0. Profiles differ in more than speed, which is why
+    code must not rely on either behaviour. Say what you mean with `checked_add`,
+    `wrapping_add` or `saturating_add`, or turn the check on for release builds with
+    `overflow-checks = true` under `[profile.release]`.
+
+- key: rust-medium-28
+  type: single
+  category: rust
+  tags: [cli, stderr, stdout]
+  prompt: |
+    A command-line tool reports a missing input file like this, and then exits with code 1:
+
+    ```rust
+    println!("error: cannot read {path}");
+    ```
+
+    A user runs `tool missing.txt > out.txt`. What happens to the message?
+  options:
+    - text: It appears in the terminal, and `out.txt` is empty
+    - text: It is written to `out.txt`, and nothing appears in the terminal
+      correct: true
+    - text: It appears in the terminal and is also written to `out.txt`
+    - text: It is lost, because output is discarded when a program exits with a non-zero code
+  explanation: |
+    `println!` writes to **standard output**, and `> out.txt` redirects exactly that stream to
+    the file. The user sees nothing, and the next program to read `out.txt` finds an error
+    message where it expected results. Diagnostics belong on **standard error**: with
+    `eprintln!` the message would still reach the terminal and `out.txt` would stay empty,
+    which is what the first option describes. The exit code is separate from both streams. It
+    tells the caller that the run failed, but it does not discard or move any output.
+
+- key: rust-medium-29
+  type: single
+  category: rust
+  tags: [cli, arguments]
+  prompt: |
+    This program is compiled to an executable named `tool` and run as `./tool alpha beta`.
+    What does it print?
+
+    ```rust
+    fn main() {
+        let args: Vec<String> = std::env::args().collect();
+        println!("{}", args.len());
+    }
+    ```
+  options:
+    - text: "`0`"
+    - text: "`1`"
+    - text: "`2`"
+    - text: "`3`"
+      correct: true
+  explanation: |
+    `std::env::args()` yields the program's own name first, here `./tool`, and then the
+    arguments the user typed. The vector therefore holds three strings, and `alpha` is at
+    index 1, not index 0. This is why argument-handling code starts by skipping one item, and
+    why `args[1]` panics with "index out of bounds" when the program is run with no arguments
+    at all: a vector of length 1 has no index 1. Check the length, or take the arguments with
+    `next()` and handle the `None`.

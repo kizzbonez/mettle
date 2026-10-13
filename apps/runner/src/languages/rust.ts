@@ -3,7 +3,7 @@ import { config } from '../config';
 import type { Harness, LanguageSpec } from './types';
 
 const RUSTC = [
-  'rustc --edition 2021 --color never',
+  'rustc --edition 2024 --color never',
   '-C opt-level=1 -C debuginfo=0 -C overflow-checks=on',
   '-A dead_code -A unused',
   '-o lab main.rs',

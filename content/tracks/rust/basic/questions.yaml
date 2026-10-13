@@ -149,3 +149,550 @@
     which: `fn longer<'a>(a: &'a str, b: &'a str) -> &'a str`. Reading the body would make the
     function's contract change whenever its implementation did, which is exactly what a
     signature is meant to prevent.
+
+- key: rust-basic-06
+  type: single
+  category: rust
+  tags: [basics, memory-safety]
+  prompt: |
+    A Rust program creates a `String`, uses it and no longer needs it. How does its heap
+    memory get freed?
+  options:
+    - text: A garbage collector that runs alongside the program finds the unused value and frees it
+    - text: The compiler inserts the cleanup at the point where the value's owner goes out of scope
+      correct: true
+    - text: "The programmer must call a `free` function on it, as in C"
+    - text: The value counts its users at run time and frees itself when the count reaches zero
+  explanation: |
+    Rust has no garbage collector. Every value has exactly one **owner**, and the compiler
+    knows where that owner's scope ends, so it inserts the cleanup (the *drop*) there. Nothing
+    has to search for unused memory while the program runs, and nobody has to remember to
+    call `free`, which is how use-after-free and double-free bugs arise in C. Counting users
+    at run time is reference counting. Rust offers it as an opt-in library type for shared
+    data, but it is not how ordinary values are managed.
+
+- key: rust-basic-07
+  type: multiple
+  category: rust
+  tags: [cargo, tooling]
+  prompt: |
+    Which statements about Cargo and editions are true? Select all that apply.
+  options:
+    - text: "`cargo new hello` creates a folder that contains `Cargo.toml` and `src/main.rs`"
+      correct: true
+    - text: "`cargo check` leaves an optimized executable in `target/release`"
+    - text: "`cargo run` rebuilds the project only if something changed, and then runs it"
+      correct: true
+    - text: "Every crate in a program must use the same edition, so a new edition forces all dependencies to upgrade"
+  explanation: |
+    `cargo new` creates the manifest `Cargo.toml` and a hello-world `src/main.rs`.
+    `cargo run` builds when needed and then runs the result, which is why a second run
+    without edits shows no `Compiling` line. `cargo check` only checks that the code
+    compiles and produces **no** executable, which is what makes it fast. The optimized
+    build comes from `cargo build --release`. Editions are chosen per crate with the
+    `edition` line in `Cargo.toml`, and crates of different editions work together, so
+    nobody is forced to upgrade.
+
+- key: rust-basic-08
+  type: single
+  category: rust
+  tags: [variables, mutability]
+  prompt: |
+    This program does not compile. Which change fixes it?
+
+    ```rust
+    fn main() {
+        let total = 0;
+        total += 5;
+        println!("{total}");
+    }
+    ```
+  options:
+    - text: "Declare the variable with `let mut total = 0;`"
+      correct: true
+    - text: "Add a type annotation: `let total: i32 = 0;`"
+    - text: "Write the second line as `total = total + 5;`"
+    - text: "Declare it as a constant: `const total: i32 = 0;`"
+  explanation: |
+    Variables are **immutable by default**. `total += 5` is a second assignment, so the
+    compiler reports E0384, "cannot assign twice to immutable variable", and its `help` line
+    shows the fix: `let mut total = 0;`. A type annotation does not make a variable mutable.
+    `total = total + 5` is the same assignment written out in full. A constant can never be
+    assigned to at all. The other legal fix would be shadowing, `let total = total + 5;`,
+    which creates a new variable instead of changing the old one.
+
+- key: rust-basic-09
+  type: single
+  category: rust
+  tags: [variables, shadowing, scope]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let mut stock = 10;
+        {
+            let stock = stock * 3;
+            println!("{stock}");
+        }
+        stock += 1;
+        println!("{stock}");
+    }
+    ```
+  options:
+    - text: "`30`, then `11`"
+      correct: true
+    - text: "`30`, then `31`"
+    - text: "`10`, then `11`"
+    - text: "Nothing: it fails to compile, because `stock` is declared twice"
+  explanation: |
+    The `let` inside the braces creates a **new** variable that shadows the outer `stock`
+    until the block ends. It is 30, and it disappears at the closing brace. The outer
+    variable was never touched, so it is still 10 when `stock += 1` runs, and the last line
+    prints 11. Answering 31 treats the inner `let` as an assignment to the outer variable.
+    Declaring a name again is legal in Rust: that is what shadowing is.
+
+- key: rust-basic-10
+  type: single
+  category: rust
+  tags: [data-types, integers]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        println!("{} {} {}", 7 / 2, -7 / 2, 7 % 2);
+    }
+    ```
+  options:
+    - text: "`3 -3 1`"
+      correct: true
+    - text: "`3.5 -3.5 1`"
+    - text: "`3 -4 1`"
+    - text: "`4 -4 1`"
+  explanation: |
+    All the numbers are integers, so `/` is integer division: the fraction is dropped, which
+    rounds **toward zero**. That gives 3 and -3. It does not round down (-4, as Python's `//`
+    would), and it does not round to the nearest number. `%` is the remainder, 1. Rust never
+    turns an integer into a float for you. To get 3.5, write `7.0 / 2.0`, or convert first:
+    `7 as f64 / 2.0`.
+
+- key: rust-basic-11
+  type: multiple
+  category: rust
+  tags: [data-types, overflow, casting]
+  prompt: |
+    Which of these expressions evaluate to `255`? Select all that apply.
+  options:
+    - text: "`250u8.saturating_add(10)`"
+      correct: true
+    - text: "`250u8.wrapping_add(10)`"
+    - text: "`-1i32 as u8`"
+      correct: true
+    - text: "`300i32 as u8`"
+  explanation: |
+    A `u8` holds 0 to 255. `saturating_add` stops at the limit, so 250 + 10 gives 255.
+    `wrapping_add` wraps around past 255 and gives 4. An `as` cast to a smaller integer type
+    keeps only the low eight bits: -1 has all bits set, so it becomes 255, while 300 becomes
+    44 (the remainder after dividing by 256). The casts compile without any warning, which is
+    why `as` is only for cases where you have thought about the range. `checked_add` would
+    have returned `None` for the addition.
+
+- key: rust-basic-12
+  type: single
+  category: rust
+  tags: [functions, expressions]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    fn area(width: u32, height: u32) -> u32 {
+        width * height;
+    }
+
+    fn main() {
+        println!("{}", area(3, 4));
+    }
+    ```
+  options:
+    - text: "It prints `12`"
+    - text: "It fails to compile: the semicolon turns the last line into a statement, so the body returns `()` instead of a `u32`"
+      correct: true
+    - text: "It prints `0`, the default value of a `u32`"
+    - text: "It compiles with a warning and prints `()`"
+  explanation: |
+    A function returns the value of its **final expression**. Adding a semicolon turns
+    `width * height` into a statement, which has no value, so the body evaluates to the unit
+    value `()`. The signature promised a `u32`, and the compiler reports E0308, "expected
+    `u32`, found `()`", with the hint "remove this semicolon to return this value". Rust has
+    no default return value, and a type mismatch is always an error, never a warning.
+
+- key: rust-basic-13
+  type: single
+  category: rust
+  tags: [control-flow, loops]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let mut total = 0;
+        for number in 1..=6 {
+            if number % 2 == 0 {
+                continue;
+            }
+            if number == 5 {
+                break;
+            }
+            total += number;
+        }
+        println!("{total}");
+    }
+    ```
+  options:
+    - text: "`4`"
+      correct: true
+    - text: "`9`"
+    - text: "`6`"
+    - text: "`21`"
+  explanation: |
+    `continue` skips the rest of the round for the even numbers, so 2 and 4 are never added.
+    1 and 3 are added, which makes 4. At 5 the `break` ends the loop **before** the addition
+    on the last line of the body, so 5 is not added, and 6 is never reached. Answering 9 adds
+    the 5 as well, 6 adds the even numbers instead of the odd ones, and 21 ignores both
+    keywords.
+
+- key: rust-basic-14
+  type: single
+  category: rust
+  tags: [ownership, functions]
+  prompt: |
+    Which line can replace the comment without causing a compile error?
+
+    ```rust
+    fn consume(text: String) -> usize {
+        text.len()
+    }
+
+    fn main() {
+        let count = 3;
+        let copy = count;
+        let label = String::from("crate");
+        let size = consume(label);
+        // HERE
+    }
+    ```
+  options:
+    - text: '`println!("{count} {copy} {size}");`'
+      correct: true
+    - text: '`println!("{label} {size}");`'
+    - text: '`println!("{}", consume(label));`'
+    - text: '`println!("{}", label.len());`'
+  explanation: |
+    Passing a value to a function follows the same rule as assignment. `count` is an integer,
+    which is `Copy`, so `let copy = count;` duplicates it and both names stay usable. `label`
+    is a `String`, which is not `Copy`: `consume(label)` **moves** it into the function, where
+    it is dropped when the function ends. Every later use of `label` is error E0382, whether
+    it is printed, passed again or only asked for its length. To keep using it, the function
+    would have to borrow it with a `&str` parameter.
+
+- key: rust-basic-15
+  type: single
+  category: rust
+  tags: [borrowing, references]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    fn add_one(value: &mut u32) {
+        *value += 1;
+    }
+
+    fn main() {
+        let mut count = 1;
+        add_one(&mut count);
+        add_one(&mut count);
+        let view = &count;
+        println!("{view} {count}");
+    }
+    ```
+  options:
+    - text: "It prints `3 3`"
+      correct: true
+    - text: "It prints `1 1`, because the function changes its own copy"
+    - text: "It fails to compile: `count` is borrowed mutably twice"
+    - text: "It fails to compile: `view` and `count` cannot be read on the same line"
+  explanation: |
+    A `&mut` reference lets the function change the caller's variable, so each call adds 1 to
+    `count` itself. The two mutable borrows are not alive **at the same time**: each one ends
+    when its call returns, and a borrow lasts only until its last use. Afterwards `view` is a
+    shared reference, and reading through it and through `count` together is fine, because
+    any number of readers is allowed. The rule that is checked is "many shared references or
+    one mutable reference at any one moment".
+
+- key: rust-basic-16
+  type: single
+  category: rust
+  tags: [strings, utf-8]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn main() {
+        let word = "naïve";
+        println!("{} {}", word.len(), word.chars().count());
+    }
+    ```
+  options:
+    - text: "`6 5`"
+      correct: true
+    - text: "`5 5`"
+    - text: "`5 6`"
+    - text: "Nothing: string literals may only contain ASCII characters"
+  explanation: |
+    Rust strings are UTF-8, where a character takes one to four bytes. `len()` counts
+    **bytes**: `ï` takes two and the other four letters take one each, which makes 6.
+    `chars().count()` counts characters, 5. This difference is the reason `word[2]` does not
+    compile: a position could land in the middle of a character. Any Unicode text is allowed
+    in a string literal.
+
+- key: rust-basic-17
+  type: multiple
+  category: rust
+  tags: [strings, slices]
+  prompt: |
+    Given this function and variable, which calls compile? Select all that apply.
+
+    ```rust
+    fn shout(text: &str) -> String {
+        text.to_uppercase()
+    }
+
+    let owned = String::from("dock");
+    ```
+  options:
+    - text: '`shout("dock")`'
+      correct: true
+    - text: "`shout(&owned)`"
+      correct: true
+    - text: "`shout(owned)`"
+    - text: "`shout(&owned[0..2])`"
+      correct: true
+  explanation: |
+    A `&str` parameter accepts every kind of borrowed text. A literal already is a `&str`.
+    `&owned` is a `&String`, which Rust converts to `&str` automatically. `&owned[0..2]` is a
+    slice of the first two bytes, also a `&str`. Only `shout(owned)` fails, with "expected
+    `&str`, found `String`": it tries to hand over the whole `String` where a borrow is
+    wanted. This is why `&str` is the usual type for a text parameter.
+
+- key: rust-basic-18
+  type: single
+  category: rust
+  tags: [structs, methods]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```rust
+    struct Counter {
+        count: u32,
+    }
+
+    impl Counter {
+        fn add(&mut self, amount: u32) {
+            self.count += amount;
+        }
+    }
+
+    fn main() {
+        let counter = Counter { count: 0 };
+        counter.add(5);
+        println!("{}", counter.count);
+    }
+    ```
+  options:
+    - text: "It prints `5`"
+    - text: "It fails to compile: `add` takes `&mut self`, but `counter` is not declared `mut`"
+      correct: true
+    - text: "It prints `0`, because a method works on a copy of the struct"
+    - text: "It fails to compile: a field cannot be read outside the `impl` block"
+  explanation: |
+    A method that takes `&mut self` borrows the instance mutably, and that is only possible
+    when the variable itself is mutable. The compiler reports E0596, "cannot borrow `counter`
+    as mutable, as it is not declared as mutable", and suggests `let mut counter`. With that
+    change the program prints 5: methods work on the instance itself, not on a copy. Reading
+    `counter.count` in `main` is fine, because `main` and the struct are in the same module,
+    which here is the same file.
+
+- key: rust-basic-19
+  type: single
+  category: rust
+  tags: [option, pattern-matching]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn label(code: Option<u32>) -> String {
+        let Some(number) = code else {
+            return String::from("none");
+        };
+        format!("#{number}")
+    }
+
+    fn main() {
+        println!("{} {}", label(Some(7)), label(None));
+    }
+    ```
+  options:
+    - text: "`#7 none`"
+      correct: true
+    - text: "`#Some(7) none`"
+    - text: "`#7 #0`"
+    - text: "It prints `#7` and then panics, because `None` does not match the pattern"
+  explanation: |
+    `let ... else` tries the pattern. When `code` is `Some(7)`, the pattern fits and `number`
+    is bound to the value **inside**, the plain `7`, for the code that follows. When
+    `code` is `None`, the `else` block runs, and it must leave the function, here by
+    returning `"none"`. Nothing panics, and a missing value never turns into 0: Rust has no
+    default for `None` unless you ask for one, for example with `unwrap_or(0)`.
+
+- key: rust-basic-20
+  type: single
+  category: rust
+  tags: [collections, hash-map]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    use std::collections::HashMap;
+
+    fn main() {
+        let mut stock = HashMap::new();
+        stock.insert("bolt", 5);
+        stock.insert("nut", 2);
+        stock.insert("bolt", 8);
+        *stock.entry("nut").or_insert(0) += 1;
+        *stock.entry("gear").or_insert(0) += 1;
+        println!("{} {:?} {:?}", stock.len(), stock.get("bolt"), stock.get("nut"));
+    }
+    ```
+  options:
+    - text: "`3 Some(8) Some(3)`"
+      correct: true
+    - text: "`4 Some(13) Some(3)`"
+    - text: "`3 Some(8) Some(1)`"
+    - text: "`3 8 3`"
+  explanation: |
+    Inserting a key that already exists **replaces** its value, so `bolt` is 8, not 13, and
+    there is still one entry for it. `entry(key).or_insert(0)` gives a mutable reference to
+    the existing value and inserts 0 only when the key is missing: `nut` goes from 2 to 3, and
+    `gear` is created at 0 and becomes 1. That makes three keys. `get` returns an `Option`,
+    because a key may be absent, so the values print as `Some(8)` and `Some(3)`.
+
+- key: rust-basic-21
+  type: single
+  category: rust
+  tags: [result, question-mark, error-handling]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    #[derive(Debug)]
+    enum ReadError {
+        Empty,
+        NotANumber,
+    }
+
+    fn read(text: &str) -> Result<i32, ReadError> {
+        if text.is_empty() {
+            return Err(ReadError::Empty);
+        }
+        let Ok(number) = text.parse::<i32>() else {
+            return Err(ReadError::NotANumber);
+        };
+        Ok(number)
+    }
+
+    fn sum(a: &str, b: &str) -> Result<i32, ReadError> {
+        let total = read(a)? + read(b)?;
+        Ok(total)
+    }
+
+    fn main() {
+        println!("{:?} {:?} {:?}", sum("2", "3"), sum("2", ""), sum("x", ""));
+    }
+    ```
+  options:
+    - text: "`Ok(5) Err(Empty) Err(NotANumber)`"
+      correct: true
+    - text: "`Ok(5) Ok(2) Ok(0)`"
+    - text: "`Ok(5) Err(Empty) Err(Empty)`"
+    - text: "It prints `Ok(5)` and then panics on the empty string"
+  explanation: |
+    `?` on an `Ok` gives the value inside. On an `Err` it **returns that error from the
+    function at once**. In `sum("x", "")` the first `read` already fails with `NotANumber`,
+    so `read(b)` is never called and its `Empty` error is never produced. An error is never
+    treated as 0, and `?` never panics: that is what `unwrap()` would do. The caller receives
+    an ordinary `Result` and decides what to do with it.
+
+- key: rust-basic-22
+  type: true_false
+  category: rust
+  tags: [input, parsing]
+  prompt: |
+    True or false: this program prints `42`.
+
+    ```rust
+    fn main() {
+        let input = "42\n";
+        let number: u32 = input.parse().unwrap_or(0);
+        println!("{number}");
+    }
+    ```
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    It prints `0`. `parse` accepts digits only, and the line ending `\n` is not a digit, so
+    the result is an `Err` and `unwrap_or(0)` supplies the 0. This is exactly what
+    `read_line` hands you, because it keeps the line ending. Trim first:
+    `input.trim().parse()`. The example also shows the danger of a silent default: the
+    program gives no sign that the input was rejected.
+
+- key: rust-basic-23
+  type: single
+  category: rust
+  tags: [parsing, iteration, strings]
+  prompt: |
+    What does this program print?
+
+    ```rust
+    fn first_bad_line(text: &str) -> Option<usize> {
+        for (index, line) in text.lines().enumerate() {
+            if line.trim().is_empty() {
+                continue;
+            }
+            if line.trim().parse::<u32>().is_err() {
+                return Some(index + 1);
+            }
+        }
+        None
+    }
+
+    fn main() {
+        println!("{:?}", first_bad_line("10\n\n 20 \nten\n30\n"));
+    }
+    ```
+  options:
+    - text: "`Some(4)`"
+      correct: true
+    - text: "`Some(3)`"
+    - text: "`Some(2)`"
+    - text: "`None`"
+  explanation: |
+    `lines()` yields `10`, an empty line, ` 20 `, `ten` and `30`, and `enumerate()` numbers
+    them 0 to 4. The empty line is skipped, but it was **already counted**, because the
+    numbering happens before the skipping. ` 20 ` parses, because it is trimmed first. `ten`
+    is the first failure, at index 3, and the function adds 1 to report line 4, the number a
+    person would see in an editor. Answering 3 forgets the `+ 1`, leaves the blank line out
+    of the count, or overlooks the `trim`.

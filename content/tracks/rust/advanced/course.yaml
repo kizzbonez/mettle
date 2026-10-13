@@ -1,16 +1,18 @@
 title: Concurrency and Systems
 summary: >-
-  Shared ownership, interior mutability and the thread-safety rules the compiler enforces,
-  followed by the model behind async code. The lab is a worker pool built from threads and
-  channels.
+  Ten lessons that take you from smart pointers and trait objects through threads, channels
+  and locks to async code, and finish with the advanced corners of the trait and type system
+  and macros. Every example is compiled and run, and the lab is a worker pool built from
+  threads and channels.
 outcomes:
-  - Choose among `Box`, `Rc`, `Arc`, `RefCell` and `Mutex` for a given ownership problem
-  - Share and send data between threads with `Arc<Mutex<T>>` and channels
-  - Explain what `Send` and `Sync` mean and why a data race does not compile
-  - Describe how a future is polled, woken and pinned, and what an executor does
+  - Choose among `Box`, `Rc`, `Arc`, `RefCell`, `Mutex` and `Weak` for a given ownership problem, and predict when values are dropped
+  - Run work on threads, coordinate it with channels, locks and atomics, and explain how `Send` and `Sync` rule out data races
+  - Describe how a future is polled, woken, pinned and cancelled, and what a runtime such as Tokio adds
+  - Use trait objects, associated types, operator overloading, newtypes, function pointers and `macro_rules!` macros, and say what each one costs
   - Build a fixed-size worker pool that returns ordered results and shuts down cleanly
 exam:
   title: Concurrency and Systems Mock Exam
-  description: Five questions on interior mutability, threads, channels, `Send` and `Sync`, and async.
-  timeLimitMinutes: 12
+  description: Ten questions drawn from a bank that covers smart pointers, trait objects, threads, channels and locks, async, advanced traits and types, and macros.
+  timeLimitMinutes: 20
   passPercent: 70
+  questionCount: 10

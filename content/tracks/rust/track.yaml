@@ -1,9 +1,12 @@
 title: Rust Development
-tagline: From ownership and borrowing to concurrent, production-grade systems code.
+tagline: From your first program to concurrent, production-grade systems code.
 description: >-
-  Four levels that go from ownership and error handling to threads, unsafe code and
-  performance work. Every level ends with a mock exam and a hands-on lab that is compiled and
-  tested in a sandbox using only the standard library.
+  A full course in four levels. It starts from installing Rust and writing a first program,
+  teaches every fundamental one lesson at a time, and goes on to traits, concurrency, async,
+  unsafe code and running Rust in production. Every level ends with a mock exam and a hands-on
+  lab that is compiled and tested in a sandbox using only the standard library.
 icon: Cog
 category: rust
 sortOrder: 1
+format: course
+revision: 2

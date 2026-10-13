@@ -1,16 +1,18 @@
 title: Idiomatic Rust
 summary: >-
-  The tools that make Rust code reusable and concise: traits and generics for abstraction,
-  iterators and closures for data processing, and the collections, module system and test
-  support you use every day.
+  The tools that turn working Rust into reusable, well-organized Rust: modules and crates,
+  generics, traits and lifetimes, closures and iterators, the wider standard collections,
+  patterns, error types, tests and Cargo. The level ends by building a complete command-line
+  tool.
 outcomes:
-  - Define traits and write generic code bounded by them
-  - Choose between static dispatch with generics and dynamic dispatch with `dyn`
-  - Build lazy iterator pipelines and explain how closures capture their environment
-  - Pick the right collection and use the entry API to update it in place
-  - Organize code into modules with deliberate visibility and cover it with unit tests
+  - Organize a program into modules, files and crates with deliberate visibility
+  - Write generic code with trait bounds, implement and derive the standard traits, and annotate lifetimes where the compiler asks for them
+  - Process data with closures and lazy iterator pipelines, and choose the right collection for each task
+  - "Design error types whose conversions work with the `?` operator, and take values apart with patterns"
+  - Test, format, lint and document a project with Cargo, and build a command-line tool that reports errors and exit codes properly
 exam:
   title: Idiomatic Rust Mock Exam
-  description: Five questions on traits, generics, iterators, closures, collections and testing.
-  timeLimitMinutes: 12
+  description: Ten questions drawn from a larger bank on modules, generics, traits, lifetimes, closures, iterators, collections, patterns, error handling, testing and Cargo.
+  timeLimitMinutes: 20
   passPercent: 70
+  questionCount: 10
