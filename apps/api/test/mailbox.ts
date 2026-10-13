@@ -29,6 +29,13 @@ export async function waitForEmail(address: string, subjectIncludes = '', timeou
   throw new Error(`No email to ${address} matching "${subjectIncludes}" arrived within ${timeoutMs} ms`);
 }
 
+/** How many caught emails to `address` have a subject containing the text. */
+export async function countEmails(address: string, subjectIncludes: string): Promise<number> {
+  const query = encodeURIComponent(`to:"${address}"`);
+  const data = (await (await fetch(`${MAILPIT}/search?query=${query}`)).json()) as { messages: { Subject: string }[] };
+  return data.messages.filter((message) => message.Subject.includes(subjectIncludes)).length;
+}
+
 export function resetTokenFrom(email: CaughtEmail): string {
   const match = /reset-password\?token=([A-Za-z0-9_%-]+)/.exec(email.text);
   if (!match?.[1]) throw new Error('No reset link in the email');

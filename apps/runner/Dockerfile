@@ -16,6 +16,9 @@ RUN npm run build --workspace @mettle/runner
 
 FROM node:24-alpine
 ENV NODE_ENV=production
+# The runtime needs Node, not a package manager. Removing npm and yarn also
+# removes the libraries bundled inside them, which image scanners report.
+RUN rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx     /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-*
 WORKDIR /app
 COPY --from=build /repo/apps/runner/dist/server.cjs ./server.cjs
 # An unprivileged user. It reaches the Docker socket through a supplementary

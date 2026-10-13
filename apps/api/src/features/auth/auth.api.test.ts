@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PASSWORD, registerLearner, TestClient, uniqueEmail } from '../../../test/client';
-import { resetTokenFrom, waitForEmail } from '../../../test/mailbox';
+import { countEmails, resetTokenFrom, waitForEmail } from '../../../test/mailbox';
 import { buildApp } from '../../app';
 import { pool } from '../../db/client';
 import { totpAt } from '../../lib/totp';
@@ -201,6 +201,15 @@ describe('password reset', () => {
     const reuse = await visitor.post('/auth/reset-password', { token, password: 'yet-another-pass-8', confirmPassword: 'yet-another-pass-8' });
     expect(reuse.body.error.code).toBe('reset_token_invalid');
     await waitForEmail(email, 'password was changed');
+  });
+
+  it('sends one reset email per account however many times it is asked', async () => {
+    const { email } = await registerLearner(app);
+    const visitor = new TestClient(app);
+    for (let i = 0; i < 4; i += 1) expect((await visitor.post('/auth/forgot-password', { email })).status).toBe(200);
+    await waitForEmail(email, 'Reset your');
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    expect(await countEmails(email, 'Reset your')).toBe(1);
   });
 });
 

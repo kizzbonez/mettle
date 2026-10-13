@@ -1,4 +1,4 @@
-import { and, eq, gt, isNull } from 'drizzle-orm';
+import { and, desc, eq, gt, isNull } from 'drizzle-orm';
 import type { FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { db } from '../../db/client';
@@ -14,17 +14,33 @@ import { revokeAllSessions } from './sessions';
 import { findUserByEmail } from './users';
 
 const RESET_TTL_MS = 60 * 60_000;
+/** At most one reset email per account in this window, so the form cannot flood an inbox. */
+const RESEND_AFTER_MS = 2 * 60_000;
 
 const forgotBody = z.object({ email: emailField });
 const resetBody = withConfirmation(
   z.object({ token: z.string().min(20).max(200), password: passwordField, confirmPassword: z.string() }),
 );
 
+/**
+ * True when a reset email went to this account moments ago. The limit is per
+ * account, not per address, because the address is whatever a proxy reports.
+ */
+async function sentRecently(userId: string): Promise<boolean> {
+  const [latest] = await db
+    .select({ createdAt: authTokens.createdAt })
+    .from(authTokens)
+    .where(and(eq(authTokens.userId, userId), eq(authTokens.purpose, 'password_reset')))
+    .orderBy(desc(authTokens.createdAt))
+    .limit(1);
+  return latest !== undefined && Date.now() - latest.createdAt.getTime() < RESEND_AFTER_MS;
+}
+
 /** Always answers the same way, so the form cannot be used to discover accounts. */
 export async function forgotPassword(request: FastifyRequest) {
   const { email } = parse(forgotBody, request.body);
   const user = await findUserByEmail(email);
-  if (user && user.status === 'active') {
+  if (user && user.status === 'active' && !(await sentRecently(user.id))) {
     const token = randomToken();
     await db.transaction(async (tx) => {
       // A new request retires any link sent earlier.
