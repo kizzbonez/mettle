@@ -5,10 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { devEnv } from './dev-env.mjs';
 
 const apiDir = fileURLToPath(new URL('../apps/api', import.meta.url));
-const child = spawn('npx', ['tsx', 'watch', 'src/server.ts'], {
-  cwd: apiDir,
-  env: devEnv(),
-  stdio: 'inherit',
-  shell: true,
-});
+// Node runs tsx's own entry point, so no shell is involved.
+const tsx = fileURLToPath(import.meta.resolve('tsx/cli'));
+const child = spawn(process.execPath, [tsx, 'watch', 'src/server.ts'], { cwd: apiDir, env: devEnv(), stdio: 'inherit' });
 child.on('exit', (code) => process.exit(code ?? 0));

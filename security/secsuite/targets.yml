@@ -1,0 +1,55 @@
+# secsuite targets for this project. Run from the host, for example:
+#
+#   docker exec security-suite-worker-1 python -m secsuite \
+#     --targets /repos/competency-exam/security/secsuite/targets.yml \
+#     scan --target mettle-source --profile static
+#
+# The secsuite worker mounts this repository read-only at /repos/competency-exam
+# and reaches host-published ports through host.docker.internal.
+
+targets:
+
+  # Source tree: SAST, dependency CVEs, committed secrets, IaC misconfiguration.
+  mettle-source:
+    kind: repo
+    source_path: /repos/competency-exam
+    semgrep_config: auto
+
+  # The running site as an anonymous visitor sees it. Everything listed under
+  # sensitive_paths needs a session and must be refused without one.
+  mettle-web:
+    kind: web
+    base_url: http://host.docker.internal:4310
+    sensitive_paths:
+      - /dashboard
+      - /courses
+      - /profile
+      - /admin
+      - /admin/users
+      - /admin/settings
+      - /api/v1/auth/me
+      - /api/v1/catalog
+      - /api/v1/me/dashboard
+      - /api/v1/admin/users
+      - /api/v1/admin/metrics
+      - /api/v1/admin/settings
+    e2e_paths:
+      - /
+      - /login
+      - /register
+      - /guide
+    e2e_wait: networkidle
+    e2e_min_text: 80
+
+  # Built images, for OS and runtime package CVEs.
+  mettle-image-web:
+    kind: image
+    image: mettle-web:local
+
+  mettle-image-api:
+    kind: image
+    image: mettle-api:local
+
+  mettle-image-runner:
+    kind: image
+    image: mettle-runner:local

@@ -17,4 +17,7 @@ ENV HOME=/work \
 
 WORKDIR /work
 USER 10001:10001
+# A sandbox lives for one submission, a few seconds. There is nothing to probe.
+# checkov:skip=CKV_DOCKER_2: single-use container, never a running service
+HEALTHCHECK NONE
 CMD ["true"]

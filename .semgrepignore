@@ -1,0 +1,7 @@
+# Generated or third-party files: scanned at their source, not here.
+node_modules/
+.next/
+dist/
+apps/web/public/monaco/
+apps/api/migrations/meta/
+package-lock.json

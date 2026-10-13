@@ -18,9 +18,11 @@ FROM node:24-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /repo/apps/runner/dist/server.cjs ./server.cjs
-# The runner stays root because it has to open the Docker socket. Compose
-# removes every capability, makes the filesystem read-only and gives the
-# container no route to the internet; see docs/ARCHITECTURE.md.
+# An unprivileged user. It reaches the Docker socket through a supplementary
+# group that Compose adds (DOCKER_GID), not by being root. Compose also drops
+# every capability, makes the filesystem read-only and gives the container no
+# route to the internet; see docs/ARCHITECTURE.md.
+USER node
 EXPOSE 4100
 HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=5 \
   CMD wget -qO /dev/null http://127.0.0.1:4100/health || exit 1

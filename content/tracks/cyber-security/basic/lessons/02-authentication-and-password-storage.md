@@ -48,8 +48,8 @@ commodity hardware computes billions per second. Password hashing functions such
 **bcrypt**, **scrypt** and **Argon2** are deliberately slow, and tunable:
 
 ```text
-$2b$12$Q9o5Yb0nC5m7dM9M3rYv8e0Xo0m0fS3fQeYz7xw1cJ8m2mTqk1x6S
- │   │  └─ 22-character salt, then the hash
+$2b$12$Q9o5Yb0nC5m7dM9M3rYv8e<31 more characters: the hash>
+ │   │  └─ 22-character salt
  │   └─ cost: 2^12 rounds
  └─ algorithm: bcrypt
 ```

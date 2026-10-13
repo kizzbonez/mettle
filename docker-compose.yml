@@ -99,6 +99,9 @@ services:
       SANDBOX_RUNTIME: ${SANDBOX_RUNTIME:-}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    # The group that owns the Docker socket on this host. 0 suits Docker
+    # Desktop; on Linux use the output of `stat -c %g /var/run/docker.sock`.
+    group_add: ['${DOCKER_GID:-0}']
     read_only: true
     tmpfs: [/tmp]
     cap_drop: [ALL]

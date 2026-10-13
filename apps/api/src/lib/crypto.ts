@@ -22,14 +22,15 @@ export function safeEqual(a: string, b: string): boolean {
 /** AES-256-GCM. Output is base64 of iv | tag | ciphertext. */
 export function encrypt(plain: string): string {
   const iv = randomBytes(IV_BYTES);
-  const cipher = createCipheriv('aes-256-gcm', key, iv);
+  const cipher = createCipheriv('aes-256-gcm', key, iv, { authTagLength: TAG_BYTES });
   const data = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()]);
   return Buffer.concat([iv, cipher.getAuthTag(), data]).toString('base64');
 }
 
 export function decrypt(sealed: string): string {
   const raw = Buffer.from(sealed, 'base64');
-  const decipher = createDecipheriv('aes-256-gcm', key, raw.subarray(0, IV_BYTES));
+  // Naming the tag length makes Node refuse a shortened tag, which is easier to forge.
+  const decipher = createDecipheriv('aes-256-gcm', key, raw.subarray(0, IV_BYTES), { authTagLength: TAG_BYTES });
   decipher.setAuthTag(raw.subarray(IV_BYTES, IV_BYTES + TAG_BYTES));
   const data = Buffer.concat([decipher.update(raw.subarray(IV_BYTES + TAG_BYTES)), decipher.final()]);
   return data.toString('utf8');
