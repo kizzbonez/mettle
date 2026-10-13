@@ -90,7 +90,7 @@ quick.
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** | Security Foundations | in development | in development | in development |
 
-61 lessons, 121 exam questions with explanations and 23 labs. Every lab is verified in the
+61 lessons, 121 exam questions with explanations and 55 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -101,8 +101,8 @@ from the official documentation (The Rust Programming Language for the 2024 edit
 standard library reference, the Rustonomicon, the Cargo Book and others); each lesson has
 worked examples that were compiled and run, common mistakes, practice with answers, and links
 to its sources. Its four question banks hold 96 questions, and every exam attempt draws ten.
-In its first level every lesson ends with a ten-minute **practice lab**, so each idea is tried
-in the editor straight after it is read.
+Every one of its 46 lessons ends with a short **practice lab**, so each idea is tried in the
+editor straight after it is read.
 AI Development and Cyber Security are still in the original short format (three lessons a
 level) and are next to be expanded.
 

@@ -77,8 +77,8 @@ end.
 At the end, choose **Mark as read and continue**. The lesson stays readable afterwards.
 
 Where a lesson has a **practice lab**, it is offered at the end: choose **Try it now**, or
-**Mark as read and practice**. It is a ten-minute task in the editor, checked by tests like any
-other lab, and passing it takes you on to the next lesson. Practice labs count toward the level.
+**Mark as read and practice**. It is a short task in the editor, checked by tests like any other
+lab, and passing it takes you on to the next lesson. Practice labs count toward the level.
 
 Most lessons end with a **Practice** section. Try the exercises before you open **Show the
 answers**: the answers stay folded until you ask for them. **Further reading** links to the

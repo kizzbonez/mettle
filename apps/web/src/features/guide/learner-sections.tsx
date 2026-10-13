@@ -80,7 +80,7 @@ export function Lessons() {
         </p>
         <p>
           Where a lesson has a <strong>practice lab</strong>, it is offered at the end: choose <strong>Try it now</strong>, or{' '}
-          <strong>Mark as read and practice</strong>. It is a ten-minute task in the editor, checked by tests like any other lab, and
+          <strong>Mark as read and practice</strong>. It is a short task in the editor, checked by tests like any other lab, and
           passing it takes you on to the next lesson. Practice labs count toward the level.
         </p>
         <p>
