@@ -22,3 +22,7 @@ apps/web/public/monaco/
 
 .DS_Store
 Thumbs.db
+
+# browser tour state and failure captures
+e2e/.state.json
+e2e/failure.png

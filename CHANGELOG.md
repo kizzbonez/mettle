@@ -4,6 +4,34 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-13
+
+The web app: the public site, sign-in, and everything a learner does.
+
+### Added
+
+- **Design system.** An assay-office identity: galvanized surfaces, an ember accent, condensed
+  display type, and a hallmark for each level in the temper colors of steel (straw, bronze,
+  violet, blue). Tokens in Tailwind CSS 4; primitives and patterns in small files.
+- **Home page** with live counts from the catalog, the four levels, the tracks, how it works
+  and how the sandbox is locked down.
+- **Sign-in screens** with entrance animation: sign in (with a second step for two-factor and
+  recovery codes), create an account (password meter, rule checklist, confirm-password match),
+  forgot password and reset password.
+- **First-run setup wizard**: token, administrator, two-factor enrollment with a QR code, site
+  settings, recovery codes.
+- **Learner portal**: dashboard, courses, a level's syllabus, the lesson reader, the exam
+  (timer on the server's clock, question navigator, flags, confirm before submit, graded
+  review), and the profile (skill tree, exam history, account, password, two-factor, devices).
+- **Lab workspace**: a full-screen split view with draggable dividers. Brief, tests, files and
+  history on the left; the Monaco editor and a console on the right. Run and Submit with
+  keyboard shortcuts, per-test results with time and output, automatic draft saving, reset.
+- **Security in the browser**: a Content-Security-Policy with a fresh nonce per request and
+  `strict-dynamic`; the editor is served from the site's own origin; pages that need a session
+  redirect to sign-in and return afterwards, only ever to a path on this site.
+- A table pattern (`DataTable`, `TableToolbar`, `Pagination`, `useListState`) for server-driven
+  lists with URL state.
+
 ## [0.3.0] - 2026-10-13
 
 The curriculum: two complete tracks, verified end to end.
