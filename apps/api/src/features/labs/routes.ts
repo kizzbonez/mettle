@@ -8,6 +8,7 @@ import { conflict, notFound } from '../../lib/errors';
 import { parse, uuidParam } from '../../lib/validate';
 import { authenticated, me } from '../../plugins/auth';
 import { ensureEnrolled } from '../catalog/enrollment';
+import { presentCompileOutput } from './compile-output';
 import { enqueueSubmission } from './jobs';
 import { presentResult } from './mask';
 
@@ -117,7 +118,7 @@ async function getSubmission(request: FastifyRequest) {
   const results = await db.select().from(submissionResults).where(eq(submissionResults.submissionId, id)).orderBy(asc(submissionResults.sortOrder));
   return {
     id: submission.id, kind: submission.kind, status: submission.status, passedCount: submission.passedCount,
-    totalCount: submission.totalCount, durationMs: submission.durationMs, compileOutput: submission.compileOutput,
+    totalCount: submission.totalCount, durationMs: submission.durationMs, compileOutput: presentCompileOutput(lab.language, submission.compileOutput),
     errorMessage: submission.errorMessage, createdAt: submission.createdAt, finishedAt: submission.finishedAt,
     results: results.map((result) => presentResult(lab.language, result, lab.timeLimitMs)),
   };
