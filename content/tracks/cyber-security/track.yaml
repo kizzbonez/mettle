@@ -1,0 +1,9 @@
+title: Cyber Security
+tagline: Think like an attacker, defend like an engineer.
+description: >-
+  Threat modeling, authentication, network fundamentals and log analysis, practiced on a real
+  Linux shell. This track is in early access: the Basic level is complete and further levels
+  are in development.
+icon: ShieldCheck
+category: cyber
+sortOrder: 3
