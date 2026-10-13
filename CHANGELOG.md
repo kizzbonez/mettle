@@ -4,6 +4,33 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-13
+
+Practice labs: something to do after every lesson.
+
+### Added
+
+- **Practice labs.** A lab can now belong to a lesson. It is offered at the end of the lesson
+  ("Try it now", or "Mark as read and practice"), listed under its lesson on the level page,
+  and passing it leads on to the next lesson. It is checked in the sandbox like any other lab
+  and counts toward the level.
+- **A practice lab for every lesson of Rust Foundations**: fourteen ten-minute labs, each using
+  only what its lesson and the ones before it teach. The first ones are nearly complete
+  programs with one marked place to write; the later ones are small sets of functions. Every
+  reference solution passes, every starter fails, and 51 deliberately wrong attempts are all
+  caught by the tests.
+- In content, a practice lab is a folder `practice/<lesson-slug>/` beside `lessons/`. In the
+  admin panel, a lab's **Offered** field ties it to a lesson of its course.
+- Rust tests can read what the code printed: `printed_by(|| greet())` returns the text. This
+  is what lets the first labs, which are about `println!`, check the output itself.
+- `npm run content:verify -- rust/basic/control-flow` and the same path for `content:try`
+  check a single lesson's practice lab.
+
+### Changed
+
+- Development tools and tests always use the local mailbox, whatever mail account `.env`
+  configures for the live site. Before, a real SMTP login in `.env` was picked up by the tests.
+
 ## [1.1.1] - 2026-10-13
 
 ### Changed
