@@ -8,14 +8,18 @@ import { register } from './register';
 import { refreshSession, revokeSession } from './sessions';
 import { findUserById, publicUser } from './users';
 
-/** Tight per-IP limits on the endpoints an attacker would hammer. */
+/**
+ * Per-address limits on the endpoints an attacker would hammer. They are sized
+ * for many people behind one address (an office, a classroom): guessing one
+ * account's password is stopped by lockout, not by these.
+ */
 const limit = (max: number, timeWindow: string) => ({ config: { rateLimit: { max, timeWindow } } });
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {
-  app.post('/auth/register', limit(10, '1 hour'), register);
-  app.post('/auth/login', limit(20, '5 minutes'), login);
-  app.post('/auth/forgot-password', limit(5, '15 minutes'), forgotPassword);
-  app.post('/auth/reset-password', limit(10, '15 minutes'), resetPassword);
+  app.post('/auth/register', limit(40, '1 hour'), register);
+  app.post('/auth/login', limit(60, '5 minutes'), login);
+  app.post('/auth/forgot-password', limit(20, '15 minutes'), forgotPassword);
+  app.post('/auth/reset-password', limit(20, '15 minutes'), resetPassword);
 
   app.post('/auth/refresh', limit(60, '1 minute'), async (request, reply) => {
     if (await refreshSession(request, reply)) return { ok: true };

@@ -31,8 +31,11 @@ WORKDIR /app
 COPY --from=build /repo/apps/web/.next/standalone ./
 COPY --from=build /repo/apps/web/.next/static ./apps/web/.next/static
 COPY --from=build /repo/apps/web/public ./apps/web/public
+COPY apps/web/server ./server
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 \
   CMD wget -qO /dev/null http://127.0.0.1:3000/login || exit 1
-CMD ["node", "apps/web/server.js"]
+# The preload sets X-Forwarded-For from the connection, so the API's rate limits
+# see real client addresses and a visitor cannot claim someone else's.
+CMD ["node", "--import", "./server/preload.mjs", "apps/web/server.js"]

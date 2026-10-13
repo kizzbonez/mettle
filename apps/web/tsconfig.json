@@ -3,6 +3,7 @@
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "ES2023"],
     "jsx": "react-jsx",
+    "allowJs": true,
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": { "@/*": ["./src/*"] }
