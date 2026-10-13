@@ -54,8 +54,7 @@ interface AuthAsideProps {
 /** The dark half of the sign-in screens: the brand, a claim, and a run that proves it. */
 export function AuthAside({ siteName, lines, caption }: AuthAsideProps) {
   return (
-    <aside className="bg-blueprint relative hidden min-h-dvh flex-col justify-between overflow-hidden bg-forge p-10 text-forge-text lg:flex xl:p-14">
-      <div className="pointer-events-none absolute -top-40 -right-40 size-[28rem] rounded-full bg-ember/20 blur-3xl" aria-hidden />
+    <aside className="bg-tempered relative hidden min-h-dvh flex-col justify-between overflow-hidden bg-forge p-10 text-forge-text lg:flex xl:p-14">
       <Wordmark inverted name={siteName} />
 
       <div className="relative">

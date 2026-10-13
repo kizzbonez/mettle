@@ -37,7 +37,7 @@ const STEPS: Step[] = [
 export function HowItWorks() {
   return (
     <section id="how" className="scroll-mt-10 bg-forge text-forge-text">
-      <div className="bg-blueprint">
+      <div className="bg-stamped">
         <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
           <p className="label-spec text-ember">How it works</p>
           <h2 className="display mt-3 max-w-3xl text-5xl text-white sm:text-6xl">Three proofs per level. No certificates for attendance.</h2>

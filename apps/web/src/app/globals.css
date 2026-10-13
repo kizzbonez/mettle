@@ -161,12 +161,42 @@
   clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
 }
 
-/* Blueprint grid for dark surfaces. */
-@utility bg-blueprint {
+/*
+ * Tempered steel, the texture of the dark surfaces. Two layers:
+ *
+ * - A heat bloom in one corner. Around a heat source, steel shows its temper
+ *   colors in bands: hottest at the source, then blue, violet, bronze and
+ *   straw as the metal cools with distance. These are the level colors, in
+ *   the order the metal produces them.
+ * - Brushed-metal hairlines across the whole surface, at two spacings so the
+ *   grain does not read as a regular pattern.
+ *
+ * Set --bloom-at to move the heat source (default: top right).
+ */
+@utility bg-tempered {
   background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
-  background-size: 44px 44px;
+    radial-gradient(
+      78% 82% at var(--bloom-at, 97% -6%),
+      rgb(242 100 25 / 0.55) 0%,
+      rgb(45 107 179 / 0.4) 12%,
+      rgb(107 74 165 / 0.32) 23%,
+      rgb(168 87 42 / 0.25) 34%,
+      rgb(216 163 27 / 0.15) 45%,
+      transparent 60%
+    ),
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.024) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.016) 0 1px, transparent 1px 11px);
+}
+
+/*
+ * A plate stamped with hallmark punches: the eight-sided mark, struck at wide
+ * intervals over the same brushed grain.
+ */
+@utility bg-stamped {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='132' height='132'%3E%3Cpath d='M61 54h10l7 7v10l-7 7H61l-7-7V61z' fill='none' stroke='%23fff' stroke-opacity='.07'/%3E%3Cpath d='M0 0' /%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.022) 0 1px, transparent 1px 3px);
+  background-size: 132px 132px, auto;
 }
 
 /* Ruler ticks along the bottom edge of an element. */

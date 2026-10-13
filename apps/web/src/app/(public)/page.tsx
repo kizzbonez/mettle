@@ -22,8 +22,7 @@ export default async function LandingPage() {
 
   return (
     <>
-      <div className="bg-blueprint relative overflow-hidden bg-forge">
-        <div className="pointer-events-none absolute -top-56 left-1/3 size-[44rem] rounded-full bg-ember/15 blur-3xl" aria-hidden />
+      <div className="bg-tempered relative overflow-hidden bg-forge">
         <SiteNav siteName={name} registrationOpen={open} />
         <Hero stats={site?.stats ?? NO_STATS} registrationOpen={open} />
       </div>

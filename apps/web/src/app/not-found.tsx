@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: 'Page not found' };
 
 export default function NotFound() {
   return (
-    <main className="bg-blueprint flex min-h-dvh flex-col bg-forge px-6 py-8 text-forge-text sm:px-10">
+    <main className="bg-tempered flex min-h-dvh flex-col bg-forge px-6 py-8 text-forge-text sm:px-10">
       <Wordmark inverted />
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center py-16">
         <p className="label-spec text-ember">Error 404</p>
