@@ -36,8 +36,12 @@ async function users(page, shot) {
   await page.waitForTimeout(600);
   await page.getByRole('button', { name: /Sort by Last seen/ }).click();
   await page.waitForURL('**sort=lastSeenAt**');
-  await page.getByRole('checkbox', { name: 'Select row' }).nth(1).check();
-  await page.getByRole('checkbox', { name: 'Select row' }).nth(2).check();
+  // Any two rows will do. A fresh install has exactly two accounts; a seeded one has a page full.
+  const boxes = page.getByRole('checkbox', { name: 'Select row' });
+  await boxes.nth(1).waitFor();
+  const first = Math.min(1, (await boxes.count()) - 2);
+  await boxes.nth(first).check();
+  await boxes.nth(first + 1).check();
   await page.getByText('2 selected').waitFor();
   check(true, 'rows can be sorted and selected for a bulk email');
   await shot('16-admin-users');

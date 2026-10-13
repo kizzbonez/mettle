@@ -30,7 +30,7 @@ async function setup(page, shot) {
   await page.getByLabel('Email').fill(ADMIN.email);
   await page.getByLabel('Password', { exact: true }).fill(ADMIN.password);
   await page.getByLabel('Confirm password').fill(ADMIN.password);
-  await shot('19-setup');
+  await shot('19-setup', { settle: 3200 });
   await page.getByRole('button', { name: 'Continue' }).click();
   const secret = await page.getByTestId('totp-secret').getAttribute('data-secret');
   await page.getByLabel(/6-digit code/).fill(totp(secret));
@@ -52,7 +52,7 @@ async function signUp(page, shot) {
   await page.getByLabel('Password', { exact: true }).fill(LEARNER.password);
   await page.getByLabel('Confirm password').fill(LEARNER.password);
   await page.getByText('The passwords match.').waitFor();
-  await shot('02-register');
+  await shot('02-register', { settle: 3200 });
   await page.getByRole('button', { name: 'Create account' }).click();
   await page.waitForURL('**/dashboard**');
   check((await waitForEmail(LEARNER.email, 'Welcome')).Text.includes('dashboard'), 'the welcome email is delivered');
@@ -71,7 +71,7 @@ async function lessons(page, shot) {
   await page.getByRole('link', { name: /Lesson 01/ }).click();
   for (let lesson = 1; lesson <= 3; lesson += 1) {
     await page.getByText(`Lesson ${lesson} of 3`).waitFor();
-    if (lesson === 1) await shot('06-lesson', { full: true });
+    if (lesson === 1) await shot('06-lesson');
     const here = page.url();
     await page.getByRole('button', { name: /Mark as read/ }).click();
     // The next lesson, or after the third one the level page.
@@ -108,7 +108,7 @@ async function exam(page, shot) {
   await page.getByText('Exam result').waitFor();
   check(await page.getByText('4 of 5 correct').isVisible(), 'the exam is graded 4 of 5 and passed');
   check((await page.getByText('Why', { exact: true }).count()) === 5, 'every question shows an explanation after grading');
-  await shot('09-exam-result', { full: true });
+  await shot('09-exam-result');
 }
 
 async function lab(page, shot) {

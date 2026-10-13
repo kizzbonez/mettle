@@ -30,7 +30,11 @@ export function shooter(page, enabled) {
     if (!enabled) return;
     // Let entrance animations finish, so no screenshot catches one mid-flight.
     await page.waitForTimeout(options.settle ?? 1200);
-    await page.screenshot({ path: `${SHOTS_DIR}/${name}.png`, fullPage: options.full ?? false });
+    // A whole page is taken by growing the window to fit it, so a full-height sidebar stays full height.
+    const view = page.viewportSize();
+    if (options.full) await page.setViewportSize({ width: view.width, height: await page.evaluate(() => document.documentElement.scrollHeight) });
+    await page.screenshot({ path: `${SHOTS_DIR}/${name}.png` });
+    if (options.full) await page.setViewportSize(view);
     console.log(`  shot ${name}.png`);
   };
 }
