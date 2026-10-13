@@ -1,0 +1,74 @@
+name: mettle
+
+# One command brings the platform up:  docker compose up -d --build
+# Only the web app (and the dev mailbox) publish a port, and only on 127.0.0.1.
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mettle
+      POSTGRES_DB: mettle
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run `npm run init:env` first}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks: [data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U mettle -d mettle']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Executes learner code. The only service that can reach the Docker socket,
+  # and it sits on an internal network: no published port, no internet.
+  runner:
+    build:
+      context: .
+      dockerfile: apps/runner/Dockerfile
+    image: mettle-runner:local
+    restart: unless-stopped
+    environment:
+      RUNNER_TOKEN: ${RUNNER_TOKEN:?run `npm run init:env` first}
+      RUNNER_MAX_CONCURRENCY: ${RUNNER_MAX_CONCURRENCY:-2}
+      SANDBOX_RUNTIME: ${SANDBOX_RUNTIME:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    networks: [sandbox-ctl]
+    depends_on:
+      sandbox-rust: { condition: service_completed_successfully }
+      sandbox-python: { condition: service_completed_successfully }
+      sandbox-bash: { condition: service_completed_successfully }
+
+  # The sandbox images. These services exist so that `up --build` builds them;
+  # each container exits at once. The runner starts sandboxes from the images.
+  sandbox-rust:
+    build: ./sandbox/rust
+    image: mettle-sandbox-rust:1
+    network_mode: none
+    restart: 'no'
+  sandbox-python:
+    build: ./sandbox/python
+    image: mettle-sandbox-python:1
+    network_mode: none
+    restart: 'no'
+  sandbox-bash:
+    build: ./sandbox/bash
+    image: mettle-sandbox-bash:1
+    network_mode: none
+    restart: 'no'
+
+networks:
+  # Database traffic only.
+  data:
+    internal: true
+  # API to runner only.
+  sandbox-ctl:
+    internal: true
+
+volumes:
+  db-data:

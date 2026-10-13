@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+# Build context: the repository root.
+
+FROM node:24-alpine AS build
+WORKDIR /repo
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/
+COPY apps/runner/package.json apps/runner/
+COPY apps/web/package.json apps/web/
+COPY packages/shared/package.json packages/shared/
+RUN npm ci --workspace @mettle/runner --include-workspace-root --no-audit --no-fund
+COPY tsconfig.base.json ./
+COPY packages/shared packages/shared
+COPY apps/runner apps/runner
+RUN npm run build --workspace @mettle/runner
+
+FROM node:24-alpine
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=build /repo/apps/runner/dist/server.cjs ./server.cjs
+# The runner stays root because it has to open the Docker socket. Compose
+# removes every capability, makes the filesystem read-only and gives the
+# container no route to the internet; see docs/ARCHITECTURE.md.
+EXPOSE 4100
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=5 \
+  CMD wget -qO /dev/null http://127.0.0.1:4100/health || exit 1
+CMD ["node", "server.cjs"]
