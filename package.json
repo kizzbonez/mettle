@@ -1,0 +1,40 @@
+{
+  "name": "mettle",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mettle: competency exams and hands-on labs with sandboxed code execution.",
+  "license": "MIT",
+  "author": "Johndenver Contaoi",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "init:env": "node scripts/init-env.mjs",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "db:generate": "npm run db:generate -w @mettle/api",
+    "sandbox:build": "docker compose --profile sandbox build",
+    "up": "docker compose up -d --build",
+    "down": "docker compose down",
+    "test:sandbox": "vitest run -c vitest.sandbox.config.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.4"
+  }
+}

@@ -1,0 +1,17 @@
+import path from 'node:path';
+import type { NextConfig } from 'next';
+
+const apiOrigin = process.env.API_ORIGIN ?? 'http://127.0.0.1:4000';
+
+const config: NextConfig = {
+  output: 'standalone',
+  outputFileTracingRoot: path.join(import.meta.dirname, '../../'),
+  transpilePackages: ['@mettle/shared'],
+  poweredByHeader: false,
+  // The browser only ever talks to this origin; the API stays private.
+  async rewrites() {
+    return [{ source: '/api/:path*', destination: `${apiOrigin}/:path*` }];
+  },
+};
+
+export default config;

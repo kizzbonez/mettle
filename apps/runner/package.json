@@ -1,0 +1,17 @@
+{
+  "name": "@mettle/runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "node build.mjs",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fastify": "^5.12.5",
+    "zod": "^4.6.7",
+    "@mettle/shared": "*"
+  }
+}
