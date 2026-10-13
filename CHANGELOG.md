@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-10-13
+
+### Changed
+
+- **Running a lab's untouched starter code now explains itself.** The reason shown for the
+  failed test says which function is not written yet and that its placeholder has to be
+  replaced, instead of repeating the language's own "not yet implemented". This covers Rust's
+  `todo!()`, Python's `NotImplementedError` and C#'s `NotImplementedException`.
+- The Rust lab starters say at the top of the file what `todo!(...)` means.
+- Rust's advice to set `RUST_BACKTRACE=1`, which nobody can follow in the sandbox, is no longer
+  shown with a failed test.
+
 ## [1.1.0] - 2026-10-13
 
 Rust becomes a full course, and the sandbox learns three languages.
