@@ -39,6 +39,23 @@ describe('rust sandbox', () => {
     expect(result.status).toBe('failed');
   });
 
+  it('lets a test read what the code printed', async () => {
+    const code = 'pub fn greet(name: &str) { println!("Hello, {name}!"); }\npub fn label() { print!("seat: "); }';
+    const tests = [
+      'println!("the test prints this itself");\nassert_eq!(printed_by(|| greet("Ada")), "Hello, Ada!\\n", "the greeting");\nassert_eq!(printed_by(label), "seat: ", "a label that does not end its line");',
+      'assert_eq!(printed_by(|| { greet("a"); label(); }), "Hello, b!\\nseat: ", "both together");',
+    ];
+    const result = await execute(request('rust', code, tests));
+    expect(result.tests.map((t) => t.passed)).toEqual([true, false]);
+    expect(result.tests[1]?.stderr).toContain('both together');
+  });
+
+  it('fails a test whose printed code panics, and says why', async () => {
+    const result = await execute(request('rust', 'pub fn greet() { todo!("greet") }', ['assert_eq!(printed_by(greet), "hi\\n", "the greeting");']));
+    expect(result.status).toBe('failed');
+    expect(result.tests[0]?.stderr).toContain('not yet implemented: greet');
+  });
+
   it('removes the generated harness after compiling', async () => {
     const probe = 'pub fn harness_exists() -> bool { std::path::Path::new("main.rs").exists() }';
     const result = await execute(request('rust', probe, ['assert!(!harness_exists());']));
