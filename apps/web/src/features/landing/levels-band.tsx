@@ -21,7 +21,7 @@ export function LevelsBand() {
           <p className="label-spec text-ember-deep">One standard, four levels</p>
           <h2 className="display mt-3 text-5xl sm:text-6xl">Every track is tempered the same way</h2>
           <p className="mt-5 text-[17px] leading-relaxed text-steel">
-            Each level is three lessons, a mock exam and a lab. Finish all of them and the level&apos;s mark is yours. The marks
+            Each level is a set of lessons, a mock exam and a lab. Finish all of them and the level&apos;s mark is yours. The marks
             take the colors steel turns as it is heated: straw, bronze, violet, blue.
           </p>
         </div>

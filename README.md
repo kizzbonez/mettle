@@ -8,8 +8,9 @@ a sandbox.
 
 - **Exams that cannot be memorized.** A blueprint of rules draws a new paper from the question
   bank for every attempt, and freezes it so it can be reviewed exactly as it was sat.
-- **Labs that really run.** Rust is compiled, Python is executed, shell scripts are run against
-  files, each in a single-use container with no network, a read-only filesystem and hard limits.
+- **Labs that really run.** Rust, C++ and C# are compiled, Python is executed, shell scripts are
+  run against files and YAML is parsed, each in a single-use container with no network, a
+  read-only filesystem and hard limits.
 - **A full platform around them.** Accounts with two-factor authentication, a learner portal with
   progress and a skill tree, and an admin panel for users, email and all of the content.
 
@@ -41,6 +42,10 @@ docker compose logs api       # shows the one-time setup token
 Open <http://localhost:4310>. A new install has no accounts, so the site opens a five-step setup:
 paste the token from the log, create the administrator, scan the two-factor QR code, name the
 site, and save your recovery codes. The curriculum is loaded automatically on first start.
+
+**Upgrading.** `git pull`, then `docker compose up -d --build`. The database is migrated, new
+subjects are added, and revised tracks are updated in place; accounts, progress and anything you
+wrote yourself are kept.
 
 Mail sent by the site (welcome messages, password resets) is caught by a local inbox at
 <http://localhost:4325> until you configure a real SMTP server.
@@ -83,10 +88,19 @@ quick.
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** | Security Foundations | in development | in development | in development |
 
-27 lessons, 45 exam questions with explanations and 9 labs with 27 test cases. Every lab is
-verified in the sandbox: its reference solution passes, its starter code does not. The whole
-curriculum is plain files under [`content/`](content/README.md) and is documented in
+61 lessons, 121 exam questions with explanations and 9 labs. Every lab is verified in the
+sandbox: its reference solution passes, its starter code does not. The whole curriculum is
+plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
+
+**Rust Development is a full course**: 46 lessons that start from installing Rust and a first
+program and go on to concurrency, async, unsafe code and release engineering. It was written
+from the official documentation (The Rust Programming Language for the 2024 edition, the
+standard library reference, the Rustonomicon, the Cargo Book and others); each lesson has
+worked examples that were compiled and run, common mistakes, practice with answers, and links
+to its sources. Its four question banks hold 96 questions, and every exam attempt draws ten.
+AI Development and Cyber Security are still in the original short format (three lessons a
+level) and are next to be expanded.
 
 ## How it is built
 
@@ -141,7 +155,7 @@ design and the risks that remain.
 | `DOCKER_GID` | Group that owns the Docker socket. The runner is not root and reaches the socket through this group. `0` for Docker Desktop; on Linux, `stat -c %g /var/run/docker.sock`. |
 | `RUNNER_MAX_CONCURRENCY` | Sandboxes that may run at once (default 2). |
 | `SANDBOX_RUNTIME` | OCI runtime for sandboxes, for example `runsc`. |
-| `SEED_CONTENT` | Load `content/` into an empty database on first start (default `true`). |
+| `SEED_CONTENT` | Keep the database up to date with `content/` at every start: add new subjects, update revised tracks in place (default `true`). |
 | `SETUP_TOKEN` | Fix the first-run token instead of reading it from the log. |
 
 **Putting it on the internet.** Serve it through a reverse proxy or tunnel that terminates HTTPS,
@@ -171,6 +185,7 @@ npm run seed:demo      # optional: fifty demo learners with a month of activity
 | `npm run test:api` | The API against a real PostgreSQL, the mailbox and the sandbox runner |
 | `npm run test:sandbox` | The runner against real containers, including the isolation tests |
 | `npm run content:verify` | Every content file, and every lab run in the sandbox |
+| `npm run content:try -- rust/basic attempt.rs` | Any attempt against one lab, to check that a wrong answer is caught |
 | `npm run e2e` | A real browser walks the whole product, from setup to the admin panel |
 | `npm run screenshots` | The same tour, writing the screenshots used here and in the guide |
 
@@ -180,7 +195,7 @@ apps/api       Fastify API, Drizzle schema and migrations, content seeder
 apps/runner    sandbox orchestrator
 packages/shared types shared by all three
 content/       the curriculum as Markdown, YAML and real source files
-sandbox/       Dockerfiles for the Rust, Python and Bash sandbox images
+sandbox/       Dockerfiles for the sandbox images: Rust, Python, Bash, C++, C#, YAML
 e2e/           the browser tour
 docs/          architecture, schema, curriculum, user guide
 ```
@@ -196,6 +211,10 @@ image and one registry entry.
 - Labs are run-and-check, not an interactive terminal session.
 - Hidden tests run in the same sandbox as the code they test, so a determined learner can
   inspect the test process. Lab results alone should not gate a high-stakes certificate.
+- The sandbox can run C++, C# and YAML labs, and labs in those languages can be written in the
+  admin panel, but no track that uses them ships yet.
+- An upgrade that revises a shipped track replaces that track's shipped lessons, questions and
+  labs, including any edits a site made to them. Content a site created itself is kept.
 - The content editors do not warn before you leave a form with unsaved changes.
 - Question categories can be created through the API (`POST /api/v1/admin/categories`) and
   chosen in the question bank, but there is no screen for creating them yet.

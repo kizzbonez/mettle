@@ -1,5 +1,5 @@
 // Shared helpers for the browser tour (e2e/tour.mjs).
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 
@@ -67,6 +67,14 @@ export function answerKey(trackSlug, level) {
     if (!match) throw new Error(`No question in ${trackSlug}/${level} has these options: ${shown.slice(0, 120)}`);
     return new Set(match.options.filter((option) => option.correct).map((option) => plain(option.text)));
   };
+}
+
+/** How many lessons a level has, and how many questions one attempt at its exam draws. */
+export function levelShape(trackSlug, level) {
+  const dir = `${root}content/tracks/${trackSlug}/${level}`;
+  const bank = parse(readFileSync(`${dir}/questions.yaml`, 'utf8')).length;
+  const drawn = parse(readFileSync(`${dir}/course.yaml`, 'utf8')).exam.questionCount ?? 10;
+  return { lessons: readdirSync(`${dir}/lessons`).filter((name) => name.endsWith('.md')).length, questions: Math.min(bank, drawn) };
 }
 
 export { plain };

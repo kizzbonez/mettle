@@ -31,7 +31,7 @@ passwords match.*
 ## 2. Tracks, levels and marks
 
 A track is a subject. Each track has up to four levels, and every level is built the same way:
-**three lessons, one mock exam, one lab**.
+**its lessons, one mock exam, one lab**.
 
 | Level | Name | Mark color |
 | --- | --- | --- |
@@ -67,12 +67,17 @@ The dashboard answers one question: what should I do next?
 
 ## 4. Reading a lesson
 
-Lessons are short and dense: an outline, the sections, working code, and a list of takeaways.
-Each one opens with what you should be able to do by the end.
+A lesson teaches one thing: worked examples with their output, the mistakes people make,
+practice, and the sources to read next. Each one opens with what you should be able to do by the
+end.
 
 ![A lesson with its objectives and a code example](../apps/web/public/guide-shots/06-lesson.png)
 
 At the end, choose **Mark as read and continue**. The lesson stays readable afterwards.
+
+Most lessons end with a **Practice** section. Try the exercises before you open **Show the
+answers**: the answers stay folded until you ask for them. **Further reading** links to the
+official documentation the lesson is based on, and opens in a new tab.
 
 ## 5. Taking a mock exam
 
@@ -129,15 +134,16 @@ saying what it was checking. You do not see its code or the value it expected.
 
 | The console says | What happened |
 | --- | --- |
-| Did not build | A compile or syntax error. Nothing was run; the compiler output is shown in full. |
+| Did not build | A compile or syntax error. Nothing was run. You see the compiler's messages about your file; lines quoted from a test are left out. |
 | Timed out | A test ran past its time limit. Look for an infinite loop or a much slower approach than needed. |
 | The process was killed | Your code used more memory than the lab allows. |
 | The sandbox is busy | Too many people are running code at once. Wait a few seconds and try again. |
 | The code exited before the test finished | Your code ended the process itself. Return a value instead. |
 
 Each run gets a new container with no network access, a read-only system, a small scratch folder
-and fixed limits on time, memory and processes. Rust labs use the standard library only. Python
-labs have NumPy. Shell labs have the usual text tools.
+and fixed limits on time, memory and processes. Rust labs use the standard library only, and so
+do C++ and C# labs. C++ labs are also checked for memory errors and leaks. Python labs have
+NumPy. Shell labs have the usual text tools. A YAML lab checks one file you write.
 
 ## 7. Your profile and security
 

@@ -11,10 +11,12 @@
 import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { adminTour, adminTourWithoutContent } from './tour-admin.mjs';
-import { answerKey, BASE, check, loadState, plain, root, saveState, shooter, waitForEmail } from './lib.mjs';
+import { answerKey, BASE, check, levelShape, loadState, plain, root, saveState, shooter, waitForEmail } from './lib.mjs';
 import { totp } from './totp.mjs';
 
 const shots = process.argv.includes('--shots');
+// The tour takes the first level of the Rust track, whatever size it currently is.
+const LEVEL = levelShape('rust', 'basic');
 const ADMIN = { name: 'Ada Okafor', email: 'ada@mettle.test', password: 'forge-and-anvil-42' };
 // A clean install (the screenshot run) gets a tidy address; a reused one needs a unique address.
 const LEARNER = { name: 'Maya Reyes', email: shots ? 'maya.reyes@mettle.test' : `maya.reyes+${Date.now()}@mettle.test`, password: 'quench-and-temper-7' };
@@ -69,17 +71,19 @@ async function lessons(page, shot) {
   await page.getByRole('link', { name: /Rust Foundations/ }).first().click();
   await page.getByText('Syllabus').waitFor();
   await page.getByRole('link', { name: /Lesson 01/ }).click();
-  for (let lesson = 1; lesson <= 3; lesson += 1) {
-    await page.getByText(`Lesson ${lesson} of 3`).waitFor();
+  for (let lesson = 1; lesson <= LEVEL.lessons; lesson += 1) {
+    await page.getByText(`Lesson ${lesson} of ${LEVEL.lessons}`).waitFor();
     if (lesson === 1) await shot('06-lesson');
     const here = page.url();
     await page.getByRole('button', { name: /Mark as read/ }).click();
-    // The next lesson, or after the third one the level page.
+    // The next lesson, or after the last one the level page.
     await page.waitForURL((url) => url.toString() !== here);
   }
   await page.waitForURL('**/courses/**');
-  await page.getByText('3 of 5 done').waitFor();
-  check(true, 'three lessons read: the level shows 3 of 5 done');
+  // A level is its lessons plus one exam and one lab.
+  const progress = `${LEVEL.lessons} of ${LEVEL.lessons + 2} done`;
+  await page.getByText(progress).waitFor();
+  check(true, `every lesson read: the level shows ${progress}`);
   await shot('05-course');
 }
 
@@ -90,7 +94,7 @@ async function exam(page, shot) {
   await page.getByRole('button', { name: 'Start the exam' }).click();
   await page.getByRole('timer').waitFor();
   const correctFor = answerKey('rust', 'basic');
-  for (let question = 0; question < 5; question += 1) {
+  for (let question = 0; question < LEVEL.questions; question += 1) {
     const options = page.getByRole('radiogroup').or(page.getByRole('group')).locator('button');
     const texts = await options.evaluateAll((nodes) => nodes.map((node) => node.querySelector('.prose-mettle')?.textContent ?? ''));
     const correct = correctFor(texts);
@@ -101,13 +105,14 @@ async function exam(page, shot) {
     }
     if (question === 1) await page.getByRole('button', { name: /Flag for review/ }).click();
     if (question === 2) await shot('08-exam-runner');
-    if (question < 4) await page.getByRole('button', { name: 'Next' }).click();
+    if (question < LEVEL.questions - 1) await page.getByRole('button', { name: 'Next' }).click();
   }
   await page.getByRole('button', { name: 'Submit exam' }).click();
   await page.getByRole('button', { name: 'Submit for grading' }).click();
   await page.getByText('Exam result').waitFor();
-  check(await page.getByText('4 of 5 correct').isVisible(), 'the exam is graded 4 of 5 and passed');
-  check((await page.getByText('Why', { exact: true }).count()) === 5, 'every question shows an explanation after grading');
+  const score = `${LEVEL.questions - 1} of ${LEVEL.questions} correct`;
+  check(await page.getByText(score).isVisible(), `the exam is graded ${score} and passed`);
+  check((await page.getByText('Why', { exact: true }).count()) === LEVEL.questions, 'every question shows an explanation after grading');
   await shot('09-exam-result');
 }
 

@@ -63,7 +63,7 @@ export function Labs() {
       <Reference
         headers={['The console says', 'What happened']}
         rows={[
-          ['Did not build', 'A compile or syntax error. Nothing was run; the compiler output is shown in full.'],
+          ['Did not build', 'A compile or syntax error. Nothing was run. You see what the compiler says about your file; lines quoted from a test are left out.'],
           ['Timed out', 'A test ran past its time limit and was stopped. Look for an infinite loop or a much slower approach than the task needs.'],
           ['The process was killed', 'Your code used more memory than the lab allows.'],
           ['The sandbox is busy', 'Too many people are running code at once. Wait a few seconds and try again.'],
@@ -72,7 +72,7 @@ export function Labs() {
       />
       <Tip title="What the sandbox allows">
         Each run gets a new container with no network access, a read-only system, a small scratch folder and fixed limits on time, memory and
-        processes. Rust labs use the standard library only. Python labs have NumPy. Shell labs have the usual text tools.
+        processes. Rust labs use the standard library only, and so do C++ and C# labs. C++ labs are also checked for memory errors and leaks. Python labs have NumPy. Shell labs have the usual text tools. A YAML lab checks one file you write.
       </Tip>
     </Section>
   );

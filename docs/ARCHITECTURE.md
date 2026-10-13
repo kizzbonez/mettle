@@ -87,7 +87,7 @@ cookies are first-party and there is no CORS surface.
 ## Secure code execution
 
 This is the part of the system that is attacked by design: any signed-in learner can submit
-arbitrary Rust, Python or shell code and the platform must run it.
+arbitrary Rust, C++, C#, Python or shell code and the platform must run it.
 
 ### Lifecycle of a submission
 
@@ -173,6 +173,18 @@ in a harness, so authors write assertions and nothing else.
 | Rust     | `solution.rs` | a function in a generated `main.rs`       | `rustc` (once per submission) | `./lab case_N`      |
 | Python   | `solution.py` | a script that does `from solution import *` | `python -m py_compile`      | `python case_N.py`  |
 | Bash     | `solution.sh` | a script with `assert_eq` / `fail` helpers | `bash -n`                    | `bash case_N.sh`    |
+| C++      | `solution.cpp` | a function in a generated `main.cpp` that includes the learner's file | `g++ -std=c++20` with the address and undefined-behaviour sanitizers | `./lab case_N` |
+| C#       | `solution.cs` | an async method in a generated `tests.cs` | the C# compiler, called directly (no MSBuild, no NuGet) | `dotnet lab.dll case_N` |
+| YAML     | `solution.yaml` | a Python script with the parsed file in scope | a strict parse: invalid YAML or a repeated key stops the run | `python case_N.py` |
+
+C++ labs are built with sanitizers on purpose: a use-after-free, an out-of-bounds access, a leak
+or a signed overflow ends the test with a report instead of passing by luck. A YAML lab has no
+program to run, so its tests are Python scripts that check what the learner's file means.
+
+When a compiled submission does not fit its tests (a missing function, a wrong parameter type),
+the compiler quotes the offending line of the test. Those excerpts are removed before the
+learner sees the output, so a hidden test stays hidden; messages about the learner's own file
+are untouched.
 
 Each test runs as **its own process with its own time limit**, so one failing or hanging test
 does not hide the result of the others, and timings are per test.
@@ -218,7 +230,9 @@ time it took and the failure message, but never the test's source or its stdout.
 
 - **A new subject** is a row in `tracks` with courses under it. It can be created in the admin
   panel or shipped as files under `content/tracks/<slug>/` and loaded by the seeder. No code
-  changes.
+  changes. At every start the site adds shipped subjects it has never been given, and updates in
+  place any track whose `revision` was raised, matching lessons, questions and labs by slug and
+  key so learners keep their progress. A shipped track that a site deleted stays deleted.
 - **A new lab language** is one harness file in `apps/runner/src/languages/`, one image under
   `sandbox/`, and one entry in the language registry.
 - **Code layout.** Feature-sliced: each feature folder owns its routes, its logic and its

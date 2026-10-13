@@ -38,7 +38,7 @@ export function LevelsAndMarks() {
       </div>
       <Prose>
         <p>
-          A level contains <strong>three lessons</strong>, one <strong>mock exam</strong> and one <strong>lab</strong>. Read the lessons, pass the
+          A level contains its <strong>lessons</strong>, one <strong>mock exam</strong> and one <strong>lab</strong>. Read the lessons, pass the
           exam and pass the lab, and the level&apos;s mark is stamped on your skill tree. The marks take the colors steel shows as it is
           tempered: straw, bronze, violet, blue.
         </p>
@@ -71,12 +71,17 @@ export function Dashboard() {
 
 export function Lessons() {
   return (
-    <Section id="lessons" number="04" title="Reading a lesson" lead="Lessons are short and dense: an outline, the sections, working code, and a list of takeaways.">
+    <Section id="lessons" number="04" title="Reading a lesson" lead="A lesson teaches one thing: worked examples with their output, the mistakes people make, practice, and the sources to read next.">
       <Figure src={shot('06-lesson')} alt="A lesson with its objectives" caption="Every lesson opens with what you should be able to do by the end. Hold the lesson to that list." />
       <Prose>
         <p>
           When you reach the end, choose <strong>Mark as read and continue</strong>. That records the lesson and takes you to the next one. A
           lesson stays readable after you mark it; you can come back before the exam.
+        </p>
+        <p>
+          Most lessons end with a <strong>Practice</strong> section. Try the exercises before you open <strong>Show the answers</strong>:
+          the answers stay folded until you ask for them. <strong>Further reading</strong> links to the official documentation the
+          lesson is based on, and opens in a new tab.
         </p>
       </Prose>
     </Section>
