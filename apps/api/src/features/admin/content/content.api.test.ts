@@ -62,6 +62,22 @@ describe('a new subject, end to end', () => {
     const list = await staff.get(`/admin/lessons?courseId=${courseId}`);
     expect(list.body.total).toBe(1);
   });
+
+  it('leaves alone the fields a partial update did not send', async () => {
+    const details = { tagline: 'Small, fast services.', description: 'From packages to production.', icon: 'Rocket', sortOrder: 7 };
+    await staff.patch(`/admin/tracks/${trackId}`, details);
+    const { track } = (await staff.patch(`/admin/tracks/${trackId}`, { title: 'Go Engineering' })).body;
+    expect(track).toMatchObject({ ...details, title: 'Go Engineering', status: 'published' });
+
+    const extras = { summary: 'Start here.', outcomes: ['Write a package'], sortOrder: 3 };
+    await staff.patch(`/admin/courses/${courseId}`, extras);
+    const { course } = (await staff.patch(`/admin/courses/${courseId}`, { title: 'Go Basics' })).body;
+    expect(course).toMatchObject({ ...extras, title: 'Go Basics', status: 'published' });
+
+    const lessonId = (await staff.get(`/admin/lessons?courseId=${courseId}`)).body.items[0].id;
+    const { lesson } = (await staff.patch(`/admin/lessons/${lessonId}`, { estMinutes: 25 })).body;
+    expect(lesson).toMatchObject({ estMinutes: 25, status: 'published', bodyMd: '## Outline\n\nPackages and `main`.' });
+  });
 });
 
 describe('question bank', () => {

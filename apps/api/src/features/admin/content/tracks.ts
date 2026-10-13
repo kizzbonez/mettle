@@ -5,7 +5,7 @@ import { db } from '../../../db/client';
 import { courses, tracks } from '../../../db/schema/catalog';
 import { uniqueOrConflict } from '../../../lib/db-errors';
 import { notFound } from '../../../lib/errors';
-import { parse, uuidParam } from '../../../lib/validate';
+import { parse, parsePatch, uuidParam } from '../../../lib/validate';
 import { audit } from '../../audit/log';
 import { difficultyField, slugField, sortOrderField, statusField, stringList, titleField } from './fields';
 
@@ -50,7 +50,7 @@ export async function createTrack(request: FastifyRequest, reply: FastifyReply) 
 
 export async function updateTrack(request: FastifyRequest) {
   const { id } = parse(uuidParam, request.params);
-  const input = parse(trackBody.partial(), request.body);
+  const input = parsePatch(trackBody, request.body);
   const [track] = await uniqueOrConflict(
     () => db.update(tracks).set({ ...input, updatedAt: new Date() }).where(eq(tracks.id, id)).returning(),
     SLUG_TAKEN,
@@ -85,7 +85,7 @@ export async function createCourse(request: FastifyRequest, reply: FastifyReply)
 
 export async function updateCourse(request: FastifyRequest) {
   const { id } = parse(uuidParam, request.params);
-  const input = parse(courseBody.partial(), request.body);
+  const input = parsePatch(courseBody, request.body);
   const [course] = await uniqueOrConflict(
     () => db.update(courses).set({ ...input, updatedAt: new Date() }).where(eq(courses.id, id)).returning(),
     SLUG_TAKEN,

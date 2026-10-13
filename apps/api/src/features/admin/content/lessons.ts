@@ -6,7 +6,7 @@ import { courses, lessons, tracks } from '../../../db/schema/catalog';
 import { uniqueOrConflict } from '../../../lib/db-errors';
 import { notFound } from '../../../lib/errors';
 import { containsPattern, listQuery, offsetOf, orderOf, toPage } from '../../../lib/listing';
-import { parse, uuidParam } from '../../../lib/validate';
+import { parse, parsePatch, uuidParam } from '../../../lib/validate';
 import { audit } from '../../audit/log';
 import { markdownField, slugField, sortOrderField, statusField, stringList, titleField } from './fields';
 
@@ -69,7 +69,7 @@ export async function createLesson(request: FastifyRequest, reply: FastifyReply)
 
 export async function updateLesson(request: FastifyRequest) {
   const { id } = parse(uuidParam, request.params);
-  const input = parse(lessonBody.partial(), request.body);
+  const input = parsePatch(lessonBody, request.body);
   const [lesson] = await uniqueOrConflict(
     () => db.update(lessons).set({ ...input, updatedAt: new Date() }).where(eq(lessons.id, id)).returning(),
     SLUG_TAKEN,

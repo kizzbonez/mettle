@@ -13,6 +13,17 @@ export function parse<S extends z.ZodType>(schema: S, data: unknown): z.infer<S>
   throw new HttpError(400, 'validation_failed', 'Please check the highlighted fields.', { fields });
 }
 
+/**
+ * Parses a PATCH body and keeps only the fields that were sent. `.partial()`
+ * alone is not enough: a field with a default is still filled in when it is
+ * missing, which would reset it on every partial update.
+ */
+export function parsePatch<S extends z.ZodObject>(schema: S, data: unknown): Partial<z.infer<S>> {
+  const parsed: Record<string, unknown> = parse(schema.partial(), data);
+  const sent = new Set(Object.keys(data as object));
+  return Object.fromEntries(Object.entries(parsed).filter(([key]) => sent.has(key))) as Partial<z.infer<S>>;
+}
+
 export const uuidParam = z.object({ id: z.uuid() });
 
 export const emailField = z
