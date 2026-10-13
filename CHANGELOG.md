@@ -4,6 +4,59 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-13
+
+Rust becomes a full course, and the sandbox learns three languages.
+
+### Added
+
+- **A full-course lesson format** (`format: course` in `track.yaml`). Basic starts from zero and
+  has ten or more lessons; every lesson has worked examples with their output, common mistakes,
+  practice with answers, and links to the sources it rests on. The subject must be researched
+  before it is written, and `npm run content:verify` enforces the format.
+- **Three lab languages**, each with its own locked-down sandbox image:
+  - **C++** (GCC, C++20), built with the address and undefined-behaviour sanitizers, so a
+    use-after-free, an out-of-bounds access, a leak or a signed overflow fails the test.
+  - **C#** on .NET 10, compiled without MSBuild or NuGet. Test bodies may `await`.
+  - **YAML**: the learner writes one file, which is parsed strictly (a repeated key is an
+    error), and the tests check what it means.
+- **Upgrades update the curriculum.** At every start a site adds the subjects it has never been
+  given and updates in place any track whose `revision` was raised, matching lessons, questions
+  and labs by slug and key so learners keep their progress. A shipped track that was deleted
+  stays deleted.
+- Practice answers in a lesson stay folded until the learner asks for them, and links in a
+  lesson open in a new tab.
+- `npm run content:try -- <track>/<level> <file>` runs any attempt against a lab in the
+  sandbox, so an author can check that wrong answers are caught.
+- `MAILPIT_URL` lets the API tests use a second mailbox, so they can run beside a live install.
+
+### Changed
+
+- **Rust Development is rewritten as a full course: 46 lessons instead of 12, and 96 exam
+  questions instead of 20.** It now starts with what Rust is, installing it and a first program,
+  and teaches one concept per lesson. It was written from the official documentation (The Rust
+  Programming Language for the 2024 edition, the standard library reference, the Rust
+  Reference, the Cargo Book, the Rustonomicon, the API Guidelines and the Performance Book),
+  and its examples were compiled and run in the sandbox. The twelve original lessons and twenty
+  original questions are still there, reworked and deepened, so progress already made is kept.
+- A mock exam attempt draws ten questions from its level's bank instead of using every
+  question, so attempts differ once a bank is larger than ten.
+- Rust labs compile with the 2024 edition, which is what the lessons teach.
+- The landing page, the guide and the README no longer say a level is three lessons.
+
+### Fixed
+
+- When a compiled submission did not fit its tests (a missing function, a wrong parameter
+  type), the compiler quoted the offending line of the test, and the learner was shown it even
+  for a hidden test. Excerpts from the generated harness are now removed from the output a
+  learner sees, for Rust and C++. Messages about the learner's own file are unchanged.
+
+### Not in this release
+
+AI Development and Cyber Security are still in the original short format. Python, Linux
+command line, C++, C# and YAML tracks have been started and set aside until they can be written
+to the same standard as Rust.
+
 ## [1.0.0] - 2026-10-13
 
 The first complete release: documented, scanned, and checked end to end in a production build.
