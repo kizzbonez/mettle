@@ -1,7 +1,9 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 // Unit tests: no Docker, no database. `npm test` runs these.
 export default defineConfig({
+  resolve: { alias: { '@': fileURLToPath(new URL('./apps/web/src', import.meta.url)) } },
   test: {
     include: ['apps/*/src/**/*.test.ts', 'packages/*/src/**/*.test.ts'],
     exclude: ['**/node_modules/**', '**/*.integration.test.ts', '**/*.api.test.ts'],

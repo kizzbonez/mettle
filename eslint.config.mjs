@@ -47,6 +47,11 @@ export default tseslint.config(
     rules: { 'max-lines-per-function': ['error', { max: 80, IIFEs: true, ...budget }] },
   },
   {
+    // The browser tour passes functions into the page, where `window` exists.
+    files: ['e2e/**'],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+  },
+  {
     // A `describe` block is a list of cases, not one function.
     files: ['**/*.test.ts', '**/*.test.tsx', '**/test/**', 'e2e/**', 'scripts/**'],
     rules: {
