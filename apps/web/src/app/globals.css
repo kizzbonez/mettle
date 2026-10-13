@@ -18,8 +18,9 @@
   --color-plate: #f6f7f6;
   --color-ink: #14181b;
   --color-ink-2: #2a3136;
-  --color-steel: #566065;
-  --color-steel-2: #838d91;
+  /* Both grays are text colors: each is at least 4.5:1 on paper, plate and white. */
+  --color-steel: #4a5458;
+  --color-steel-2: #616b6f;
   --color-rule: #c9cfcd;
   --color-rule-soft: #dde1df;
 
@@ -28,11 +29,11 @@
   --color-ember-hot: #ff7d36;
   --color-ember-deep: #b93c0a;
   --color-ember-soft: #fbe3d5;
-  --color-patina: #1c7560;
+  --color-patina: #196b57;
   --color-patina-soft: #d9ece5;
   --color-crimson: #b0222b;
   --color-crimson-soft: #f6dcdd;
-  --color-brass: #94700f;
+  --color-brass: #7d5e08;
   --color-brass-soft: #f3e8c9;
 
   /* Temper scale: one color per level */
@@ -54,6 +55,8 @@
   --color-forge-rule: #2d373c;
   --color-forge-text: #e7eae9;
   --color-forge-muted: #97a3a7;
+  /* The quietest text allowed on a dark surface: 4.5:1 or better on forge, forge-2 and forge-3. */
+  --color-forge-dim: #84919a;
 
   --radius-plate: 3px;
   --shadow-plate: inset 0 1px 0 0 rgb(255 255 255 / 0.9), 0 1px 2px 0 rgb(20 24 27 / 0.07);

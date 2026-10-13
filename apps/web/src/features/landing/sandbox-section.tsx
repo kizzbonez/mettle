@@ -64,7 +64,7 @@ export function FinalCta({ registrationOpen }: { registrationOpen: boolean }) {
       <div className="relative mx-auto flex max-w-7xl flex-col items-start gap-8 px-6 py-20 md:flex-row md:items-center md:justify-between lg:px-10">
         <div>
           <h2 className="display text-6xl text-ink sm:text-7xl">The first level is waiting.</h2>
-          <p className="mt-4 max-w-xl text-lg text-ink/80">Three lessons, one exam, one lab. You will know by the end of it.</p>
+          <p className="mt-4 max-w-xl text-lg text-ink">Three lessons, one exam, one lab. You will know by the end of it.</p>
         </div>
         <ButtonLink
           href={registrationOpen ? '/register' : '/login'}

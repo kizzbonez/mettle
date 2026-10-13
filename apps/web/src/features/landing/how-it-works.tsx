@@ -45,7 +45,7 @@ export function HowItWorks() {
             {STEPS.map((step, index) => (
               <li key={step.title} className="flex flex-col bg-forge-2 p-7">
                 <div className="flex items-center justify-between">
-                  <span className="display text-6xl text-forge-rule">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="display text-6xl text-forge-dim">{String(index + 1).padStart(2, '0')}</span>
                   <step.icon className="size-7 text-ember" aria-hidden />
                 </div>
                 <h3 className="mt-6 text-xl font-semibold text-white">{step.title}</h3>

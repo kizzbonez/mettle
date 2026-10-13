@@ -75,7 +75,7 @@ export function LabPreview() {
           <pre className="overflow-hidden px-4 py-4 font-mono text-[12.5px] leading-[1.7] text-forge-text">
             {CODE.map((line, index) => (
               <div key={index} className="flex">
-                <span className="mr-4 w-4 shrink-0 text-right text-forge-rule select-none">{index + 1}</span>
+                <span className="mr-4 w-4 shrink-0 text-right text-forge-dim select-none">{index + 1}</span>
                 <span className="whitespace-pre">{line}</span>
               </div>
             ))}

@@ -10,8 +10,9 @@ export const temperBg: Record<Difficulty, string> = {
 };
 
 export const temperText: Record<Difficulty, string> = {
-  basic: 'text-[#8a6500]',
-  medium: 'text-temper-2',
+  // The straw and bronze marks are too light to read as text, so their labels use a darker step.
+  basic: 'text-[#7a5a00]',
+  medium: 'text-[#9a4d22]',
   advanced: 'text-temper-3',
   professional: 'text-temper-4',
 };

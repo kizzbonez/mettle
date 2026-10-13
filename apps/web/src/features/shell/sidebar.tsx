@@ -70,7 +70,7 @@ export function Sidebar({ siteName, onNavigate }: SidebarProps) {
       <nav className="flex-1 space-y-6 overflow-y-auto px-2 py-3" aria-label="Main">
         {navFor(user.role).map((group) => (
           <div key={group.title}>
-            <p className="label-spec px-3 pb-2 text-[#6f7c81]">{group.title}</p>
+            <p className="label-spec px-3 pb-2 text-forge-dim">{group.title}</p>
             <div className="space-y-px">
               {group.items.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} onNavigate={onNavigate} />
