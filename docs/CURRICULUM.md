@@ -1006,6 +1006,9 @@ it.
 //!
 //! Parse scanner uploads into typed stock movements. Nothing in this file may
 //! panic on bad input: every problem is reported through a `Result`.
+//!
+//! Every `todo!(...)` below marks code you still have to write. Until you
+//! replace one, calling that function stops the test with "not yet implemented".
 
 /// The direction of a stock movement.
 #[derive(Debug, Clone, PartialEq)]
@@ -2431,6 +2434,9 @@ you the tie-breaking rule of `top` without extra work.
 //! Latency Roll-up
 //!
 //! A trait for statistics and a generic container that keeps one per key.
+//!
+//! Every `todo!(...)` below marks code you still have to write. Until you
+//! replace one, calling that function stops the test with "not yet implemented".
 
 use std::collections::BTreeMap;
 
@@ -3667,6 +3673,9 @@ assert_eq!(pool.shutdown(), 3);
 //! Artifact Fingerprint Pool
 //!
 //! A fixed-size worker pool built from `std::thread` and `std::sync::mpsc`.
+//!
+//! Every `todo!(...)` below marks code you still have to write. Until you
+//! replace one, calling that function stops the test with "not yet implemented".
 
 use std::thread::JoinHandle;
 
@@ -4868,6 +4877,9 @@ assert_eq!(cache.stats(), Stats { hits: 1, misses: 1, evictions: 1 });
 //!
 //! A generic least-recently-used cache. Every operation except `iter` must
 //! run in O(1) expected time.
+//!
+//! Every `todo!(...)` below marks code you still have to write. Until you
+//! replace one, calling that function stops the test with "not yet implemented".
 
 use std::borrow::Borrow;
 use std::collections::HashMap;

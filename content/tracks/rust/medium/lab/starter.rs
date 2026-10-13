@@ -1,6 +1,9 @@
 //! Latency Roll-up
 //!
 //! A trait for statistics and a generic container that keeps one per key.
+//!
+//! Every `todo!(...)` below marks code you still have to write. Until you
+//! replace one, calling that function stops the test with "not yet implemented".
 
 use std::collections::BTreeMap;
 

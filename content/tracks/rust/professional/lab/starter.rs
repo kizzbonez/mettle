@@ -2,6 +2,9 @@
 //!
 //! A generic least-recently-used cache. Every operation except `iter` must
 //! run in O(1) expected time.
+//!
+//! Every `todo!(...)` below marks code you still have to write. Until you
+//! replace one, calling that function stops the test with "not yet implemented".
 
 use std::borrow::Borrow;
 use std::collections::HashMap;

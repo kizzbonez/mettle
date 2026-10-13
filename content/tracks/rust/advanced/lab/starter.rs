@@ -1,6 +1,9 @@
 //! Artifact Fingerprint Pool
 //!
 //! A fixed-size worker pool built from `std::thread` and `std::sync::mpsc`.
+//!
+//! Every `todo!(...)` below marks code you still have to write. Until you
+//! replace one, calling that function stops the test with "not yet implemented".
 
 use std::thread::JoinHandle;
 

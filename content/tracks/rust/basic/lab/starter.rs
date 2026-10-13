@@ -2,6 +2,9 @@
 //!
 //! Parse scanner uploads into typed stock movements. Nothing in this file may
 //! panic on bad input: every problem is reported through a `Result`.
+//!
+//! Every `todo!(...)` below marks code you still have to write. Until you
+//! replace one, calling that function stops the test with "not yet implemented".
 
 /// The direction of a stock movement.
 #[derive(Debug, Clone, PartialEq)]

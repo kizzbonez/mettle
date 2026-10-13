@@ -1,4 +1,5 @@
 import type { LabLanguage } from '@mettle/shared';
+import { explainPlaceholder } from './placeholder';
 
 /**
  * What a learner may see of one test result. A visible test shows everything.
@@ -31,6 +32,8 @@ export interface PresentedResult {
 
 const MAX_MESSAGE = 240;
 const KILLED = 137;
+/** Rust ends every panic with advice about an environment variable, which nobody can set in the sandbox. */
+const BACKTRACE_NOTE = /^note: run with `RUST_BACKTRACE=1`.*\n?/m;
 
 const nonEmptyLines = (text: string) => text.split('\n').map((line) => line.trim()).filter(Boolean);
 
@@ -94,7 +97,7 @@ export function failureMessage(language: LabLanguage, result: StoredResult, time
   const crash = CRASHES[result.exitCode ?? 0];
   if (crash && !result.stderr.trim()) return crash;
   const extracted = extractors[language](result.stderr);
-  if (extracted) return extracted.slice(0, MAX_MESSAGE);
+  if (extracted) return explainPlaceholder(extracted).slice(0, MAX_MESSAGE);
   if (result.exitCode === 0) return 'The code exited before the test finished checking it.';
   return `The test failed (exit code ${result.exitCode ?? 'unknown'}).`;
 }
@@ -108,6 +111,6 @@ export function presentResult(language: LabLanguage, result: StoredResult, timeL
     durationMs: result.durationMs,
     message: failureMessage(language, result, timeLimitMs),
     stdout: result.hidden ? null : result.stdout,
-    stderr: result.hidden ? null : result.stderr,
+    stderr: result.hidden ? null : result.stderr.replace(BACKTRACE_NOTE, ''),
   };
 }

@@ -82,6 +82,24 @@ describe('failureMessage', () => {
     expect(failureMessage('cpp', result({ exitCode: 139 }), 5000)).toMatch(/segmentation fault/);
   });
 
+  it('says in plain words that starter code is still a placeholder', () => {
+    const todo = ["thread 'main' (53) panicked at solution.rs:51:5:", 'not yet implemented: parse_ledger', 'note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace'].join('\n');
+    expect(failureMessage('rust', result({ exitCode: 101, stderr: todo }), 5000)).toBe(
+      "`parse_ledger` is not written yet: it still has the starter's todo!() placeholder. Replace it with your code.",
+    );
+    const python = 'Traceback (most recent call last):\n  File "case_1.py", line 3\nNotImplementedError: softmax is not implemented yet';
+    expect(failureMessage('python', result({ stderr: python }), 5000)).toBe(
+      'softmax is not implemented yet: replace the starter\'s "raise NotImplementedError" with your code.',
+    );
+    const csharp = 'FAIL: unexpected NotImplementedException: The method or operation is not implemented.';
+    expect(failureMessage('csharp', result({ stderr: csharp }), 5000)).toMatch(/^This part is not written yet/);
+  });
+
+  it('leaves an ordinary failure message as the author wrote it', () => {
+    const stderr = ["thread 'main' (59) panicked at main.rs:11:1:", 'a blank line is skipped, not counted as an error'].join('\n');
+    expect(failureMessage('rust', result({ stderr }), 5000)).toBe('a blank line is skipped, not counted as an error');
+  });
+
   it('caps very long messages', () => {
     const stderr = `AssertionError: ${'x'.repeat(2000)}`;
     expect(failureMessage('python', result({ stderr }), 5000)?.length).toBe(240);
@@ -94,6 +112,12 @@ describe('presentResult', () => {
     expect(shown.stdout).toBeNull();
     expect(shown.stderr).toBeNull();
     expect(shown.message).toBe('nope');
+  });
+
+  it('drops the backtrace advice from a Rust panic, which cannot be followed in the sandbox', () => {
+    const stderr = "thread 'main' (53) panicked at solution.rs:51:5:\nnot yet implemented: parse_ledger\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n";
+    const shown = presentResult('rust', result({ hidden: false, stderr }), 5000);
+    expect(shown.stderr).toBe("thread 'main' (53) panicked at solution.rs:51:5:\nnot yet implemented: parse_ledger\n");
   });
 
   it('shows the full output of a visible test', () => {
