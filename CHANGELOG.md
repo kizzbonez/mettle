@@ -4,6 +4,37 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-10-14
+
+Practice labs for the rest of the Rust course.
+
+### Added
+
+- **A practice lab for every lesson of the other three Rust levels**: 13 in Idiomatic Rust, 10
+  in Concurrency and Systems and 9 in Production Rust. With the 14 in Rust Foundations, each
+  of the course's 46 lessons now ends with a lab of its own. Every reference solution passes,
+  every starter builds and fails, and the tests caught the wrong attempts written against
+  them (two that passed were shown to be equivalent to a correct answer).
+- Where a lesson is about something the sandbox cannot run, its lab is built on the part that
+  can be coded and checked:
+  - **Testing**: the learner writes tests, judged by whether they pass on correct code and
+    catch faulty versions.
+  - **Cargo and release engineering**: the caret version rule, what an update picks, and
+    feature unification across a dependency graph.
+  - **Threads, channels and async**: results that are checked after every thread is joined,
+    and futures driven by the test itself, with poll and wake counts instead of time.
+  - **Performance**: allocations are counted. Nothing asserts on time.
+  - **Verification**: a seeded generator and a property that must expose faulty
+    implementations.
+  - **FFI**: functions with the C calling convention around an opaque handle.
+
+### Known limits of these labs
+
+- Tests see behaviour, not style. The unsafe lab can be passed without writing `unsafe`, and
+  "use a `VecDeque`" or "one pipeline with no `for`" is asked for but not enforced.
+- In a few labs a wrong choice of lifetime or closure trait stops the build instead of failing
+  a test; the learner sees the compiler's message without the test's source.
+
 ## [1.2.0] - 2026-10-13
 
 Practice labs: something to do after every lesson.
