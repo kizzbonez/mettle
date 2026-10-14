@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-10-14
+
+### Added
+
+- **`FRAME_ANCESTORS`** lists the sites allowed to show Mettle inside a frame, for example a
+  portfolio page that embeds it. It sets the Content-Security-Policy `frame-ancestors`
+  directive. Left empty, no site may frame the app, as before, and `X-Frame-Options: DENY` is
+  still sent. Only plain origins are accepted, so the setting cannot inject into a header.
+- C# lab tests can read what the code wrote to the console with `Printed.By(() => ...)`.
+
 ## [1.3.0] - 2026-10-14
 
 Practice labs for the rest of the Rust course.
