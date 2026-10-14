@@ -32,6 +32,8 @@ services:
     restart: unless-stopped
     environment:
       API_ORIGIN: http://api:4000
+      # Sites allowed to show the app in a frame, for example a portfolio. Empty: none.
+      FRAME_ANCESTORS: ${FRAME_ANCESTORS:-}
     ports:
       - '127.0.0.1:${WEB_PORT:-4310}:3000'
     read_only: true

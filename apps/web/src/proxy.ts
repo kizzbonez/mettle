@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { frameAncestors, frameAncestorsDirective } from '@/lib/framing';
 
 /** Pages that need a session. Everything else is public. */
 const PROTECTED = ['/dashboard', '/courses', '/lessons', '/exams', '/attempts', '/labs', '/profile', '/admin'];
@@ -10,7 +11,7 @@ const SESSION_MARKER = 'mt_s';
 const startsWithAny = (path: string, prefixes: string[]) =>
   prefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 
-function contentSecurityPolicy(nonce: string, secureOrigin: boolean): string {
+function contentSecurityPolicy(nonce: string, secureOrigin: boolean, framers: string[]): string {
   const dev = process.env.NODE_ENV === 'development';
   return [
     "default-src 'self'",
@@ -25,7 +26,7 @@ function contentSecurityPolicy(nonce: string, secureOrigin: boolean): string {
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'none'",
+    frameAncestorsDirective(framers),
     ...(secureOrigin ? ['upgrade-insecure-requests'] : []),
   ].join('; ');
 }
@@ -50,13 +51,17 @@ export function proxy(request: NextRequest): NextResponse {
   }
 
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
-  const csp = contentSecurityPolicy(nonce, request.nextUrl.protocol === 'https:');
+  const framers = frameAncestors(process.env.FRAME_ANCESTORS);
+  const csp = contentSecurityPolicy(nonce, request.nextUrl.protocol === 'https:', framers);
   const headers = new Headers(request.headers);
   headers.set('x-nonce', nonce);
   headers.set('Content-Security-Policy', csp);
 
   const response = NextResponse.next({ request: { headers } });
   response.headers.set('Content-Security-Policy', csp);
+  // X-Frame-Options cannot name another site, so it is sent only when no site may frame the page.
+  // Where some may, the CSP frame-ancestors list above is what browsers follow.
+  if (framers.length === 0) response.headers.set('X-Frame-Options', 'DENY');
   return response;
 }
 
