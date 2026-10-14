@@ -4,6 +4,32 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-10-14
+
+C# Development, a full course.
+
+### Added
+
+- **C# Development**: 45 lessons in four levels on C# 14 and .NET 10, in the same full-course
+  format as Rust. It starts from what C# and .NET are, installing .NET and a first program, and
+  teaches one idea per lesson through generics and LINQ, async code and cancellation, threads,
+  channels, spans, the garbage collector, dependency injection, logging, testing and shipping.
+  It was written from Microsoft Learn, and every example was compiled and run in the sandbox.
+  - C# Foundations (14 lessons), Types, Generics and LINQ (13), Async and Advanced Language
+    Features (9) and Production .NET (9).
+  - 93 exam questions; each attempt at a level's mock exam draws ten.
+  - An end-of-level lab for each level, from a tool library's lending desk to a throttled,
+    retrying relay that must not allocate while parsing.
+  - A practice lab for 42 of the 45 lessons, each using only what has been taught so far. The
+    tests catch the wrong attempts written against them, and the async and concurrency labs
+    are deterministic: they never measure time.
+
+### Not in this release
+
+Practice labs for three Production .NET lessons (dependency injection, logging and
+configuration, testing) are still being written. They will arrive with a raised track
+revision, which updates installed sites in place.
+
 ## [1.4.0] - 2026-10-14
 
 ### Added
