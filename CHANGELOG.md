@@ -4,6 +4,22 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-10-14
+
+### Added
+
+- The last three practice labs of Production .NET: **logging, configuration and options**
+  (a structured logger that hides secrets, and settings bound from layered sources with
+  validation), **testing .NET code** (a spy and check methods judged on correct and faulty
+  jobs, some unseen), and **building and shipping** (NuGet version ranges and picking the
+  lowest applicable version). Every one of the C# course's 45 lessons now ends with a
+  practice lab. The C# track's revision is raised, so installed sites receive them in place.
+
+### Fixed
+
+- The 1.5.0 notes named the dependency injection lab as missing. It was already included; the
+  three that were missing were logging and configuration, testing, and building and shipping.
+
 ## [1.5.0] - 2026-10-14
 
 C# Development, a full course.
