@@ -88,10 +88,11 @@ quick.
 | --- | --- | --- | --- | --- |
 | **Rust Development** | Rust Foundations | Idiomatic Rust | Concurrency and Systems | Production Rust |
 | **C# Development** | C# Foundations | Types, Generics and LINQ | Async and Advanced Language Features | Production .NET |
+| **Linux Command Line** | Shell Foundations | Text and Automation | Robust Shell Scripting | Systems Administration |
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** | Security Foundations | in development | in development | in development |
 
-106 lessons, 214 exam questions with explanations and 104 labs. Every lab is verified in the
+151 lessons, 307 exam questions with explanations and 153 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -109,6 +110,13 @@ installing .NET and a first program to async code, concurrency, spans, dependenc
 and shipping, written from Microsoft Learn with every example compiled and run. Its question
 banks hold 93 questions, each level ends with a lab, and every one of its 45 lessons ends with a
 practice lab.
+**Linux Command Line is the third full course**: 45 lessons on Bash and the GNU tools that start
+from what Linux and the shell are and a first command, and go on to text processing with grep,
+sed and awk, robust scripts with strict mode, traps and ShellCheck, and the system
+administration topics of LPIC-1 (users, systemd, logs, scheduling, disks, networking, SSH and
+security). It was written from the man pages, the GNU and Bash manuals, the Bash wiki and the
+LPIC-1 objectives. Its question banks hold 93 questions, each level ends with a lab, and every
+lesson ends with a practice lab that runs real Bash.
 
 AI Development and Cyber Security are still in the original short format (three lessons a
 level) and are next to be expanded.
@@ -219,10 +227,12 @@ image and one registry entry.
 
 - Lab jobs are queued in the API process. A restart fails jobs that were in flight (the learner
   is told to submit again). Use a durable queue before running more than one API instance.
-- Labs are run-and-check, not an interactive terminal session.
+- Labs are run-and-check, not an interactive terminal session. The Linux course's
+  administration labs work on captured command output and configuration files, because the
+  sandbox has no root, no systemd and no network.
 - Hidden tests run in the same sandbox as the code they test, so a determined learner can
   inspect the test process. Lab results alone should not gate a high-stakes certificate.
-- The sandbox can run C++, C# and YAML labs, and labs in those languages can be written in the
+- The sandbox can run C++ and YAML labs, and labs in those languages can be written in the
   admin panel, but no track that uses them ships yet.
 - An upgrade that revises a shipped track replaces that track's shipped lessons, questions and
   labs, including any edits a site made to them. Content a site created itself is kept.
