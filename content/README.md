@@ -189,7 +189,7 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
 | Language | Learner file  | The test body is…                                             | Fail by                 |
 | -------- | ------------- | ------------------------------------------------------------- | ----------------------- |
 | Rust     | `solution.rs` | the body of a function. `use solution::*;` is in scope, so the learner's items must be `pub`. | `assert!`, `assert_eq!`, `panic!` |
-| Python   | `solution.py` | a script that starts after `from solution import *`.          | `assert`, raising       |
+| Python   | `solution.py` | a script in which everything the learner's file defines is in scope, as after `from solution import *`. | `assert`, raising       |
 | Bash     | `solution.sh` | a script with `assert_eq ACTUAL EXPECTED [MESSAGE]` and `fail MESSAGE` defined. Run the learner's script with `bash solution.sh …`. | `assert_eq`, `fail`, non-zero exit |
 | C++      | `solution.cpp` | the body of a function. The learner's file is included above it, so everything it declares is in scope. | `CHECK`, `CHECK_EQ`, `CHECK_THROWS`, `mettle::fail`, an escaping exception |
 | C#       | `solution.cs` | the body of an `async Task` method, so it may `await`. Declare the lab's types without a namespace so the test can name them. | `Check.True`, `Check.Equal`, `Check.SequenceEqual`, `Check.Throws<T>`, `Check.ThrowsAsync<T>`, an escaping exception |
@@ -199,7 +199,15 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   A Rust test can read what the code printed: `printed_by(|| greet("Ada"))` returns the text,
   so a lab about `println!` can check the output itself. To call a `main` in the learner's
   file, write `printed_by(solution::main)`; a bare `main` is the test program's own.
-- Python is 3.12 with NumPy. No other packages, no network.
+- Python is 3.15 with NumPy. No other packages, no network. A Python test can treat the
+  learner's file as a program: `run_script(stdin="Ada\n", args=["--loud"])` runs
+  `python solution.py`, typing the input into it, and returns `.out`, `.err` and `.code`. So a
+  beginner's script that reads with `input()` and prints is tested as it is written.
+  `printed_by(greet, "Ada", stdin="")` calls one function and returns what it printed. While
+  the file is loaded for the test, `input()` finds nothing to read: a script stops at its first
+  `input()` and keeps only what it defined before it, so define the functions a test calls
+  above the script part, or under `if __name__ == "__main__":`, which `run_script` runs and the
+  test's own load does not.
 - C++ is GCC 14 with `-std=c++20 -Wall -Wextra -pthread`, standard library only, built with the
   address and undefined-behaviour sanitizers. A use-after-free, an out-of-bounds access, a
   **memory leak** or a signed overflow fails the test, so the reference solution must be clean.

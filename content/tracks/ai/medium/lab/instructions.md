@@ -63,7 +63,7 @@ visible test, the index holds nine chunks, `leave#0` to `equipment#2`. For the q
 `"How many vacation days carry over?"` with `k=2` and `min_score=0.3`, `retrieve` returns
 `leave#2` (score 1.0) and then `leave#1` (about 0.866).
 
-**Available:** Python 3.12 and NumPy. The standard library (`json`, `math`) is enough.
+**Available:** Python 3.15 and NumPy. The standard library (`json`, `math`) is enough.
 
 **Tip:** `json.loads` raises on malformed input, and it returns whatever the text describes: a
 list, a number or `null` are all valid JSON. Check what you got before you index into it.

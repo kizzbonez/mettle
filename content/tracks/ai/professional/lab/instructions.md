@@ -98,7 +98,7 @@ instead, which is registered but not allowed, the result would have been
 `{"role": "tool", "tool_call_id": "c2", "ok": False, "content": "error: tool not allowed: close_account"}`
 and `close_account` would not have run.
 
-**Available:** Python 3.12 and NumPy. The standard library (`json`) is enough.
+**Available:** Python 3.15 and NumPy. The standard library (`json`) is enough.
 
 **Tip:** `json.loads` returns whatever the text describes. A list, a string and `null` are all
 valid JSON, and none of them is a set of arguments.

@@ -52,9 +52,15 @@ describe('python harness', () => {
 
   it('imports the solution before the test body and prints the nonce after it', () => {
     const lines = file(harness.files, 'case_1.py').trim().split('\n');
-    expect(lines[0]).toContain('from solution import *');
-    expect(lines).toContain('TEST_BODY_A');
+    const imported = lines.indexOf('globals().update(load_solution())');
+    expect(imported).toBeGreaterThan(0);
+    expect(imported).toBeLessThan(lines.indexOf('TEST_BODY_A'));
     expect(lines.at(-1)).toBe(`print("\\n${NONCE}")`);
+  });
+
+  it('gives test bodies run_script and printed_by', () => {
+    expect(file(harness.files, 'case_1.py')).toContain('from lab_helpers import Ran, load_solution, printed_by, run_script');
+    expect(file(harness.files, 'lab_helpers.py')).toContain('def run_script(stdin="", args=()):');
   });
 
   it('syntax-checks the solution first', () => {

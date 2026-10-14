@@ -65,7 +65,7 @@ multi_head_attention(x, eye, eye, eye, 2 * eye, num_heads=2, mask=causal_mask(2)
 #  [0.6605, 1.3395, 0.0, 2.0]]
 ```
 
-**Available:** Python 3.12 and NumPy.
+**Available:** Python 3.15 and NumPy.
 
 **Tips:** `np.swapaxes` and `reshape` work on arrays with any number of leading dimensions;
 `.T` reverses all of them. For a mask shaped `(batch, T, T)` to line up with scores shaped

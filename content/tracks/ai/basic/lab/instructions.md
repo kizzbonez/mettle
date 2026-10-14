@@ -37,7 +37,7 @@ kb-401  0.5390
 
 Do not round the scores yourself. The tests compare them with a small tolerance.
 
-**Available:** Python 3.12 and NumPy. The standard library is enough for this lab.
+**Available:** Python 3.15 and NumPy. The standard library is enough for this lab.
 
 **Tip:** sorting by score alone leaves the order of tied articles up to whatever order they
 arrived in. Sort on both things you care about.

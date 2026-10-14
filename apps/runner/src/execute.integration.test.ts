@@ -70,6 +70,16 @@ describe('python sandbox', () => {
     expect(result.status).toBe('passed');
   });
 
+  it('runs a script that reads input, and catches what a function prints', async () => {
+    const script = 'def shout(word):\n    print(word.upper())\n\nname = input("Name: ")\nprint(f"Hello, {name}!")\n';
+    const tests = [
+      'ran = run_script(stdin="Ada\\n")\nassert ran.out == "Name: Hello, Ada!\\n", ran\nassert ran.code == 0',
+      'assert printed_by(shout, "hi") == "HI\\n"',
+    ];
+    const result = await execute(request('python', script, tests));
+    expect(result.status).toBe('passed');
+  });
+
   it('reports a syntax error from the check step', async () => {
     const result = await execute(request('python', 'def broken(:\n    pass\n', ['broken()']));
     expect(result.status).toBe('compile_error');

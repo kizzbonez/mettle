@@ -1,5 +1,5 @@
-# Sandbox image for Python and AI labs: CPython plus NumPy, nothing else.
-FROM python:3.12-slim
+# Sandbox image for Python and AI labs: CPython 3.15 plus NumPy, nothing else.
+FROM python:3.15-slim
 
 RUN pip install --no-cache-dir --disable-pip-version-check "numpy>=2,<3" \
  && useradd --uid 10001 --user-group --no-create-home --home-dir /work --shell /usr/sbin/nologin sandbox \
