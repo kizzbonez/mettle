@@ -1,0 +1,19 @@
+title: Parcel Depot Hot Spots
+summary: Rewrite three slow functions the efficient way, a set for repeated scans, one sort for the smallest gap and a per-call functools.cache around a slow lookup, judged by input sizes and call counts, never by timing.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Gives the answers of the example and asks about each leg once
+    file: 01-example.py
+    hidden: false
+  - name: Finds the first repeat among 300,000 scans in time
+    file: 02-first-repeat.py
+    hidden: true
+  - name: Finds the smallest gap among 200,000 times without changing the list
+    file: 03-smallest-gap.py
+    hidden: true
+  - name: Asks once per distinct leg with a fresh cache for each call
+    file: 04-cached-lookups.py
+    hidden: true

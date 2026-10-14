@@ -1,0 +1,19 @@
+title: Shopping List
+summary: Keep a shared shopping list with append, insert, remove and in, then print it in its own order and sorted, without sorting the list itself.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the commands from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Adds items to the end and refuses duplicates
+    file: 02-add.py
+    hidden: true
+  - name: Puts urgent items at the front
+    file: 03-urgent.py
+    hidden: true
+  - name: Ticks items off and handles an empty list
+    file: 04-got-and-empty.py
+    hidden: true

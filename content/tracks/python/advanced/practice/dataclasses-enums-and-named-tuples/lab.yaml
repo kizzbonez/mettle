@@ -1,0 +1,19 @@
+title: Bike Rental Records
+summary: Model a bike rental shop with a StrEnum of frame sizes, a named tuple for bikes and a dataclass for rentals that uses a default factory, validates itself in __post_init__ and prices the hire.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the rental example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Defines the sizes as a StrEnum
+    file: 02-size.py
+    hidden: true
+  - name: Defines bikes as an immutable named tuple
+    file: 03-bike.py
+    hidden: true
+  - name: Gives each rental its own list, validates it and prices it
+    file: 04-rental.py
+    hidden: true

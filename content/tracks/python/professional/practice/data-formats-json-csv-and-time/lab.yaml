@@ -1,0 +1,19 @@
+title: Night Shifts Across Time Zones
+summary: Read shifts from CSV as aware datetimes with zoneinfo, count the real minutes across daylight saving changes, and write the payroll as JSON with a default function for datetimes and Decimal pay rounded half up.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Pays the three shifts of the example
+    file: 01-example.py
+    hidden: false
+  - name: Reads quoted names and aware times in several zones
+    file: 02-read-shifts.py
+    hidden: true
+  - name: Counts real minutes across clock changes, days and zones
+    file: 03-minutes-worked.py
+    hidden: true
+  - name: Writes datetimes and decimals as JSON and rounds pay half up
+    file: 04-json-and-pay.py
+    hidden: true

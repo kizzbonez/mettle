@@ -1,0 +1,14 @@
+title: Python Development
+tagline: From your first script to tested, packaged, concurrent Python.
+description: >-
+  A full course in four levels on Python 3.15. It starts from what Python is and a first
+  program, teaches every fundamental one lesson at a time, and goes on to modules and packages,
+  classes, files, generators, the data model, type hints, threads and asyncio, and shipping
+  tested, packaged Python. It is planned against the Python Institute's PCEP and PCAP
+  syllabi. Every level ends with a mock exam and a hands-on lab that runs against hidden tests
+  in a sandbox using only the standard library.
+icon: Code
+category: python
+sortOrder: 6
+format: course
+revision: 1

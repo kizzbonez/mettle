@@ -1,0 +1,19 @@
+title: Bake Sale Boxes
+summary: Split cookies into full boxes and a remainder with // and %, round the number of boxes up with math.ceil, and round a float total to two decimal places.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Splits the cookies into full boxes and a remainder
+    file: 02-full-and-left-over.py
+    hidden: true
+  - name: Counts the boxes needed for every cookie
+    file: 03-boxes-needed.py
+    hidden: true
+  - name: Rounds the takings to two decimal places
+    file: 04-takings.py
+    hidden: true

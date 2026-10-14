@@ -1,0 +1,6 @@
+# watering settings for the community greenhouse
+dry_below = 35
+beds = ["tomatoes", "herbs", "chillies"]
+
+[pump]
+litres_per_minute = 12

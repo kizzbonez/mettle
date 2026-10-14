@@ -1,0 +1,19 @@
+title: Museum Tickets
+summary: Build child and family tickets on a base class with super(), add a member discount as a mixin that works through the MRO, and total any objects that have a price() method.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prices the example tickets
+    file: 01-example.py
+    hidden: false
+  - name: Builds the hierarchy and extends prices with super()
+    file: 02-hierarchy.py
+    hidden: true
+  - name: Prices family tickets on top of the base ticket
+    file: 03-family.py
+    hidden: true
+  - name: Discounts any ticket with the mixin and totals anything with a price
+    file: 04-mixin-and-takings.py
+    hidden: true

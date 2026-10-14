@@ -1,0 +1,19 @@
+title: Cinema Tickets
+summary: Price a cinema ticket from an age and a day with a chained comparison, an if-elif-else chain, a condition joined with and, and a conditional expression.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the two examples from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Chooses the category and price at every age boundary
+    file: 02-categories.py
+    hidden: true
+  - name: Applies the Tuesday saver only where it belongs
+    file: 03-tuesday-saver.py
+    hidden: true
+  - name: Rejects ages outside 0 to 120
+    file: 04-invalid-age.py
+    hidden: true

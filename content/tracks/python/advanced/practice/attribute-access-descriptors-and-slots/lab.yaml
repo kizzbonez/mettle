@@ -1,0 +1,19 @@
+title: Aquarium Readings
+summary: Write a reusable data descriptor with __set_name__, __get__ and __set__ that keeps tank readings within safe bounds, and an __init_subclass__ hook that checks and registers every kind of fish.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the aquarium example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Stores each instance's value in that instance under the private name
+    file: 02-descriptor-storage.py
+    hidden: true
+  - name: Accepts numbers within the bounds and refuses everything else
+    file: 03-descriptor-validation.py
+    hidden: true
+  - name: Checks and registers every subclass of Fish
+    file: 04-fish-subclasses.py
+    hidden: true

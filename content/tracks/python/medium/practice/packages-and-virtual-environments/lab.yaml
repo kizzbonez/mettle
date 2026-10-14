@@ -1,0 +1,19 @@
+title: Requirements Check
+summary: Read a requirements file, decide which versions a specifier such as >=2.0,<3, ==2.32.* or ~=1.4.2 allows, and report the installed packages that do not match.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Checks the example requirements file
+    file: 01-example.py
+    hidden: false
+  - name: Reads names, specifiers, comments and blank lines
+    file: 02-parse.py
+    hidden: true
+  - name: Applies each kind of clause, with padded numeric versions
+    file: 03-specifiers.py
+    hidden: true
+  - name: Reports missing and mismatched packages in file order
+    file: 04-problems.py
+    hidden: true

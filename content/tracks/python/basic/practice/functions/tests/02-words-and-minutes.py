@@ -1,0 +1,13 @@
+assert count_words("") == 0, "an empty text has no words"
+assert count_words("   \n\t  ") == 0, "a text of only spaces, tabs and new lines has no words"
+assert count_words("Hello") == 1, "a single word"
+assert count_words("  café   naïve\tdéjà vu  ") == 4, "words with accented letters, separated by spaces and tabs"
+
+assert reading_minutes("") == 0, "no words take no minutes"
+assert reading_minutes("one") == 1, "a single word still takes a minute, rounded up"
+assert reading_minutes("w " * 200) == 1, "exactly one minute's worth of words is one minute"
+assert reading_minutes("w " * 201) == 2, "one word more than a minute's worth is rounded up to two minutes"
+assert reading_minutes("w " * 399) == 2, "a little under two minutes' worth is rounded up to two"
+assert reading_minutes("w " * 1000, 100) == 10, "words_per_minute can be given by position"
+assert reading_minutes("w " * 1000, words_per_minute=150) == 7, "words_per_minute can be given by keyword"
+assert type(reading_minutes("w " * 450)) is int, "reading_minutes returns a whole number, an int"

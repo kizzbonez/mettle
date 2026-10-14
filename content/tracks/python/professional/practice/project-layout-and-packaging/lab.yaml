@@ -1,0 +1,19 @@
+title: Release Checklist
+summary: Check a parsed pyproject.toml before a release (build backend, name, version, pinned dependencies, console scripts) and decide whether a version satisfies a specifier such as ~= 1.4.2.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Checks the birdcount example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Reads plain release versions and rejects everything else
+    file: 02-version-tuple.py
+    hidden: true
+  - name: Applies every specifier operator, padding and ~=
+    file: 03-specifiers.py
+    hidden: true
+  - name: Reports each checklist problem in order
+    file: 04-problems.py
+    hidden: true

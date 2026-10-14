@@ -1,0 +1,19 @@
+title: Link Builder
+summary: Build web links with positional-only, keyword-only, *args and **kwargs parameters, unpack a list and a dict into a call, chain functions passed as arguments, and avoid a shared mutable default.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Builds the example links
+    file: 01-example.py
+    hidden: false
+  - name: Declares and applies link's parameters exactly
+    file: 02-link.py
+    hidden: true
+  - name: Unpacks parts and options, and chains step functions
+    file: 03-unpacking-and-steps.py
+    hidden: true
+  - name: Starts a new history on every call without one
+    file: 04-remember.py
+    hidden: true

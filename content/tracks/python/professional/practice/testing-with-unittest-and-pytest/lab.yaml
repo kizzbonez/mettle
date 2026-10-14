@@ -1,0 +1,19 @@
+title: Tests for the Library Fees
+summary: Write unittest test cases, with subTest, assertRaises and a Mock mailer scripted by side_effect, that pass on the library's late-fee and reminder code and catch every broken version of it.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Passes on the real code and catches the two broken versions from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: LateFeeTest catches every broken late_fee
+    file: 02-late-fee-mistakes.py
+    hidden: true
+  - name: SendRemindersTest checks who is emailed, with what, and the count
+    file: 03-reminder-mistakes.py
+    hidden: true
+  - name: SendRemindersTest checks what happens when an email fails
+    file: 04-failed-send-mistakes.py
+    hidden: true

@@ -1,0 +1,23 @@
+slug: makerspace-print-farm
+title: Makerspace Print Farm
+summary: Build the overnight controller for a makerspace's 3D printers, with a validated, ordered job dataclass, a job board that behaves like a container, a printer reservation that is always released, and an asyncio run that prints every job once, in order of urgency, on all printers at once.
+language: python
+minutes: 55
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the Tuesday evening example from the instructions
+    file: 01-tuesday-evening.py
+    hidden: false
+  - name: Validates print jobs and orders them by priority
+    file: 02-print-jobs.py
+    hidden: true
+  - name: Behaves like a container and refuses bad or duplicate jobs
+    file: 03-job-board.py
+    hidden: true
+  - name: Reserves printers and always releases them, even when a print fails
+    file: 04-printer-reservation.py
+    hidden: true
+  - name: Prints every job once, in order, with the printers working at the same time
+    file: 05-night-run.py
+    hidden: true

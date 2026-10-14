@@ -1,0 +1,19 @@
+title: Door Codes
+summary: Read a known number of keypad codes with a for loop over range, check each character with break, spot runs of digits with a loop's else clause, and count the codes accepted and rejected.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Checks the six codes from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Checks the length and the characters first
+    file: 02-length-and-digits.py
+    hidden: true
+  - name: Rejects codes that are too easy to guess
+    file: 03-too-easy.py
+    hidden: true
+  - name: Counts the codes, including when there are none
+    file: 04-counts.py
+    hidden: true

@@ -1,0 +1,19 @@
+title: Greenhouse Watering Library
+summary: Load layered settings from defaults, a TOML file and environment variables, warn about a deprecated key, and log each moisture reading through a named library logger, the lazy way and without configuring logging.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Loads the example settings and logs the example readings
+    file: 01-example.py
+    hidden: false
+  - name: Layers defaults, file and environment, and rejects bad variables
+    file: 02-settings-layers.py
+    hidden: true
+  - name: Warns about the old dry key and still applies the environment
+    file: 03-deprecated-key.py
+    hidden: true
+  - name: Logs every bed in order without configuring logging
+    file: 04-library-logging.py
+    hidden: true

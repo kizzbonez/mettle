@@ -1,0 +1,19 @@
+title: Choir Website Security Fixes
+summary: Store passwords as salted scrypt keys, verify them with hmac.compare_digest, make reset tokens with secrets instead of random, and keep uploaded file names from escaping their folder.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Hashes with scrypt and unpredictable salts
+    file: 02-hashing.py
+    hidden: true
+  - name: Checks passwords in constant time
+    file: 03-checking.py
+    hidden: true
+  - name: Makes safe tokens and refuses paths that lead out
+    file: 04-tokens-and-paths.py
+    hidden: true

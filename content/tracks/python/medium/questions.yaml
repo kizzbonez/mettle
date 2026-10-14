@@ -1,0 +1,692 @@
+- key: python-medium-01
+  type: single
+  category: python
+  tags: [modules, imports, main-guard]
+  prompt: |
+    Two files sit in one folder.
+
+    ```python
+    # helpers.py
+    print("loading helpers")
+
+
+    def greet(name):
+        return f"Hi {name}"
+
+
+    if __name__ == "__main__":
+        print(greet("main"))
+    ```
+
+    ```python
+    # app.py
+    import helpers
+    import helpers
+    from helpers import greet
+
+    print(greet("Ada"))
+    ```
+
+    What does `python app.py` print?
+  options:
+    - text: "`loading helpers` then `Hi Ada`"
+      correct: true
+    - text: "`loading helpers` three times, then `Hi Ada`"
+    - text: "`loading helpers`, `Hi main`, then `Hi Ada`"
+    - text: "Only `Hi Ada`, because importing a module does not run its top-level code"
+  explanation: |
+    A module's code runs the **first** time it is imported. Python stores the module object
+    in `sys.modules`, and every later `import helpers` or `from helpers import ...` reuses
+    it, so `loading helpers` appears once. When `helpers.py` is imported, its `__name__` is
+    `"helpers"`, not `"__main__"`, so the code under the main guard does not run and
+    `Hi main` never appears. Importing does run top-level code once, which is exactly why
+    script code belongs under `if __name__ == "__main__":`.
+
+- key: python-medium-02
+  type: single
+  category: python
+  tags: [modules, sys-path]
+  prompt: |
+    A folder holds `game.py` and a file of experiments the learner named `random.py`.
+
+    ```python
+    # game.py
+    import random
+
+    print(random.randint(1, 6))
+    ```
+
+    `python game.py` fails with `AttributeError: module 'random' has no attribute 'randint'`.
+    Why?
+  options:
+    - text: The folder of the script comes first in `sys.path`, so `import random` loads the learner's `random.py` instead of the standard library module
+      correct: true
+    - text: "`randint` was removed from the `random` module in Python 3.15"
+    - text: "`randint` can only be reached with `from random import randint`"
+    - text: The `random` module is not installed until you run `pip install random`
+  explanation: |
+    `import random` searches the folders of `sys.path` in order, and the first entry is the
+    folder of the script being run. The learner's `random.py` is found there first, so it
+    **shadows** the standard library module, and it has no `randint`. Python 3.13 and later
+    even suggest renaming the file in the error message. `randint` still exists, both import
+    forms reach the same module, and `random` is part of the standard library, never
+    installed with pip. Rename the file and delete its `__pycache__` entry.
+
+- key: python-medium-03
+  type: single
+  category: python
+  tags: [packages, relative-imports]
+  prompt: |
+    In a project folder, the package `garden` contains `__init__.py`, `tools.py` and a
+    subpackage `beds` with `__init__.py` and `planner.py`. `planner.py` starts with
+    `from ..tools import water`. Running `python garden/beds/planner.py` from the project
+    folder fails with `ImportError: attempted relative import with no known parent package`.
+    How do you run it so that the import works?
+  options:
+    - text: "From the project folder, run `python -m garden.beds.planner`"
+      correct: true
+    - text: "Run `cd garden/beds` and then `python planner.py`"
+    - text: "Add an empty `__init__.py` to the project folder itself"
+    - text: "Change the line to `import ..tools`"
+  explanation: |
+    Run as a file, `planner.py` becomes the module `__main__` with no package, so `..` has
+    nothing to refer to. `python -m garden.beds.planner` imports it by its dotted name, so
+    Python knows it lives in `garden.beds` and `..` means `garden`. Changing folder only
+    changes `sys.path` and the module still has no package. An `__init__.py` in the project
+    folder does not make the script part of a package. `import ..tools` is a SyntaxError:
+    relative imports exist only in the `from ... import` form.
+
+- key: python-medium-04
+  type: multiple
+  category: python
+  tags: [virtual-environments, pip]
+  prompt: |
+    Which statements about virtual environments and pip are true? Select all that apply.
+  options:
+    - text: A virtual environment is not committed to version control; you recreate it and install from `requirements.txt`
+      correct: true
+    - text: "`python -m pip install ...` installs into the interpreter that runs the command"
+      correct: true
+    - text: "`pip install \"pkg~=1.4.2\"` may install version 1.5.0"
+    - text: A virtual environment's packages cannot be used unless the environment is activated first
+  explanation: |
+    A virtual environment contains absolute paths and is disposable, so you commit
+    `requirements.txt` and recreate the environment anywhere. `python -m pip` runs pip as a
+    module of that exact `python`, which avoids installing into a different interpreter.
+    `~=1.4.2` is a compatible release: `>=1.4.2` and `==1.4.*`, so 1.5.0 is excluded.
+    Activation is only a convenience that puts the environment's folder first on `PATH`;
+    running `.venv/bin/python script.py` (or `.venv\Scripts\python` on Windows) uses the
+    environment without it.
+
+- key: python-medium-05
+  type: single
+  category: python
+  tags: [unicode, bytes, encoding]
+  prompt: |
+    What does this print?
+
+    ```python
+    print(len("naïve"), len("naïve".encode("utf-8")))
+    ```
+  options:
+    - text: "`5 6`"
+      correct: true
+    - text: "`5 5`"
+    - text: "`6 6`"
+    - text: "`5 10`"
+  explanation: |
+    `len` of a `str` counts code points: `n`, `a`, `ï`, `v`, `e` are five. Encoding to
+    UTF-8 gives `bytes`: the ASCII letters take one byte each, and `ï` (U+00EF) takes two,
+    so the result is six bytes. UTF-8 is variable-length, which is why `5 5` is wrong, and
+    it does not use two bytes for every character, which is why `5 10` is wrong (that would
+    be closer to UTF-16).
+
+- key: python-medium-06
+  type: single
+  category: python
+  tags: [strings, formatting]
+  prompt: |
+    What does this print?
+
+    ```python
+    print(f"{'tea':*^9}|{3.14159:>8.2f}|{1234567:,}|")
+    ```
+  options:
+    - text: "`***tea***|    3.14|1,234,567|`"
+      correct: true
+    - text: "`tea******|3.14    |1,234,567|`"
+    - text: "`***tea***|3.14|1234567|`"
+    - text: "`*********tea|    3.14|1.234.567|`"
+  explanation: |
+    In the format specification, `*^9` means fill with `*`, centre (`^`), width 9: three
+    letters plus three stars on each side. `>8.2f` right-aligns in 8 columns with two
+    decimals, so four spaces precede `3.14`. `,` groups thousands with commas. The width is
+    the total width of the field, not extra padding, and `^` centres rather than aligning
+    left.
+
+- key: python-medium-07
+  type: single
+  category: python
+  tags: [comprehensions]
+  prompt: |
+    What does this print?
+
+    ```python
+    grid = [[1, 2], [3, 4]]
+    print([n * 10 for row in grid for n in row if n != 3])
+    ```
+  options:
+    - text: "`[10, 20, 40]`"
+      correct: true
+    - text: "`[[10, 20], [40]]`"
+    - text: "`[10, 20, 30, 40]`"
+    - text: "A NameError, because `row` is used before it is defined"
+  explanation: |
+    Several `for` clauses run like nested loops, in the order written: `for row in grid`,
+    then `for n in row` inside it. The filter drops 3, and each remaining number is
+    multiplied by 10, giving one flat list. A list of lists needs a nested comprehension,
+    `[[...] for row in grid]`. The order is correct here; writing `for n in row` first would
+    be the NameError.
+
+- key: python-medium-08
+  type: single
+  category: python
+  tags: [generator-expressions]
+  prompt: |
+    What does this print?
+
+    ```python
+    squares = (n * n for n in range(4))
+    print(sum(squares), max(squares, default=-1))
+    ```
+  options:
+    - text: "`14 -1`"
+      correct: true
+    - text: "`14 9`"
+    - text: "`14 0`"
+    - text: It raises ValueError, because the generator is empty
+  explanation: |
+    A generator expression produces its values once. `sum` consumes all of them
+    (0 + 1 + 4 + 9 = 14), so `max` finds nothing left and returns its `default`. Without
+    `default=-1`, `max` would raise `ValueError: max() iterable argument is empty`. If you
+    need the values twice, build a list with square brackets instead.
+
+- key: python-medium-09
+  type: multiple
+  category: python
+  tags: [functions, parameters]
+  prompt: |
+    Given this function, which calls succeed? Select all that apply.
+
+    ```python
+    def book(room, /, nights=1, *, breakfast=False):
+        return room, nights, breakfast
+    ```
+  options:
+    - text: "`book(\"A12\", 3, breakfast=True)`"
+      correct: true
+    - text: "`book(\"A12\", nights=2)`"
+      correct: true
+    - text: "`book(room=\"A12\")`"
+    - text: "`book(\"A12\", 2, True)`"
+  explanation: |
+    Parameters before `/` are positional-only, so `room` cannot be passed by name:
+    `book(room="A12")` raises "got some positional-only arguments passed as keyword
+    arguments". `nights` sits between `/` and `*`, so it may be given either way.
+    Parameters after `*` are keyword-only, so `breakfast` must be named: `book("A12", 2,
+    True)` raises "takes from 1 to 2 positional arguments but 3 were given".
+
+- key: python-medium-10
+  type: single
+  category: python
+  tags: [functions, defaults]
+  prompt: |
+    What does this print?
+
+    ```python
+    def add(item, basket=[]):
+        basket.append(item)
+        return basket
+
+
+    add("tea")
+    print(add("jam"))
+    ```
+  options:
+    - text: "`['tea', 'jam']`"
+      correct: true
+    - text: "`['jam']`"
+    - text: "`['tea']`"
+    - text: "`[]`"
+  explanation: |
+    A default value is evaluated **once**, when `def` runs, and the same list is reused by
+    every call that omits `basket`. The first call appended `"tea"` to it, the second
+    appends `"jam"` to the same list. The fix is `basket=None` and `if basket is None:
+    basket = []` inside the function, which creates a fresh list on each call.
+
+- key: python-medium-11
+  type: single
+  category: python
+  tags: [closures, late-binding]
+  prompt: |
+    What does this print?
+
+    ```python
+    actions = []
+    for n in range(3):
+        actions.append(lambda: n * 10)
+    print([act() for act in actions])
+    ```
+  options:
+    - text: "`[20, 20, 20]`"
+      correct: true
+    - text: "`[0, 10, 20]`"
+    - text: "`[0, 0, 0]`"
+    - text: A NameError, because `n` no longer exists when the lambdas run
+  explanation: |
+    Each lambda refers to the **variable** `n`, not to the value `n` had when the lambda was
+    created; it looks the value up when called. By then the loop has finished and `n` is 2,
+    so every call returns 20. The variable still exists, because a `for` loop's variable
+    remains after the loop. To capture each value, bind it as a default:
+    `lambda n=n: n * 10`.
+
+- key: python-medium-12
+  type: single
+  category: python
+  tags: [sorting, key-functions]
+  prompt: |
+    What does this print?
+
+    ```python
+    print(sorted(["pear", "Fig", "apple", "kiwi"], key=len))
+    ```
+  options:
+    - text: "`['Fig', 'pear', 'kiwi', 'apple']`"
+      correct: true
+    - text: "`['Fig', 'kiwi', 'pear', 'apple']`"
+    - text: "`[3, 4, 4, 5]`"
+    - text: "`['Fig', 'apple', 'kiwi', 'pear']`"
+  explanation: |
+    `key=len` makes `sorted` compare the lengths 4, 3, 5 and 4 instead of the words, but it
+    still returns the words. Python's sort is **stable**: `pear` and `kiwi` both have length
+    4 and keep their original order, so `pear` stays before `kiwi`; the sort does not break
+    ties alphabetically. Sorting without a key would give alphabetical order by code point.
+
+- key: python-medium-13
+  type: single
+  category: python
+  tags: [classes, class-attributes]
+  prompt: |
+    What does this print?
+
+    ```python
+    class Playlist:
+        songs = []
+
+        def __init__(self, name):
+            self.name = name
+
+        def add(self, song):
+            self.songs.append(song)
+
+
+    road = Playlist("road")
+    gym = Playlist("gym")
+    road.add("Song 2")
+    print(len(gym.songs), "songs" in vars(road))
+    ```
+  options:
+    - text: "`1 False`"
+      correct: true
+    - text: "`0 True`"
+    - text: "`1 True`"
+    - text: "`0 False`"
+  explanation: |
+    `songs = []` in the class body is a **class attribute**: one list shared by every
+    playlist. `self.songs.append(...)` finds it through the instance and changes that shared
+    list, so the gym playlist sees the song too. No instance attribute was ever assigned, so
+    `songs` is not in the instance's `__dict__` (`vars(road)`). Create per-object lists in
+    `__init__` with `self.songs = []`.
+
+- key: python-medium-14
+  type: single
+  category: python
+  tags: [classes, str, repr]
+  prompt: |
+    What does this print?
+
+    ```python
+    class Note:
+        def __init__(self, text):
+            self.text = text
+
+        def __str__(self):
+            return f"note: {self.text}"
+
+
+    note = Note("milk")
+    print(note, [note])
+    ```
+  options:
+    - text: "`note: milk` followed by a list showing `<__main__.Note object at 0x...>` with a memory address"
+      correct: true
+    - text: "`note: milk [note: milk]`"
+    - text: "`note: milk ['note: milk']`"
+    - text: It raises TypeError, because the class has no `__repr__`
+  explanation: |
+    `print(note)` uses `__str__`. A list, however, shows its items with `repr()`, which uses
+    `__repr__`, and this class only inherits the default one from `object`: the class name
+    and a memory address. `str()` falls back to `__repr__`, but not the other way round, so
+    define `__repr__` first. Nothing raises an error, since every object has a default
+    `__repr__`.
+
+- key: python-medium-15
+  type: single
+  category: python
+  tags: [properties]
+  prompt: |
+    What happens on the last line?
+
+    ```python
+    class Kettle:
+        def __init__(self, litres):
+            self.litres = litres
+
+        @property
+        def litres(self):
+            return self._litres
+
+        @litres.setter
+        def litres(self, value):
+            if not 0 < value <= 1.7:
+                raise ValueError("a kettle holds up to 1.7 litres")
+            self._litres = value
+
+        @property
+        def cups(self):
+            return int(self._litres / 0.25)
+
+
+    kettle = Kettle(1.5)
+    kettle.cups = 10
+    ```
+  options:
+    - text: "AttributeError: the property `cups` has no setter"
+      correct: true
+    - text: "`cups` becomes 10, stored in the instance's `__dict__`"
+    - text: "ValueError, raised by the `litres` setter"
+    - text: "The assignment changes `_litres` to 2.5"
+  explanation: |
+    A property without a setter is **read-only**. Assigning to it raises `AttributeError:
+    property 'cups' of 'Kettle' object has no setter`; the instance's `__dict__` is never
+    used, because the property on the class takes precedence. `cups` is computed from
+    `_litres` on each read, and the `litres` setter only runs for `kettle.litres = ...`,
+    including the assignment in `__init__`.
+
+- key: python-medium-16
+  type: multiple
+  category: python
+  tags: [encapsulation, name-mangling]
+  prompt: |
+    A class `Lock` stores `self.__pin = pin` and `self._tries = 0` in its `__init__`. Which
+    statements are true for `lock = Lock("1234")`? Select all that apply.
+  options:
+    - text: "The PIN is stored in the instance's `__dict__` under the name `_Lock__pin`"
+      correct: true
+    - text: "`lock.__pin` outside the class raises AttributeError"
+      correct: true
+    - text: "Code outside the class has no way to read the PIN"
+    - text: "`_tries` is renamed to `_Lock_tries` in the same way"
+  explanation: |
+    A name with two leading underscores (and not two trailing ones) is **mangled** inside a
+    class: `__pin` becomes `_Lock__pin`, so `vars(lock)` shows `{'_Lock__pin': '1234',
+    '_tries': 0}`. Outside the class, `lock.__pin` is not mangled and finds nothing. But
+    `lock._Lock__pin` still reads the value: mangling avoids clashes between a class and its
+    subclasses, it is not security. A single underscore is only a convention and nothing is
+    renamed.
+
+- key: python-medium-17
+  type: single
+  category: python
+  tags: [inheritance, mro, super]
+  prompt: |
+    What does this print?
+
+    ```python
+    class A:
+        def hello(self):
+            return "A"
+
+
+    class B(A):
+        def hello(self):
+            return "B" + super().hello()
+
+
+    class C(A):
+        def hello(self):
+            return "C" + super().hello()
+
+
+    class D(B, C):
+        def hello(self):
+            return "D" + super().hello()
+
+
+    print(D().hello())
+    ```
+  options:
+    - text: "`DBCA`"
+      correct: true
+    - text: "`DBA`"
+    - text: "`DBACA`"
+    - text: "`DCBA`"
+  explanation: |
+    The method resolution order of `D` is `D, B, C, A, object`: each class once, children
+    before parents, bases left to right. `super()` means "the next class in the MRO of this
+    object", so `super()` inside `B.hello` reaches `C`, a sibling that `B` does not even
+    inherit from, and only then `A`. `DBA` assumes `super()` means "my parent". `A` runs
+    once, not twice, which is how Python resolves the diamond.
+
+- key: python-medium-18
+  type: multiple
+  category: python
+  tags: [inheritance, polymorphism, duck-typing]
+  prompt: |
+    `Light` is a subclass of `Device`, and `lamp = Light("desk")`. Which statements are
+    true? Select all that apply.
+  options:
+    - text: "`isinstance(True, int)` is `True`"
+      correct: true
+    - text: "`issubclass(Light, Light)` is `True`"
+      correct: true
+    - text: "`type(lamp) is Device` is `True`"
+    - text: A function that calls `thing.status()` works only with instances of `Device` and its subclasses
+  explanation: |
+    `bool` is a subclass of `int`, so `True` is an `int` too. A class counts as a subclass of
+    itself. `type(lamp)` is exactly `Light`; `type(...) is` ignores inheritance, which is why
+    `isinstance` is usually what you want. Python never checks the class before calling a
+    method: any object with a `status` method works. This is **duck typing**.
+
+- key: python-medium-19
+  type: single
+  category: python
+  tags: [exceptions, hierarchy]
+  prompt: |
+    What does this print?
+
+    ```python
+    class AppError(Exception):
+        pass
+
+
+    class ConfigError(AppError):
+        pass
+
+
+    try:
+        raise ConfigError("missing key")
+    except AppError as error:
+        print("app:", error)
+    except ConfigError as error:
+        print("config:", error)
+    ```
+  options:
+    - text: "`app: missing key`"
+      correct: true
+    - text: "`config: missing key`"
+    - text: Both lines, first `app:` then `config:`
+    - text: "Nothing: Python raises SyntaxError because `ConfigError` can never be reached"
+  explanation: |
+    An `except` clause catches its class **and its subclasses**, and the first matching
+    clause wins. `ConfigError` is an `AppError`, so the first clause handles it and the
+    second is never used. Only one `except` clause runs (unlike `except*` with exception
+    groups). Python does not report the unreachable clause; put specific classes first.
+
+- key: python-medium-20
+  type: single
+  category: python
+  tags: [exceptions, chaining]
+  prompt: |
+    This program is run and nothing catches the exception.
+
+    ```python
+    class SettingsError(Exception):
+        pass
+
+
+    def read_port(text):
+        try:
+            return int(text)
+        except ValueError as error:
+            raise SettingsError(f"bad port: {text!r}") from error
+
+
+    read_port("eighty")
+    ```
+
+    What does the traceback show?
+  options:
+    - text: "The ValueError, then \"The above exception was the direct cause of the following exception:\", then the SettingsError"
+      correct: true
+    - text: "The ValueError, then \"During handling of the above exception, another exception occurred:\", then the SettingsError"
+    - text: Only the SettingsError, because `from error` replaces the original exception
+    - text: Only the ValueError, because it happened first
+  explanation: |
+    `raise ... from error` stores the ValueError as the new exception's `__cause__`, and the
+    traceback prints both, linked by "direct cause". Without `from`, the original would
+    still be attached (as `__context__`) but the link would read "During handling of the
+    above exception, another exception occurred", which suggests a bug in the handler. To
+    show only the new exception, write `from None`.
+
+- key: python-medium-21
+  type: multiple
+  category: python
+  tags: [files, io]
+  prompt: |
+    Which statements about files in Python 3.15 are true? Select all that apply.
+  options:
+    - text: "`open(path, \"w\")` on an existing file empties it before anything is written"
+      correct: true
+    - text: "`file.readline()` returns an empty string `\"\"` at the end of the file"
+      correct: true
+    - text: "Mode `\"x\"` appends to the end of an existing file"
+    - text: "Without an `encoding` argument, `open` uses the system's locale encoding"
+  explanation: |
+    `"w"` truncates the file; use `"a"` to add to it. `readline` returns each line with its
+    `"\n"`, so an empty line inside the file is `"\n"` and only the end of the file gives
+    `""`. Mode `"x"` creates a new file and raises FileExistsError if it already exists.
+    Since Python 3.15 (PEP 686), the default text encoding is UTF-8 on every system; the
+    locale encoding is used only if UTF-8 mode is turned off or you pass
+    `encoding="locale"`.
+
+- key: python-medium-22
+  type: single
+  category: python
+  tags: [files, oserror, errno]
+  prompt: |
+    `settings.ini` does not exist. What does this print?
+
+    ```python
+    import errno
+
+    try:
+        with open("settings.ini", encoding="utf-8") as file:
+            text = file.read()
+    except OSError as error:
+        print(type(error).__name__, error.errno == errno.ENOENT)
+    ```
+  options:
+    - text: "`FileNotFoundError True`"
+      correct: true
+    - text: "`OSError True`"
+    - text: "`FileNotFoundError False`"
+    - text: "`IOError True`"
+  explanation: |
+    `open` raises **FileNotFoundError**, a subclass of OSError, so `except OSError` catches
+    it, but `type(error)` is still the specific class. Its `errno` attribute is the system
+    error number for "No such file or directory", which the `errno` module names `ENOENT`.
+    `IOError` is only an old alias of OSError, never the type of a new exception.
+
+- key: python-medium-23
+  type: single
+  category: python
+  tags: [generators, yield]
+  prompt: |
+    What does this print?
+
+    ```python
+    def numbers():
+        print("start")
+        yield 1
+        print("middle")
+        yield 2
+
+
+    gen = numbers()
+    print("created")
+    print(next(gen))
+    ```
+  options:
+    - text: "`created`, then `start`, then `1`"
+      correct: true
+    - text: "`start`, then `created`, then `1`"
+    - text: "`created`, then `start`, then `1`, then `middle`"
+    - text: "`start`, `middle`, `created`, then `1`"
+  explanation: |
+    Calling a generator function runs **none** of its body; it returns a generator. The
+    first `next` runs the body until the first `yield`, so `start` appears after `created`,
+    and the generator pauses there, handing out 1. `middle` would only be printed by a
+    second `next`.
+
+- key: python-medium-24
+  type: single
+  category: python
+  tags: [pattern-matching]
+  prompt: |
+    What does this print?
+
+    ```python
+    LIMIT = 10
+
+
+    def check(n):
+        match n:
+            case LIMIT:
+                return "at limit"
+
+
+    print(check(3))
+    ```
+  options:
+    - text: "`at limit`"
+      correct: true
+    - text: "`None`"
+    - text: A SyntaxError, because `LIMIT` is not a literal
+    - text: A NameError inside `check`
+  explanation: |
+    A bare name in a pattern is a **capture pattern**: it matches anything and binds the
+    subject to a new local variable called `LIMIT`. It never compares with the global 10,
+    so `check(3)` returns `"at limit"`. Constants must be dotted names, such as
+    `Limits.MAX`, to be compared with `==`. Python reports a SyntaxError only when a capture
+    pattern is followed by more cases, which it would make unreachable.

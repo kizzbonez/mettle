@@ -1,0 +1,19 @@
+title: Name Badges
+summary: Compare names with NFC and casefold, cut text to a byte budget without breaking a character, show code points in hex, and lay out a seating list with the format mini-language.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example names
+    file: 01-example.py
+    hidden: false
+  - name: Gives one key for every spelling of a name
+    file: 02-name-key.py
+    hidden: true
+  - name: Fits text into a number of bytes without cutting a character
+    file: 03-fit-bytes.py
+    hidden: true
+  - name: Shows code points and lays out seating lines in columns
+    file: 04-points-and-lines.py
+    hidden: true

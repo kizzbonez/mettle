@@ -1,0 +1,19 @@
+title: Photo Backup
+summary: Replace a counter that leans on a global with one that returns its result, then walk nested folders recursively to add up their sizes and find the largest file.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the examples from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Counts files at any depth, the same on every call
+    file: 02-count-files.py
+    hidden: true
+  - name: Adds up the sizes at any depth
+    file: 03-total-size.py
+    hidden: true
+  - name: Finds the largest file at any depth
+    file: 04-largest-file.py
+    hidden: true

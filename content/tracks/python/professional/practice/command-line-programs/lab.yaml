@@ -1,0 +1,19 @@
+title: Balcony Weather Summary
+summary: Build an argparse command that reads temperature files or standard input, warns about bad lines on standard error, prints a summary in the chosen unit and precision, and exits with status 0, 1 or 2.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the three commands from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Reads several files and standard input, and main returns the status
+    file: 02-files-and-stdin.py
+    hidden: true
+  - name: Applies unit and precision and rejects bad options with status 2
+    file: 03-options-and-usage.py
+    hidden: true
+  - name: Exits with status 1 and a clean standard output on failure
+    file: 04-failures.py
+    hidden: true

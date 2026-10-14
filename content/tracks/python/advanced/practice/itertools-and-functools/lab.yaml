@@ -1,0 +1,19 @@
+title: Quiz League Numbers
+summary: Use accumulate, groupby, combinations and permutations to turn a quiz team's results into running points, streaks and fixtures, and count scoring sequences with a recursive function cached by functools.cache.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the league example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Gives running points and streaks, also for empty and uniform results
+    file: 02-points-and-streaks.py
+    hidden: true
+  - name: Lists fixtures with one leg or both
+    file: 03-fixtures.py
+    hidden: true
+  - name: Counts the ways to score, with a cache
+    file: 04-ways-to-score.py
+    hidden: true

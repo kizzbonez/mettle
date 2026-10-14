@@ -1,0 +1,19 @@
+title: Tool Library
+summary: Model a lending library's tools as a class with instance attributes, a class-level counter, methods that lend and take back, and readable __str__ and __repr__.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Lends the example drill and ladder
+    file: 01-example.py
+    hidden: false
+  - name: Gives each tool its own attributes and counts tools on the class
+    file: 02-attributes.py
+    hidden: true
+  - name: Lends and takes back, refusing impossible moves
+    file: 03-lending.py
+    hidden: true
+  - name: Describes tools with str and repr
+    file: 04-text.py
+    hidden: true

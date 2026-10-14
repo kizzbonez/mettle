@@ -1,0 +1,19 @@
+title: Returns Trolley Types
+summary: Annotate a library helper with Iterable, unions and Callable, write a generic function and a generic stack class with the type parameter syntax, and define a type alias, checked at run time through get_type_hints.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the library example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Annotates shelf_labels with Iterable, a union and a list
+    file: 02-shelf-labels.py
+    hidden: true
+  - name: Makes first_match generic and uses its type parameter throughout
+    file: 03-first-match.py
+    hidden: true
+  - name: Makes Trolley a generic stack and Catalogue a type alias
+    file: 04-trolley-and-alias.py
+    hidden: true

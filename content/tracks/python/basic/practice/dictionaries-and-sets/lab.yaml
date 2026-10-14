@@ -1,0 +1,19 @@
+title: Book Club Vote
+summary: Keep each member's latest vote in a dictionary, count the votes per book with get, pick the winner, and find who did not vote with a set difference.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reports the vote from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Keeps each member's last vote and ignores non-members
+    file: 02-recording-votes.py
+    hidden: true
+  - name: Counts the votes and picks the winner
+    file: 03-counts-and-winner.py
+    hidden: true
+  - name: Lists the members who did not vote
+    file: 04-did-not-vote.py
+    hidden: true

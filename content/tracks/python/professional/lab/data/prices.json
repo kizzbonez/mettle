@@ -1,0 +1,11 @@
+{
+  "currency": "EUR",
+  "month": "2026-10",
+  "items": {
+    "coffee-1kg": "17.85",
+    "lentils-2kg": "6.95",
+    "oats-5kg": "11.40",
+    "olive-oil-1l": "8.25",
+    "rice-5kg": "9.99"
+  }
+}

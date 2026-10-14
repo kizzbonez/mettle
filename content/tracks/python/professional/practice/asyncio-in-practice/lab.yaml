@@ -1,0 +1,19 @@
+title: Bike-Share Station Poller
+summary: Poll every docking station concurrently in a TaskGroup, at most a few at a time with a semaphore, give each fetch its own asyncio.timeout, turn connection errors into results and let any other error cancel the rest.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Polls the four stations of the example
+    file: 01-example.py
+    hidden: false
+  - name: Runs exactly limit fetches at once and keeps the station order
+    file: 02-limit-and-order.py
+    hidden: true
+  - name: Times out each silent station on its own deadline
+    file: 03-timeouts.py
+    hidden: true
+  - name: Reports connection errors and cancels the rest on any other error
+    file: 04-errors.py
+    hidden: true

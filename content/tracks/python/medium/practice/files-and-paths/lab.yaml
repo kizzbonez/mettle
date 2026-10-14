@@ -1,0 +1,19 @@
+title: Guest Book
+summary: Append to text files with mode a, read entries line by line with UTF-8 and universal newlines, create a season's book safely with mode x and pathlib, and list the books in a folder with glob.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Keeps the example guest book
+    file: 01-example.py
+    hidden: false
+  - name: Signs at the end of a book without erasing it
+    file: 02-sign.py
+    hidden: true
+  - name: Reads only real entries, from any line endings
+    file: 03-read-entries.py
+    hidden: true
+  - name: Creates books once and lists the seasons
+    file: 04-books-and-seasons.py
+    hidden: true

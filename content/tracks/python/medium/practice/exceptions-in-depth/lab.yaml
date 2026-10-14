@@ -1,0 +1,19 @@
+title: Seat Booking
+summary: Define a small exception hierarchy with attributes and a ValueError subclass, chain a parse error with raise from, annotate errors with add_note, and report a whole basket's problems in one ExceptionGroup.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Books and refuses the example baskets
+    file: 01-example.py
+    hidden: false
+  - name: Builds the exception hierarchy with messages and attributes
+    file: 02-classes.py
+    hidden: true
+  - name: Parses seats and chains the cause of a bad row
+    file: 03-parse-seat.py
+    hidden: true
+  - name: Books all or nothing and groups every problem
+    file: 04-book.py
+    hidden: true

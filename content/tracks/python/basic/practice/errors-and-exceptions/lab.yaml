@@ -1,0 +1,19 @@
+title: Pocket Calculator
+summary: Raise ValueError with clear messages from a function, let float's ValueError and ZeroDivisionError travel up, and catch each in a script that reads lines until the input ends.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the examples from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Calculates with the four operators
+    file: 02-calculate.py
+    hidden: true
+  - name: Raises the right exception with the right message
+    file: 03-raises.py
+    hidden: true
+  - name: Reads until the input ends and reports every line
+    file: 04-script.py
+    hidden: true

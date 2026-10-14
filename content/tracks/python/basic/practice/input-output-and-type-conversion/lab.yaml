@@ -1,0 +1,19 @@
+title: Bill Splitter
+summary: Read a bill, a tip rate and a number of people with input(), convert each with float or int, and print the shares with sep and two-decimal f-strings, letting a bad conversion stop the script with ValueError.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Reads and converts the three lines
+    file: 02-reads-and-converts.py
+    hidden: true
+  - name: Works out the tip, the total and the shares
+    file: 03-tip-and-shares.py
+    hidden: true
+  - name: Stops with a ValueError on input it cannot convert
+    file: 04-value-errors.py
+    hidden: true

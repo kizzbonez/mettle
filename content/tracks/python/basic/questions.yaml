@@ -1,0 +1,609 @@
+- key: python-basic-01
+  type: single
+  category: python
+  tags: [cpython, bytecode, interpreter]
+  prompt: |
+    You run `python report.py`. What does CPython do before the first line of the program runs?
+  options:
+    - text: It reads the file, splits it into tokens, parses it and compiles the whole file to bytecode, which its virtual machine then executes
+      correct: true
+    - text: It translates the file into machine code for the processor and saves an executable next to it
+    - text: "Nothing: it reads and runs the text one line at a time, so a grammar mistake on line 10 is noticed only when line 10 is reached"
+    - text: It loads report.py's bytecode from the __pycache__ folder, where every run saves it
+  explanation: |
+    CPython is an interpreter with a compiler inside it. It decodes the source, tokenizes it,
+    parses it and compiles it to **bytecode**, instructions for the Python **virtual machine**,
+    which then runs them one by one. Bytecode is not machine code, and no executable is written.
+    Because the whole file is compiled first, a syntax error anywhere stops the program before
+    line 1 runs. Bytecode is cached in `__pycache__` only for **imported** modules; the file you
+    run directly is always compiled afresh.
+
+- key: python-basic-02
+  type: single
+  category: python
+  tags: [syntax-error, traceback]
+  prompt: |
+    What happens when this script is run?
+
+    ```python
+    print("Starting")
+    total = 3 + 4
+    print("Total:" total)
+    ```
+  options:
+    - text: "Nothing is printed; Python reports `SyntaxError: invalid syntax. Perhaps you forgot a comma?` for line 3"
+      correct: true
+    - text: "`Starting` is printed, then a `SyntaxError` is reported for line 3"
+    - text: "`Starting` and `Total: 7` are printed"
+    - text: "`Starting` is printed, then a `NameError` is raised because `total` is not defined"
+  explanation: |
+    Two values side by side without a comma break Python's grammar, so this is a **syntax
+    error**. Syntax errors are found while the file is compiled, before anything runs, which is
+    why not even `Starting` appears and the report has no "Traceback" heading. The tempting answer,
+    that `Starting` is printed first, describes an **exception**, which happens only at run time
+    after the earlier lines have run. The fix is `print("Total:", total)`.
+
+- key: python-basic-03
+  type: multiple
+  category: python
+  tags: [identifiers, keywords, naming]
+  prompt: |
+    Which of these are legal Python variable names? Select all that apply.
+  options:
+    - text: "`_total`"
+      correct: true
+    - text: "`max_speed2`"
+      correct: true
+    - text: "`2nd_place`"
+    - text: "`class`"
+  explanation: |
+    A name may contain letters, digits and underscores, must not start with a digit, and must
+    not be a keyword. `_total` (a leading underscore is allowed and signals "internal") and
+    `max_speed2` (digits are fine after the first character, and it follows PEP 8's snake_case)
+    are legal. `2nd_place` starts with a digit and is a `SyntaxError: invalid decimal literal`.
+    `class` is one of Python's 35 keywords, reserved for defining classes.
+
+- key: python-basic-04
+  type: single
+  category: python
+  tags: [names, objects, identity, equality]
+  prompt: |
+    What does this print?
+
+    ```python
+    price = 250000
+    other = price
+    price = price + 1
+    copy = int("250000")
+    print(other == copy, other is copy, price == other)
+    ```
+  options:
+    - text: "`True False False`"
+      correct: true
+    - text: "`True True True`"
+    - text: "`True False True`"
+    - text: "`False False False`"
+  explanation: |
+    `other = price` binds a second name to the object 250000. `price = price + 1` then
+    **rebinds** `price` to a new object, 250001, and leaves `other` where it was, so
+    `price == other` is `False`. `int("250000")` creates a new `int` with an equal value: `==`
+    compares values (`True`), while `is` asks whether two names refer to the same object
+    (`False`). Assignment never changes an object or the other names bound to it.
+
+- key: python-basic-05
+  type: single
+  category: python
+  tags: [arithmetic, floor-division, modulo]
+  prompt: |
+    What does this print?
+
+    ```python
+    print(-7 // 2, -7 % 2, 7 // -2)
+    ```
+  options:
+    - text: "`-4 1 -4`"
+      correct: true
+    - text: "`-3 -1 -3`"
+    - text: "`-3.5 1 -3.5`"
+    - text: "`-4 -1 -3`"
+  explanation: |
+    `//` rounds **down**, towards minus infinity: -7 / 2 is -3.5, so `-7 // 2` is -4, and
+    `7 // -2` is -4 too. `%` is defined so that `a == (a // b) * b + a % b`, which makes its
+    result take the sign of the right operand: -7 - (-8) = 1. The tempting `-3 -1 -3` is what
+    C and Java give, because they truncate towards zero.
+
+- key: python-basic-06
+  type: single
+  category: python
+  tags: [operators, precedence, associativity]
+  prompt: |
+    What does this print?
+
+    ```python
+    print(2 ** 3 ** 2, -3 ** 2, 10 - 4 - 3, 2 + 3 * 4 ** 2)
+    ```
+  options:
+    - text: "`512 -9 3 50`"
+      correct: true
+    - text: "`64 9 3 50`"
+    - text: "`512 9 9 400`"
+    - text: "`64 -9 9 50`"
+  explanation: |
+    `**` groups **right to left**, so `2 ** 3 ** 2` is `2 ** 9`, 512, not `8 ** 2`. `**` also
+    binds tighter than a minus on its left, so `-3 ** 2` is `-(3 ** 2)`, -9. Subtraction groups
+    left to right: `(10 - 4) - 3` is 3. In the last expression `**` comes first, then `*`, then
+    `+`: `2 + 3 * 16` is 50.
+
+- key: python-basic-07
+  type: single
+  category: python
+  tags: [float, floating-point]
+  prompt: |
+    After `total = 0.1 + 0.2`, the branch `if total == 0.3:` never runs. Why, and what is the best
+    fix?
+  options:
+    - text: "0.1 and 0.2 have no exact binary representation, so the sum is 0.30000000000000004; compare with `math.isclose(total, 0.3)` or round both sides first"
+      correct: true
+    - text: "It is a bug in this version of Python's float addition; a later version gives exactly 0.3"
+    - text: "`==` compares the identity of floats; use `total is 0.3` instead"
+    - text: "The sum is an `int`, so convert it with `float(total)` before comparing"
+  explanation: |
+    Floats are stored in binary (IEEE 754), and most decimal fractions, like 1/10, are endless
+    in binary, so Python keeps the nearest value it can. The tiny errors add up:
+    `0.1 + 0.2` prints `0.30000000000000004`. The tutorial says this is "not a bug in Python";
+    every language using the processor's floats behaves the same. Never test floats with `==`
+    after arithmetic. `is` would be worse: it compares object identity, not value.
+
+- key: python-basic-08
+  type: single
+  category: python
+  tags: [numeral-systems, bitwise]
+  prompt: |
+    What does this print?
+
+    ```python
+    print(0b1100 & 0b1010, 0o17 + 0x1, 1 << 3, int("101", 2))
+    ```
+  options:
+    - text: "`8 16 8 5`"
+      correct: true
+    - text: "`14 18 8 101`"
+    - text: "`8 18 3 5`"
+    - text: "`1110 16 8 5`"
+  explanation: |
+    `&` keeps the bits that are 1 in both: `1100 & 1010` is `1000`, which is 8. `0o17` is octal
+    for 15 and `0x1` is 1, so their sum is 16. `1 << 3` shifts left three places, multiplying by
+    2³: 8. `int("101", 2)` reads the text as binary: 5. The prefixes only change how a number is
+    written; the results are ordinary `int` values printed in decimal.
+
+- key: python-basic-09
+  type: single
+  category: python
+  tags: [strings, slicing, indexing]
+  prompt: |
+    What does this print?
+
+    ```python
+    word = "keyboard"
+    print(word[1:4], word[-3:], word[::3])
+    ```
+  options:
+    - text: "`eyb ard kbr`"
+      correct: true
+    - text: "`keyb ard kbr`"
+    - text: "`eybo ard kya`"
+    - text: "`eyb oard kbr`"
+  explanation: |
+    Indices start at 0, and a slice includes its start but **excludes** its stop: `word[1:4]`
+    is the characters at 1, 2 and 3, `eyb`. `word[-3:]` starts three from the end and runs to
+    the end: `ard`. `word[::3]` takes every third character from the start, indices 0, 3 and 6:
+    `k`, `b`, `r`. The tempting `keyb` would need the slice to start at 0.
+
+- key: python-basic-10
+  type: single
+  category: python
+  tags: [strings, immutability, methods]
+  prompt: |
+    What does this print?
+
+    ```python
+    name = "  Ada  "
+    name.strip()
+    name.upper()
+    print(f"[{name}]")
+    ```
+  options:
+    - text: "`[  Ada  ]`"
+      correct: true
+    - text: "`[ADA]`"
+    - text: "`[Ada]`"
+    - text: "`[  ADA  ]`"
+  explanation: |
+    Strings are **immutable**: `strip()` and `upper()` never change the string they are called
+    on; they return a **new** string. Here both results are thrown away, so `name` still refers
+    to the original `"  Ada  "`. To keep the result, bind it: `name = name.strip().upper()`,
+    which would print `[ADA]`.
+
+- key: python-basic-11
+  type: single
+  category: python
+  tags: [input, str, conversion]
+  prompt: |
+    The user types `21` and presses Enter. What does the second line print?
+
+    ```python
+    age = input("Age: ")
+    print(age * 2)
+    ```
+  options:
+    - text: "`2121`"
+      correct: true
+    - text: "`42`"
+    - text: "`21 21`"
+    - text: "Nothing: it raises `TypeError` because text cannot be multiplied"
+  explanation: |
+    `input()` **always returns a string**, even when the user types digits. `"21" * 2` repeats
+    the string, giving `"2121"`. To do arithmetic, convert first: `int(input("Age: ")) * 2` is
+    42. Multiplying a string by an `int` is allowed (repetition); it is `"21" + 2`, adding a
+    number to a string, that raises `TypeError`.
+
+- key: python-basic-12
+  type: multiple
+  category: python
+  tags: [conversion, int, float, valueerror]
+  prompt: |
+    Which of these calls raise `ValueError`? Select all that apply.
+  options:
+    - text: "`int(\"3.5\")`"
+      correct: true
+    - text: "`int(\"\")`"
+      correct: true
+    - text: "`int(7.9)`"
+    - text: "`float(\"1e3\")`"
+  explanation: |
+    `int()` given a **string** accepts only whole-number text (with optional sign and spaces), so
+    `"3.5"` and the empty string `""`, what you get when the user just presses Enter, both raise
+    `ValueError: invalid literal for int() with base 10`. Given a **float**, `int()` does not
+    complain: it truncates towards zero, so `int(7.9)` is 7. `float("1e3")` understands
+    scientific notation and returns `1000.0`.
+
+- key: python-basic-13
+  type: single
+  category: python
+  tags: [booleans, and-or, short-circuit, truthiness]
+  prompt: |
+    What are the values of these four expressions, in order?
+
+    ```python
+    0 or "none"
+    3 and ""
+    not "a"
+    "" or 0
+    ```
+  options:
+    - text: "`'none'`, `''`, `False`, `0`"
+      correct: true
+    - text: "`True`, `False`, `False`, `False`"
+    - text: "`'none'`, `3`, `False`, `''`"
+    - text: "`'none'`, `True`, `''`, `0`"
+  explanation: |
+    `and` and `or` return one of their **operands**, not necessarily a `bool`. `x or y` returns
+    `x` if it is true, otherwise `y`: `0` is false, so `'none'`; `""` is false, so `0`. `x and y`
+    returns `x` if it is false, otherwise `y`: `3` is true, so `''`. Only `not` always returns a
+    `bool`: `"a"` is a non-empty string, which is true, so `not "a"` is `False`.
+
+- key: python-basic-14
+  type: single
+  category: python
+  tags: [conditions, or, truthiness]
+  prompt: |
+    What does this print, and why?
+
+    ```python
+    day = "mon"
+    if day == "sat" or "sun":
+        print("weekend")
+    else:
+        print("weekday")
+    ```
+  options:
+    - text: "`weekend`, because the condition means `(day == \"sat\") or \"sun\"`, and the non-empty string `\"sun\"` is true"
+      correct: true
+    - text: "`weekday`, because `day` is neither `\"sat\"` nor `\"sun\"`"
+    - text: "Nothing: it is a `SyntaxError` to compare one value with two strings"
+    - text: "`weekday`, because `or` compares `day` with each string in turn"
+  explanation: |
+    `==` binds tighter than `or`, so the condition is `(day == "sat") or "sun"`. The comparison
+    is `False`, so `or` returns its right operand, `"sun"`, and every non-empty string is true.
+    The branch always runs. Python does not distribute `==` over `or`; write
+    `day == "sat" or day == "sun"`.
+
+- key: python-basic-15
+  type: single
+  category: python
+  tags: [loops, for-else, break]
+  prompt: |
+    What does this print?
+
+    ```python
+    for n in [3, 5, 7]:
+        if n % 2 == 0:
+            print("even", n)
+            break
+    else:
+        print("no even number")
+    print("end")
+    ```
+  options:
+    - text: "`no even number`, then `end`"
+      correct: true
+    - text: "Only `end`"
+    - text: "`no even number` three times, then `end`"
+    - text: "`even 3`, then `end`"
+  explanation: |
+    The `else` belongs to the `for` loop, not to the `if` (look at its indentation). A loop's
+    `else` runs once, when the loop finishes **without** `break`. No number is even, so `break`
+    never runs, the loop ends normally and the `else` block prints `no even number`. Had the
+    list contained an even number, `break` would have skipped the `else`.
+
+- key: python-basic-16
+  type: single
+  category: python
+  tags: [loops, nested-loops, break, range]
+  prompt: |
+    What does this print?
+
+    ```python
+    for row in range(3):
+        for col in range(3):
+            if col == row:
+                break
+            print(row, col)
+    ```
+  options:
+    - text: "Three lines: `1 0`, `2 0` and `2 1`"
+      correct: true
+    - text: "Nothing, because the first `break` ends both loops"
+    - text: "One line: `1 0`"
+    - text: "Six lines: every pair where `col` differs from `row`"
+  explanation: |
+    `break` leaves only the **innermost** loop. For `row` 0, `col` 0 equals the row at once, so
+    the inner loop breaks before printing. For `row` 1 it prints `1 0`, then breaks at `col` 1.
+    For `row` 2 it prints `2 0` and `2 1`, then breaks. The outer loop carries on each time,
+    because the `break` belongs to the inner one.
+
+- key: python-basic-17
+  type: single
+  category: python
+  tags: [lists, aliasing, copy]
+  prompt: |
+    What does this print?
+
+    ```python
+    a = [1, 2]
+    b = a
+    c = a[:]
+    b.append(3)
+    c.append(4)
+    print(a, b, c)
+    ```
+  options:
+    - text: "`[1, 2, 3] [1, 2, 3] [1, 2, 4]`"
+      correct: true
+    - text: "`[1, 2] [1, 2, 3] [1, 2, 4]`"
+    - text: "`[1, 2, 3, 4] [1, 2, 3, 4] [1, 2, 3, 4]`"
+    - text: "`[1, 2, 3] [1, 2, 3] [1, 2, 3, 4]`"
+  explanation: |
+    `b = a` does not copy: it binds another name to the **same** list, so appending through `b`
+    changes the list `a` refers to. These two names are **aliases**. `a[:]` is a slice of the
+    whole list, which is a **new** list (a shallow copy) made before 3 was appended, so `c`
+    gets only the 4. The tempting `[1, 2]` for `a` assumes assignment copies; in Python it never
+    does.
+
+- key: python-basic-18
+  type: single
+  category: python
+  tags: [lists, sort, sorted, none]
+  prompt: |
+    What does this print?
+
+    ```python
+    names = ["Cy", "Ada", "Bo"]
+    names = names.sort()
+    print(names)
+    ```
+  options:
+    - text: "`None`"
+      correct: true
+    - text: "`['Ada', 'Bo', 'Cy']`"
+    - text: "`['Cy', 'Ada', 'Bo']`"
+    - text: "Nothing: it raises `AttributeError`"
+  explanation: |
+    `list.sort()` sorts the list **in place** and returns `None`, as every method that changes a
+    mutable object does. The list was sorted, but the next moment `names` was rebound to the
+    returned `None`, and the sorted list was lost. Write `names.sort()` on its own line, or
+    `names = sorted(names)`: the built-in `sorted()` returns a new sorted list.
+
+- key: python-basic-19
+  type: single
+  category: python
+  tags: [tuples, unpacking, starred]
+  prompt: |
+    After these lines run, which statement is true?
+
+    ```python
+    point = (4)
+    pair = 4,
+    first, *rest = "abc"
+    ```
+  options:
+    - text: "`point` is the `int` 4, `pair` is a one-item tuple, and `rest` is the list `['b', 'c']`"
+      correct: true
+    - text: "`point` and `pair` are both one-item tuples, and `rest` is the tuple `('b', 'c')`"
+    - text: "`point` is a one-item tuple, and `pair = 4,` is a `SyntaxError`"
+    - text: "`point` is the `int` 4, `pair` is the `int` 4, and `rest` is the string `'bc'`"
+  explanation: |
+    The **comma** makes a tuple, not the parentheses: `(4)` is just 4 in brackets, while `4,`
+    (or `(4,)`) is a tuple of one item. In starred unpacking, `first` takes the first item of
+    the sequence and the starred name collects all the rest, **always as a list**, even when
+    the source is a string or a tuple.
+
+- key: python-basic-20
+  type: single
+  category: python
+  tags: [dict, get, counting]
+  prompt: |
+    What does this print?
+
+    ```python
+    counts = {}
+    for word in "a b a c a b".split():
+        counts[word] = counts.get(word, 0) + 1
+    print(counts, counts.get("d"), "c" in counts)
+    ```
+  options:
+    - text: "`{'a': 3, 'b': 2, 'c': 1} None True`"
+      correct: true
+    - text: "`{'a': 3, 'b': 2, 'c': 1} 0 True`"
+    - text: "Nothing: `counts[word]` raises `KeyError` the first time a word is seen"
+    - text: "`{'a': 1, 'b': 1, 'c': 1} None True`"
+  explanation: |
+    `counts.get(word, 0)` returns 0 for a word not seen yet, so nothing raises `KeyError`, and
+    assigning to `counts[word]` adds or updates the entry. Dictionaries keep insertion order, so
+    the keys appear as first seen. `counts.get("d")` without a default returns `None`, not 0.
+    `in` tests the keys, so `"c" in counts` is `True`.
+
+- key: python-basic-21
+  type: multiple
+  category: python
+  tags: [dict, hashable, keys]
+  prompt: |
+    Which of these can be used as a dictionary key? Select all that apply.
+  options:
+    - text: "`(\"Lima\", \"Peru\")`"
+      correct: true
+    - text: "`\"Lima\"`"
+      correct: true
+    - text: "`[\"Lima\", \"Peru\"]`"
+    - text: "`(\"Lima\", [\"Peru\"])`"
+  explanation: |
+    Dictionary keys must be **hashable**: their hash must never change, which in practice means
+    immutable. Strings, numbers and tuples of them qualify. A list is mutable, so using one
+    raises `TypeError: cannot use 'list' as a dict key (unhashable type: 'list')`. The trap is
+    the last option: a tuple is hashable only if **everything inside it** is, and this one holds
+    a list, so it fails the same way.
+
+- key: python-basic-22
+  type: single
+  category: python
+  tags: [functions, default-arguments, mutable-default]
+  prompt: |
+    What does this print?
+
+    ```python
+    def add_tag(tag, tags=[]):
+        tags.append(tag)
+        return tags
+
+
+    print(add_tag("red"))
+    print(add_tag("blue"))
+    print(add_tag("green", []))
+    ```
+  options:
+    - text: "`['red']`, then `['red', 'blue']`, then `['green']`"
+      correct: true
+    - text: "`['red']`, then `['blue']`, then `['green']`"
+    - text: "`['red']`, then `['red', 'blue']`, then `['red', 'blue', 'green']`"
+    - text: "`['red']`, then `['blue']`, then `['blue', 'green']`"
+  explanation: |
+    A default value is evaluated **once**, when `def` runs, not at every call. Every call that
+    leaves out `tags` shares that one list, so `blue` is appended to the list that already holds
+    `red`. The third call passes its own new list, so it is unaffected. The fix is
+    `tags=None` and `if tags is None: tags = []` inside the function.
+
+- key: python-basic-23
+  type: single
+  category: python
+  tags: [scope, unboundlocalerror, global]
+  prompt: |
+    What happens when this runs?
+
+    ```python
+    total = 0
+
+
+    def add(n):
+        total = total + n
+        return total
+
+
+    print(add(5))
+    ```
+  options:
+    - text: "It raises `UnboundLocalError`: because `add` assigns to `total`, the name is local throughout `add`, and it is read before it has a value"
+      correct: true
+    - text: "It prints `5` and the global `total` becomes 5"
+    - text: "It prints `5`, and the global `total` stays 0"
+    - text: "It raises `NameError`, because a function can never read a global name"
+  explanation: |
+    Python decides at compile time that a name assigned anywhere in a function is **local** to
+    that function. So `total + n` reads the local `total`, which has no value yet:
+    `UnboundLocalError: cannot access local variable 'total' where it is not associated with a
+    value`. Functions can read globals they do not assign. The clean fix is to pass the total in
+    and return the new one; `global total` also works but makes the function harder to follow.
+
+- key: python-basic-24
+  type: single
+  category: python
+  tags: [exceptions, try-except, else, finally]
+  prompt: |
+    What does this print?
+
+    ```python
+    def check(text):
+        try:
+            value = int(text)
+        except ValueError:
+            print("A")
+        else:
+            print("B")
+        finally:
+            print("C")
+        print("D")
+
+
+    check("x")
+    check("7")
+    ```
+  options:
+    - text: "`A C D B C D`, one letter per line"
+      correct: true
+    - text: "`A C D B D`, one letter per line"
+    - text: "`A D B C D`, one letter per line"
+    - text: "`A B C D A B C D`, one letter per line"
+  explanation: |
+    For `"x"`, `int` raises `ValueError`: the `except` branch prints A, `else` is skipped
+    because there was an exception, `finally` prints C, and since the exception was handled the
+    function carries on to D. For `"7"` nothing is raised: `except` is skipped, `else` prints B,
+    `finally` prints C, then D. `finally` runs **every** time, with or without an exception.
+
+- key: python-basic-25
+  type: multiple
+  category: python
+  tags: [exceptions, hierarchy]
+  prompt: |
+    Which statements about Python's built-in exceptions are true? Select all that apply.
+  options:
+    - text: "`except LookupError:` also catches `KeyError` and `IndexError`"
+      correct: true
+    - text: "`except Exception:` does not catch `KeyboardInterrupt`"
+      correct: true
+    - text: "`ValueError` is a subclass of `LookupError`, so `except LookupError:` catches a failed `int(\"x\")`"
+    - text: "`SystemExit` is a subclass of `Exception`, so `except Exception:` stops `sys.exit()` from ending the program"
+  explanation: |
+    An `except` clause catches its type **and all its subclasses**. `KeyError` and `IndexError`
+    both derive from `LookupError`. `KeyboardInterrupt` and `SystemExit` derive directly from
+    `BaseException`, deliberately outside `Exception`, so that `except Exception:` does not stop
+    the user from pressing Ctrl+C or the program from exiting. `ValueError` derives directly from
+    `Exception`, not from `LookupError`.

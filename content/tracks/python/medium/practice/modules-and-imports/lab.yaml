@@ -1,0 +1,19 @@
+title: Raffle Draw
+summary: Write a module that imports the organisers' raffle module, draws winners repeatably with a seeded random, lists a module's public names with dir(), and prints the draw only when run as a program.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Draws the example raffle and runs it as a program
+    file: 01-example.py
+    hidden: false
+  - name: Seeds random and samples each winning ticket once
+    file: 02-draw-rules.py
+    hidden: true
+  - name: Lists only the public names of a module
+    file: 03-public-names.py
+    hidden: true
+  - name: Prints the draw from raffle_data only when run as a program
+    file: 04-main-guard.py
+    hidden: true

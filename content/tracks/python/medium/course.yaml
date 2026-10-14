@@ -1,0 +1,18 @@
+title: Idiomatic Python
+summary: >-
+  Write Python the way Python is written. Import modules and build packages, master strings
+  and Unicode, comprehensions, the full range of function parameters and closures, then
+  classes, properties and inheritance, your own exceptions, files and paths, iterators and
+  generators, and structural pattern matching.
+outcomes:
+  - Import modules every way Python allows, write your own modules and packages, and use a virtual environment
+  - Handle text as Unicode, encode and decode bytes, and format output with the format mini-language
+  - Replace loops with comprehensions and generator expressions, and pass functions, lambdas and closures around
+  - Model data with classes, properties, class and static methods, inheritance and polymorphism
+  - Read and write files safely, define exception hierarchies, write generators, and match structured data
+exam:
+  title: Idiomatic Python Mock Exam
+  description: Ten questions drawn from the level's bank, from imports and Unicode to comprehensions, closures, classes, files, generators and pattern matching.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

@@ -1,0 +1,19 @@
+title: School Trip
+summary: Change one line of a complete script so that it prints the number it works out, run it, read what the test reports, and submit it.
+language: python
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the four lines from the instructions
+    file: 01-whole-output.py
+    hidden: false
+  - name: Prints the number of pupils on the third line
+    file: 02-pupil-count.py
+    hidden: true
+  - name: Keeps the other lines as they were
+    file: 03-other-lines.py
+    hidden: true
+  - name: Lets Python work the number out
+    file: 04-calculated.py
+    hidden: true

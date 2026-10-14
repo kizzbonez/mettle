@@ -1,0 +1,18 @@
+title: Production Python
+summary: >-
+  Python that other people can install, run and trust. Lay out and package a project, test it
+  with unittest and pytest, log and configure it, build command-line programs, handle JSON, CSV,
+  dates and money correctly, run asyncio services that cancel cleanly, measure and improve
+  performance and memory, write safe code, and keep quality high with linters and type checkers.
+outcomes:
+  - Lay out a project with pyproject.toml, build a wheel and declare dependencies and entry points
+  - Test code with unittest, mocks and doctests, and know what pytest adds
+  - Log and configure a program properly, and build command-line tools with argparse and exit codes
+  - Process JSON, CSV, dates, time zones and money without the classic errors
+  - Profile and speed up code, manage memory, avoid insecure patterns, and enforce quality with tools
+exam:
+  title: Production Python Mock Exam
+  description: Ten questions drawn from the level's bank, from packaging and testing to logging, data formats, asyncio services, performance and security.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

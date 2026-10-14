@@ -1,0 +1,18 @@
+title: Python Foundations
+summary: >-
+  Python from zero. Learn what Python is and run a first program, then variables, numbers,
+  strings, input and output, conditions and loops, lists, tuples, dictionaries and sets, your
+  own functions, scope and recursion, and finish by handling errors and exceptions in a
+  complete program that reads and checks real input.
+outcomes:
+  - Install Python 3.15, use the interactive shell, and write, run and debug a script from its traceback
+  - Work with names, numbers, strings and conversions, and read and print text with input() and print()
+  - Control a program with conditions and loops, including break, continue and the loop else clause
+  - Store and process data with lists, tuples, dictionaries and sets, and unpack values
+  - Write functions with parameters, defaults and return values, reason about scope, and handle exceptions
+exam:
+  title: Python Foundations Mock Exam
+  description: Ten questions drawn from the level's bank, from how Python runs and its types to loops, collections, functions and exceptions.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

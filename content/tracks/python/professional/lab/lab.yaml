@@ -1,0 +1,23 @@
+slug: food-coop-bulk-order
+title: Food Co-op Bulk Order
+summary: Build a command-line tool with argparse subcommands that reads a CSV order file and a JSON price list, bills every household in Decimal with a handling fee rounded half up, logs skipped lines to stderr and exits with a status a scheduler can trust.
+language: python
+minutes: 60
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the October totals and invoice from the instructions
+    file: 01-october-order.py
+    hidden: false
+  - name: Loads prices, reads orders and bills members exactly
+    file: 02-prices-and-bills.py
+    hidden: true
+  - name: Skips every kind of bad line with the right warning
+    file: 03-messy-order-lines.py
+    hidden: true
+  - name: Validates options and exits with status 0, 1 or 2
+    file: 04-options-and-exit-codes.py
+    hidden: true
+  - name: Handles an empty order file and awkward member names
+    file: 05-empty-files-and-invoices.py
+    hidden: true

@@ -1,0 +1,19 @@
+title: A Linter of Your Own
+summary: 'Write a small ast-based linter with an ast.NodeVisitor that reports the N802 (function names with capitals) and E711 (== None) rules, honours noqa comments with codes, and sorts its findings by line and column.'
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Lints data/adoptions.py as in the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Reports every function name with a capital, at any depth
+    file: 02-function-names.py
+    hidden: true
+  - name: Reports each comparison with None once and ignores safe ones
+    file: 03-none-comparisons.py
+    hidden: true
+  - name: Honours noqa codes only on their own line and sorts the problems
+    file: 04-noqa-and-order.py
+    hidden: true

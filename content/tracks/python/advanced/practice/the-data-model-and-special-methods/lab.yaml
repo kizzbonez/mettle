@@ -1,0 +1,19 @@
+title: Market Basket
+summary: Give a farmers' market basket the special methods for length, indexing, membership, sorted iteration, value equality with a matching hash, and addition that returns NotImplemented for other types.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the market example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Counts, indexes, checks membership and loops in sorted order
+    file: 02-container.py
+    hidden: true
+  - name: Compares by contents and hashes equal baskets alike
+    file: 03-equality-and-hashing.py
+    hidden: true
+  - name: Adds baskets into a new one and refuses other types
+    file: 04-adding.py
+    hidden: true

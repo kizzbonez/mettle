@@ -1,0 +1,19 @@
+title: Meter Reading
+summary: Keep an old value under a second name before its first name is rebound, then print the difference between two meter readings.
+language: python
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Remembers the previous reading after the new one is read
+    file: 02-previous-reading.py
+    hidden: true
+  - name: Prints the units used for several months
+    file: 03-units-used.py
+    hidden: true
+  - name: Prints exactly three lines in the starter's format
+    file: 04-exact-output.py
+    hidden: true

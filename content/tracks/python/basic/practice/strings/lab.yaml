@@ -1,0 +1,19 @@
+title: Name Badges
+summary: Clean up a name typed with odd capitals and spaces, then build its sorted form, its initials and a centred badge with string methods, indexing and an f-string.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Cleans the capitals and spaces of the name
+    file: 02-clean-name.py
+    hidden: true
+  - name: Builds the sorted form and the initials
+    file: 03-sorted-and-initials.py
+    hidden: true
+  - name: Centres the name on the badge
+    file: 04-badge.py
+    hidden: true

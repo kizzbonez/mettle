@@ -1,0 +1,19 @@
+title: Chore Rota
+summary: Hand out chores in turn with an iterator class, an endless generator function with yield from, islice, and a lazy schedule that zips an endless supply of chores with the rota.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Builds the example rota and schedule
+    file: 01-example.py
+    hidden: false
+  - name: Follows the iterator protocol in the Rota class
+    file: 02-rota-class.py
+    hidden: true
+  - name: Cycles for ever in rota and slices it in first_turns
+    file: 03-rota-generator.py
+    hidden: true
+  - name: Schedules lazily, even from an endless list of chores
+    file: 04-schedule.py
+    hidden: true

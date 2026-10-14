@@ -1,0 +1,32 @@
+assert allows("", "0.1") is True, "an empty specifier allows any version"
+
+assert allows("==2.32.3", "2.32.3") is True, "== allows exactly that version"
+assert allows("==2.32.3", "2.32.4") is False, "== rejects any other version"
+assert allows("==2.0", "2") is True and allows("==2", "2.0.0") is True, "versions are padded with zeros before comparing"
+assert allows("!=2.32.0", "2.32") is False, "!= compares padded versions too"
+assert allows("!=2.32.0", "2.32.1") is True, "!= allows a different version"
+
+assert allows(">=2.32", "2.100") is True, "versions are compared as numbers, not as text"
+assert allows(">=2.32", "2.32.0") is True, ">= includes the version itself"
+assert allows(">=2.32", "2.31.9") is False, ">= rejects an older version"
+assert allows("<3", "2.99.99") is True, "< allows an older version"
+assert allows("<3", "3.0.0") is False, "< excludes the version itself"
+assert allows("<3", "10") is False, "< compares versions as numbers, not as text"
+
+assert allows("==2.32.*", "2.32") is True, "==V.* allows V itself"
+assert allows("==2.32.*", "2.32.9") is True, "==V.* allows any release that starts with V"
+assert allows("==2.32.*", "2.33.0") is False, "==V.* rejects a release outside V"
+assert allows("==2.3.*", "2.32.0") is False, "==V.* compares whole numbers, so 2.32 is not in 2.3"
+assert allows("==2.*", "2.9.1") is True and allows("==2.*", "3.0") is False, "a one-number wildcard covers every 2.x release"
+
+assert allows("~=1.4.2", "1.4.2") is True, "~= allows the version itself"
+assert allows("~=1.4.2", "1.4.1") is False, "~= rejects an older version"
+assert allows("~=1.4.2", "1.4") is False, "~= pads the version with zeros before comparing"
+assert allows("~=2.2", "2.9") is True, "~=2.2 allows every later 2.x release"
+assert allows("~=2.2", "3.0") is False, "~=2.2 rejects 3.0"
+assert allows("~=2.2", "2.1") is False, "~=2.2 rejects 2.1"
+
+assert allows(">=2.1,!=2.2.0", "2.2.1") is True, "a version that satisfies every clause is allowed"
+assert allows(">=2.1,!=2.2.0", "2.2.0") is False, "every clause must hold, not just the first"
+assert allows("!=2.2.0,>=2.1", "2.0") is False, "every clause must hold, not just the first one that passes"
+assert allows(">=1.0,<2,!=1.5", "1.5.0") is False, "three clauses are all checked"

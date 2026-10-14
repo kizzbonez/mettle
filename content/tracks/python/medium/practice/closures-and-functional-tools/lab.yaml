@@ -1,0 +1,19 @@
+title: Bake Sale
+summary: Make cake stands that remember their own stock with a closure and nonlocal, build price offers without the late-binding trap, and rank the best sellers with a key function.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Sells, discounts and ranks the example cakes
+    file: 01-example.py
+    hidden: false
+  - name: Keeps each stand's stock separate and never sells too much
+    file: 02-stands.py
+    hidden: true
+  - name: Gives every offer its own percentage
+    file: 03-offers.py
+    hidden: true
+  - name: Ranks by number sold, then alphabetically
+    file: 04-best-sellers.py
+    hidden: true

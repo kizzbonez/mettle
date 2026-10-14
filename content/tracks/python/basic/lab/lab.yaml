@@ -1,0 +1,23 @@
+slug: choir-rehearsal-headcount
+title: Choir Rehearsal Headcount
+summary: Turn a choir volunteer's hurried rehearsal notes into attendance per section, keeping the largest count taken at one time, and report every line that could not be used, with its number and the reason.
+language: python
+minutes: 45
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reports the sample rehearsal from the instructions
+    file: 01-sample-rehearsal.py
+    hidden: false
+  - name: Normalizes names and reads good headcount lines
+    file: 02-parse-good-lines.py
+    hidden: true
+  - name: Rejects bad lines with the right message, in the order of the rules
+    file: 03-parse-bad-lines.py
+    hidden: true
+  - name: Keeps the largest count per section and builds the report
+    file: 04-tally-and-report.py
+    hidden: true
+  - name: Handles empty input, comments, line numbers and ties in the script
+    file: 05-script-edge-cases.py
+    hidden: true

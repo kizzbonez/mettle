@@ -1,0 +1,23 @@
+slug: garden-bird-count
+title: Garden Bird Count
+summary: Read the volunteers' tally sheets with pathlib and a generator, parse each line into a Sighting, report unreadable lines through a small exception hierarchy, and build the totals with comprehensions.
+language: python
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reads the Maple Close sheet from the instructions
+    file: 01-maple-close.py
+    hidden: false
+  - name: Applies the rules for fields, times and counts in order
+    file: 02-line-rules.py
+    hidden: true
+  - name: Yields numbered lines lazily, skipping blanks and comments
+    file: 03-sheet-lines.py
+    hidden: true
+  - name: Merges three sheets into totals, a top list and time windows
+    file: 04-whole-count.py
+    hidden: true
+  - name: Handles an empty count, a missing sheet and a sheet with nothing readable
+    file: 05-missing-and-empty.py
+    hidden: true

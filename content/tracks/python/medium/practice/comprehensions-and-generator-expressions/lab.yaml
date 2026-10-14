@@ -1,0 +1,19 @@
+title: Reading Challenge
+summary: Summarise pupils' reading logs with a dict comprehension, a set comprehension with any(), a list comprehension with two for clauses, and max over a generator expression, each function a single return.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Summarises the example logs
+    file: 01-example.py
+    hidden: false
+  - name: Totals every pupil and finds the missed days
+    file: 02-totals-and-missed.py
+    hidden: true
+  - name: Lists the reading days in order and finds the busiest one
+    file: 03-entries-and-best.py
+    hidden: true
+  - name: Writes each function as one return of a comprehension
+    file: 04-one-expression.py
+    hidden: true

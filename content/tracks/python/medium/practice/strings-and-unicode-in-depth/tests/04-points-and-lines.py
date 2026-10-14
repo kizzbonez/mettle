@@ -1,0 +1,13 @@
+assert code_points("") == "", "an empty text has no code points"
+assert code_points("A") == "U+0041", "an ASCII letter is padded to four hex digits"
+assert code_points("é") == "U+0065 U+0301", "a combining accent is a code point of its own"
+assert code_points("€ ß") == "U+20AC U+0020 U+00DF", "spaces are characters too, and hex digits are upper case"
+assert code_points("😀a") == "U+1F600 U+0061", "a code point above FFFF uses all its digits"
+
+assert badge_line(112, "Ana", 0) == "112 Ana                       0.00", "a three-digit seat and a fee of 0"
+assert badge_line(5, "Bo", 12.5) == "005 Bo                       12.50", "a one-digit seat is padded with zeros"
+assert badge_line(1234, "Li", 3) == "1234 Li                        3.00", "a seat number wider than three digits is not cut"
+long_name = "Maximiliane von Hohenberg"
+assert badge_line(9, long_name, 75) == f"009 {long_name}     75.00", "a name longer than 20 characters is not cut"
+assert badge_line(40, "Eve", 1234567.891) == "040 Eve                  1,234,567.89", "a fee wider than 9 characters keeps its commas and two decimals"
+assert badge_line(3, "Zoë", 999.999) == "003 Zoë                   1,000.00", "the fee is rounded to two decimals"

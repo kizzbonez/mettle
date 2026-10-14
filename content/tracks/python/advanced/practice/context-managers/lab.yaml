@@ -1,0 +1,19 @@
+title: Guest House Settings
+summary: Write a class-based context manager that records and suppresses chosen exceptions, and a contextlib.contextmanager generator that changes settings for one block and always restores them.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the settings panel example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Suppresses and records only the chosen exceptions
+    file: 02-tolerate.py
+    hidden: true
+  - name: Restores exactly the changed keys after the block
+    file: 03-temporary.py
+    hidden: true
+  - name: Restores the settings when the block raises
+    file: 04-temporary-on-errors.py
+    hidden: true

@@ -1,0 +1,19 @@
+title: Practice Metronome
+summary: Guard a metronome's tempo with a validating property setter, compute the beat length in a read-only property, and add a class-method constructor and a static check.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Sets, refuses and builds tempos as in the example
+    file: 01-example.py
+    hidden: false
+  - name: Validates bpm on creation and on every assignment
+    file: 02-bpm-property.py
+    hidden: true
+  - name: Computes beat_ms and refuses to set it
+    file: 03-beat-ms.py
+    hidden: true
+  - name: Builds from tempo names with cls and checks values statically
+    file: 04-class-and-static.py
+    hidden: true

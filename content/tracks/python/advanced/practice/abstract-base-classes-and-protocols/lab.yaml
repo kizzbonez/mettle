@@ -1,0 +1,19 @@
+title: Café Payments
+summary: Write an abstract Payment class whose subclasses must define their fee, two concrete payment methods, and a runtime-checkable Refundable protocol that lets the till refund any object with a refund method.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the café example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Makes Payment abstract with a concrete charge
+    file: 02-abstract-payment.py
+    hidden: true
+  - name: Computes card and cash fees and gives only cards a refund
+    file: 03-card-and-cash.py
+    hidden: true
+  - name: Refunds every object that matches the Refundable protocol
+    file: 04-refundable.py
+    hidden: true

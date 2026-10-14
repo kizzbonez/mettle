@@ -1,0 +1,19 @@
+title: Fun Run Results
+summary: Pair runners with their times in tuples with zip, sort the tuples, number the results with enumerate, and write each time as minutes and seconds with divmod.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the results board from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Orders the runners by time, then by name
+    file: 02-order.py
+    hidden: true
+  - name: Writes the times and the spread as minutes and seconds
+    file: 03-times-and-spread.py
+    hidden: true
+  - name: Handles mismatched lines and no runners
+    file: 04-mismatch-and-empty.py
+    hidden: true

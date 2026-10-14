@@ -1,0 +1,683 @@
+- key: python-advanced-01
+  type: single
+  category: python
+  tags: [decorators, functools-wraps]
+  prompt: |
+    What does this program print?
+
+    ```python
+    import functools
+
+
+    def twice(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            func(*args, **kwargs)
+            return func(*args, **kwargs)
+
+        return wrapper
+
+
+    @twice
+    def greet(name):
+        print(f"hi {name}")
+        return name.upper()
+
+
+    result = greet("ada")
+    print(result, greet.__name__)
+    ```
+  options:
+    - text: "Three lines: `hi ada`, `hi ada`, `ADA greet`"
+      correct: true
+    - text: "Three lines: `hi ada`, `hi ada`, `ADA wrapper`"
+    - text: "Two lines: `hi ada`, `ADA greet`"
+    - text: "Two lines: `hi ada`, `ADA wrapper`"
+  explanation: |
+    `@twice` replaces `greet` with `wrapper`, which calls the original function twice, so
+    `hi ada` is printed twice, and returns the second call's result, `ADA`. The name is `greet`,
+    not `wrapper`, because `functools.wraps(func)` copies the wrapped function's `__name__`,
+    `__doc__`, `__qualname__` and other metadata onto the wrapper. Without `wraps`, the name
+    would indeed be `wrapper`.
+
+- key: python-advanced-02
+  type: single
+  category: python
+  tags: [decorators, decorator-arguments]
+  prompt: |
+    What happens when this program runs?
+
+    ```python
+    import functools
+
+
+    def repeat(times):
+        def decorate(func):
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                return [func(*args, **kwargs) for _ in range(times)]
+
+            return wrapper
+
+        return decorate
+
+
+    @repeat
+    def roll():
+        return 4
+
+
+    print(roll())
+    ```
+  options:
+    - text: "`roll()` raises `TypeError: repeat.<locals>.decorate() missing 1 required positional argument: 'func'`"
+      correct: true
+    - text: "It prints `[4]`, because `times` defaults to one repetition"
+    - text: "It prints `4`, because a decorator used without parentheses is skipped"
+    - text: "The `@repeat` line itself raises `TypeError`, before `roll` is ever called"
+  explanation: |
+    `repeat` is a decorator *factory*: it must be called with its argument, `@repeat(3)`, to
+    produce the real decorator. Written as `@repeat`, Python calls `repeat(roll)`, so `times`
+    is the function and the name `roll` is bound to the returned `decorate`. Nothing fails at
+    definition time. The error appears at the call: `roll()` calls `decorate()` with no
+    arguments, and `decorate` needs `func`.
+
+- key: python-advanced-03
+  type: single
+  category: python
+  tags: [data-model, hashing]
+  prompt: |
+    What happens when this code runs?
+
+    ```python
+    class Tag:
+        def __init__(self, name):
+            self.name = name
+
+        def __eq__(self, other):
+            return isinstance(other, Tag) and self.name == other.name
+
+
+    tags = {Tag("red"), Tag("red")}
+    print(len(tags))
+    ```
+  options:
+    - text: "It raises `TypeError`, because `Tag` instances are unhashable"
+      correct: true
+    - text: "It prints `1`, because the two tags are equal"
+    - text: "It prints `2`, because sets use identity-based hashes for user classes"
+    - text: "It prints `1`, but only because both tags happen to have the same `id`"
+  explanation: |
+    A class that defines `__eq__` without defining `__hash__` gets `__hash__` set to `None`,
+    so its instances cannot go in a set or be dict keys: Python 3.15 reports
+    `cannot use 'Tag' as a set element (unhashable type: 'Tag')`. This protects the rule that
+    equal objects must have equal hashes; the inherited identity hash would break it. To make
+    tags hashable, add `def __hash__(self): return hash(self.name)`, and then the set would
+    have one element.
+
+- key: python-advanced-04
+  type: single
+  category: python
+  tags: [data-model, operators, notimplemented]
+  prompt: |
+    What does this program do?
+
+    ```python
+    class Meters:
+        def __init__(self, value):
+            self.value = value
+
+        def __add__(self, other):
+            if isinstance(other, Meters):
+                return Meters(self.value + other.value)
+            return NotImplemented
+
+        def __radd__(self, other):
+            if other == 0:
+                return self
+            return NotImplemented
+
+
+    total = sum([Meters(2), Meters(3)])
+    print(total.value)
+    print(5 + Meters(1))
+    ```
+  options:
+    - text: "It prints `5`, then raises `TypeError: unsupported operand type(s) for +: 'int' and 'Meters'`"
+      correct: true
+    - text: "The `sum` call raises `TypeError`, because `sum` starts from `0` and `int` cannot add a `Meters`"
+    - text: "It prints `5`, then `6`"
+    - text: "It prints `5`, then raises `NotImplementedError`"
+  explanation: |
+    `sum` computes `0 + Meters(2)` first. `int.__add__` returns `NotImplemented` for a
+    `Meters`, so Python tries the reflected `Meters.__radd__(Meters(2), 0)`, which returns the
+    meters unchanged. Then `Meters(2) + Meters(3)` uses `__add__`. In `5 + Meters(1)`, both
+    `int.__add__` and `Meters.__radd__` return `NotImplemented`, so Python raises the standard
+    `TypeError`. `NotImplemented` is a value meaning "ask the other operand", not the exception
+    `NotImplementedError`.
+
+- key: python-advanced-05
+  type: multiple
+  category: python
+  tags: [data-model, special-methods]
+  prompt: |
+    Which statements about special methods are true? Select all that apply.
+  options:
+    - text: "`len(obj)` looks up `__len__` on the type, so assigning `obj.__len__ = ...` on one instance does not change what `len(obj)` returns"
+      correct: true
+    - text: "A class without `__bool__` whose `__len__` returns `0` makes its instances false in an `if`"
+      correct: true
+    - text: "Without `__contains__`, the `in` operator raises `TypeError` even if the class defines `__iter__`"
+    - text: "Defining `__eq__` and `__lt__` is enough for `<=` to work without any decorator"
+  explanation: |
+    Implicit calls such as `len(obj)` look the special method up on the type, not in the
+    instance dictionary. Truth testing falls back to `__len__` when there is no `__bool__`.
+    Membership falls back too: without `__contains__`, `in` iterates with `__iter__` (or the old
+    `__getitem__` protocol). Python implies no relationship between `<=` and `<` or `==`;
+    `functools.total_ordering` is what fills in the missing comparison methods.
+
+- key: python-advanced-06
+  type: single
+  category: python
+  tags: [dataclasses, default-factory]
+  prompt: |
+    What does this program print?
+
+    ```python
+    from dataclasses import dataclass, field
+
+
+    @dataclass
+    class Basket:
+        owner: str
+        items: list[str] = field(default_factory=list)
+
+
+    a = Basket("ana")
+    b = Basket("bo")
+    a.items.append("pear")
+    print(b.items, a == Basket("ana", ["pear"]))
+    ```
+  options:
+    - text: "`[] True`"
+      correct: true
+    - text: "`['pear'] True`"
+    - text: "`[] False`"
+    - text: "`['pear'] False`"
+  explanation: |
+    `field(default_factory=list)` calls `list()` for every new instance, so `a` and `b` get
+    separate lists and `b.items` stays empty. (A plain `items: list = []` is refused with
+    `ValueError` precisely to prevent a shared list.) The generated `__eq__` compares the
+    fields in order when both objects have the same class, so `a` equals a new basket with the
+    same owner and items; identity does not matter.
+
+- key: python-advanced-07
+  type: multiple
+  category: python
+  tags: [dataclasses, enum, namedtuple, frozendict]
+  prompt: |
+    Which statements are true in Python 3.15? Select all that apply.
+  options:
+    - text: "Instances of `@dataclass(frozen=True)` (with the default `eq=True`) are hashable and can be dict keys"
+      correct: true
+    - text: "A `typing.NamedTuple` instance compares equal to a plain tuple with the same items"
+      correct: true
+    - text: "A plain `Enum` member compares equal to its value, so `Status.ACTIVE == 1` is `True` when `ACTIVE = 1`"
+    - text: "`frozendict` is a subclass of `dict`, so `isinstance(frozendict(), dict)` is `True`"
+  explanation: |
+    With `eq` and `frozen` both true, `@dataclass` generates `__hash__` from the fields. A named
+    tuple *is* a tuple, so it compares like one, which is occasionally surprising. Plain `Enum`
+    members are not equal to their values; only `IntEnum` and `StrEnum` members, which are ints
+    and strings, are. The new built-in `frozendict` (PEP 814) inherits directly from `object`;
+    check for `collections.abc.Mapping` to accept both kinds of mapping.
+
+- key: python-advanced-08
+  type: single
+  category: python
+  tags: [context-managers, exit]
+  prompt: |
+    What does this program print?
+
+    ```python
+    class Quiet:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            print("exit", exc_type.__name__ if exc_type else None)
+            return True
+
+
+    with Quiet():
+        print("start")
+        raise KeyError("x")
+        print("never")
+    print("after")
+    ```
+  options:
+    - text: "Three lines: `start`, `exit KeyError`, `after`"
+      correct: true
+    - text: "`start` and `exit KeyError`, then a traceback for the `KeyError`"
+    - text: "Four lines: `start`, `never`, `exit None`, `after`"
+    - text: "Three lines: `start`, `after`, `exit KeyError`"
+  explanation: |
+    When the block raises, `__exit__` receives the exception's type, value and traceback. A true
+    return value tells the `with` statement that the exception is handled, so it is suppressed
+    and execution continues after the block. The rest of the block (`print("never")`) is still
+    skipped. Returning a true value by accident is a classic bug: it hides every error raised
+    inside the block.
+
+- key: python-advanced-09
+  type: single
+  category: python
+  tags: [context-managers, contextmanager]
+  prompt: |
+    What does this program print, and why?
+
+    ```python
+    from contextlib import contextmanager
+
+
+    @contextmanager
+    def opened(name):
+        print(f"open {name}")
+        yield name
+        print(f"close {name}")
+
+
+    try:
+        with opened("log") as n:
+            raise ValueError("bad")
+    except ValueError:
+        print("handled")
+    ```
+  options:
+    - text: "`open log` and `handled`: the exception is raised inside the generator at `yield`, so the line after it never runs"
+      correct: true
+    - text: "`open log`, `close log` and `handled`: code after `yield` always runs, like `__exit__`"
+    - text: "`open log`, `handled` and `close log`: the cleanup runs when the generator is garbage collected"
+    - text: "`open log` and an unhandled `RuntimeError: generator didn't stop`"
+  explanation: |
+    `contextmanager` re-raises an exception from the block inside the generator at the point of
+    the `yield`. Nothing catches it there, so the generator ends with the exception and the
+    `print("close ...")` line is skipped. The exception then reaches the outer `except`. Cleanup
+    that must always run belongs in `try: yield name` / `finally: ...`.
+
+- key: python-advanced-10
+  type: single
+  category: python
+  tags: [itertools, groupby]
+  prompt: |
+    What does this print?
+
+    ```python
+    from itertools import groupby
+
+    data = ["ant", "bee", "asp", "bat", "bug"]
+    print([(k, len(list(g))) for k, g in groupby(data, key=lambda w: w[0])])
+    ```
+  options:
+    - text: "`[('a', 1), ('b', 1), ('a', 1), ('b', 2)]`"
+      correct: true
+    - text: "`[('a', 2), ('b', 3)]`"
+    - text: "`[('a', 1), ('b', 1), ('a', 1), ('b', 1), ('b', 1)]`"
+    - text: "`[('b', 3), ('a', 2)]`"
+  explanation: |
+    `groupby` groups **consecutive** items with the same key. It never looks back, so `ant` and
+    `asp` end up in different groups because `bee` lies between them; only `bat` and `bug` are
+    neighbours. To group all words by first letter, sort by the same key first:
+    `groupby(sorted(data, key=first), key=first)` gives `[('a', 2), ('b', 3)]`.
+
+- key: python-advanced-11
+  type: single
+  category: python
+  tags: [functools, caching]
+  prompt: |
+    What does this print?
+
+    ```python
+    from functools import lru_cache
+
+    calls = []
+
+
+    @lru_cache(maxsize=None)
+    def slow_square(n):
+        calls.append(n)
+        return n * n
+
+
+    print(slow_square(3) + slow_square(3) + slow_square(4), calls)
+    ```
+  options:
+    - text: "`34 [3, 4]`"
+      correct: true
+    - text: "`34 [3, 3, 4]`"
+    - text: "`25 [3, 4]`"
+    - text: "`34 []`"
+  explanation: |
+    The first `slow_square(3)` runs the function and caches `9` under the argument `3`. The second
+    call with `3` is a cache hit: the result comes from the cache and the body does not run, so
+    `3` is recorded once. `slow_square(4)` is a miss. The sum is `9 + 9 + 16 = 34`. Because the
+    body is skipped on hits, caching is only safe for functions without side effects that matter.
+
+- key: python-advanced-12
+  type: single
+  category: python
+  tags: [type-hints, runtime]
+  prompt: |
+    What does this print?
+
+    ```python
+    def scale(value: int, factor: int = 2) -> int:
+        return value * factor
+
+
+    print(scale("ab"))
+    ```
+  options:
+    - text: "`abab`"
+      correct: true
+    - text: "Nothing: the call raises `TypeError` because `value` must be an `int`"
+    - text: "A type checker warning, followed by `abab`"
+    - text: "`0`, because the string is converted to an `int` first"
+  explanation: |
+    The Python runtime does not enforce annotations. They are stored in `__annotations__` for
+    tools to read, and the function runs exactly as if they were absent, so `"ab" * 2` gives
+    `abab`. A type checker such as mypy or pyright would report the call as an error, but only
+    when you run the checker; nothing is printed at run time.
+
+- key: python-advanced-13
+  type: multiple
+  category: python
+  tags: [type-hints, generics, typeddict]
+  prompt: |
+    Which statements about type hints in Python 3.15 are true? Select all that apply.
+  options:
+    - text: "`def first[T](items: Sequence[T]) -> T` declares a type parameter `T` that links the items' type to the return type"
+      correct: true
+    - text: "`int | None` and `Optional[int]` describe the same type"
+      correct: true
+    - text: "Annotations are evaluated lazily, so a method of `class Node` can annotate a parameter as `Node` without quotes"
+      correct: true
+    - text: "A `TypedDict` instance raises `KeyError` at run time when a required key is missing"
+  explanation: |
+    PEP 695 syntax declares type parameters in brackets after the name. `Optional[X]` is an
+    older spelling of `X | None`. Since Python 3.14 (PEP 649 and PEP 749), annotations are
+    evaluated only when requested, so forward references need no quotes. A `TypedDict` is
+    purely a description for type checkers: at run time the value is an ordinary `dict`, and
+    nothing checks its keys.
+
+- key: python-advanced-14
+  type: single
+  category: python
+  tags: [abc, abstract-methods]
+  prompt: |
+    What happens when this program runs?
+
+    ```python
+    from abc import ABC, abstractmethod
+
+
+    class Exporter(ABC):
+        @abstractmethod
+        def export(self, rows): ...
+
+        def run(self, rows):
+            return self.export(rows)
+
+
+    class CsvExporter(Exporter):
+        def export_rows(self, rows):
+            return ",".join(rows)
+
+
+    print(CsvExporter().run(["a", "b"]))
+    ```
+  options:
+    - text: "`CsvExporter()` raises `TypeError`: the class cannot be instantiated because `export` is still abstract"
+      correct: true
+    - text: "It prints `a,b`"
+    - text: "It prints `None`, the result of the abstract method's `...` body"
+    - text: "`run` raises `NotImplementedError` when it calls `export`"
+  explanation: |
+    `CsvExporter` defines `export_rows`, not `export`, so it inherits the abstract method and
+    remains abstract. A class whose metaclass is `ABCMeta` cannot be instantiated while any
+    abstract method is unimplemented, so the mistake surfaces at creation time:
+    `Can't instantiate abstract class CsvExporter without an implementation for abstract method 'export'`.
+    Nothing ever reaches `run`.
+
+- key: python-advanced-15
+  type: single
+  category: python
+  tags: [protocols, runtime-checkable]
+  prompt: |
+    What does this print?
+
+    ```python
+    from typing import Protocol, runtime_checkable
+
+
+    @runtime_checkable
+    class Speaker(Protocol):
+        def speak(self) -> str: ...
+
+
+    class Robot:
+        speak = 42
+
+
+    class Dog:
+        def speak(self) -> str:
+            return "woof"
+
+
+    print(isinstance(Dog(), Speaker), isinstance(Robot(), Speaker), isinstance("hi", Speaker))
+    ```
+  options:
+    - text: "`True True False`"
+      correct: true
+    - text: "`True False False`"
+    - text: "`False False False`, because neither class inherits from `Speaker`"
+    - text: "It raises `TypeError`, because protocols cannot be used with `isinstance`"
+  explanation: |
+    Protocols are structural: `Dog` conforms because it has a `speak` member, with no
+    inheritance needed. `@runtime_checkable` allows `isinstance`, but it checks only that the
+    members **exist**, not their signatures or types, so `Robot`, whose `speak` is an integer,
+    passes too. A `str` has no `speak`. Without `@runtime_checkable`, the `isinstance` calls
+    would raise `TypeError`.
+
+- key: python-advanced-16
+  type: single
+  category: python
+  tags: [attribute-access, getattr]
+  prompt: |
+    What does this print?
+
+    ```python
+    class Fallback:
+        colour = "blue"
+
+        def __init__(self):
+            self.size = 3
+
+        def __getattr__(self, name):
+            return f"default {name}"
+
+
+    f = Fallback()
+    print(f.size, f.colour, f.shape)
+    ```
+  options:
+    - text: "`3 blue default shape`"
+      correct: true
+    - text: "`default size default colour default shape`"
+    - text: "`3 default colour default shape`"
+    - text: "`3 blue`, then `AttributeError` for `shape`"
+  explanation: |
+    `__getattr__` is called only when normal lookup fails. `size` is found in the instance
+    `__dict__` and `colour` on the class, so neither reaches it; only the missing `shape` does.
+    The method that runs for **every** attribute access is `__getattribute__`, which is rarely
+    worth overriding.
+
+- key: python-advanced-17
+  type: single
+  category: python
+  tags: [descriptors, attribute-lookup]
+  prompt: |
+    What does this print?
+
+    ```python
+    class Always:
+        def __get__(self, obj, objtype=None):
+            return "from descriptor"
+
+
+    class Strict(Always):
+        def __set__(self, obj, value):
+            raise AttributeError("read-only")
+
+
+    class Item:
+        a = Always()
+        b = Strict()
+
+
+    item = Item()
+    item.__dict__["a"] = "from instance"
+    item.__dict__["b"] = "from instance"
+    print(item.a, "|", item.b)
+    ```
+  options:
+    - text: "`from instance | from descriptor`"
+      correct: true
+    - text: "`from descriptor | from descriptor`"
+    - text: "`from instance | from instance`"
+    - text: "`from descriptor | from instance`"
+  explanation: |
+    `Always` defines only `__get__`, so it is a **non-data** descriptor, and the instance
+    dictionary takes priority over it. `Strict` also defines `__set__`, which makes it a
+    **data** descriptor, and data descriptors take priority over the instance dictionary. That
+    order (data descriptors, instance `__dict__`, non-data descriptors and class attributes,
+    then `__getattr__`) is also why a `property` cannot be shadowed by an instance attribute
+    while an ordinary method can.
+
+- key: python-advanced-18
+  type: single
+  category: python
+  tags: [concurrency, gil, processes]
+  prompt: |
+    A pure-Python function counts the primes below 5,000,000 and is split into four
+    independent chunks. On the standard (GIL) build of CPython 3.15 on an eight-core machine,
+    which change is most likely to make the whole job close to four times faster?
+  options:
+    - text: "Run the four chunks with `ProcessPoolExecutor(max_workers=4)`"
+      correct: true
+    - text: "Run the four chunks with `ThreadPoolExecutor(max_workers=4)`"
+    - text: "Turn the function into a coroutine and run the chunks with `asyncio.gather`"
+    - text: "Protect the shared counter with a `threading.Lock` so the threads stop interfering"
+  explanation: |
+    The work is CPU-bound. In the standard build, the global interpreter lock lets only one
+    thread execute Python bytecode at a time, so four threads take turns on one core and finish
+    no sooner. asyncio runs everything in one thread, so it cannot help either. Separate
+    processes each have their own interpreter, so they run on four cores in parallel. (On the
+    free-threaded build, threads could also run in parallel.)
+
+- key: python-advanced-19
+  type: multiple
+  category: python
+  tags: [threads, queue, concurrent-futures]
+  prompt: |
+    Which statements are true for the standard (GIL) build of Python 3.15? Select all that apply.
+  options:
+    - text: "A `queue.Queue` can be shared by several threads without an extra lock"
+      correct: true
+    - text: "`ThreadPoolExecutor.map` returns results in the order of its inputs, even if they finish in another order"
+      correct: true
+    - text: "Functions and arguments sent to a `ProcessPoolExecutor` must be picklable, so a `lambda` should not be expected to work"
+      correct: true
+    - text: "Because of the GIL, `counter += 1` from several threads can never lose an update, so no lock is needed"
+  explanation: |
+    `queue.Queue` does its own locking; it is the standard way to pass work between threads.
+    `Executor.map` works like `map`, yielding results in input order. A process pool sends work
+    to other processes by pickling it, and lambdas are not picklable. The GIL protects the
+    interpreter's own data, not your logic: `counter += 1` is a read, an add and a write, and a
+    thread switch between them can lose an update. Hold a `Lock` for the whole sequence.
+
+- key: python-advanced-20
+  type: single
+  category: python
+  tags: [asyncio, await]
+  prompt: |
+    What does this program print?
+
+    ```python
+    import asyncio
+
+
+    async def step(name):
+        print(f"start {name}")
+        await asyncio.sleep(0)
+        print(f"end {name}")
+
+
+    async def main():
+        await step("a")
+        await step("b")
+
+
+    asyncio.run(main())
+    ```
+  options:
+    - text: "`start a`, `end a`, `start b`, `end b`"
+      correct: true
+    - text: "`start a`, `start b`, `end a`, `end b`"
+    - text: "`start b`, `end b`, `start a`, `end a`"
+    - text: "Nothing, because the coroutines are never turned into tasks"
+  explanation: |
+    Awaiting a coroutine runs it to completion before the next line of `main` runs, so the two
+    steps happen one after the other. `sleep(0)` does pause `step("a")`, but there is no other
+    task to switch to. To interleave them, schedule both first with `asyncio.create_task` (or
+    use `gather` or a `TaskGroup`); then the output becomes `start a`, `start b`, `end a`,
+    `end b`.
+
+- key: python-advanced-21
+  type: single
+  category: python
+  tags: [asyncio, taskgroup, gather]
+  prompt: |
+    Three tasks run inside `async with asyncio.TaskGroup() as tg:`. One of them raises
+    `ValueError` while the other two are still waiting. What happens?
+  options:
+    - text: "The other two tasks are cancelled, and when they have finished the group raises an `ExceptionGroup` containing the `ValueError`"
+      correct: true
+    - text: "The other two tasks keep running, and the `ValueError` is raised directly at the end of the block"
+    - text: "The failed task's result becomes `None` and the other tasks finish normally"
+    - text: "The event loop stops immediately and the program exits without running any cleanup"
+  explanation: |
+    A `TaskGroup` gives structured concurrency: on the first failure (other than cancellation)
+    it cancels the remaining tasks, waits for them, and raises all failures together in an
+    `ExceptionGroup`, which you handle with `except* ValueError`. The second option describes
+    `asyncio.gather` without `return_exceptions`: it passes the first exception on while the
+    other awaitables keep running unattended.
+
+- key: python-advanced-22
+  type: single
+  category: python
+  tags: [asyncio, blocking, to-thread]
+  prompt: |
+    Inside a coroutine you must call `legacy_fetch()`, an ordinary (not `async`) library
+    function that blocks for two seconds while it waits for a server. Which call lets the other
+    tasks keep running during those two seconds?
+  options:
+    - text: "`data = await asyncio.to_thread(legacy_fetch)`"
+      correct: true
+    - text: "`data = legacy_fetch()`"
+    - text: "`data = await legacy_fetch()`"
+    - text: "`data = asyncio.run(legacy_fetch())`"
+  explanation: |
+    The event loop switches tasks only at an `await`, so a blocking call made directly freezes
+    every task for two seconds. `asyncio.to_thread` runs the function in a worker thread and
+    lets the coroutine await the result while the loop keeps going. `await legacy_fetch()` first
+    calls the function (blocking) and then fails because its result is not awaitable, and
+    `asyncio.run` cannot be called from a running event loop.

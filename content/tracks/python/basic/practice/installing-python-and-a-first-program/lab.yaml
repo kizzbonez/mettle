@@ -1,0 +1,19 @@
+title: Bookshop Window Sign
+summary: Read the tracebacks of a broken first script, fix its two NameErrors one at a time, and turn a stray line into a comment so the sign prints exactly.
+language: python
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the sign from the instructions
+    file: 01-window-sign.py
+    hidden: false
+  - name: Runs to the end without an error
+    file: 02-runs-to-the-end.py
+    hidden: true
+  - name: Keeps the staff note as a comment
+    file: 03-staff-note.py
+    hidden: true
+  - name: Prints every line exactly, the empty one included
+    file: 04-exact-lines.py
+    hidden: true

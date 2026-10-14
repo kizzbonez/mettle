@@ -1,0 +1,19 @@
+title: Robot Vacuum
+summary: Read typed commands with sequence patterns, OR patterns, as, guards and a starred capture, and the robot's messages with mapping patterns, int() and str() checks and class patterns.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reads the example commands and messages
+    file: 01-example.py
+    hidden: false
+  - name: Matches every command shape and refuses the rest
+    file: 02-parse.py
+    hidden: true
+  - name: Reports battery, stuck and bin messages and ignores the others
+    file: 03-report-dicts.py
+    hidden: true
+  - name: Matches Bump objects by class and position, with match statements
+    file: 04-bumps-and-match.py
+    hidden: true

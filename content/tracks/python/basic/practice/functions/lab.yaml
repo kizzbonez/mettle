@@ -1,0 +1,19 @@
+title: Reading Time
+summary: Write four small functions for a blog post card, with default and keyword arguments, a rounded-up return value, a None default instead of a shared list, and one function that prints and returns None.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the examples from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Counts words and rounds the minutes up
+    file: 02-words-and-minutes.py
+    hidden: true
+  - name: Adds tags without sharing a default list
+    file: 03-tags.py
+    hidden: true
+  - name: Prints the card and returns None
+    file: 04-card.py
+    hidden: true

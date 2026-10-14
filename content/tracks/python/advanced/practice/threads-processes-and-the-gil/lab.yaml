@@ -1,0 +1,19 @@
+title: Car Park Barriers
+summary: Run jobs in threads that provably work at the same time, protect a car park's shared count of free spaces with a lock, and checksum number-plate logs in a ProcessPoolExecutor.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the car park example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Runs every job at the same time and keeps the results in order
+    file: 02-run-together.py
+    hidden: true
+  - name: Holds the lock in enter and leave and never overfills
+    file: 03-car-park-lock.py
+    hidden: true
+  - name: Refuses unknown plates and computes checksums in other processes
+    file: 04-leave-and-processes.py
+    hidden: true

@@ -1,0 +1,19 @@
+title: Audio Guide Clip Cache
+summary: Give a clip class __slots__ that still allows weak references, share clips through a WeakValueDictionary cache that never keeps them alive, total their lengths with a generator, and take deep-copy snapshots of a tour.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Clip uses slots, supports weak references and is freed at once
+    file: 02-clip-slots.py
+    hidden: true
+  - name: ClipCache shares live clips and never keeps them alive
+    file: 03-clip-cache.py
+    hidden: true
+  - name: Totals with at most two clips alive and snapshots at every depth
+    file: 04-generator-and-deepcopy.py
+    hidden: true

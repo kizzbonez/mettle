@@ -1,0 +1,19 @@
+title: Morning Register
+summary: Ask every classroom tablet for the register at the same time with asyncio tasks, give each room its own timeout, report a flat tablet as offline, and return the answers in room order.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the register example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Returns the answer, or no answer after the limit, or offline
+    file: 02-ask.py
+    hidden: true
+  - name: Asks every room at the same time and keeps the rooms' order
+    file: 03-at-the-same-time.py
+    hidden: true
+  - name: Keeps a silent or flat tablet from affecting the other rooms
+    file: 04-mixed-answers.py
+    hidden: true

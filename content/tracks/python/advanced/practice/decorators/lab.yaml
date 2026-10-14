@@ -1,0 +1,19 @@
+title: Limited Home Actions
+summary: Write a decorator with an argument that limits how often a smart-home action may run, keeping its identity with functools.wraps, and a registry decorator, then stack the two.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the garage example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Counts calls and refuses the extra ones without running the function
+    file: 02-limit-counts.py
+    hidden: true
+  - name: Keeps the function's identity and a separate count per function
+    file: 03-identity-and-separate-counts.py
+    hidden: true
+  - name: Registers functions by name and refuses duplicates
+    file: 04-register.py
+    hidden: true

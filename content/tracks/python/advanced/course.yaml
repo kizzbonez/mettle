@@ -1,0 +1,19 @@
+title: The Data Model and Concurrency
+summary: >-
+  How Python really works, and how to make it work at once on many things. Write decorators,
+  give your classes the behaviour of built-in types with special methods, use dataclasses,
+  enums and context managers, itertools and functools, type hints and protocols, control
+  attribute access with descriptors and slots, and run work concurrently with threads,
+  processes and asyncio.
+outcomes:
+  - Write decorators, with and without arguments, that keep the wrapped function's identity
+  - Implement the data model's special methods so your objects compare, hash, iterate and calculate like built-ins
+  - Choose between dataclasses, named tuples and enums, and write context managers for any resource
+  - Annotate code with generics and protocols, and define interfaces with abstract base classes
+  - Pick threads, processes or asyncio for a job, knowing what the GIL does, and write correct async code
+exam:
+  title: The Data Model and Concurrency Mock Exam
+  description: Ten questions drawn from the level's bank, from decorators and special methods to typing, descriptors, threads and asyncio.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10
