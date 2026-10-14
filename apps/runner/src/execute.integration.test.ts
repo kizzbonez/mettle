@@ -80,6 +80,23 @@ describe('python sandbox', () => {
     expect(result.status).toBe('passed');
   });
 
+  it('shows an error in the learner file as running it would, without the loader', async () => {
+    const result = await execute(request('python', 'total = 4 * 28\nPrint(total)\n', ['assert total == 112']));
+    expect(result.status).toBe('failed');
+    const stderr = result.tests[0]?.stderr ?? '';
+    expect(stderr).toMatch(/^Traceback \(most recent call last\):\n {2}File "\/work\/solution.py", line 2/);
+    expect(stderr).toContain("NameError: name 'Print' is not defined");
+    expect(stderr).not.toContain('importlib');
+  });
+
+  it('lets the learner import a module shipped with the fixtures', async () => {
+    const code = 'import fair_data\n\n\ndef prizes():\n    return len(fair_data.PRIZES)\n\n\nif __name__ == "__main__":\n    print(prizes())\n';
+    const fixtures = [{ path: 'data/fair_data.py', content: 'PRIZES = ["kite", "hamper"]\n' }];
+    const tests = ['assert prizes() == 2', 'assert run_script().out == "2\\n"'];
+    const result = await execute(request('python', code, tests, { fixtures }));
+    expect(result.status).toBe('passed');
+  });
+
   it('reports a syntax error from the check step', async () => {
     const result = await execute(request('python', 'def broken(:\n    pass\n', ['broken()']));
     expect(result.status).toBe('compile_error');

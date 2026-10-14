@@ -207,7 +207,10 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   the file is loaded for the test, `input()` finds nothing to read: a script stops at its first
   `input()` and keeps only what it defined before it, so define the functions a test calls
   above the script part, or under `if __name__ == "__main__":`, which `run_script` runs and the
-  test's own load does not.
+  test's own load does not. If the file raises anything else while it loads, the test fails
+  with the traceback `python solution.py` would print. Python files among a lab's fixtures
+  (`data/*.py`) are modules the learner's file and the tests import by name (`import raffle_data`),
+  both when the file is loaded and under `run_script`; do not name one after a standard module.
 - C++ is GCC 14 with `-std=c++20 -Wall -Wextra -pthread`, standard library only, built with the
   address and undefined-behaviour sanitizers. A use-after-free, an out-of-bounds access, a
   **memory leak** or a signed overflow fails the test, so the reference solution must be clean.

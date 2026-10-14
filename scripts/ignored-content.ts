@@ -10,7 +10,8 @@ export function ignoredContent(contentDir: string): string[] {
       cwd: contentDir,
       encoding: 'utf8',
     });
-    return listed.split('\n').filter(Boolean);
+    // Bytecode from running a lab's Python locally is not curriculum.
+    return listed.split('\n').filter((file) => file && !file.includes('__pycache__/'));
   } catch {
     return []; // not a git checkout: there is nothing to compare against
   }
