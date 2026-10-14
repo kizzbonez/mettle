@@ -1,0 +1,19 @@
+title: Parts Order
+summary: Write the helper functions of a script that prices a bike co-op's parts order, answering yes or no through a status, sending numbers back as output, keeping every variable local and guarding main so the file can be sourced.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prices the example order and skips the unknown part code
+    file: 01-example-order.sh
+    hidden: false
+  - name: Recognises part codes through the status alone
+    file: 02-part-codes.sh
+    hidden: true
+  - name: Sends costs and euro amounts back as output
+    file: 03-costs-as-output.sh
+    hidden: true
+  - name: Keeps function variables local, stops with die and can be sourced safely
+    file: 04-locals-and-die.sh
+    hidden: true

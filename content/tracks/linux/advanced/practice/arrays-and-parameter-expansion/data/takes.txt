@@ -1,0 +1,6 @@
+/srv/studio/Season 2/Ep 14 Intro.WAV
+/srv/studio/Season 2/Ep 14 Interview Ana.wav
+
+/srv/studio/music/Theme v3.FLAC
+notes.TXT
+/srv/studio/Season 2/Ep 14 Mix.final.wav

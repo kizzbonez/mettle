@@ -1,0 +1,19 @@
+title: Prop Store Tour
+summary: Find your way around a tree of folders with relative paths, cd, pwd and the everyday options of ls.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prints the tour of the store in the instructions
+    file: 01-prop-store.sh
+    hidden: false
+  - name: Lists everything here, hidden names included
+    file: 02-here.sh
+    hidden: true
+  - name: Lists the folder one level up with folders marked
+    file: 03-one-level-up.sh
+    hidden: true
+  - name: Reaches the top of a deeper store and prints its absolute path
+    file: 04-top.sh
+    hidden: true

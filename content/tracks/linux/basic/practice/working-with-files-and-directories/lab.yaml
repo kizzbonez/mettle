@@ -1,0 +1,19 @@
+title: Newsletter Wrap-Up
+summary: Archive a month's files with mkdir -p, cp and cp -r, rename the draft with mv, and tidy up with rm and rmdir.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Wraps up the newsletter folder in the instructions
+    file: 01-wrap-up.sh
+    hidden: false
+  - name: Copies into an archive that exists already, without errors
+    file: 02-archive-exists.sh
+    hidden: true
+  - name: Copies the whole templates folder into the same place every month
+    file: 03-templates.sh
+    hidden: true
+  - name: Renames the draft and removes the scraps
+    file: 04-rename-and-delete.sh
+    hidden: true

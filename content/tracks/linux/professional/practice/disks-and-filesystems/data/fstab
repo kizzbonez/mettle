@@ -1,0 +1,13 @@
+# /etc/fstab: static file system information.
+#
+# <file system>                            <mount point>  <type>  <options>              <dump> <pass>
+/dev/mapper/vg0-root                       /              ext4    errors=remount-ro      0      1
+UUID=9b2d6c1e-4a7f-4e33-a0f1-5d2c8e7b1a90  /boot          ext4    defaults               0      2
+UUID=3C1A-9F02                             /boot/efi      vfat    umask=0077             0      1
+/dev/mapper/vg0-var                        /var           ext4    defaults               0      2
+/dev/vdb1                                  /srv/data      ext4    defaults,nosuid,nodev  0      2
+UUID=a7f3c2d1-5e8b-4c9a-b0d6-3e1f2a4b5c6d  /srv/scratch   ext4    defaults               0      2
+LABEL=backup                               /mnt/backup    ext4    ro,nofail              0      2
+UUID=0d4e8b2a-61c7-4f3e-9a85-c2b7d1e6f403  /srv/media     xfs     defaults               0      2
+/dev/mapper/vg0-swap                       none           swap    sw                     0      0
+tmpfs                                      /tmp           tmpfs   defaults,nosuid,nodev  0      0

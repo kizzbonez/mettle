@@ -1,0 +1,19 @@
+title: Where Does ssh Go
+summary: Work out the host name, user, port and jump host that ssh would use for a name, from Host blocks with wildcards and exceptions where the first value wins.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Resolves web01 with the sample config
+    file: 01-example.sh
+    hidden: false
+  - name: Uses the first value found and the lines before the first Host
+    file: 02-first-wins.sh
+    hidden: true
+  - name: Reads keywords in any case and with = separators
+    file: 03-syntax.sh
+    hidden: true
+  - name: Matches *, ? and ! patterns
+    file: 04-patterns.sh
+    hidden: true

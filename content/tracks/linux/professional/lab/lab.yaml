@@ -1,0 +1,23 @@
+slug: server-health-audit
+title: Server Health Audit
+summary: Turn the output collected from a server into a short audit report of full disks, failed units, exposed ports, weak SSH settings and dangerous accounts.
+language: bash
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Reports every finding in the sample bundle from web01
+    file: 01-sample-bundle.sh
+    hidden: false
+  - name: Reads sshd_config the way sshd does
+    file: 02-sshd-rules.sh
+    hidden: true
+  - name: Applies the disk threshold and the port allow list exactly
+    file: 03-disk-and-ports.sh
+    hidden: true
+  - name: Finds failed units, extra root accounts and empty passwords
+    file: 04-units-and-accounts.sh
+    hidden: true
+  - name: Handles a clean server and bundles with missing sections
+    file: 05-clean-and-missing.sh
+    hidden: true

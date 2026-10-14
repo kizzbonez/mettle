@@ -1,0 +1,13 @@
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name            Version               Architecture Description
++++-===============-=====================-============-=========================================================
+ii  curl            7.88.1-10+deb12u8     amd64        command line tool for transferring data with URL syntax
+ii  gawk            1:5.2.1-2             amd64        GNU awk, a pattern scanning and processing language
+ii  git             1:2.39.5-0+deb12u1    amd64        fast, scalable, distributed revision control system
+ii  jq              1.6-2.1               amd64        lightweight and flexible command-line JSON processor
+rc  nginx           1.22.1-9              amd64        small, powerful, scalable web/proxy server
+ii  python3         3.11.2-1+b1           amd64        interactive high-level object-oriented language (default python3 version)
+ii  python3-minimal 3.11.2-1+b1           amd64        minimal subset of the Python language (default python3 version)
+ii  tar             1.34+dfsg-1.2+deb12u1 amd64        GNU version of the tar archiving utility

@@ -1,0 +1,8 @@
+# find fs -xdev -type f -perm /6000 -printf '%m %p\n' | LC_ALL=C sort -k2
+# saved after the audit of 2 September 2026
+2755 fs/usr/bin/chage
+4755 fs/usr/bin/chsh
+4755 fs/usr/bin/mount
+4755 fs/usr/bin/passwd
+4755 fs/usr/bin/su
+2755 fs/usr/sbin/unix_chkpwd

@@ -1,0 +1,19 @@
+title: Server Blocks
+summary: Write an nginx server block from a here-document that expands the site's values but keeps nginx's own variables, list the site's pages in a subshell, and count them in a loop fed by process substitution.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Writes the server block and lists the pages of the example site
+    file: 01-example-site.sh
+    hidden: false
+  - name: Expands the site's values but keeps $uri and $host as written
+    file: 02-render-conf.sh
+    hidden: true
+  - name: Lists pages at any depth without changing the caller's directory
+    file: 03-list-pages.sh
+    hidden: true
+  - name: Splits HOST:PORT, rejects bad targets and counts a site without pages
+    file: 04-main-checks.sh
+    hidden: true

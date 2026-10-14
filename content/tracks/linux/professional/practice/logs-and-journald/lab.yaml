@@ -1,0 +1,19 @@
+title: Journal Export Filter
+summary: Do what `journalctl -p PRIORITY -u UNIT` does on a `journalctl -o json` export with jq, including systemd's own messages about the unit and the kernel's entries without a PID.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Filters the sample export for orders-api at warning
+    file: 01-example.sh
+    hidden: false
+  - name: Keeps the level asked for and everything more serious
+    file: 02-priority.sh
+    hidden: true
+  - name: Matches the unit exactly, by _SYSTEMD_UNIT or UNIT
+    file: 03-units.sh
+    hidden: true
+  - name: Formats times and missing PIDs, and reports when nothing matches
+    file: 04-format.sh
+    hidden: true

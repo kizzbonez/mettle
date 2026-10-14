@@ -1,0 +1,19 @@
+title: Overdue Loans
+summary: Turn a lending library's JSON loan list into an aligned table of overdue books and a JSON-lines file, counting days in UTC with date, reading records with jq and @tsv, and building every JSON object with --arg and --argjson.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Lists the overdue loans of the example file
+    file: 01-example-loans.sh
+    hidden: false
+  - name: Counts days across leap days, year ends and summer time
+    file: 02-date-arithmetic.sh
+    hidden: true
+  - name: Writes valid JSON for awkward titles and rewrites the file every run
+    file: 03-json-output.sh
+    hidden: true
+  - name: Rejects an invalid DATE with status 2 and a missing LOANS with status 1
+    file: 04-validation.sh
+    hidden: true

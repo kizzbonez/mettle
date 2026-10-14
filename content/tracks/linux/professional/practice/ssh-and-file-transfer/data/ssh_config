@@ -1,0 +1,17 @@
+# ~/.ssh/config of ana
+Host bastion
+    HostName bastion.example.com
+    User ana
+    IdentityFile ~/.ssh/id_ed25519
+
+Host db?? web??
+    HostName %h.corp.example.com
+    ProxyJump bastion
+
+Host web01
+    User deploy
+    Port 2222
+
+Host *
+    User ana
+    ServerAliveInterval 30

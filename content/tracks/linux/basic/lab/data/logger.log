@@ -1,0 +1,6 @@
+2026-10-05 06:00:02 INFO logger started
+2026-10-05 06:00:05 ERROR sensor 3 did not respond
+2026-10-05 06:00:35 INFO sensor 3 back online
+2026-10-06 12:00:01 INFO recovered from a minor error in the clock
+2026-10-07 18:00:04 ERROR battery below 20%
+2026-10-07 18:00:09 INFO upload queued

@@ -1,0 +1,19 @@
+title: Tagged Story Snapshot
+summary: Write a first script with arguments, variables, command substitution and an exit status that reports whether the copy worked.
+language: bash
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Saves the sample story as v2_story.txt
+    file: 01-example.sh
+    hidden: false
+  - name: Handles a file name and a tag that contain spaces
+    file: 02-spaces.sh
+    hidden: true
+  - name: Counts lines and words of empty and unterminated files
+    file: 03-counts.sh
+    hidden: true
+  - name: Exits with the status cp returned
+    file: 04-exit-status.sh
+    hidden: true

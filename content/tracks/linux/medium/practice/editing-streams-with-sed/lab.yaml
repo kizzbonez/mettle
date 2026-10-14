@@ -1,0 +1,19 @@
+title: Screen Settings Migration
+summary: Migrate a settings file in place with one sed command that uses addresses, back-references and deletions, and keeps a backup.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Migrates the sample settings file and keeps a backup
+    file: 01-example.sh
+    hidden: false
+  - name: Switches to https on the url lines only, every time it appears
+    file: 02-url-lines.sh
+    hidden: true
+  - name: Rewrites the dates of the expires lines only
+    file: 03-dates.sh
+    hidden: true
+  - name: Deletes comments and empty lines, and backs up a file whose name has spaces
+    file: 04-comments-and-backup.sh
+    hidden: true

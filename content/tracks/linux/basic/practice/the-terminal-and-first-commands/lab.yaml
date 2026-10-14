@@ -1,0 +1,19 @@
+title: Opening Checklist
+summary: Turn the exit status of two check programs into reminders, joining commands with && and ||.
+language: bash
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prints the checklist for a hot oven and a full till
+    file: 01-ready-to-open.sh
+    hidden: false
+  - name: Says nothing about the oven while it is heating up
+    file: 02-oven-heating.sh
+    hidden: true
+  - name: Reminds you about the till when it lacks change
+    file: 03-till-empty.sh
+    hidden: true
+  - name: Handles both checks failing at once
+    file: 04-nothing-ready.sh
+    hidden: true

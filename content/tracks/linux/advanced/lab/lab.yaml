@@ -1,0 +1,23 @@
+slug: backup-rotation
+title: Backup Rotation
+summary: Write the script that decides which nightly database backups to keep and which to delete, with options, a usage message, a dry run, an atomic report and nothing left behind when it fails.
+language: bash
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Plans a dry run of the sample backup directory
+    file: 01-sample-dry-run.sh
+    hidden: false
+  - name: Applies the keep rules, the order and the age limit, and deletes only what it should
+    file: 02-rotation-rules.sh
+    hidden: true
+  - name: Rejects incorrect usage with status 2 and a missing directory with status 1
+    file: 03-usage-and-errors.sh
+    hidden: true
+  - name: Writes the report atomically and leaves no temporary files, even when it fails
+    file: 04-report-and-cleanup.sh
+    hidden: true
+  - name: Passes ShellCheck with no findings
+    file: 05-shellcheck.sh
+    hidden: true

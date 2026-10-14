@@ -1,0 +1,19 @@
+title: Pinned Package Audit
+summary: Compare a saved dpkg -l listing with a list of pinned package versions, telling installed, removed and missing packages apart.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Audits the sample listing against the sample pins
+    file: 01-example.sh
+    hidden: false
+  - name: Counts only installed rows and matches whole package names
+    file: 02-states-and-names.sh
+    hidden: true
+  - name: Reads every pinned line and compares whole versions
+    file: 03-wanted-file.sh
+    hidden: true
+  - name: Reports a clean audit with status 0
+    file: 04-all-ok.sh
+    hidden: true

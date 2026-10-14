@@ -1,0 +1,19 @@
+title: Hosts File or DNS
+summary: Compare /etc/hosts with saved dig answers, following CNAME aliases, and report every name for which programs and DNS get different addresses.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Finds the stale entries in the sample hosts file
+    file: 01-example.sh
+    hidden: false
+  - name: Reads the hosts file the way the resolver does
+    file: 02-hosts-file.sh
+    hidden: true
+  - name: Collects A records and follows aliases in the answers
+    file: 03-answers.sh
+    hidden: true
+  - name: Reports agreement when nothing differs
+    file: 04-agree.sh
+    hidden: true

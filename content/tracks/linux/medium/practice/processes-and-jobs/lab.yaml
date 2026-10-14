@@ -1,0 +1,19 @@
+title: Nightly Jobs Side by Side
+summary: Start several jobs in the background at once, wait for each by its process ID, and summarise their exit statuses, including one ended by a signal.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Summarises the three sample jobs
+    file: 01-example.sh
+    hidden: false
+  - name: Hides the jobs' output, and handles all-good runs and no jobs
+    file: 02-all-ok-and-none.sh
+    hidden: true
+  - name: Runs all the jobs at the same time
+    file: 03-running-together.sh
+    hidden: true
+  - name: Reports a job ended by a signal and the highest status
+    file: 04-statuses-and-names.sh
+    hidden: true

@@ -1,0 +1,462 @@
+- key: linux-professional-01
+  type: single
+  category: linux
+  tags: [users, groups, usermod]
+  prompt: |
+    The user `ana` belongs to the supplementary groups `developers` and `sudo`. An administrator
+    runs:
+
+    ```bash
+    sudo usermod -G docker ana
+    ```
+
+    Which groups does `ana` have after her next login, besides her primary group?
+  options:
+    - text: "`developers`, `sudo` and `docker`"
+    - text: "Only `docker`"
+      correct: true
+    - text: "`developers` and `sudo`; `usermod` refuses because `-a` is missing"
+    - text: "`docker` now, and `developers` and `sudo` again after a reboot"
+  explanation: |
+    `-G` sets the complete list of supplementary groups, so every group not named is removed.
+    Only `-a` together with `-G` (`usermod -aG docker ana`) appends. Nothing refuses or restores
+    the old list, which is why this mistake can silently remove the last administrator's sudo
+    rights. Even with the correct command, the new group applies only to processes started after
+    the next login.
+
+- key: linux-professional-02
+  type: multiple
+  category: linux
+  tags: [sudo, sudoers, visudo]
+  prompt: |
+    Which of these statements about sudo's policy files are correct? Select all that apply.
+  options:
+    - text: "`visudo` checks the syntax before saving, because a broken sudoers file can stop sudo from working at all"
+      correct: true
+    - text: "A file named `/etc/sudoers.d/webops.conf` is skipped, because file names containing a dot are ignored in that directory"
+      correct: true
+    - text: "When several rules match a command, the most specific rule wins, wherever it is in the file"
+    - text: "`%webops ALL=(root) /usr/bin/systemctl restart nginx` lets members of the group `webops` run that one command as root"
+      correct: true
+  explanation: |
+    sudo reads its rules in order and the **last** matching entry wins, not the most specific one,
+    so exceptions belong after general rules. `%` marks a group. Files in an `@includedir`
+    directory whose names contain a dot or end in `~` are skipped, which is how editor and
+    package-manager leftovers are kept out, and why `webops.conf` never takes effect. Always edit
+    with `visudo` (or `visudo -f` for a drop-in): on a server without a root password, a syntax
+    error in sudoers can leave nobody able to repair it without a rescue boot.
+
+- key: linux-professional-03
+  type: single
+  category: linux
+  tags: [systemd, systemctl, enable]
+  prompt: |
+    After installing a new service you run `sudo systemctl start reportd`. It works. The next
+    morning, after a reboot, it is not running. What was missing?
+  options:
+    - text: "`sudo systemctl daemon-reload`, so systemd forgot the unit at boot"
+    - text: "`sudo systemctl enable reportd`, which links the unit into the target named in its `[Install]` section"
+      correct: true
+    - text: "`Restart=always` in the unit, which also starts the service at boot"
+    - text: "`sudo systemctl unmask reportd`, because new units are masked until approved"
+  explanation: |
+    `start` acts on the running system only; `enable` acts at boot, by creating the symbolic link
+    described by `WantedBy=` (for example in `multi-user.target.wants/`). `enable --now` does
+    both. `daemon-reload` makes systemd re-read changed unit files but does not decide what
+    starts at boot. `Restart=` only restarts a service that exits while running. New units are
+    not masked.
+
+- key: linux-professional-04
+  type: single
+  category: linux
+  tags: [systemd, drop-in, override]
+  prompt: |
+    You want the packaged `nginx.service` to restart automatically after a crash. What is the
+    recommended way to change it?
+  options:
+    - text: "Edit `/usr/lib/systemd/system/nginx.service` and add `Restart=on-failure`"
+    - text: "Run `sudo systemctl edit nginx` and put `Restart=on-failure` under `[Service]` in the drop-in it opens"
+      correct: true
+    - text: "Add `Restart=on-failure` to `/etc/nginx/nginx.conf` and reload nginx"
+    - text: "Create a cron job that runs `systemctl start nginx` every minute"
+  explanation: |
+    `systemctl edit` creates `/etc/systemd/system/nginx.service.d/override.conf`, which is merged
+    over the packaged unit and survives upgrades, and it reloads systemd for you. Files under
+    `/usr/lib/systemd/system/` belong to the package and are replaced on the next upgrade.
+    `nginx.conf` configures nginx itself, not how systemd supervises it, and a cron loop is a
+    crude imitation of what `Restart=` already does, without logging the crash.
+
+- key: linux-professional-05
+  type: single
+  category: linux
+  tags: [journalctl, priority, logs]
+  prompt: |
+    Which messages does `journalctl -u postgresql -p warning --since yesterday` show?
+  options:
+    - text: "Only messages of priority `warning` from the postgresql unit since the start of yesterday"
+    - text: "Messages of priority `warning`, `err`, `crit`, `alert` and `emerg` from the postgresql unit since the start of yesterday"
+      correct: true
+    - text: "Messages of priority `warning` and everything less serious, such as `notice` and `info`"
+    - text: "Warnings from every unit, because `-u` only highlights the postgresql lines"
+  explanation: |
+    A single priority given to `-p` means that level **and every more serious level** (priorities
+    run from `emerg`, 0, to `debug`, 7). For exactly one level, give a range such as
+    `-p warning..warning`. `-u` filters to the unit and includes systemd's own messages about it,
+    and `--since yesterday` starts at midnight at the beginning of yesterday.
+
+- key: linux-professional-06
+  type: single
+  category: linux
+  tags: [journald, persistent, storage]
+  prompt: |
+    A server rebooted unexpectedly last night. `journalctl --list-boots` shows only the current
+    boot, and `/var/log/journal/` does not exist. What explains this?
+  options:
+    - text: "The journal is kept in memory under `/run/log/journal/`, so the previous boot's messages were lost at reboot"
+      correct: true
+    - text: "journalctl only lists boots when run with `sudo`"
+    - text: "The previous boot was deleted by logrotate overnight"
+    - text: "The crash corrupted the journal; `journalctl --verify` will restore it"
+  explanation: |
+    With `Storage=auto`, journald writes persistently only if `/var/log/journal/` exists; without
+    it the journal is volatile and lives in `/run`, which is emptied at every boot. Create the
+    directory (or set `Storage=persistent` in a journald drop-in) and restart
+    `systemd-journald` so the next incident is recorded. logrotate handles text files, not the
+    journal, and `--verify` checks files but cannot bring back data that was never written to disk.
+
+- key: linux-professional-07
+  type: single
+  category: linux
+  tags: [cron, path, environment]
+  prompt: |
+    This crontab line never produces output in `/tmp/rules.txt`, although the same command works
+    when you type it as root:
+
+    ```text
+    0 * * * * nft list ruleset > /tmp/rules.txt
+    ```
+
+    `nft` is installed as `/usr/sbin/nft`. What is the most likely cause?
+  options:
+    - text: "cron runs jobs with a minimal `PATH` (`/usr/bin:/bin` on Debian), so `nft` is not found"
+      correct: true
+    - text: "Redirection with `>` is not allowed in crontab lines"
+    - text: "The minute field `0` is invalid; it must be `00`"
+    - text: "cron jobs cannot write to `/tmp`"
+  explanation: |
+    cron does not read your shell profile. It runs `/bin/sh` with a small environment, and the
+    error "nft: not found" goes to standard error, which is mailed or lost, while the redirection
+    has already created an empty file. Use the absolute path `/usr/sbin/nft`, or set `PATH=` at
+    the top of the crontab. Redirection works in cron because the line is run by `/bin/sh`; `0` is
+    a valid minute.
+
+- key: linux-professional-08
+  type: single
+  category: linux
+  tags: [cron, schedule, syntax]
+  prompt: |
+    When does this job run?
+
+    ```text
+    0 0 13 * 5  /usr/local/bin/audit
+    ```
+  options:
+    - text: "At midnight on every Friday the 13th only"
+    - text: "At midnight on the 13th of every month and at midnight on every Friday"
+      correct: true
+    - text: "At 00:13 every Friday"
+    - text: "At midnight on the 5th of every month and on every 13th day of the year"
+  explanation: |
+    The fields are minute, hour, day of month, month and day of week. When **both** day fields are
+    restricted (neither is `*`), cron runs the job when **either** matches, so this runs on every
+    13th and on every Friday (5). To run only on Friday the 13th, schedule it for the 13th and
+    test the weekday inside the script, for example with `[ "$(date +%u)" = 5 ]`.
+
+- key: linux-professional-09
+  type: single
+  category: linux
+  tags: [locale, lc_all, environment]
+  prompt: |
+    A user's environment contains `LANG=de_DE.UTF-8` and `LC_NUMERIC=en_US.UTF-8`. A script then
+    runs a command as `LC_ALL=C sort data.txt`. Which locale decides the sort order?
+  options:
+    - text: "`de_DE.UTF-8`, because `LANG` is the user's main setting"
+    - text: "`en_US.UTF-8`, because a specific `LC_*` variable beats the general ones"
+    - text: "`C`, because `LC_ALL` overrides every `LC_*` variable and `LANG`"
+      correct: true
+    - text: "It depends on the order in which the variables were exported"
+  explanation: |
+    The precedence is fixed: `LC_ALL` first, then the `LC_*` variable for the category (here
+    `LC_COLLATE` would decide sorting), then `LANG` for anything not set. Scripts set `LC_ALL=C`
+    precisely because it overrides whatever the user has configured, giving the same byte-order
+    sorting and number format on every machine.
+
+- key: linux-professional-10
+  type: multiple
+  category: linux
+  tags: [fstab, mount, boot]
+  prompt: |
+    You are adding a new data disk to `/etc/fstab` on a remote server. Which practices reduce the
+    risk that the next boot stops in emergency mode? Select all that apply.
+  options:
+    - text: "Refer to the filesystem by `UUID=` rather than by a name such as `/dev/sdb1`"
+      correct: true
+    - text: "Run `findmnt --verify`, then `systemctl daemon-reload` and `mount -a`, before rebooting"
+      correct: true
+    - text: "Add `nofail` if the system can boot without that disk"
+      correct: true
+    - text: "Set the sixth field to `1` so the new disk is checked before the root filesystem"
+  explanation: |
+    Device names depend on detection order and can change; a UUID cannot. `findmnt --verify`
+    checks the file and `mount -a` mounts every listed filesystem now, so an error appears while
+    you are still logged in; `daemon-reload` is needed because systemd turns fstab into mount
+    units. `nofail` keeps a missing disk from blocking the boot. The sixth field orders `fsck`:
+    `1` is for the root filesystem only, other filesystems use `2`, and it does nothing to make
+    the boot safer.
+
+- key: linux-professional-11
+  type: single
+  category: linux
+  tags: [df, du, deleted-files]
+  prompt: |
+    `df -h /var` reports 100% use, but `sudo du -sh /var` adds up to less than half of the
+    filesystem. An hour earlier someone ran `rm /var/log/app/huge.log` to free space. What is
+    going on?
+  options:
+    - text: "`du` cannot read files owned by other users, even with sudo"
+    - text: "The application still has the deleted log file open, so its blocks are not freed until it closes it"
+      correct: true
+    - text: "`df` caches its numbers and will update after the next reboot"
+    - text: "The filesystem has run out of inodes rather than blocks"
+  explanation: |
+    Removing a name does not free the data while a process holds the file open. `du` walks the
+    directory tree and no longer sees the file; `df` asks the filesystem, which still counts the
+    blocks. `sudo lsof +L1` lists open files that have no name left. Restarting or reloading the
+    application frees the space; next time rotate the log or truncate it with `: > file`. Inode
+    exhaustion would show in `df -i`, not as a gap between `df` and `du`.
+
+- key: linux-professional-12
+  type: single
+  category: linux
+  tags: [ss, sockets, networking]
+  prompt: |
+    `sudo ss -tlnp` on a database server shows:
+
+    ```text
+    LISTEN 0  200  127.0.0.1:5432  0.0.0.0:*  users:(("postgres",pid=1102,fd=6))
+    ```
+
+    An application on another server gets "connection refused" on port 5432. Why?
+  options:
+    - text: "PostgreSQL listens on the loopback address only, so it accepts connections from this machine alone"
+      correct: true
+    - text: "The Recv-Q of 0 shows the queue is full"
+    - text: "`0.0.0.0:*` means no peer is allowed to connect"
+    - text: "The `-n` option hid the port that remote clients use"
+  explanation: |
+    The local address column says where the socket listens. `127.0.0.1` is reachable only from
+    the same host; `0.0.0.0` or `*` would mean every IPv4 address. The peer column of a listening
+    socket is always a wildcard. To accept remote clients, change the listen address in
+    PostgreSQL's configuration and allow the port in the firewall only from the application
+    servers.
+
+- key: linux-professional-13
+  type: single
+  category: linux
+  tags: [dns, getent, dig, hosts]
+  prompt: |
+    `getent hosts db02` prints `10.20.0.99`, but `dig +short db02.corp.example.com` prints
+    `10.20.0.14`. Applications connect to `10.20.0.99`. What is the most likely explanation?
+  options:
+    - text: "The DNS server returns a different answer each time"
+    - text: "An entry in `/etc/hosts` answers first, because `/etc/nsswitch.conf` lists `files` before `dns`, and `dig` never reads `/etc/hosts`"
+      correct: true
+    - text: "`getent` uses IPv6 and `dig` uses IPv4"
+    - text: "`dig` queries the root servers directly and ignores `/etc/resolv.conf`"
+  explanation: |
+    Programs resolve names through the Name Service Switch, so the `hosts:` line of
+    `/etc/nsswitch.conf` decides the order, normally `files dns`. `getent` asks the same way
+    programs do, while `dig` sends a DNS query straight to the servers in `/etc/resolv.conf` (or
+    the one named with `@`). A stale `/etc/hosts` line explains the difference; remove or correct
+    it.
+
+- key: linux-professional-14
+  type: true_false
+  category: linux
+  tags: [curl, http, scripting]
+  prompt: |
+    True or false: by default, `curl https://example.com/missing` exits with a non-zero status
+    when the server answers `404 Not Found`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. curl treats any completed HTTP exchange as success and exits with 0, whatever the
+    status code, and prints the error page as if it were the content. In scripts use `-f`
+    (`--fail`), which makes curl exit with code 22 for status codes of 400 and above, usually as
+    `curl -fsS` with a timeout such as `-m 10`.
+
+- key: linux-professional-15
+  type: single
+  category: linux
+  tags: [rsync, ssh, file-transfer]
+  prompt: |
+    You run this on your laptop:
+
+    ```bash
+    rsync -av --delete site web01:/var/www/site/
+    ```
+
+    What ends up on `web01`?
+  options:
+    - text: "The contents of `site` directly in `/var/www/site/`"
+    - text: "A directory `/var/www/site/site/` with the contents, and every other file in `/var/www/site/` deleted"
+      correct: true
+    - text: "Nothing: rsync refuses `--delete` without `--dry-run`"
+    - text: "The contents of `site` in `/var/www/site/`, and the local `site` directory deleted"
+  explanation: |
+    Without a trailing slash on the source, rsync copies the directory itself, creating
+    `/var/www/site/site/`. With `--delete`, everything in the destination that is not in the
+    source is removed, which here is everything that was in `/var/www/site/` before. `site/`
+    (with the slash) copies the contents. rsync never deletes the source; and it does not insist
+    on `--dry-run`, which is why you should always run with `-n` first.
+
+- key: linux-professional-16
+  type: single
+  category: linux
+  tags: [sshd, hardening, configuration]
+  prompt: |
+    On a Debian server, `/etc/ssh/sshd_config` begins with
+    `Include /etc/ssh/sshd_config.d/*.conf`, and its last line is `PasswordAuthentication no`.
+    The file `/etc/ssh/sshd_config.d/50-cloud-init.conf` contains `PasswordAuthentication yes`.
+    sshd has been reloaded. Can users log in with a password?
+  options:
+    - text: "No, because the last line of the main file overrides earlier settings"
+    - text: "Yes, because for most keywords sshd uses the first value it reads, and the included file is read first"
+      correct: true
+    - text: "No, because included files are only used for `Match` blocks"
+    - text: "Yes, because files in `sshd_config.d` always override the main file whatever their position"
+  explanation: |
+    sshd_config(5) says that, unless noted otherwise, the first obtained value of each keyword is
+    used. The `Include` line comes first, so the drop-in's `yes` is read before the main file's
+    `no`. Position decides, not the file: an `Include` at the end would lose. Put your settings in
+    an early drop-in (for example `10-hardening.conf`), check with `sudo sshd -T`, and keep a
+    session open while testing.
+
+- key: linux-professional-17
+  type: multiple
+  category: linux
+  tags: [permissions, setuid, setgid, sticky]
+  prompt: |
+    Which statements about special permission bits are correct? Select all that apply.
+  options:
+    - text: "A setuid executable runs with the identity of the file's owner, not the user who starts it"
+      correct: true
+    - text: "The setgid bit on a directory makes new files created in it inherit the directory's group"
+      correct: true
+    - text: "The sticky bit on a directory stops anyone, including the owner, from deleting files in it"
+    - text: "`find / -xdev -perm -4000 -type f` lists files that have the setuid bit set"
+      correct: true
+  explanation: |
+    setuid (4000) is how `passwd` can update `/etc/shadow` for an ordinary user, and also why a
+    buggy or planted setuid-root program is dangerous, so administrators audit them with
+    `find -perm -4000` (or `-perm /6000` for setuid or setgid). setgid (2000) on a directory gives
+    new files its group, ideal for shared team directories. The sticky bit (1000), as on `/tmp`,
+    lets only the file's owner (or the directory's owner, or root) delete or rename a file; it does
+    not stop owners from deleting their own files.
+
+- key: linux-professional-18
+  type: single
+  category: linux
+  tags: [firewalld, firewall, runtime]
+  prompt: |
+    On a firewalld server you ran `sudo firewall-cmd --add-port=9100/tcp`. Monitoring worked
+    until the server was rebooted; now port 9100 is blocked again. What happened?
+  options:
+    - text: "firewalld blocks all ports opened by hand after 24 hours"
+    - text: "The rule was added to the runtime configuration only; without `--permanent` it is not saved"
+      correct: true
+    - text: "The rule needed `--zone=public`, so it applied to no zone"
+    - text: "Port rules only last until `ufw` is enabled at boot"
+  explanation: |
+    firewalld keeps a runtime configuration (active now) and a permanent one (loaded at start and
+    on `--reload`). A command without `--permanent` changes only runtime and is lost at the next
+    reload or restart. Repeat it with `--permanent` and reload, or save a tested runtime state with
+    `firewall-cmd --runtime-to-permanent`. Without `--zone`, the default zone is used.
+
+- key: linux-professional-19
+  type: single
+  category: linux
+  tags: [performance, load-average, io]
+  prompt: |
+    A 4-CPU server shows a load average of `14.20, 13.75, 12.90`. `top` shows the CPUs about 90%
+    idle and `wa` around 60%, and `ps` lists many processes in state `D`. What is the bottleneck?
+  options:
+    - text: "CPU: the load is more than three times the number of CPUs"
+    - text: "Storage I/O: tasks waiting in uninterruptible sleep for the disk count toward the load average"
+      correct: true
+    - text: "Memory: a load above the CPU count always means the system is swapping"
+    - text: "Nothing; the load average is only a problem above 100"
+  explanation: |
+    The load average counts tasks that are running or runnable **and** tasks in uninterruptible
+    sleep (`D`), which is almost always waiting for disk or network storage. Idle CPUs with high
+    `wa` and many `D` processes point at storage: check `iostat -xz 1` for a saturated device and
+    find the processes doing the I/O. Swapping would show in `si` and `so` in `vmstat`.
+
+- key: linux-professional-20
+  type: true_false
+  category: linux
+  tags: [memory, free, page-cache]
+  prompt: |
+    True or false: on a server that has been running for days, a small value in the `free` column
+    of `free -h` is a sign of a memory leak, even if the `available` column is large.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. Linux uses otherwise idle memory as page cache (`buff/cache`) and gives it back as soon
+    as programs need it, so `free` is naturally low on a busy machine. `available` estimates how
+    much memory new programs can get without swapping, and is the number to watch. Real memory
+    pressure shows as `available` near zero, growing swap use and steady `si`/`so` activity in
+    `vmstat`.
+
+- key: linux-professional-21
+  type: single
+  category: linux
+  tags: [boot, initramfs, kernel]
+  prompt: |
+    What is the job of the initramfs during boot?
+  options:
+    - text: "It is the firmware's list of boot devices and their order"
+    - text: "It holds the GRUB menu entries generated by `update-grub`"
+    - text: "It is a small filesystem loaded into memory with the kernel that finds, prepares and mounts the real root filesystem, then hands over to systemd"
+      correct: true
+    - text: "It is the area of RAM where systemd keeps the journal before `/var` is mounted"
+  explanation: |
+    The kernel may need drivers and tools (for NVMe, LVM, RAID or encryption) that live on the root
+    filesystem it has not mounted yet. The boot loader therefore loads the initramfs next to the
+    kernel; it unlocks or assembles the root device, mounts it and switches to it, then starts
+    `/sbin/init` (systemd). Rebuild it with `update-initramfs -u` or `dracut -f` after changing
+    storage drivers. The boot order belongs to the firmware, and the menu to `grub.cfg`.
+
+- key: linux-professional-22
+  type: single
+  category: linux
+  tags: [boot, emergency, fstab, rescue]
+  prompt: |
+    After a colleague added a line to `/etc/fstab`, a server boots into "You are in emergency
+    mode". You log in with the root password. What is the right next step?
+  options:
+    - text: "Run `fsck -y /` on the mounted root filesystem to repair it"
+    - text: "Read `journalctl -xb` to see which mount failed, remount `/` read-write, correct or comment out the line, verify it with `findmnt --verify`, and reboot"
+      correct: true
+    - text: "Reinstall GRUB, because emergency mode means the boot loader is damaged"
+    - text: "Run `systemctl isolate graphical.target` to skip the failed mount"
+  explanation: |
+    systemd enters emergency mode when a filesystem that is required for boot cannot be mounted,
+    and a new fstab line is the obvious suspect. The journal names the failing unit. The root
+    filesystem may be read-only in emergency mode, so remount it with `mount -o remount,rw /`
+    before editing. Never run a repair tool on a mounted filesystem, and the boot loader worked
+    fine: the kernel and systemd are already running.

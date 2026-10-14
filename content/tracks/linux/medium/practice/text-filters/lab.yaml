@@ -1,0 +1,19 @@
+title: Top Loans Chart
+summary: Turn a library kiosk's loan export into a top-three chart with one pipeline of text filters.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Charts the sample loans file
+    file: 01-example.sh
+    hidden: false
+  - name: Handles Windows line endings and titles in mixed case
+    file: 02-windows-and-case.sh
+    hidden: true
+  - name: Counts repeated titles anywhere in the file and orders ties
+    file: 03-order-and-ties.sh
+    hidden: true
+  - name: Handles names with spaces, short files and a file with only a header
+    file: 04-small-files.sh
+    hidden: true

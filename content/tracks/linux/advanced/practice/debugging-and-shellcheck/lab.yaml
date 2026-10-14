@@ -1,0 +1,19 @@
+title: Photo Albums
+summary: Repair a photographer's album counting script with bash -n, set -x and ShellCheck, so that it survives names with spaces, brackets and leading dashes, traces with a useful PS4 and passes ShellCheck cleanly.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Counts the photos of the example albums
+    file: 01-example-albums.sh
+    hidden: false
+  - name: Handles album names with spaces, brackets and dots, and ignores what is not a photo
+    file: 02-awkward-names.sh
+    hidden: true
+  - name: Reports a directory it cannot enter, and traces with line and function on request
+    file: 03-errors-and-tracing.sh
+    hidden: true
+  - name: Passes ShellCheck with no findings
+    file: 04-shellcheck.sh
+    hidden: true

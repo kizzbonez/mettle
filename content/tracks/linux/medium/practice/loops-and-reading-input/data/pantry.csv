@@ -1,0 +1,8 @@
+# item,stock,minimum
+rice,2,4
+olive oil,1,2
+flour,6,3
+
+salt,0,1
+END
+sugar,0,5

@@ -1,0 +1,561 @@
+- key: linux-basic-01
+  type: single
+  category: linux
+  tags: [linux, kernel, distributions]
+  prompt: |
+    A colleague says a server runs "Debian 12 with Linux 6.1". What is Linux 6.1 in that
+    sentence?
+  options:
+    - text: The version of the distribution, which Debian then renames for its own release
+    - text: The version of the kernel, the core program that manages the hardware and runs every other program
+      correct: true
+    - text: The version of the Bash shell that Debian installs by default
+    - text: The version of the GNU core utilities, such as `ls` and `cp`
+  explanation: |
+    Strictly speaking, Linux is a **kernel**. Debian 12 is the **distribution**: the kernel plus
+    the GNU tools, thousands of other programs, an installer and a package manager, released
+    together. The shell (Bash) and the core utilities come from the GNU project and have their
+    own version numbers, which is why the whole system is also called GNU/Linux.
+
+- key: linux-basic-02
+  type: single
+  category: linux
+  tags: [exit-status, command-lists]
+  prompt: |
+    What does this line print in an interactive Bash shell? (`whoaim` is a typing mistake for
+    `whoami`.)
+
+    ```bash
+    whoaim && echo done; echo $?
+    ```
+  options:
+    - text: "`bash: whoaim: command not found`, then `done`, then `0`"
+    - text: "`bash: whoaim: command not found`, then `0`"
+    - text: "`bash: whoaim: command not found`, then `127`"
+      correct: true
+    - text: Nothing at all, because the whole line is rejected before anything runs
+  explanation: |
+    The shell finds no command called `whoaim`, prints the error and records exit status
+    **127**, the shell's code for "command not found". `&&` runs the next command only after a
+    success, so `echo done` is skipped. `;` runs the next command whatever happened, and
+    `echo $?` prints the status of the last command that ran, the failed lookup. The status is
+    not 0: zero means success.
+
+- key: linux-basic-03
+  type: single
+  category: linux
+  tags: [man, sections]
+  prompt: |
+    You want the manual page that describes the **format of the file** `/etc/passwd`, not the
+    `passwd` command. What do you type?
+  options:
+    - text: "`man passwd`"
+    - text: "`man /etc/passwd`"
+    - text: "`passwd --help`"
+    - text: "`man 5 passwd`"
+      correct: true
+  explanation: |
+    The manual is divided into sections: 1 for user commands, 5 for file formats, 8 for
+    administration commands. `passwd` has a page in both 1 and 5, and `man passwd` shows the
+    first match, the command in section 1. Putting the section number first, `man 5 passwd`,
+    selects the file format. `passwd --help` documents the command, and `man /etc/passwd`
+    does not look up a page by that name. `whatis passwd` lists both pages with their sections.
+
+- key: linux-basic-04
+  type: multiple
+  category: linux
+  tags: [man, synopsis]
+  prompt: |
+    The synopsis of `cp` includes this form:
+
+    ```text
+    cp [OPTION]... SOURCE... DIRECTORY
+    ```
+
+    Which commands fit this form? Select all that apply.
+  options:
+    - text: "`cp a.txt b.txt backup/`"
+      correct: true
+    - text: "`cp -v -i notes.txt archive/`"
+      correct: true
+    - text: "`cp backup/`"
+    - text: "`cp [-v] notes.txt archive/`"
+  explanation: |
+    Square brackets mark something **optional**, `...` means **may be repeated**, and words
+    without brackets are **required**. So any number of options (including none), then one or
+    more sources, then exactly one directory. `cp a.txt b.txt backup/` has two sources, and
+    `cp -v -i notes.txt archive/` has two options and one source. `cp backup/` has no source.
+    The brackets are notation, never typed: `cp [-v] ...` passes a literal `[-v]` as a file
+    name.
+
+- key: linux-basic-05
+  type: single
+  category: linux
+  tags: [paths, cd]
+  prompt: |
+    What does this sequence print?
+
+    ```bash
+    cd /home/dana/projects/website
+    cd ../..
+    pwd
+    ```
+  options:
+    - text: "`/home/dana/projects`"
+    - text: "`/home/dana`"
+      correct: true
+    - text: "`/home`"
+    - text: "`../..`"
+  explanation: |
+    `..` is the parent directory, so `../..` climbs two levels: from `website` to `projects`,
+    then to `dana`. `pwd` always prints an absolute path, starting at `/`, never the relative
+    path you typed. One `..` would have stopped at `/home/dana/projects`.
+
+- key: linux-basic-06
+  type: single
+  category: linux
+  tags: [ls, hidden-files]
+  prompt: |
+    Your home directory contains `.bashrc`, `.profile` and `notes.txt`. Which command lists all
+    three, but not the `.` and `..` entries?
+  options:
+    - text: "`ls -a`"
+    - text: "`ls -l`"
+    - text: "`ls -A`"
+      correct: true
+    - text: "`ls *`"
+  explanation: |
+    Names that begin with a dot are **hidden**: `ls` skips them unless asked. `-a` shows
+    everything, including the `.` (this directory) and `..` (parent) entries; `-A` ("almost
+    all") shows hidden files but leaves those two out. `-l` changes the format, not the
+    selection. `ls *` lists only what the shell's `*` matched, and `*` does not match names
+    that start with a dot.
+
+- key: linux-basic-07
+  type: single
+  category: linux
+  tags: [cp, directories]
+  prompt: |
+    `backup` is an **existing** directory. Where does this command put the copy of
+    `site/css/main.css`?
+
+    ```bash
+    cp -r site backup
+    ```
+  options:
+    - text: "`backup/css/main.css`"
+    - text: "`backup/site/css/main.css`"
+      correct: true
+    - text: "Nowhere: `cp` refuses because `backup` already exists"
+    - text: "`backup/main.css`, because `-r` flattens the tree"
+  explanation: |
+    When the destination is an existing directory, `cp` (and `mv`) put the source **inside**
+    it, keeping its name, so the tree arrives as `backup/site/...`. Only if `backup` did not
+    exist would `cp -r` create it as the copy itself, giving `backup/css/main.css`. Running
+    the same command twice therefore gives different results, which is why `-v` (show each
+    copy) is worth adding when unsure.
+
+- key: linux-basic-08
+  type: multiple
+  category: linux
+  tags: [rm, rmdir]
+  prompt: |
+    `old` is an **empty** directory. Which commands remove it? Select all that apply.
+  options:
+    - text: "`rm old`"
+    - text: "`rmdir old`"
+      correct: true
+    - text: "`rm -f old`"
+    - text: "`rm -r old`"
+      correct: true
+  explanation: |
+    `rmdir` removes empty directories, and `rm -r` removes a directory with everything in it,
+    so both work here. Plain `rm` does not remove directories at all: it fails with
+    `rm: cannot remove 'old': Is a directory`. `-f` only silences missing files and prompts;
+    it does not add the ability to remove directories, so `rm -f old` fails the same way.
+    Prefer `rmdir` when a directory should be empty: if it is not, it refuses.
+
+- key: linux-basic-09
+  type: single
+  category: linux
+  tags: [wc, newline]
+  prompt: |
+    A file was written without a newline after its last line:
+
+    ```bash
+    printf 'alpha\nbeta\ngamma' > f.txt
+    wc -l f.txt
+    ```
+
+    What does `wc -l` print?
+  options:
+    - text: "`3 f.txt`"
+    - text: "`0 f.txt`"
+    - text: "`2 f.txt`"
+      correct: true
+    - text: "An error, because the file does not end with a newline"
+  explanation: |
+    `wc -l` counts **newline characters**, not visible lines. There are two `\n` in the file,
+    after `alpha` and after `beta`, so it reports 2, although three lines appear when you
+    `cat` it. Most programs end every line properly, but files from hand-written tools
+    sometimes do not, and this is how counts end up one short. `wc -w` would still report 3
+    words.
+
+- key: linux-basic-10
+  type: single
+  category: linux
+  tags: [globbing, wildcards]
+  prompt: |
+    A directory contains `img-1.png`, `img-2.png`, `img-10.png`, `img-a.png` and `.img-3.png`.
+    What does this print?
+
+    ```bash
+    echo img-?.png
+    ```
+  options:
+    - text: "`img-1.png img-2.png img-10.png img-a.png`"
+    - text: "`img-1.png img-2.png img-a.png`"
+      correct: true
+    - text: "`img-1.png img-2.png`"
+    - text: "`img-1.png img-2.png .img-3.png img-a.png`"
+  explanation: |
+    `?` matches exactly **one** character of any kind, so it matches `1`, `2` and `a` but not
+    the two characters `10`. `.img-3.png` does not start with `img-`, and a leading dot must
+    be matched explicitly in any case. Only `[0-9]` would restrict the match to digits. The
+    shell does the matching before `echo` runs, which is why `echo` is the safe way to preview
+    a pattern.
+
+- key: linux-basic-11
+  type: single
+  category: linux
+  tags: [quoting]
+  prompt: |
+    For user `dana`, what does this print?
+
+    ```bash
+    echo '$HOME is' "$HOME" \$HOME
+    ```
+  options:
+    - text: "`$HOME is /home/dana $HOME`"
+      correct: true
+    - text: "`/home/dana is /home/dana /home/dana`"
+    - text: "`$HOME is $HOME $HOME`"
+    - text: "`'$HOME is' /home/dana \\$HOME`"
+  explanation: |
+    Single quotes keep everything literal, so `'$HOME is'` stays as written. Double quotes
+    still expand `$`, so `"$HOME"` becomes `/home/dana`. The backslash protects the next
+    character, so `\$HOME` prints a literal `$HOME`. The quotes and the backslash themselves
+    are removed by the shell before `echo` runs, which is why none of them is printed.
+
+- key: linux-basic-12
+  type: single
+  category: linux
+  tags: [symlinks]
+  prompt: |
+    In `/home/dana/proj` there is a file `guide.txt` and a directory `docs`. You run:
+
+    ```bash
+    cd /home/dana/proj
+    ln -s guide.txt docs/guide-link
+    cat docs/guide-link
+    ```
+
+    What happens?
+  options:
+    - text: "`cat` fails with `No such file or directory`: the link points to `docs/guide.txt`"
+      correct: true
+    - text: "`cat` prints `guide.txt`, because a link's content is a path"
+    - text: "`ln` refuses to create a link in a different directory from its target"
+    - text: "`cat` prints the contents of `guide.txt`, because the target is resolved from where you ran `ln`"
+  explanation: |
+    A symbolic link stores its target as text and resolves it later **relative to the
+    directory the link is in**. This link lives in `docs`, so `guide.txt` means
+    `docs/guide.txt`, which does not exist: the link is broken (dangling). Write the target from
+    the link's point of view, `ln -s ../guide.txt docs/guide-link`, or use an absolute path.
+    `readlink docs/guide-link` would show the stored text, `guide.txt`; `cat` follows the
+    link, it does not print it.
+
+- key: linux-basic-13
+  type: true_false
+  category: linux
+  tags: [hard-links, inodes]
+  prompt: |
+    True or false: after these commands, the text `data` is gone, because `a.txt` was the
+    original file.
+
+    ```bash
+    echo data > a.txt
+    ln a.txt b.txt
+    rm a.txt
+    ```
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    `ln` without `-s` makes a **hard link**: a second name for the same inode. Neither name is
+    the original. `rm` removes one name and lowers the link count from 2 to 1; the data is
+    only released when the count reaches zero. `cat b.txt` still prints `data`. With a
+    symbolic link (`ln -s`) the statement would be true in effect: the link would be broken.
+
+- key: linux-basic-14
+  type: single
+  category: linux
+  tags: [chmod, octal]
+  prompt: |
+    Which permission string does `chmod 750 deploy.sh` give?
+  options:
+    - text: "`rwxrw----`"
+    - text: "`rw-r-x---`"
+    - text: "`rwxr-x---`"
+      correct: true
+    - text: "`---r-xrwx`"
+  explanation: |
+    Each digit is the sum of `r` = 4, `w` = 2, `x` = 1, and the digits are owner, group,
+    others, in that order. 7 = 4+2+1 = `rwx`, 5 = 4+1 = `r-x`, 0 = `---`. So the owner may do
+    everything, the group may read and run the script, and others get nothing. `rwxrw----`
+    would be 760, and reading the digits from the right would put the owner last, which is
+    never the order.
+
+- key: linux-basic-15
+  type: multiple
+  category: linux
+  tags: [permissions, directories]
+  prompt: |
+    Which statements about permissions on a **directory** are true? Select all that apply.
+  options:
+    - text: Making a file read-only with `chmod a-w` stops its owner from deleting it
+    - text: Deleting a file needs write permission on the directory that contains it
+      correct: true
+    - text: Without `x` on a directory you cannot `cd` into it or open the files inside it
+      correct: true
+    - text: "`644` is a sensible mode for a directory that others should be able to browse"
+  explanation: |
+    A directory is a list of names. `w` lets you change the list (create, rename, delete
+    entries), so deletion depends on the **directory's** `w`, not the file's: in a writable
+    directory you can delete a read-only file. `x` lets you enter the directory and use the
+    entries in it; with `r` but no `x` you can see names but not open them. That is why `644`
+    (no `x` for anyone) makes a directory unusable; directories normally want `755` or `750`.
+
+- key: linux-basic-16
+  type: single
+  category: linux
+  tags: [redirection, stderr]
+  prompt: |
+    `/etc/hostname` exists and `/nowhere` does not. What appears on the **terminal**?
+
+    ```bash
+    ls /etc/hostname /nowhere 2>&1 > out.txt
+    ```
+  options:
+    - text: "Only the error, `ls: cannot access '/nowhere': No such file or directory`"
+      correct: true
+    - text: Nothing; both the output and the error go into `out.txt`
+    - text: "Only `/etc/hostname`"
+    - text: Both lines, and `out.txt` stays empty
+  explanation: |
+    Redirections are processed **left to right**. `2>&1` first points stderr at wherever stdout
+    goes *at that moment*, the terminal. Then `> out.txt` moves stdout to the file. So the
+    error still reaches the screen and the file holds only `/etc/hostname`. To send both to
+    the file, put the file first: `> out.txt 2>&1`, or use `&> out.txt`.
+
+- key: linux-basic-17
+  type: single
+  category: linux
+  tags: [redirection, pipes]
+  prompt: |
+    `names.txt` holds two lines, `b` and `a`. What is in `names.txt` after this command?
+
+    ```bash
+    sort names.txt > names.txt
+    ```
+  options:
+    - text: "`a` and `b`, in that order"
+    - text: Nothing; the file is empty
+      correct: true
+    - text: "`b` and `a`, unchanged, because `sort` notices the conflict and stops"
+    - text: The four lines `a`, `b`, `b`, `a`
+  explanation: |
+    The shell sets up `> names.txt` **before** `sort` starts, and `>` empties an existing file.
+    By the time `sort` opens `names.txt` to read it, the file is already empty, so there is
+    nothing to sort and nothing to write. Sort into a new file and then replace the old one:
+    `sort names.txt > sorted.txt && mv sorted.txt names.txt`.
+
+- key: linux-basic-18
+  type: single
+  category: linux
+  tags: [grep, exit-status]
+  prompt: |
+    `app.log` exists and contains no line with `refund`. What is the exit status of this
+    command?
+
+    ```bash
+    grep refund app.log
+    ```
+  options:
+    - text: "`0`, because `grep` ran without problems"
+    - text: "`2`"
+    - text: "`1`"
+      correct: true
+    - text: "`127`"
+  explanation: |
+    `grep` uses its exit status to report the search result: **0** if at least one line
+    matched, **1** if no line matched, **2** if an error occurred, such as a file that does
+    not exist. A search that finds nothing prints nothing, so the status is the only way to
+    tell "nothing found" from "something went wrong". 127 is the shell's "command not found".
+
+- key: linux-basic-19
+  type: multiple
+  category: linux
+  tags: [grep]
+  prompt: |
+    `app.log` contains these four lines:
+
+    ```text
+    Error one
+    warning two
+    error three
+    ERRORS: 0
+    ```
+
+    Which statements are true? Select all that apply.
+  options:
+    - text: "`grep -ci error app.log` prints `3`"
+      correct: true
+    - text: "`grep error app.log` prints `Error one` and `error three`"
+    - text: "`grep -wi error app.log` prints `Error one` and `error three`"
+      correct: true
+    - text: "`grep -v error app.log` prints only `warning two`"
+  explanation: |
+    `-i` ignores case, so `error`, `Error` and `ERRORS` all match, and `-c` counts the 3
+    matching lines. `-w` requires a whole word, which excludes `ERRORS`. Without `-i`, `grep
+    error` matches only the lower-case `error three`. `-v` inverts the match, and without `-i`
+    it prints every line that lacks lower-case `error`: `Error one`, `warning two` and
+    `ERRORS: 0`.
+
+- key: linux-basic-20
+  type: single
+  category: linux
+  tags: [find, quoting]
+  prompt: |
+    The current directory contains `a.log` and `b.log`, and a subdirectory with `c.log`. Why
+    does this command fail with `find: paths must precede expression`?
+
+    ```bash
+    find . -name *.log
+    ```
+  options:
+    - text: The shell expanded `*.log` to `a.log b.log` before `find` ran, so `find` received an extra argument
+      correct: true
+    - text: "`find` needs `-type f` before `-name`"
+    - text: "`-name` only accepts exact names, not wildcards"
+    - text: "The starting point `.` must be written as `./`"
+  explanation: |
+    Unquoted wildcards are expanded by the **shell**, in the current directory, before the
+    command starts. `find` therefore received `-name a.log b.log`, and `b.log` is not a valid
+    part of an expression. Quote the pattern, `find . -name '*.log'`, so that `find` receives
+    the `*` and applies it to every name in the tree, including `sub/c.log`. With exactly one
+    matching file the command would not even fail; it would silently search for that one name.
+
+- key: linux-basic-21
+  type: single
+  category: linux
+  tags: [vi]
+  prompt: |
+    In vi you changed a file by mistake, typed `:q` and Enter, and saw
+    `E37: No write since last change (add ! to override)`. You want to leave and **keep the
+    file as it was on disk**. What do you type?
+  options:
+    - text: "`:wq` then Enter"
+    - text: "`:q!` then Enter"
+      correct: true
+    - text: "`ZZ`"
+    - text: Ctrl+X, then `N`
+  explanation: |
+    `:q` refuses to quit while the buffer has unsaved changes; adding `!` overrides that and
+    discards them. `:wq` and `ZZ` both **write** the changed buffer first, which is the
+    opposite of what you want. Ctrl+X then `N` is how you leave **nano** without saving; in vi
+    it does nothing useful. If you are not sure which mode you are in, press Esc first.
+
+- key: linux-basic-22
+  type: single
+  category: linux
+  tags: [variables, export, environment]
+  prompt: |
+    What does the last line print?
+
+    ```bash
+    colour=blue
+    export size=large
+    bash -c 'echo "colour=[$colour] size=[$size]"'
+    ```
+  options:
+    - text: "`colour=[blue] size=[large]`"
+    - text: "`colour=[] size=[]`"
+    - text: "`colour=[] size=[large]`"
+      correct: true
+    - text: "`colour=[blue] size=[]`"
+  explanation: |
+    `bash -c` starts a **child** process. A child receives only the **environment**, that is,
+    variables marked with `export`. `size` was exported, so the child sees it; `colour` is a
+    plain shell variable and stays in the parent. The single quotes matter too: they stop the
+    parent shell from expanding the variables, so the child does the expanding.
+
+- key: linux-basic-23
+  type: true_false
+  category: linux
+  tags: [path, security]
+  prompt: |
+    True or false: Bash looks in the current directory for commands, so an executable script
+    `tool.sh` in the working directory can be run by typing just `tool.sh`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    A command name without a `/` is looked up as an alias, function or builtin, and then in
+    the directories of `PATH`, in order. The current directory is normally **not** in
+    `PATH`, so `tool.sh` gives `command not found`. Run it with a path, `./tool.sh`, or add
+    its directory to `PATH`. Leaving `.` out is deliberate: otherwise a file named like a
+    common command, placed in a shared directory, could run in its place.
+
+- key: linux-basic-24
+  type: single
+  category: linux
+  tags: [umask]
+  prompt: |
+    After `umask 077`, which permissions do a new file made with `touch` and a new directory
+    made with `mkdir` get?
+  options:
+    - text: "File `rw-------` (600), directory `rwx------` (700)"
+      correct: true
+    - text: "File `rwx------` (700), directory `rwx------` (700)"
+    - text: "File `---rwxrwx` (077), directory `---rwxrwx` (077)"
+    - text: "File `rw-r--r--` (644), directory `rwxr-xr-x` (755)"
+  explanation: |
+    The umask lists bits to **remove**. Programs normally ask for `666` for files and `777`
+    for directories; removing `077` (everything for group and others) leaves `600` and `700`.
+    Files never get `x` from the default, which is why scripts need `chmod +x`. `644` and `755`
+    are what the common umask `022` produces.
+
+- key: linux-basic-25
+  type: single
+  category: linux
+  tags: [quoting, rm, spaces]
+  prompt: |
+    The directory contains `big report.txt` and `report.txt`. What happens with this command?
+
+    ```bash
+    rm big report.txt
+    ```
+  options:
+    - text: "It deletes `big report.txt` only"
+    - text: "It prints an error for `big` and deletes `report.txt`, leaving `big report.txt`"
+      correct: true
+    - text: Nothing is deleted, because one of the names does not exist
+    - text: It deletes both files
+  explanation: |
+    The shell splits the line at spaces, so `rm` receives two names, `big` and `report.txt`.
+    It reports `rm: cannot remove 'big': No such file or directory` and goes on to delete
+    `report.txt`, the wrong file. `rm` handles each argument independently, so one missing name
+    does not stop the others. Quote names with spaces: `rm "big report.txt"`.

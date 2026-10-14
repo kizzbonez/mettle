@@ -1,0 +1,12 @@
+title: Linux Command Line
+tagline: From your first command to scripts and servers you can trust.
+description: >-
+  A full course in four levels on the Linux command line and Bash. It starts from what Linux and
+  the shell are, teaches every everyday command one lesson at a time, and goes on to text
+  processing, robust shell scripts and the system administration tasks of LPIC-1. Every level
+  ends with a mock exam and a hands-on lab that runs real Bash in a sandbox.
+icon: Terminal
+category: linux
+sortOrder: 5
+format: course
+revision: 1

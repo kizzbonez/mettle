@@ -1,0 +1,19 @@
+title: Evening Class Cheat Sheet
+summary: Use type, help and --help to discover three options you have not met yet, and put what they print on a cheat sheet.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prints the cheat sheet from the instructions
+    file: 01-cheat-sheet.sh
+    hidden: false
+  - name: Prints one word for the kind of each command
+    file: 02-kinds.sh
+    hidden: true
+  - name: Prints only the short synopsis of pwd
+    file: 03-synopsis.sh
+    hidden: true
+  - name: Prints the weekdays of the two dates with date itself
+    file: 04-weekdays.sh
+    hidden: true

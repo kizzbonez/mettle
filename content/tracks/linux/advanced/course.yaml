@@ -1,0 +1,19 @@
+title: Robust Shell Scripting
+summary: >-
+  Nine lessons that turn working shell scripts into tools you can leave running unattended:
+  functions and libraries, arrays and parameter expansion, strict mode and traps, option
+  parsing with getopts, here-documents and subshells, signals and background jobs, debugging
+  with ShellCheck, dates, printf and JSON with jq, and the habits of safe scripts. Every example
+  was run in the sandbox, and the lab is a backup rotation tool built to production standards.
+outcomes:
+  - Structure a script as functions with local variables, separate status from output, and share helpers through a sourced library
+  - Store lists and lookups in indexed and associative arrays, and edit strings with parameter expansion instead of extra processes
+  - Make failures stop a script with strict mode, check expected failures explicitly, and clean up on every exit, error and signal with traps
+  - Give a script a conventional interface with getopts, a usage message and distinct exit codes, and check it with bash -n, set -x and ShellCheck
+  - Write scripts that are safe to run unattended, twice and on any file name, using mktemp, atomic renames, flock, dates in UTC and jq
+exam:
+  title: Robust Shell Scripting Mock Exam
+  description: Ten questions drawn from a bank that covers functions, arrays and parameter expansion, strict mode and traps, getopts, subshells, signals, ShellCheck, dates and JSON, and safe scripting habits.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

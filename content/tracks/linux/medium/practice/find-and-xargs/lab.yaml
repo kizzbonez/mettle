@@ -1,0 +1,19 @@
+title: Render Cache Sweep
+summary: Delete stale and empty files with one find expression, then count errors across log files safely with find, xargs and grep.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Sweeps the sample render folder
+    file: 01-example.sh
+    hidden: false
+  - name: Deletes old .tmp files and empty files, and nothing else
+    file: 02-what-is-deleted.sh
+    hidden: true
+  - name: Counts ERROR lines in .log files only, with spaces in their names
+    file: 03-error-count.sh
+    hidden: true
+  - name: Handles a folder name with spaces, no log files and an empty folder
+    file: 04-awkward-folders.sh
+    hidden: true

@@ -1,0 +1,1 @@
+raw frame 0413 (a stand-in for the real image data)

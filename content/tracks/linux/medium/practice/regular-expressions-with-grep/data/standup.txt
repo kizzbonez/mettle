@@ -1,0 +1,7 @@
+Mon: fixed the login loop, see NET-1043
+Mon: OPS-7781 still open, waiting on the vendor
+Tue: payroll export broke again (HR-0042)
+Tue: nothing to report
+Wed: NET-1043 reopened; also look at OPS-7781 and DB-310.
+Wed: ignore the draft id NET-12 and the old one ACCTS-55120
+Thu: lunch order sorted

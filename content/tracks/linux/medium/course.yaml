@@ -1,0 +1,19 @@
+title: Text and Automation
+summary: >-
+  Process text and automate work at the command line: the filters sort, uniq, cut, paste, tr and
+  nl, regular expressions with grep, stream editing with sed, reports with awk, finding files with
+  find and xargs, archives and compression, then shell scripts with variables, arguments,
+  conditions and loops, managing processes and jobs, and installing software with apt, dpkg, dnf
+  and rpm. The level ends with a lab that turns a folder of messy timesheets into a report.
+outcomes:
+  - Build pipelines of filters, regular expressions, sed and awk that turn raw text into summaries and reports
+  - Find files by name, type, size, age and permissions, and act on them safely with -exec, -delete and xargs -0
+  - Create, inspect and extract tar, gzip, xz and zip archives, and verify them with checksums
+  - Write Bash scripts that take arguments, quote correctly, test conditions, loop over files and lines, and report an exit status
+  - Manage processes and jobs with ps, kill, bg, fg, nohup and nice, and install, query and remove packages on Debian and Red Hat systems
+exam:
+  title: Text and Automation Mock Exam
+  description: Ten questions drawn from a larger bank on text filters, regular expressions, sed, awk, find and xargs, archives, shell scripts, conditions, loops, processes and package management.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

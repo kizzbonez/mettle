@@ -1,0 +1,19 @@
+title: Print Jobs
+summary: Give a copy shop's print script a real command line, parsing combined and attached options with getopts in silent mode, validating every value, ending the options at --, and telling misuse (status 2) from failure (status 1).
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Runs the example dry run and rejects the unknown option
+    file: 01-example-jobs.sh
+    hidden: false
+  - name: Accepts combined, attached and repeated options and honours --
+    file: 02-option-spellings.sh
+    hidden: true
+  - name: Rejects incorrect usage with status 2, the reason and the usage
+    file: 03-usage-errors.sh
+    hidden: true
+  - name: Prints help on standard output and refuses unreadable files with status 1
+    file: 04-help-and-files.sh
+    hidden: true

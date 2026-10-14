@@ -1,0 +1,19 @@
+title: Address Inventory
+summary: Turn `ip -br address` output into a list of IPv4 addresses with their network and whether each is loopback, link-local, private or public.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Lists the addresses of the sample firewall
+    file: 01-example.sh
+    hidden: false
+  - name: Works out the network for any prefix length
+    file: 02-networks.sh
+    hidden: true
+  - name: Classifies addresses at the edges of each range
+    file: 03-classes.sh
+    hidden: true
+  - name: Handles interface names with @ and lines without IPv4
+    file: 04-names.sh
+    hidden: true

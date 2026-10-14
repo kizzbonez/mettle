@@ -1,0 +1,19 @@
+title: Lunch Order Tally
+summary: Sort, count and save a day's lunch orders with redirection, pipes and tee, append to a log, and keep a missing file quiet.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Tallies the orders in the instructions
+    file: 01-tally.sh
+    hidden: false
+  - name: Replaces yesterday's sorted list and counts a longer day
+    file: 02-stale-sorted.sh
+    hidden: true
+  - name: Appends to the kitchen log and handles fewer than three orders
+    file: 03-kitchen-log.sh
+    hidden: true
+  - name: Handles a day with no orders and a list of extras
+    file: 04-no-orders-extras.sh
+    hidden: true

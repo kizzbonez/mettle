@@ -1,0 +1,19 @@
+title: Meter Readings
+summary: Repair a strict-mode script that summarises water meter readings, fixing the lines where set -e misfires, adding die, an ERR trap that names the failed command, and an EXIT trap that always removes the work directory.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Writes the report for the example readings, silently
+    file: 01-example-readings.sh
+    hidden: false
+  - name: Survives evenings with no faults, no readings or a single reading of 0
+    file: 02-quiet-evenings.sh
+    hidden: true
+  - name: Stops with die on bad input and leaves no work directory behind
+    file: 03-bad-input.sh
+    hidden: true
+  - name: Reports an unexpected failure through the ERR trap and still cleans up
+    file: 04-unexpected-failure.sh
+    hidden: true

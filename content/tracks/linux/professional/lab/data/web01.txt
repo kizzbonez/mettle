@@ -1,0 +1,99 @@
+### df -hT
+Filesystem           Type      Size  Used Avail Use% Mounted on
+udev                 devtmpfs  1.9G     0  1.9G   0% /dev
+tmpfs                tmpfs     392M  1.2M  391M   1% /run
+/dev/mapper/vg0-root ext4       29G   18G  9.6G  66% /
+tmpfs                tmpfs     2.0G     0  2.0G   0% /dev/shm
+/dev/vda2            ext4      974M  198M  709M  22% /boot
+/dev/vda1            vfat      511M  6.1M  505M   2% /boot/efi
+/dev/mapper/vg0-var  xfs        20G   19G  1.3G  94% /var
+/dev/loop0           squashfs   64M   64M     0 100% /snap/core20/2318
+/dev/mapper/vg0-home ext4       49G   41G  4.6G  90% /home
+tmpfs                tmpfs     392M   12K  392M   1% /run/user/1000
+
+### systemctl --failed
+  UNIT              LOAD   ACTIVE SUB    DESCRIPTION
+● backup-db.service loaded failed failed Nightly database dump
+● certbot.service   loaded failed failed Certbot
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+2 loaded units listed.
+
+### ss -tlnp
+State  Recv-Q Send-Q Local Address:Port  Peer Address:Port Process
+LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*     users:(("systemd-resolve",pid=612,fd=14))
+LISTEN 0      128          0.0.0.0:22         0.0.0.0:*     users:(("sshd",pid=901,fd=3))
+LISTEN 0      511          0.0.0.0:80         0.0.0.0:*     users:(("nginx",pid=1204,fd=6),("nginx",pid=1203,fd=6))
+LISTEN 0      511          0.0.0.0:443        0.0.0.0:*     users:(("nginx",pid=1204,fd=7),("nginx",pid=1203,fd=7))
+LISTEN 0      151        127.0.0.1:3306       0.0.0.0:*     users:(("mysqld",pid=1290,fd=24))
+LISTEN 0      511          0.0.0.0:6379       0.0.0.0:*     users:(("redis-server",pid=1388,fd=6))
+LISTEN 0      4096               *:9100             *:*     users:(("node_exporter",pid=744,fd=3))
+LISTEN 0      128             [::]:22            [::]:*     users:(("sshd",pid=901,fd=4))
+LISTEN 0      511            [::1]:6379          [::]:*     users:(("redis-server",pid=1388,fd=7))
+
+### cat /etc/ssh/sshd_config
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+Include /etc/ssh/sshd_config.d/*.conf
+
+#Port 22
+#ListenAddress 0.0.0.0
+
+#PermitRootLogin prohibit-password
+permitrootlogin yes
+#MaxAuthTries 6
+
+PubkeyAuthentication yes
+#PasswordAuthentication yes
+KbdInteractiveAuthentication no
+UsePAM yes
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+
+# Locked down after the September audit
+PermitRootLogin no
+
+Match User backup
+	PasswordAuthentication no
+	ForceCommand /usr/local/bin/backup-receive
+
+### getent passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+systemd-network:x:998:998:systemd Network Management:/:/usr/sbin/nologin
+messagebus:x:100:107::/nonexistent:/usr/sbin/nologin
+sshd:x:105:65534::/run/sshd:/usr/sbin/nologin
+redis:x:106:113::/var/lib/redis:/usr/sbin/nologin
+ana:x:1000:1000:Ana Reyes,,,:/home/ana:/bin/bash
+deploy:x:1001:1001:Deploy user:/home/deploy:/bin/bash
+toor:x:0:0::/root:/bin/bash
+guest:x:1002:1002::/home/guest:/bin/bash
+
+### getent shadow
+root:$y$j9T$Kq2V0fUe8sXb1mWn3pLr0.$dE5tH8qZr7aN2cV4bX1yM9oP6uS3wK0jL8iG5fD2eA1:20654:0:99999:7:::
+daemon:*:20650:0:99999:7:::
+bin:*:20650:0:99999:7:::
+sys:*:20650:0:99999:7:::
+sync:*:20650:0:99999:7:::
+www-data:*:20650:0:99999:7:::
+nobody:*:20650:0:99999:7:::
+systemd-network:!*:20650::::::
+messagebus:!:20650::::::
+sshd:!:20650::::::
+redis:!:20651::::::
+ana:$y$j9T$7Fh2kLq9Zp1Xc0Vb5Nm3Ta.$Qw8Er2Ty6Ui4Op0As9Df1Gh5Jk7Lz3Xc2Vb8Nm6Qa4:20702:0:99999:7:::
+deploy:!:20702:0:99999:7:::
+toor:$y$j9T$Pz4Lm8Nq2Wx6Rc0Tv1Bk5Ys.$Ha3Jd7Kf1Lg9Zs5Xq2Wc8Ve4Rb6Tn0Ym2Pu1Io7Kl3:20738:0:99999:7:::
+guest::20738:0:99999:7:::
+

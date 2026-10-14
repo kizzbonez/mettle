@@ -1,0 +1,19 @@
+title: Shoot Delivery Archive
+summary: Pack a folder into a .tar.gz with tar, write a checksum the client can verify with sha256sum -c, and list the archive's files.
+language: bash
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Packs the sample shoot and lists its files
+    file: 01-example.sh
+    hidden: false
+  - name: Creates a gzip-compressed tar that extracts to the same folder
+    file: 02-archive-contents.sh
+    hidden: true
+  - name: Writes a checksum that verifies the archive and catches damage
+    file: 03-checksum.sh
+    hidden: true
+  - name: Handles a folder name with spaces, hidden files and empty folders
+    file: 04-awkward-folder.sh
+    hidden: true

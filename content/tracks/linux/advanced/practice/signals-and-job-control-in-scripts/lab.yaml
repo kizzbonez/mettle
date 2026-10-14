@@ -1,0 +1,19 @@
+title: Pre-show Checks
+summary: Run a theatre rig's check scripts in the background all at once, collect each exit status with wait, name the signal that ended a check, and stop every running check when the script itself receives TERM.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Reports the four example checks in order
+    file: 01-example-rig.sh
+    hidden: false
+  - name: Tells passed, failed and killed checks apart and sets the exit status
+    file: 02-statuses.sh
+    hidden: true
+  - name: Starts every check at once and reports them in name order
+    file: 03-all-at-once.sh
+    hidden: true
+  - name: Stops the running checks and exits with 143 on TERM
+    file: 04-term-stops-everything.sh
+    hidden: true

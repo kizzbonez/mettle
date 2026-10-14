@@ -1,0 +1,19 @@
+title: What the Boot Waited For
+summary: Read `systemd-analyze critical-chain` output, convert each unit's start-up time to milliseconds, and list the slow units the boot really waited for.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Lists the slow units of the sample kiosk boot
+    file: 01-example.sh
+    hidden: false
+  - name: Converts times in min, s and ms
+    file: 02-durations.sh
+    hidden: true
+  - name: Applies the limit and keeps equal times in chain order
+    file: 03-threshold-order.sh
+    hidden: true
+  - name: Reads the unit lines and names exactly
+    file: 04-lines.sh
+    hidden: true

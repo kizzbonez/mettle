@@ -1,0 +1,18 @@
+title: Systems Administration
+summary: >-
+  The administration tasks of LPIC-1 from the command line: users, groups and sudo, services
+  with systemd, logs and the journal, scheduled jobs, time and locale, disks and filesystems,
+  networking, DNS and HTTP, SSH and file transfer, host security and firewalls, performance
+  triage, and the boot process, ending with a lab that audits a server from captured output.
+outcomes:
+  - Manage user and group accounts, password ageing and narrowly scoped sudo rights
+  - Run, write, override and troubleshoot systemd services and timers, cron jobs and their logs
+  - Partition, format and mount storage safely, and find what is filling a disk
+  - Diagnose network, name resolution, HTTP and SSH problems, and transfer files with rsync
+  - Harden a server with least privilege, updates and a firewall, find the cause of slowness, and recover a system that will not boot
+exam:
+  title: Systems Administration Mock Exam
+  description: Ten questions drawn from a larger bank on accounts and sudo, systemd, logging, scheduling, time, storage, networking, DNS and HTTP, SSH, security, performance and booting.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

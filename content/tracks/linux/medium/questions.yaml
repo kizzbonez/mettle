@@ -1,0 +1,472 @@
+- key: linux-medium-01
+  type: single
+  category: linux
+  tags: [sort, text-filters]
+  prompt: |
+    What does this command print?
+
+    ```bash
+    printf '10\n9\n100\n' | sort
+    ```
+  options:
+    - text: "`10`, `100`, `9`, one per line"
+      correct: true
+    - text: "`9`, `10`, `100`, one per line"
+    - text: "`100`, `10`, `9`, one per line"
+    - text: "`9`, `100`, `10`, one per line"
+  explanation: |
+    Without options, `sort` compares lines as text, one character at a time from the left. `10` and
+    `100` both start with `1`, which sorts before `9`, and `10` is a prefix of `100`, so it comes
+    first. Numeric order (`9 10 100`) needs `sort -n`, which compares the value of the leading
+    number instead of its characters.
+
+- key: linux-medium-02
+  type: single
+  category: linux
+  tags: [sort, uniq, pipelines]
+  prompt: |
+    `orders.csv` holds lines such as `ada,pen,3`: customer, product, quantity. Which pipeline
+    prints each product with the number of orders for it, most frequent first?
+  options:
+    - text: "`cut -d, -f2 orders.csv | sort | uniq -c | sort -rn`"
+      correct: true
+    - text: "`cut -d, -f2 orders.csv | uniq -c | sort -rn`"
+    - text: "`sort -t, -k2 orders.csv | uniq -c`"
+    - text: "`cut -d, -f2 orders.csv | sort -u | wc -l`"
+  explanation: |
+    `uniq -c` only merges identical lines that are next to each other, so the products must be
+    sorted first; the final `sort -rn` puts the largest counts on top. Without the first `sort`, a
+    product that appears in separate places is counted in several pieces (`2 pen` and `1 pen`).
+    Sorting whole lines by field 2 and counting them counts entire orders, which are all different.
+    `sort -u | wc -l` counts how many different products there are, not how often each occurs.
+
+- key: linux-medium-03
+  type: multiple
+  category: linux
+  tags: [sort, fields]
+  prompt: |
+    Which commands print `orders.csv` (lines such as `ada,pen,3`) ordered by the quantity in the
+    third field, largest first? Select all that apply.
+  options:
+    - text: "`sort -t, -k3,3nr orders.csv`"
+      correct: true
+    - text: "`sort -t, -k3nr orders.csv`"
+      correct: true
+    - text: "`sort -t, -k3,3 -r orders.csv`"
+    - text: "`sort -k3,3nr orders.csv`"
+  explanation: |
+    `-t,` makes the comma the field separator and `-k3,3nr` compares field 3 alone, as a number, in
+    reverse. `-k3nr` runs from field 3 to the end of the line, but field 3 is the last field and
+    `n` reads only the leading number, so it gives the same order here (write the end anyway; it is
+    safer). Without `n`, the key is compared as text, and `3` sorts after `25`. Without `-t,`, the
+    line contains no blanks, so it has a single field, field 3 is empty for every line and nothing
+    is sorted by quantity.
+
+- key: linux-medium-04
+  type: single
+  category: linux
+  tags: [grep, regular-expressions]
+  prompt: |
+    A file contains the four lines `ac`, `abc`, `abbc` and `ab+c`. What does this print?
+
+    ```bash
+    grep 'ab+c' file
+    ```
+  options:
+    - text: "`ab+c` only"
+      correct: true
+    - text: "`abc` and `abbc`"
+    - text: "`ac`, `abc` and `abbc`"
+    - text: Nothing, because `+` is not valid in a pattern
+  explanation: |
+    Without `-E`, grep uses basic regular expressions, in which `+` is an ordinary character. The
+    pattern therefore means the literal text `ab+c`. With `grep -E 'ab+c'`, `+` means "one or more of
+    the previous item" and the command prints `abc` and `abbc`. In basic syntax the same operator is
+    written `\+`. `ac` would match only `ab*c`, since `*` allows zero `b`s.
+
+- key: linux-medium-05
+  type: multiple
+  category: linux
+  tags: [grep, anchors]
+  prompt: |
+    Which commands print the lines of `app.conf` that are neither comments (lines starting with
+    `#`) nor empty? Select all that apply.
+  options:
+    - text: "`grep -v '^#' app.conf | grep -v '^$'`"
+      correct: true
+    - text: "`grep -Ev '^(#|$)' app.conf`"
+      correct: true
+    - text: "`grep -v '#|^$' app.conf`"
+    - text: "`grep -v '^[#$]' app.conf`"
+  explanation: |
+    `^#` matches a line that starts with `#`, and `^$` a line with nothing between its start and its
+    end; `-v` keeps the lines that do not match. The extended pattern `^(#|$)` combines both. In
+    basic syntax (no `-E`) `|` is a literal character, so `'#|^$'` looks for the text `#|` and
+    removes almost nothing. `[#$]` is one character, `#` or `$`, so it removes comments and lines
+    starting with a dollar sign, but an empty line has no character to match and stays.
+
+- key: linux-medium-06
+  type: single
+  category: linux
+  tags: [sed, substitution]
+  prompt: |
+    What does this print?
+
+    ```bash
+    echo 'a-b-c' | sed 's/-/+/'
+    ```
+  options:
+    - text: "`a+b-c`"
+      correct: true
+    - text: "`a+b+c`"
+    - text: "`a-b-c`"
+    - text: "`+`"
+  explanation: |
+    The `s` command replaces only the first match on each line unless you add the `g` flag.
+    `s/-/+/g` would print `a+b+c`, and `s/-/+/2` would replace only the second hyphen, printing
+    `a-b+c`. The replacement takes the place of the matched text only; the rest of the line is kept.
+
+- key: linux-medium-07
+  type: single
+  category: linux
+  tags: [sed, in-place]
+  prompt: |
+    `config.txt` has three lines, `one`, `old value` and `three`. What does it contain after this
+    command?
+
+    ```bash
+    sed -n -i 's/old/new/p' config.txt
+    ```
+  options:
+    - text: Only the line `new value`
+      correct: true
+    - text: "`one`, `new value` and `three`"
+    - text: "`one`, `new value`, `new value` and `three`"
+    - text: It is unchanged; sed refuses to combine `-n` with `-i`
+  explanation: |
+    `-i` replaces the file with whatever sed prints. `-n` turns off the automatic printing of every
+    line, so the only output is what the `p` flag prints: the one line where a substitution
+    happened. The other lines are lost. Drop `-n` and the `p` flag to edit in place safely, and add
+    a backup suffix (`-i.bak`) so a mistake can be undone.
+
+- key: linux-medium-08
+  type: single
+  category: linux
+  tags: [awk, arrays]
+  prompt: |
+    What does this print?
+
+    ```bash
+    printf 'a,1\nb,2\na,3\n' | awk -F, '{ t[$1] += $2 } END { for (k in t) print k, t[k] }' | sort
+    ```
+  options:
+    - text: "`a 4` and `b 2`"
+      correct: true
+    - text: "`a 3` and `b 2`"
+    - text: "`a 1`, `b 2` and `a 3`"
+    - text: "`6`"
+  explanation: |
+    `-F,` splits each line at the comma. `t[$1] += $2` adds the second field to the array entry for
+    the first field, starting from zero the first time a key appears, so `a` collects 1 + 3 and `b`
+    collects 2. The `END` loop prints one line per key; `sort` gives them a predictable order,
+    because `for (k in t)` has none. With `=` instead of `+=`, the last value would win and `a`
+    would show `3`.
+
+- key: linux-medium-09
+  type: true_false
+  category: linux
+  tags: [awk, variables]
+  prompt: |
+    In awk, a variable must be set to 0 in a `BEGIN` block before an action such as
+    `total += $3` will work.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    awk variables need no declaration. A variable that has never been assigned counts as `0` in
+    arithmetic and as the empty string in text, so `total += $3` simply starts from zero. `BEGIN` is
+    useful for printing a header or setting `FS` and `OFS`, but not needed to start a total.
+
+- key: linux-medium-10
+  type: single
+  category: linux
+  tags: [find, size]
+  prompt: |
+    A directory holds an empty file, a 1-byte file and a 500-byte file. Which of them does
+    `find . -type f -size -1k` list?
+  options:
+    - text: Only the empty file
+      correct: true
+    - text: All three, since each is smaller than 1024 bytes
+    - text: The 1-byte and 500-byte files, but not the empty one
+    - text: None, because `-1k` is not a valid size
+  explanation: |
+    `find` rounds each file's size **up** to whole units before comparing. In kibibytes, the 1-byte
+    and 500-byte files both count as 1k, and "less than 1k" leaves only files of size 0. To find
+    files under 1024 bytes, compare in bytes: `-size -1024c`.
+
+- key: linux-medium-11
+  type: multiple
+  category: linux
+  tags: [find, xargs, file-names]
+  prompt: |
+    Which commands count the lines of every `.txt` file under `docs`, working correctly even for
+    a file named `my notes.txt`? Select all that apply.
+  options:
+    - text: "`find docs -name '*.txt' -print0 | xargs -0 wc -l`"
+      correct: true
+    - text: "`find docs -name '*.txt' -exec wc -l {} +`"
+      correct: true
+    - text: "`find docs -name '*.txt' | xargs wc -l`"
+    - text: "`wc -l $(find docs -name '*.txt')`"
+  explanation: |
+    `-print0` ends every name with a null byte and `xargs -0` splits only there, so spaces and
+    newlines in names survive. `-exec ... {} +` hands the names to `wc` directly, with no splitting
+    at all. Plain `xargs` splits its input at blanks, and an unquoted `$(...)` is split by the
+    shell, so both turn `docs/my notes.txt` into `docs/my` and `notes.txt`, and `wc` reports that
+    neither exists.
+
+- key: linux-medium-12
+  type: single
+  category: linux
+  tags: [tar, archives]
+  prompt: |
+    In a directory containing `notes.txt` and no other files, someone runs:
+
+    ```bash
+    tar -czf notes.txt backup.tar.gz
+    ```
+
+    What happens?
+  options:
+    - text: "`notes.txt` is overwritten with a new, empty compressed archive, and tar reports that `backup.tar.gz` does not exist"
+      correct: true
+    - text: "`backup.tar.gz` is created and holds `notes.txt`"
+    - text: tar refuses to run because the archive name does not end in `.tar.gz`
+    - text: "`notes.txt` is added to the existing `backup.tar.gz`"
+  explanation: |
+    The word straight after `-f` is the archive to create, whatever its name, and the remaining
+    words are the files to put in it. tar therefore creates `notes.txt` as the archive, replacing
+    the original, and then fails to find `backup.tar.gz`. The correct order is
+    `tar -czf backup.tar.gz notes.txt`. tar never checks that an archive's name matches its format.
+
+- key: linux-medium-13
+  type: single
+  category: linux
+  tags: [gzip, compression]
+  prompt: |
+    What is in the directory after running `gzip report.log`?
+  options:
+    - text: "`report.log.gz` only; the original file is replaced"
+      correct: true
+    - text: "`report.log` and `report.log.gz`"
+    - text: "`report.log`, now compressed but with the same name"
+    - text: Nothing changes; gzip only prints compressed data unless given `-f`
+  explanation: |
+    `gzip` replaces each file it compresses with a `.gz` version, and `gunzip` does the reverse.
+    To keep the original, add `-k`; to write the compressed data to standard output instead, use
+    `-c`. `zcat report.log.gz` reads the content without decompressing it to disk.
+
+- key: linux-medium-14
+  type: single
+  category: linux
+  tags: [scripts, arguments, quoting]
+  prompt: |
+    `args.sh` contains:
+
+    ```bash
+    #!/bin/bash
+    for a in $@; do echo "[$a]"; done
+    ```
+
+    What does `bash args.sh "two words" x` print?
+  options:
+    - text: "`[two]`, `[words]` and `[x]`, one per line"
+      correct: true
+    - text: "`[two words]` and `[x]`, one per line"
+    - text: "`[two words x]`"
+    - text: "`[$@]`"
+  explanation: |
+    An unquoted `$@` expands to the arguments and then the shell splits the result at spaces, so
+    `two words` becomes two items. Written as `"$@"`, each argument stays exactly one word, which
+    gives `[two words]` and `[x]`. `"$*"` would join everything into one word, `[two words x]`.
+    This is why every expansion of an argument or a file name should be in double quotes.
+
+- key: linux-medium-15
+  type: single
+  category: linux
+  tags: [scripts, variables]
+  prompt: |
+    A script contains the line `name = "Ada"`. What happens when it runs?
+  options:
+    - text: "The shell reports `name: command not found`, and `name` stays unset"
+      correct: true
+    - text: "`name` is set to `Ada`"
+    - text: "`name` is set to ` Ada`, with a leading space"
+    - text: The line compares `name` with `Ada` and continues silently
+  explanation: |
+    An assignment is written with no spaces around `=`: `name="Ada"`. With spaces, the shell sees
+    three words and runs the first, `name`, as a command with the arguments `=` and `Ada`. As no
+    such command exists, it reports an error and carries on with the next line. Comparisons belong
+    inside `[ ]` or `[[ ]]`.
+
+- key: linux-medium-16
+  type: multiple
+  category: linux
+  tags: [tests, numbers]
+  prompt: |
+    The variable `count` holds `10`. Which commands correctly test whether it is greater than 9?
+    Select all that apply.
+  options:
+    - text: '`[ "$count" -gt 9 ]`'
+      correct: true
+    - text: "`[[ $count -gt 9 ]]`"
+      correct: true
+    - text: '`[ "$count" > 9 ]`'
+    - text: '`[ "$count" \> 9 ]`'
+  explanation: |
+    Numbers are compared with `-eq`, `-ne`, `-lt`, `-le`, `-gt` and `-ge`, in `[ ]` or `[[ ]]`.
+    Inside `[ ]`, a bare `>` is a redirection: the test becomes `[ "$count" ]`, which is true for
+    any non-empty value, and a file named `9` is created. Escaped as `\>`, it compares the values
+    as **text**, and `10` sorts before `9`, so the test is false although 10 is greater.
+
+- key: linux-medium-17
+  type: single
+  category: linux
+  tags: [tests, lists]
+  prompt: |
+    What does this print?
+
+    ```bash
+    true && false || echo fallback
+    ```
+  options:
+    - text: "`fallback`"
+      correct: true
+    - text: Nothing, because the first command succeeded
+    - text: "`true`"
+    - text: An error, because `&&` and `||` cannot be combined
+  explanation: |
+    `&&` runs the next command only if the previous one succeeded, and `||` only if it failed. The
+    chain is read from left to right: `true` succeeds, so `false` runs and fails, so `echo` runs.
+    `a && b || c` is therefore not an if-else: `c` runs whenever `a` **or** `b` fails. When `b`
+    can fail, write a real `if a; then b; else c; fi`.
+
+- key: linux-medium-18
+  type: single
+  category: linux
+  tags: [loops, read]
+  prompt: |
+    What does this print?
+
+    ```bash
+    printf 'a\nb' > f
+    while read -r line; do echo "$line"; done < f
+    ```
+  options:
+    - text: "`a` only"
+      correct: true
+    - text: "`a` and `b`, one per line"
+    - text: "`b` only"
+    - text: Nothing
+  explanation: |
+    The file's last line, `b`, has no newline after it. `read` still stores `b` in `line`, but
+    returns a failure status because it reached the end of the file, so the loop stops before
+    printing it. `while IFS= read -r line || [ -n "$line" ]` lets that final line through, and also
+    keeps leading spaces, which plain `read` removes.
+
+- key: linux-medium-19
+  type: single
+  category: linux
+  tags: [loops, subshells]
+  prompt: |
+    `f3` has three lines. What does this print?
+
+    ```bash
+    count=0
+    cat f3 | while read -r l; do count=$((count + 1)); done
+    echo "$count"
+    ```
+  options:
+    - text: "`0`"
+      correct: true
+    - text: "`3`"
+    - text: "`1`"
+    - text: An error, because `count` is not visible inside the loop
+  explanation: |
+    Each command of a pipeline runs in a subshell, a separate copy of the shell. The loop counts to
+    3 in its own copy of `count`, and that copy disappears when the pipeline ends, leaving the
+    original `0`. Redirecting the file into the loop, `done < f3`, keeps the loop in the current
+    shell and prints `3`.
+
+- key: linux-medium-20
+  type: single
+  category: linux
+  tags: [processes, signals]
+  prompt: |
+    Which signal does `kill 1234` send to process 1234?
+  options:
+    - text: "`TERM` (15), a request to finish"
+      correct: true
+    - text: "`KILL` (9), which cannot be ignored"
+    - text: "`HUP` (1), as if the terminal had closed"
+    - text: "`INT` (2), as if Ctrl+C had been pressed"
+  explanation: |
+    With no signal named, `kill` sends `TERM`, which asks the program to finish and lets it clean up
+    first. `kill -9` (`KILL`) ends it at once and cannot be caught; keep it for programs that ignore
+    `TERM`. `HUP` is what a closing terminal sends and `INT` is what Ctrl+C sends.
+
+- key: linux-medium-21
+  type: true_false
+  category: linux
+  tags: [jobs]
+  prompt: |
+    Pressing Ctrl+Z ends the foreground program, just as Ctrl+C does.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    Ctrl+Z sends `TSTP`, which **suspends** the program: it stays in memory, stopped, and `jobs`
+    lists it as `Stopped`. `fg` resumes it in the foreground and `bg` lets it continue in the
+    background. Ctrl+C sends `INT`, which normally ends the program.
+
+- key: linux-medium-22
+  type: multiple
+  category: linux
+  tags: [packages, dpkg, rpm]
+  prompt: |
+    Which commands tell you which installed package owns the file `/usr/bin/jq`? Select all that
+    apply.
+  options:
+    - text: "`dpkg -S /usr/bin/jq` on Debian or Ubuntu"
+      correct: true
+    - text: "`rpm -qf /usr/bin/jq` on Fedora or Red Hat"
+      correct: true
+    - text: "`dpkg -L /usr/bin/jq` on Debian or Ubuntu"
+    - text: "`apt install /usr/bin/jq` on Debian or Ubuntu"
+  explanation: |
+    `dpkg -S` searches the installed packages' file lists for a path, and `rpm -qf` queries the
+    package that owns a file. `dpkg -L` works the other way round: it takes a package name and lists
+    its files, so given a path it fails with an error. `apt install` installs packages and is no
+    way to ask a question.
+
+- key: linux-medium-23
+  type: single
+  category: linux
+  tags: [packages, apt, scripts]
+  prompt: |
+    Why should a shell script call `apt-get` rather than `apt` to install packages?
+  options:
+    - text: "`apt`'s command-line interface and output may change between versions, while `apt-get` keeps backward compatibility"
+      correct: true
+    - text: "`apt` cannot install packages without a terminal"
+    - text: "Only `apt-get` resolves dependencies; `apt` installs single packages"
+    - text: "`apt` exists only on Ubuntu, `apt-get` on every Debian system"
+  explanation: |
+    `apt` is designed for people at a terminal, and it says so: in a pipe it prints `WARNING: apt
+    does not have a stable CLI interface. Use with caution in scripts.` Both tools resolve
+    dependencies from the same repositories, and both exist on Debian and Ubuntu. Scripts use
+    `apt-get` and `apt-cache`, usually with `-y` so the script does not stop at the confirmation
+    question.

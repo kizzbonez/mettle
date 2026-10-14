@@ -1,0 +1,6 @@
+db02.corp.example.com.	2711	IN	A	10.20.0.14
+www.corp.example.com.	300	IN	CNAME	web-lb.corp.example.com.
+web-lb.corp.example.com. 60	IN	A	10.20.0.21
+web-lb.corp.example.com. 60	IN	A	10.20.0.22
+ldap01.corp.example.com. 3600	IN	A	10.20.0.40
+mail.corp.example.com.	3600	IN	A	10.20.0.25

@@ -1,0 +1,19 @@
+title: Food Bank Permissions
+summary: Put a shared office's permissions right with chmod in symbolic and octal form, and create a private folder with the right defaults.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Fixes the permissions in the office folder from the instructions
+    file: 01-office.sh
+    hidden: false
+  - name: Lets only the owner run the backup script
+    file: 02-backup-script.sh
+    hidden: true
+  - name: Makes the spreadsheet private and the notice read-only for others
+    file: 03-salaries-and-notice.sh
+    hidden: true
+  - name: Creates the drafts folder and file with the right permissions
+    file: 04-drafts.sh
+    hidden: true

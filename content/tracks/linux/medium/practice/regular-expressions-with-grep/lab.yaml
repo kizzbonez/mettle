@@ -1,0 +1,19 @@
+title: Ticket IDs in Stand-up Notes
+summary: Describe a ticket ID with one extended regular expression, then use grep to list every ID once and count the lines that have none.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Lists the IDs in the sample notes and counts the other lines
+    file: 01-example.sh
+    hidden: false
+  - name: Recognises exactly the strings that are ticket IDs
+    file: 02-what-is-an-id.sh
+    hidden: true
+  - name: Handles several IDs on a line, repeated IDs and empty lines
+    file: 03-repeats.sh
+    hidden: true
+  - name: Handles a name with spaces, a missing final newline and an empty file
+    file: 04-awkward-files.sh
+    hidden: true

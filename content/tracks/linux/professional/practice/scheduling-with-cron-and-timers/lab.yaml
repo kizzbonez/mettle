@@ -1,0 +1,19 @@
+title: What Runs at 07:30
+summary: Read a crontab the way cron does and list the jobs that start at a given minute, with lists, ranges, steps, Sunday as 0 or 7, and the either-day rule.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Lists the jobs of the sample crontab at 07:30 on a Friday
+    file: 01-example.sh
+    hidden: false
+  - name: Matches lists, ranges and steps in every field
+    file: 02-fields.sh
+    hidden: true
+  - name: Applies Sunday as 0 or 7 and the rule for the two day fields
+    file: 03-days.sh
+    hidden: true
+  - name: Skips lines that are not jobs and keeps each command as written
+    file: 04-lines.sh
+    hidden: true

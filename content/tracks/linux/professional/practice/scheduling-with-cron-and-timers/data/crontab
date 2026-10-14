@@ -1,0 +1,11 @@
+# Playout schedule of the automation account (crontab -l)
+# m   h     dom   mon  dow   command
+MAILTO=studio@radio.example
+PATH=/usr/local/bin:/usr/bin:/bin
+
+0     *     *     *    *     playout --jingle station-id
+*/15  6-9   *     *    1-5   playout --traffic-report
+30    7     *     *    1-5   playout --show morning-news
+0     12    1,15  *    *     record-archive --upload
+45    23    *     *    0     rotate-playlists --week
+@reboot                      playout --resume

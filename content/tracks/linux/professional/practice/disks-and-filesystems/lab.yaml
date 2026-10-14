@@ -1,0 +1,19 @@
+title: Will It Boot Tonight
+summary: Compare /etc/fstab with the output of blkid and report device names, missing disks without nofail, and wrong filesystem types before the next reboot.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Checks the sample fstab against the sample blkid output
+    file: 01-example.sh
+    hidden: false
+  - name: Matches UUID, LABEL and TYPE exactly, not their look-alikes
+    file: 02-keys.sh
+    hidden: true
+  - name: Reads nofail and noauto anywhere in the options
+    file: 03-options.sh
+    hidden: true
+  - name: Tells device names, stable paths and other sources apart
+    file: 04-sources.sh
+    hidden: true

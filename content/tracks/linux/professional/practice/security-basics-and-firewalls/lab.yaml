@@ -1,0 +1,19 @@
+title: Setuid Baseline
+summary: Find every setuid and setgid file with find -perm and compare it with the list saved at the last audit, reporting new, changed and vanished files.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Compares the example tree with the sample baseline
+    file: 01-example.sh
+    hidden: false
+  - name: Finds setuid and setgid regular files and nothing else
+    file: 02-modes.sh
+    hidden: true
+  - name: Groups and sorts new, changed and gone files
+    file: 03-compare.sh
+    hidden: true
+  - name: Handles paths with spaces and a tree without changes
+    file: 04-names-and-clean.sh
+    hidden: true

@@ -1,0 +1,19 @@
+title: Homework Upload Check
+summary: Decide whether a file may be uploaded with if, file and number tests and case, reporting wrong usage on standard error with the right exit status.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Accepts the sample note and rejects a large picture
+    file: 01-example.sh
+    hidden: false
+  - name: Reports wrong usage and paths that are not files
+    file: 02-arguments-and-files.sh
+    hidden: true
+  - name: Rejects empty files first, then names of the wrong kind
+    file: 03-empty-and-type.sh
+    hidden: true
+  - name: Allows files exactly at each size limit and rejects one byte more
+    file: 04-size-limits.sh
+    hidden: true

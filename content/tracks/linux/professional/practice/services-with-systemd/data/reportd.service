@@ -1,0 +1,17 @@
+# /etc/systemd/system/reportd.service
+[Unit]
+Description=Report generator API
+Documentation=https://wiki.example.internal/reportd
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/srv/reportd
+EnvironmentFile=-/etc/default/reportd
+ExecStart=/usr/local/bin/reportd --port 8080 > /var/log/reportd.log 2>&1
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

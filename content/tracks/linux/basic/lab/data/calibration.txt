@@ -1,0 +1,2 @@
+Soil probe recalibrated on 2026-10-04.
+Temperature offset: +0.2 C

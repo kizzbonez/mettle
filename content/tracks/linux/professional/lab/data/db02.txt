@@ -1,0 +1,54 @@
+### df -hT
+Filesystem     Type      Size  Used Avail Use% Mounted on
+udev           devtmpfs  7.8G     0  7.8G   0% /dev
+tmpfs          tmpfs     1.6G  1.1M  1.6G   1% /run
+/dev/nvme0n1p2 ext4       98G   61G   32G  66% /
+tmpfs          tmpfs     7.8G     0  7.8G   0% /dev/shm
+/dev/nvme0n1p1 vfat      511M  6.1M  505M   2% /boot/efi
+/dev/nvme1n1   xfs       500G  401G  100G  81% /var/lib/postgresql
+/dev/loop1     squashfs   92M   92M     0 100% /snap/lxd/29351
+tmpfs          tmpfs     1.6G  4.0K  1.6G   1% /run/user/1000
+
+### systemctl --failed
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+0 loaded units listed.
+
+### ss -tlnp
+State  Recv-Q Send-Q Local Address:Port  Peer Address:Port Process
+LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*     users:(("systemd-resolve",pid=598,fd=14))
+LISTEN 0      128          0.0.0.0:22         0.0.0.0:*     users:(("sshd",pid=877,fd=3))
+LISTEN 0      200       10.20.0.12:5432       0.0.0.0:*     users:(("postgres",pid=1102,fd=7))
+LISTEN 0      200        127.0.0.1:5432       0.0.0.0:*     users:(("postgres",pid=1102,fd=6))
+LISTEN 0      128             [::]:22            [::]:*     users:(("sshd",pid=877,fd=4))
+LISTEN 0      200            [::1]:5432          [::]:*     users:(("postgres",pid=1102,fd=8))
+
+### cat /etc/ssh/sshd_config
+Include /etc/ssh/sshd_config.d/*.conf
+
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+UsePAM yes
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+Match Address 10.20.0.0/24
+    PasswordAuthentication yes
+
+### getent passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+systemd-network:x:998:998:systemd Network Management:/:/usr/sbin/nologin
+sshd:x:105:65534::/run/sshd:/usr/sbin/nologin
+postgres:x:106:110:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+lee:x:1000:1000:Lee Tan,,,:/home/lee:/bin/bash
+
+### getent shadow
+root:!:20650:0:99999:7:::
+daemon:*:20650:0:99999:7:::
+nobody:*:20650:0:99999:7:::
+systemd-network:!*:20650::::::
+sshd:!:20650::::::
+postgres:!:20650::::::
+lee:$y$j9T$Rv5Nb1Mc7Xz3Lk9Jh2Gf6Ds.$Pq4Wo8Ei2Ru6Ty0Ua3Sd7Fg1Hj5Kl9Zx4Cv8Bn2Mq6:20711:0:99999:7:::
+

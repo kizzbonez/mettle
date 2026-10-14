@@ -1,0 +1,19 @@
+title: Studio Takes
+summary: Read a list of recorded takes into an array, take each name apart with parameter expansion to suggest a tidy new name, honour an optional PREFIX and count the files of each type in an associative array.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Renames and counts the example list
+    file: 01-example-list.sh
+    hidden: false
+  - name: Keeps awkward names whole and splits them at the right dot
+    file: 02-awkward-names.sh
+    hidden: true
+  - name: Counts extensions in lower case and skips blank lines
+    file: 03-counts.sh
+    hidden: true
+  - name: Adds PREFIX only when it has a value, and requires LIST
+    file: 04-prefix-and-usage.sh
+    hidden: true

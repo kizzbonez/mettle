@@ -1,0 +1,19 @@
+title: Pool Desk Report
+summary: Look inside a booking log and a mystery file with head, tail, wc and file, without an editor.
+language: bash
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prints the report for the files in data/
+    file: 01-desk-report.sh
+    hidden: false
+  - name: Shows only the header and the last three bookings of a long log
+    file: 02-long-log.sh
+    hidden: true
+  - name: Handles a log with a single booking
+    file: 03-one-booking.sh
+    hidden: true
+  - name: Says what an empty poster file contains
+    file: 04-empty-poster.sh
+    hidden: true

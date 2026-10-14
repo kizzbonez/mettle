@@ -1,0 +1,19 @@
+title: Pantry Shopping List
+summary: Read a stock list line by line with while read, skip and stop with continue and break, and add up what to buy with shell arithmetic.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Makes the shopping list for the sample pantry
+    file: 01-example.sh
+    hidden: false
+  - name: Skips comments and empty lines and stops at END
+    file: 02-skip-and-stop.sh
+    hidden: true
+  - name: Keeps names exactly and reads a last line without a newline
+    file: 03-awkward-lines.sh
+    hidden: true
+  - name: Adds up larger numbers and handles files with nothing to buy
+    file: 04-totals.sh
+    hidden: true

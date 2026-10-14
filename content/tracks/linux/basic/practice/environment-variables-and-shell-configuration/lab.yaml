@@ -1,0 +1,19 @@
+title: Race Day Badges
+summary: Read a script's arguments, export them to a program, put your own tools first in PATH, and print a count with command substitution.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prints the badge for the runner in the instructions
+    file: 01-ada.sh
+    hidden: false
+  - name: Prints the name and bib exactly as given
+    file: 02-arguments.sh
+    hidden: true
+  - name: Hands the details to the badge program and counts the log
+    file: 03-export-and-count.sh
+    hidden: true
+  - name: Runs its own badge program even when another comes first in PATH
+    file: 04-path-order.sh
+    hidden: true

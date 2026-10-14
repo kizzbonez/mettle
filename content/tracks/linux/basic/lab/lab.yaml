@@ -1,0 +1,20 @@
+slug: field-station-release
+title: Field Station Data Release
+summary: Turn a messy data-logger upload into a tidy, read-only release folder with a README link and a summary, using only the commands of this level.
+language: bash
+minutes: 45
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Packages the week 41 upload in data/
+    file: 01-sample-upload.sh
+    hidden: false
+  - name: Copies exactly the right files, even with spaces in names, and leaves the upload untouched
+    file: 02-spaces-and-selection.sh
+    hidden: true
+  - name: Sets the permissions and a README link that survives moving the release
+    file: 03-permissions-and-link.sh
+    hidden: true
+  - name: Handles an upload with no readings and no logs quietly
+    file: 04-quiet-upload.sh
+    hidden: true

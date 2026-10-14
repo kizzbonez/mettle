@@ -1,0 +1,20 @@
+slug: timesheet-hours-report
+title: Timesheet Hours Report
+summary: Turn a folder tree of messy staff timesheet exports into the hours-per-project report that finance invoices from.
+language: bash
+minutes: 45
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Reports the sample timesheets
+    file: 01-sample-timesheets.sh
+    hidden: false
+  - name: Applies the record rules to line endings, spaces, comments and bad values
+    file: 02-record-rules.sh
+    hidden: true
+  - name: Finds every timesheet in the tree and reads every line of it
+    file: 03-finding-files.sh
+    hidden: true
+  - name: Orders and formats the report, and handles empty folders and bad arguments
+    file: 04-order-and-arguments.sh
+    hidden: true

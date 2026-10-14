@@ -1,0 +1,8 @@
+/dev/vda1: SEC_TYPE="msdos" UUID="3C1A-9F02" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="5b1e0a7c-2f3d-4c9e-8a61-0e7d3b2c9f14"
+/dev/vda2: UUID="9b2d6c1e-4a7f-4e33-a0f1-5d2c8e7b1a90" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="c8a3f2e1-7d64-4b59-9e02-1f4a6c3d8b75"
+/dev/vda3: UUID="Zp3x1Q-aB4c-Dd5e-Ff6g-Hh7i-Jj8k-Kl9m0n" TYPE="LVM2_member" PARTUUID="e2b7c9d4-0a35-4f81-b6c2-9d8e1f7a3c60"
+/dev/mapper/vg0-root: UUID="1f0e7c55-2b8d-4c61-9d3e-7a4b2c9e8f10" BLOCK_SIZE="4096" TYPE="ext4"
+/dev/mapper/vg0-var: UUID="6c8a2e41-0d9b-4f7a-b3c5-2e1f9d8a7c66" BLOCK_SIZE="512" TYPE="xfs"
+/dev/mapper/vg0-swap: UUID="7d4c2b19-8e5a-4f60-a3d7-1c9b0e2f6a84" TYPE="swap"
+/dev/vdb1: LABEL="data" UUID="e3f1a0c2-7b5d-4e8a-9c21-0d6f4b3a2e11" BLOCK_SIZE="4096" TYPE="ext4" PARTLABEL="data" PARTUUID="0b6e2d4f-9a17-4c3e-8f52-1d7a6c9e4b30"
+/dev/vdc1: UUID="0d4e8b2a-61c7-4f3e-9a85-c2b7d1e6f403" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="4a9c1e7b-3d52-4f08-b6e1-8c2d0f9a7b35"

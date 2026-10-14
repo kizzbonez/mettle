@@ -1,0 +1,19 @@
+title: Delivery Van Fuel Report
+summary: Turn a fuel log into a report with awk, using patterns to pick the records, arrays for the totals per van and printf for the layout.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Reports the sample fuel log
+    file: 01-example.sh
+    hidden: false
+  - name: Skips lines that are not records and prints one decimal place
+    file: 02-records-and-format.sh
+    hidden: true
+  - name: Orders the vans and finds the first of two equally long trips
+    file: 03-order-and-longest.sh
+    hidden: true
+  - name: Handles names with spaces, a missing final newline and a single record
+    file: 04-awkward-files.sh
+    hidden: true

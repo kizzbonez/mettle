@@ -1,0 +1,18 @@
+title: Shell Foundations
+summary: >-
+  The Linux command line from zero. Learn what Linux and the shell are, run and look up
+  commands, move around the filesystem, manage files, links and permissions, connect commands
+  with redirection and pipes, find files and text, edit in the terminal, and configure your own
+  shell.
+outcomes:
+  - Run commands with options and arguments, read their errors and find help with man, help and apropos
+  - Navigate the filesystem tree and create, copy, move, link and delete files and directories safely
+  - Use wildcards, brace expansion and quoting to work with many files, including names with spaces
+  - Read and set permissions and ownership, and predict the effect of the umask
+  - Combine commands with redirection and pipes, search with grep and find, and configure Bash with variables, PATH and aliases
+exam:
+  title: Shell Foundations Mock Exam
+  description: Ten questions drawn from the level's bank, from first commands and paths to permissions, redirection, searching and shell configuration.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

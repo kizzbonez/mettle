@@ -1,0 +1,513 @@
+- key: linux-advanced-01
+  type: single
+  category: linux
+  tags: [functions, subshells, command-substitution]
+  prompt: |
+    What does this script print?
+
+    ```bash
+    total=0
+    add() { total=$((total + $1)); echo "$total"; }
+    result=$(add 5)
+    add 2 > /dev/null
+    echo "$total $result"
+    ```
+  options:
+    - text: "`2 5`"
+      correct: true
+    - text: "`7 5`"
+    - text: "`7 7`"
+    - text: "`2 7`"
+  explanation: |
+    Command substitution, `$( )`, runs the function in a **subshell**, a copy of the shell. The
+    copy adds 5 to its own `total` and prints 5, which is captured in `result`, but the change
+    to `total` is lost when the copy exits. The second call runs in the current shell, so it
+    really changes `total`, from 0 to 2. The tempting `7 5` assumes both calls changed the same
+    variable. To get data out of a function, print it and capture it; to change a variable,
+    call the function directly, not inside `$( )`.
+
+- key: linux-advanced-02
+  type: single
+  category: linux
+  tags: [functions, exit-status]
+  prompt: |
+    What does this script print?
+
+    ```bash
+    check() {
+      local n=$1
+      (( n > 10 )) && echo "big"
+    }
+    check 3
+    echo "status $?"
+    ```
+  options:
+    - text: "`status 0`"
+    - text: "`status 1`"
+      correct: true
+    - text: "`big`, then `status 0`"
+    - text: Nothing; the function ends the script
+  explanation: |
+    A function without `return` has the status of the **last command it ran**. Here that is
+    the `&&` list: `(( 3 > 10 ))` is false (status 1), so `echo` is skipped and the list, and
+    therefore the function, returns 1. Without `set -e` nothing stops, so the script prints
+    `status 1`. With `set -e`, a caller would be stopped by this harmless-looking function.
+    End such functions with an `if` statement, or with an explicit `return 0`, when "no" is not
+    a failure.
+
+- key: linux-advanced-03
+  type: single
+  category: linux
+  tags: [arrays, quoting]
+  prompt: |
+    How many lines does this print?
+
+    ```bash
+    files=("my report.txt" notes.txt)
+    for f in ${files[@]}; do echo "[$f]"; done
+    ```
+  options:
+    - text: Two, `[my report.txt]` and `[notes.txt]`
+    - text: Three, `[my]`, `[report.txt]` and `[notes.txt]`
+      correct: true
+    - text: One, `[my report.txt notes.txt]`
+    - text: None; Bash reports a syntax error
+  explanation: |
+    The array holds two elements, but `${files[@]}` is **unquoted**, so after expansion each
+    element is split on spaces (and could be expanded as a glob). `my report.txt` becomes two
+    words, and the loop runs three times. Writing `"${files[@]}"` produces exactly one word per
+    element and gives the two lines people expect. ShellCheck reports the unquoted form as
+    SC2068.
+
+- key: linux-advanced-04
+  type: multiple
+  category: linux
+  tags: [parameter-expansion]
+  prompt: |
+    Given `path=/srv/app/releases/v2.4.1.tar.gz`, which of these print exactly
+    `v2.4.1.tar.gz`? Select all that apply.
+  options:
+    - text: "`echo \"${path##*/}\"`"
+      correct: true
+    - text: "`echo \"${path#*/}\"`"
+    - text: "`basename -- \"$path\"`"
+      correct: true
+    - text: "`echo \"${path%/*}\"`"
+  explanation: |
+    `##*/` removes the **longest** match of `*/` from the start, which is everything up to and
+    including the last slash, so it behaves like `basename` without starting a process. `#*/`
+    removes the **shortest** match, only the leading `/`, and prints
+    `srv/app/releases/v2.4.1.tar.gz`. `%/*` removes the shortest `/*` from the **end**, giving
+    the directory `/srv/app/releases`, like `dirname`.
+
+- key: linux-advanced-05
+  type: single
+  category: linux
+  tags: [parameter-expansion, defaults]
+  prompt: |
+    What does this print?
+
+    ```bash
+    name=""
+    echo "[${name:-guest}] [${name-guest}]"
+    ```
+  options:
+    - text: "`[guest] [guest]`"
+    - text: "`[guest] []`"
+      correct: true
+    - text: "`[] [guest]`"
+    - text: "`[] []`"
+  explanation: |
+    The colon decides what counts as missing. `${name:-guest}` uses the default when `name` is
+    **unset or empty**, so it gives `guest`. `${name-guest}` uses it only when `name` is
+    **unset**; `name` is set (to the empty string), so its empty value is kept. The same rule
+    applies to `:=`, `:?` and `:+`. For settings, the colon form is usually what you want,
+    because an empty value is rarely meaningful.
+
+- key: linux-advanced-06
+  type: single
+  category: linux
+  tags: [arrays, associative-arrays]
+  prompt: |
+    A script contains these lines and no `declare` statement. What do they print?
+
+    ```bash
+    port[web]=80
+    port[db]=5432
+    echo "${port[web]}"
+    ```
+  options:
+    - text: "`80`"
+    - text: "`5432`"
+      correct: true
+    - text: Nothing, because `port[web]` is unset
+    - text: "An error: `port` is not an associative array"
+  explanation: |
+    Without `declare -A port`, Bash creates an **indexed** array, whose subscripts are
+    arithmetic. `web` and `db` are evaluated as variable names, both unset, so both count as 0.
+    Both assignments write element 0, and `${port[web]}` reads element 0 again: the last value
+    written, 5432. No error is reported, which is what makes this mistake dangerous.
+    `declare -p port` shows the truth: `declare -a port=([0]="5432")`.
+
+- key: linux-advanced-07
+  type: multiple
+  category: linux
+  tags: [strict-mode, errexit, pipefail]
+  prompt: |
+    A script starts with `set -euo pipefail`, and `missing.txt` does not exist. Which of these
+    lines, on its own, ends the script? Select all that apply.
+  options:
+    - text: "`grep -q ok missing.txt || echo \"not found\"`"
+    - text: "`count=$(wc -l < missing.txt)`"
+      correct: true
+    - text: "`cat missing.txt | sort > sorted.txt`"
+      correct: true
+    - text: "`load() { local data=$(cat missing.txt); }; load`"
+  explanation: |
+    `set -e` ignores a failure on the left of `||`, so the `grep` line prints `not found` and
+    carries on. A plain assignment takes the status of its command substitution, so the failed
+    redirection in `count=$(...)` stops the script. In the pipeline, `cat` fails but `sort`
+    succeeds; `pipefail` makes the pipeline report the failure, so it stops too. In the
+    function, `local` succeeds and **masks** the status of `cat` (ShellCheck SC2155), so the
+    script continues with an empty variable. Declare and assign on separate lines to fix it.
+
+- key: linux-advanced-08
+  type: single
+  category: linux
+  tags: [traps, errexit]
+  prompt: |
+    What does this script print, and with what exit status does it end?
+
+    ```bash
+    #!/usr/bin/env bash
+    set -e
+    trap 'echo "cleanup"' EXIT
+    echo "start"
+    false
+    echo "end"
+    ```
+  options:
+    - text: "`start`, `cleanup`; status 1"
+      correct: true
+    - text: "`start`, `cleanup`; status 0, because the trap's `echo` succeeded"
+    - text: "`start`; status 1, because `set -e` exits without running traps"
+    - text: "`start`, `end`, `cleanup`; status 0"
+  explanation: |
+    `false` fails and `set -e` makes the shell exit with its status, 1. An `EXIT` trap runs
+    whenever the shell exits, whatever the reason, so `cleanup` is printed. The trap's own
+    commands do not change the exit status unless the trap itself calls `exit`; the script
+    still ends with 1. That is why `trap cleanup EXIT` is the standard way to clean up.
+
+- key: linux-advanced-09
+  type: true_false
+  category: linux
+  tags: [strict-mode, arithmetic]
+  prompt: |
+    True or false: in a script with `set -e`, the lines `count=0` followed by `((count++))`
+    end the script.
+  options:
+    - text: "True"
+      correct: true
+    - text: "False"
+  explanation: |
+    True. `((count++))` increments `count` but evaluates to its **old** value, 0, and an
+    arithmetic command whose value is 0 returns status 1. Under `set -e` that is a failure, so
+    the script exits at a harmless counter. Write `count=$((count + 1))`, which is an
+    assignment and always succeeds.
+
+- key: linux-advanced-10
+  type: single
+  category: linux
+  tags: [getopts]
+  prompt: |
+    A script parses its options with `while getopts ':vo:' opt; do ... done`. A user runs it
+    with only `-o`. What does `getopts` set?
+  options:
+    - text: "`opt` is `?` and `OPTARG` is unset, and `getopts` prints `option requires an argument -- o`"
+    - text: "`opt` is `:` and `OPTARG` is `o`, and `getopts` prints nothing"
+      correct: true
+    - text: "`opt` is `o` and `OPTARG` is empty"
+    - text: "`getopts` prints an error and exits the script with status 2"
+  explanation: |
+    The leading `:` in the option string selects **silent mode**. In that mode a missing value
+    is reported by setting the variable to `:` and `OPTARG` to the option letter, so the script
+    can print its own message (`option -o needs a value`) and choose its exit status, by
+    convention 2. The first option describes the *default* mode, without the leading colon.
+    `getopts` never exits the script itself.
+
+- key: linux-advanced-11
+  type: multiple
+  category: linux
+  tags: [getopts, command-line]
+  prompt: |
+    A script parses `-v` and `-o FILE` with `getopts ':vo:'`, followed by
+    `shift $((OPTIND - 1))`. Which command lines set the output file to `out.txt`? Select all
+    that apply.
+  options:
+    - text: "`script -o out.txt input`"
+      correct: true
+    - text: "`script -vo out.txt input`"
+      correct: true
+    - text: "`script -oout.txt input`"
+      correct: true
+    - text: "`script input -o out.txt`"
+  explanation: |
+    `getopts` follows the POSIX conventions. Letters can be combined (`-vo`), and an option
+    that takes a value uses the rest of its word (`-oout.txt`) or, if nothing is left, the next
+    word. Parsing stops at the first word that is not an option, so in the last command
+    `input` ends the options, and `-o` and `out.txt` become operands. To accept options
+    anywhere, you must write your own loop.
+
+- key: linux-advanced-12
+  type: single
+  category: linux
+  tags: [subshells, pipelines, while-read]
+  prompt: |
+    What does this print?
+
+    ```bash
+    count=0
+    printf 'a\nb\n' | while read -r line; do count=$((count + 1)); done
+    echo "$count"
+    ```
+  options:
+    - text: "`0`"
+      correct: true
+    - text: "`2`"
+    - text: "`1`"
+    - text: Nothing; `count` is unset after the loop
+  explanation: |
+    Each command of a pipeline runs in its own subshell, including the `while` loop. The loop
+    counts to 2 in its copy of `count`, and the copy disappears when the pipeline ends, leaving
+    the original 0. Feed the loop with process substitution instead, `done < <(printf ...)`,
+    so it runs in the current shell, or set `shopt -s lastpipe` in a script.
+
+- key: linux-advanced-13
+  type: multiple
+  category: linux
+  tags: [subshells, grouping]
+  prompt: |
+    A script is in `/work`. After which of these is the script's own current directory
+    `/tmp`? Select all that apply.
+  options:
+    - text: "`( cd /tmp )`"
+    - text: "`{ cd /tmp; }`"
+      correct: true
+    - text: "`cd /tmp | true`"
+    - text: "`go_tmp() { cd /tmp; }; go_tmp`"
+      correct: true
+  explanation: |
+    `( )` runs its commands in a subshell, and each side of a pipe is a subshell too, so their
+    `cd` changes only a copy that then exits. `{ ...; }` groups commands in the **current**
+    shell, and a function also runs in the current shell, so both really move the script.
+    That is why `(cd "$dir" && make)` is the idiom for "work somewhere else without moving".
+
+- key: linux-advanced-14
+  type: single
+  category: linux
+  tags: [signals, exit-status]
+  prompt: |
+    A script runs `wait "$pid"` for a background job and gets status 143. What happened to the
+    job?
+  options:
+    - text: It was terminated by `SIGTERM`
+      correct: true
+    - text: It exited normally with the code 143 chosen by the program
+    - text: It was killed by `SIGKILL`
+    - text: It was stopped by `timeout` after its time limit
+  explanation: |
+    When a process is ended by signal N, the shell reports 128 + N. 143 - 128 = 15, which is
+    `TERM`, the default signal of `kill`; Bash's `kill -l 143` prints `TERM`. `SIGKILL` (9)
+    would give 137, and `timeout` reports a time-out as 124. A program could in theory choose
+    143 itself, but by convention values above 128 mean "ended by a signal", so do not use them
+    as your own exit codes.
+
+- key: linux-advanced-15
+  type: single
+  category: linux
+  tags: [signals, traps]
+  prompt: |
+    This script is started in the background, and one second later it receives `SIGTERM` from
+    `kill`. When does the trap run?
+
+    ```bash
+    trap 'echo "stopping"; exit 143' TERM
+    sleep 60
+    echo "done"
+    ```
+  options:
+    - text: At once, after one second
+    - text: About 60 seconds after the start, when `sleep` finishes
+      correct: true
+    - text: Never, because the signal goes to `sleep`, which dies
+    - text: Never, because a script started in the background ignores `TERM`
+  explanation: |
+    `kill` sent the signal to the script, not to `sleep`. Bash does not run a trap while it is
+    waiting for a **foreground** command; it records the signal and runs the trap when `sleep`
+    finishes. So the trap prints `stopping` after about 60 seconds, and `done` is never
+    printed. To react at once, run long commands in the background and wait for them:
+    `sleep 60 & wait $!`, because the `wait` builtin is interrupted by trapped signals.
+    (Background jobs ignore `INT` and `QUIT`, not `TERM`.)
+
+- key: linux-advanced-16
+  type: single
+  category: linux
+  tags: [shellcheck, cd]
+  prompt: |
+    ShellCheck reports SC2164 for line 2 of this script. Which change fixes the problem it
+    describes?
+
+    ```bash
+    #!/usr/bin/env bash
+    cd "$1"
+    rm -f ./*.tmp
+    ```
+  options:
+    - text: "`cd \"$1\" || exit`"
+      correct: true
+    - text: "`cd $1`"
+    - text: "`cd -- \"$1\"`"
+    - text: Adding `# shellcheck disable=SC2164` above the line
+  explanation: |
+    SC2164 warns that if `cd` fails, for example because the directory does not exist, the
+    script carries on in the wrong directory and the `rm` deletes `.tmp` files there. Only
+    `|| exit` (or `|| return` in a function) makes the script stop. `--` is good practice for
+    names starting with a dash but does not handle failure, removing the quotes adds SC2086,
+    and a directive hides the warning without fixing the danger.
+
+- key: linux-advanced-17
+  type: single
+  category: linux
+  tags: [debugging]
+  prompt: |
+    What does `bash -n deploy.sh` do?
+  options:
+    - text: Reads the script and reports syntax errors without running any command
+      correct: true
+    - text: Runs the script and prints each command before it runs
+    - text: Runs the script but treats unset variables as errors
+    - text: Checks the script for misspelt command names and unquoted variables
+  explanation: |
+    `-n` is `noexec`: Bash parses the whole file and reports problems such as a missing `fi` or
+    an unclosed quote, but runs nothing, so it is safe on any script. It cannot find misspelt
+    commands or logic errors, because those only show when commands run. Printing each command
+    is `-x` (trace), unset variables are `-u`, and quoting problems are ShellCheck's job.
+
+- key: linux-advanced-18
+  type: single
+  category: linux
+  tags: [date]
+  prompt: |
+    With GNU `date`, what does `date -u -d '2026-01-31 + 1 month' +%F` print?
+  options:
+    - text: "`2026-02-28`"
+    - text: "`2026-03-03`"
+      correct: true
+    - text: "`2026-03-01`"
+    - text: "An error, because 31 February does not exist"
+  explanation: |
+    GNU `date` adds a month by increasing the month and keeping the day, which gives
+    31 February 2026. That date does not exist, so it rolls over by the three extra days into
+    March: `2026-03-03`. Month arithmetic at the end of a month is a classic source of bugs.
+    For "the last day of a month", take the first day of the following month and subtract one
+    day.
+
+- key: linux-advanced-19
+  type: multiple
+  category: linux
+  tags: [jq, json, quoting]
+  prompt: |
+    `note` holds text that may contain double quotes and backslashes, such as
+    `she said "hi" \ bye`. Which commands print valid JSON with that text as the value of
+    `note`? Select all that apply.
+  options:
+    - text: "`jq -n --arg note \"$note\" '{note: $note}'`"
+      correct: true
+    - text: "`echo \"{\\\"note\\\": \\\"$note\\\"}\"`"
+    - text: "`printf '%s' \"$note\" | jq -R '{note: .}'`"
+      correct: true
+    - text: "`jq -n \"{note: \\\"$note\\\"}\"`"
+  explanation: |
+    `--arg` binds the shell value to a `jq` variable as a string, and `jq` escapes it when it
+    prints. `jq -R` reads raw text as one string, with the same result. Both forms that paste
+    the value into JSON or into the `jq` program break: the quotes inside the value end the
+    string early, giving invalid JSON in one case and a `jq` compile error in the other. With
+    hostile input, pasting can also inject extra fields.
+
+- key: linux-advanced-20
+  type: single
+  category: linux
+  tags: [printf, formatting]
+  prompt: |
+    What does `printf '%-6s|%4s|\n' ab cd` print?
+  options:
+    - text: "`ab    |  cd|`"
+      correct: true
+    - text: "`    ab|cd  |`"
+    - text: "`ab|cd|`"
+    - text: "`ab    |cd  |`"
+  explanation: |
+    A width pads a value to that many characters. Strings are right-aligned by default, and the
+    `-` flag left-aligns them. So `%-6s` prints `ab` followed by four spaces, and `%4s` prints
+    two spaces followed by `cd`. Widths are how scripts print aligned columns without an extra
+    tool.
+
+- key: linux-advanced-21
+  type: single
+  category: linux
+  tags: [atomic-writes, mktemp]
+  prompt: |
+    A script updates `/etc/app/app.conf` by writing a temporary file and then running
+    `mv tmp /etc/app/app.conf`. Why should the temporary file be created in `/etc/app` rather
+    than in `/tmp`?
+  options:
+    - text: Within one file system `mv` is a rename, which readers see as a single atomic step
+      correct: true
+    - text: "`mktemp` cannot create files in `/tmp` when the target is elsewhere"
+    - text: Files in `/tmp` are always deleted before `mv` can read them
+    - text: A file in the same directory keeps the permissions of the old `app.conf`
+  explanation: |
+    `/tmp` is often a different file system. Moving across file systems is a copy followed by
+    a delete, so for a moment `app.conf` exists half-written. In the same directory, `mv` is a
+    `rename`, which the kernel performs atomically: every reader sees the old file or the new
+    one, never a mix. The new file does not inherit the old one's permissions; `mktemp` makes
+    it private, so set the mode with `chmod` before the `mv`.
+
+- key: linux-advanced-22
+  type: true_false
+  category: linux
+  tags: [flock, locking]
+  prompt: |
+    True or false: a script takes its lock with `exec 9> /tmp/job.lock` and `flock -n 9`. If
+    the script is killed with `SIGKILL`, the next run cannot get the lock until someone deletes
+    `/tmp/job.lock`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. A `flock` lock belongs to the open file, not to the file's existence. When a process
+    dies, even by `SIGKILL`, the kernel closes its files and releases the lock, so the next run
+    gets it at once. That is why `flock` does not suffer from the stale lock files of the
+    "create a file if it does not exist" approach. One caution: a background child that
+    inherited descriptor 9 keeps the lock until it exits too.
+
+- key: linux-advanced-23
+  type: single
+  category: linux
+  tags: [filenames, find]
+  prompt: |
+    A directory contains files whose names include spaces and newlines. Which loop processes
+    each file found by `find` exactly once?
+  options:
+    - text: "`for f in $(find . -type f); do ...; done`"
+    - text: "`find . -type f | while read -r f; do ...; done`"
+    - text: "`while IFS= read -r -d '' f; do ...; done < <(find . -type f -print0)`"
+      correct: true
+    - text: "`for f in \"$(find . -type f)\"; do ...; done`"
+  explanation: |
+    Only the NUL byte can never appear in a file name, so only NUL-separated lists are
+    unambiguous. `-print0` ends each name with a NUL, `read -d ''` reads up to one, `IFS=` keeps
+    surrounding spaces and `-r` keeps backslashes. The `for` over `$(find)` splits names on
+    spaces and newlines; the pipe into `read` splits on newlines (and its variables vanish with
+    the subshell); the quoted `"$(find)"` makes one single item of all the names.

@@ -1,0 +1,19 @@
+title: Hotel Maintenance Morning
+summary: Count and filter tickets with grep's everyday options, and search a folder tree with find and grep -r.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prints the morning report for the hotel in the instructions
+    file: 01-morning.sh
+    hidden: false
+  - name: Counts the word leak in any case and lists the open tickets
+    file: 02-tickets.sh
+    hidden: true
+  - name: Lists only the regular .log files, at any depth
+    file: 03-logs.sh
+    hidden: true
+  - name: Lists each file that contains URGENT once
+    file: 04-urgent.sh
+    hidden: true

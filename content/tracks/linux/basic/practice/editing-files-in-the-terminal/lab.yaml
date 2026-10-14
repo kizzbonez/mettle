@@ -1,0 +1,19 @@
+title: Keystroke Replay
+summary: Work out what vi and nano saved from a list of keys, including a quit that saved nothing, and write those files from a script.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Writes playlist.txt as vi saved it
+    file: 01-playlist.sh
+    hidden: false
+  - name: Writes studio.conf as nano saved it
+    file: 02-studio-conf.sh
+    hidden: true
+  - name: Leaves a file that was never saved as it was
+    file: 03-notes-unsaved.sh
+    hidden: true
+  - name: Writes rota.txt as vi saved it, and nothing else
+    file: 04-rota.sh
+    hidden: true

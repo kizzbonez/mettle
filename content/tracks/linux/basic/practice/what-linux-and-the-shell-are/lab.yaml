@@ -1,0 +1,19 @@
+title: Machine Card
+summary: Change one option in a complete script, run it, read what the test reports, and submit it.
+language: bash
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prints the card from the instructions
+    file: 01-machine-card.sh
+    hidden: false
+  - name: Names the operating system
+    file: 02-operating-system.sh
+    hidden: true
+  - name: Still names the kernel
+    file: 03-kernel.sh
+    hidden: true
+  - name: Keeps the rest of the card and runs without errors
+    file: 04-rest-of-card.sh
+    hidden: true

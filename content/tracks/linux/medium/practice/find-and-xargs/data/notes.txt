@@ -1,0 +1,2 @@
+Remember: only ERROR lines in the .log files count.
+ERROR is written in capitals by the renderer.

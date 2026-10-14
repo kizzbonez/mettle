@@ -1,0 +1,13 @@
+127.0.0.1	localhost
+127.0.1.1	app01.corp.example.com	app01
+
+# Pinned during the database move, remove after 2026-09-30 (ticket OPS-2291)
+10.20.0.99	db02.corp.example.com	db02
+
+10.20.0.15	www.corp.example.com
+10.20.0.40	ldap01.corp.example.com ldap01   # checked by Lee in March
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters

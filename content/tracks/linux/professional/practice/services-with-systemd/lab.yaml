@@ -1,0 +1,19 @@
+title: Unit File Review
+summary: Read a service unit the way systemd does and flag shell syntax in ExecStart, a service running as root, no restart after a crash, and a unit that cannot be enabled.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Reviews the sample unit data/reportd.service
+    file: 01-example.sh
+    hidden: false
+  - name: Counts settings only in their own section
+    file: 02-sections.sh
+    hidden: true
+  - name: Applies repeated and empty settings like systemd
+    file: 03-repeated.sh
+    hidden: true
+  - name: Flags shell syntax only where no shell runs the command
+    file: 04-shell-syntax.sh
+    hidden: true

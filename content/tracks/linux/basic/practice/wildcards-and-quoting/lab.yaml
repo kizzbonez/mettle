@@ -1,0 +1,19 @@
+title: Podcast Session Sort
+summary: Sort a recording folder with wildcards and brace expansion, and quote names with spaces and a line full of special characters.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Sorts the recording folder in the instructions
+    file: 01-session.sh
+    hidden: false
+  - name: Copies only the single-digit takes
+    file: 02-takes.sh
+    hidden: true
+  - name: Copies every visible .txt file, spaces and all
+    file: 03-notes.sh
+    hidden: true
+  - name: Deletes only the rough cut and prints the trailer exactly
+    file: 04-rough-cut.sh
+    hidden: true

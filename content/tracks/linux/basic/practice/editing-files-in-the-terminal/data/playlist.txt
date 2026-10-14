@@ -1,0 +1,4 @@
+06:00 news
+06:05 weather
+06:10 traffic
+06:15 music

@@ -1,0 +1,19 @@
+title: Slow Server Triage
+summary: Read saved vmstat output to decide whether memory, disk or CPU is the bottleneck, then pick the suspects for it from saved ps output.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Finds the bottleneck and suspects in the sample output
+    file: 01-example.sh
+    hidden: false
+  - name: Recognises a CPU-bound machine and its busiest process
+    file: 02-cpu.sh
+    hidden: true
+  - name: Puts swapping first and compares memory sizes as numbers
+    file: 03-memory.sh
+    hidden: true
+  - name: Skips repeated headers and the since-boot line
+    file: 04-headers-and-none.sh
+    hidden: true

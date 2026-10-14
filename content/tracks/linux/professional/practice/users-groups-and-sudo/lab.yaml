@@ -1,0 +1,19 @@
+title: Who Is in Which Group
+summary: Rebuild the answer of `id USER` from copies of /etc/passwd and /etc/group, with the primary group first and every supplementary group matched by whole name.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Prints the id line for ana from the sample files
+    file: 01-example.sh
+    hidden: false
+  - name: Matches whole user names in member lists and keeps the file order
+    file: 02-whole-names.sh
+    hidden: true
+  - name: Finds the primary group by its GID and does not repeat it
+    file: 03-primary-group.sh
+    hidden: true
+  - name: Reports a user that is not in the passwd file
+    file: 04-no-such-user.sh
+    hidden: true

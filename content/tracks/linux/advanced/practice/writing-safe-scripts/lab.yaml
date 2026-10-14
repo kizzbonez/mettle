@@ -1,0 +1,19 @@
+title: Mail Relay Allowlist
+summary: Add hosts to a mail relay's allowlist safely, holding a flock so only one run works at a time, writing a mktemp file beside the list and renaming it into place, adding each entry once and leaving nothing behind.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Adds the example entries once and leaves only the list and its lock
+    file: 01-example-allowlist.sh
+    hidden: false
+  - name: Compares entries as whole lines of fixed text, whatever they contain
+    file: 02-whole-lines.sh
+    hidden: true
+  - name: Replaces the list atomically, and only when something was added
+    file: 03-atomic-and-idempotent.sh
+    hidden: true
+  - name: Refuses to run while locked, rejects bad usage and passes ShellCheck
+    file: 04-lock-usage-shellcheck.sh
+    hidden: true

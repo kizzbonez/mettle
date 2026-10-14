@@ -1,0 +1,19 @@
+title: Timetable Links
+summary: Give one timetable file the names it needs with a hard link, a relative symbolic link and a switchable folder link, and read them back with readlink.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Makes the links in the office folder from the instructions
+    file: 01-office.sh
+    hidden: false
+  - name: Makes timetable.txt a second name, not a copy or a shortcut
+    file: 02-hard-link.sh
+    hidden: true
+  - name: Keeps the staff room link working when the office folder moves
+    file: 03-move-office.sh
+    hidden: true
+  - name: Replaces an existing latest link instead of adding to its folder
+    file: 04-replace-latest.sh
+    hidden: true
