@@ -1,0 +1,19 @@
+title: Snowmaking Settings
+summary: Write a structured logger that filters by level, binds template placeholders by position and hides secrets, then layer configuration sources into a validated options class.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Writes only enabled levels and skips the rest at once
+    file: 02-levels.cs
+    hidden: true
+  - name: Writes fields by position with invariant values and hidden secrets
+    file: 03-lines.cs
+    hidden: true
+  - name: Layers the sources, binds the Snow section and validates it
+    file: 04-options.cs
+    hidden: true

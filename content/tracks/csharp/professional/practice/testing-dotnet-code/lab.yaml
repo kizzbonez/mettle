@@ -1,0 +1,19 @@
+title: Refill Reminders
+summary: Write a spy for a text-message gateway and two checks built from stubs, fakes and a recording delay that pass a correct reminder job and expose faulty ones, including ones you have not seen.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Counts every call and records only the sends that went through
+    file: 02-spy.cs
+    hidden: true
+  - name: RemindsOnlyDueSoon passes correct jobs and fails unseen faulty ones
+    file: 03-reminds-only-due-soon.cs
+    hidden: true
+  - name: RetriesTimeouts passes correct jobs and fails unseen faulty ones
+    file: 04-retries-timeouts.cs
+    hidden: true

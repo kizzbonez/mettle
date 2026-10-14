@@ -1,0 +1,19 @@
+title: Lowest Applicable
+summary: Parse NuGet version ranges, pick the lowest version every range allows as NuGet does, and read the PackageReference items of SDK-style and older project files.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Parses every range form and rejects text that is not a range
+    file: 02-parse.cs
+    hidden: true
+  - name: Includes each bound as written and picks the lowest version
+    file: 03-includes-and-pick.cs
+    hidden: true
+  - name: Reads package references from new and old project files
+    file: 04-project-file.cs
+    hidden: true
