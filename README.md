@@ -87,10 +87,11 @@ quick.
 | Track | Basic | Medium | Advanced | Professional |
 | --- | --- | --- | --- | --- |
 | **Rust Development** | Rust Foundations | Idiomatic Rust | Concurrency and Systems | Production Rust |
+| **C# Development** | C# Foundations | Types, Generics and LINQ | Async and Advanced Language Features | Production .NET |
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** | Security Foundations | in development | in development | in development |
 
-61 lessons, 121 exam questions with explanations and 55 labs. Every lab is verified in the
+106 lessons, 214 exam questions with explanations and 101 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -103,6 +104,13 @@ worked examples that were compiled and run, common mistakes, practice with answe
 to its sources. Its four question banks hold 96 questions, and every exam attempt draws ten.
 Every one of its 46 lessons ends with a short **practice lab**, so each idea is tried in the
 editor straight after it is read.
+**C# Development is a full course in the same format**: 45 lessons on C# 14 and .NET 10, from
+installing .NET and a first program to async code, concurrency, spans, dependency injection
+and shipping, written from Microsoft Learn with every example compiled and run. Its question
+banks hold 93 questions, each level ends with a lab, and 42 of its lessons already have a
+practice lab; the last three (dependency injection, logging and configuration, testing) are
+still being written.
+
 AI Development and Cyber Security are still in the original short format (three lessons a
 level) and are next to be expanded.
 
