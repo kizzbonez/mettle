@@ -95,6 +95,14 @@ describe('c# sandbox', () => {
     expect(result.tests[0]?.stderr).toContain('actual:   [2, 4]');
   });
 
+  it('lets a test read what the code wrote to the console', async () => {
+    const greeter = 'public static class Greeter\n{\n    public static void Hello(string name) => Console.WriteLine($"Hello, {name}!");\n}\n';
+    const tests = ['Check.Equal(Printed.By(() => Greeter.Hello("Ada")), "Hello, Ada!\\n", "the greeting");', 'Check.Equal(Printed.By(() => Greeter.Hello("Ada")), "Hi\\n", "a wrong greeting");'];
+    const result = await execute(request('csharp', greeter, tests));
+    expect(result.tests.map((t) => t.passed)).toEqual([true, false]);
+    expect(result.tests[1]?.stderr).toContain('actual:   "Hello, Ada!');
+  });
+
   it('names an exception the test did not expect', async () => {
     const thrower = 'public static class Stock { public static int Total() => throw new InvalidOperationException("empty"); }\n';
     const result = await execute(request('csharp', thrower, ['Stock.Total();']));

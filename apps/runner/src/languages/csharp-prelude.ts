@@ -10,8 +10,26 @@ export const CSHARP_USINGS = [
   '',
 ].join('\n');
 
-/** The checks every C# test body can call. Arguments run actual, expected, message, as in the other languages. */
-export const CSHARP_CHECKS = String.raw`sealed class CheckFailed(string message) : Exception(message);
+/**
+ * The checks every C# test body can call. Arguments run actual, expected,
+ * message, as in the other languages. `Printed.By(() => ...)` returns what
+ * the code wrote to the console, so a lab about Console.WriteLine can check
+ * the output itself.
+ */
+export const CSHARP_CHECKS = String.raw`static class Printed
+{
+    public static string By(Action action)
+    {
+        var original = Console.Out;
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        try { action(); }
+        finally { Console.SetOut(original); }
+        return writer.ToString();
+    }
+}
+
+sealed class CheckFailed(string message) : Exception(message);
 
 static class Check
 {
