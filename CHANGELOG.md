@@ -4,6 +4,40 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-14
+
+Linux Command Line, a full course.
+
+### Added
+
+- **Linux Command Line**: 45 lessons in four levels on Bash and the GNU tools, in the same
+  full-course format as Rust and C#, planned against the LPIC-1 objectives. It starts from what
+  Linux and the shell are and a first command, and teaches one idea per lesson through files,
+  permissions, redirection and pipes, text filters, regular expressions, sed and awk, shell
+  scripts, strict mode and traps, getopts and ShellCheck, then users and sudo, systemd, logs,
+  scheduling, time and locale, disks, networking, DNS and HTTP, SSH, security and the boot.
+  It was written from the man pages, the GNU and Bash manuals and the Bash wiki.
+  - Shell Foundations (13 lessons), Text and Automation (11), Robust Shell Scripting (9) and
+    Systems Administration (12).
+  - 93 exam questions; each attempt at a level's mock exam draws ten.
+  - An end-of-level lab for each level, from a field station's data release to a server health
+    audit.
+  - A practice lab for every lesson, each using only what has been taught so far. The tests
+    catch the wrong attempts written against them, and the signal and trap labs do not depend
+    on timing. The administration labs work on captured command output and configuration files.
+- The shell sandbox has the archive tools (`xz`, `zip`, `unzip`), `file`, `bc`, `column`,
+  `tree`, `jq`, `procps` and ShellCheck.
+
+### Fixed
+
+- **The Cyber Security lab could not be passed.** Its sample log, `data/auth.log`, was caught by
+  the `*.log` rules in `.gitignore` and `.dockerignore`, so it was never published and never
+  reached the image; the lab's first test had nothing to read. Log files under `content/` are
+  now kept, and the Cyber Security track's revision is raised so installed sites reload the lab
+  in place.
+- `content:verify` fails when git would leave a curriculum file out of a commit.
+- The README said no shipped track used C#; C# Development has shipped since 1.5.0.
+
 ## [1.6.0] - 2026-10-14
 
 ### Added
