@@ -1,0 +1,19 @@
+title: Parcel Labels
+summary: Tidy tracking codes, cut a name in two with IndexOf and Substring, align a shelf line with widths and F2, and compare city names ignoring case.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Trims the code and converts it to upper case
+    file: 02-tidy-code.cs
+    hidden: true
+  - name: Files a parcel under the surname
+    file: 03-file-as.cs
+    hidden: true
+  - name: Aligns the shelf line and compares city names
+    file: 04-shelf-and-city.cs
+    hidden: true

@@ -1,0 +1,19 @@
+title: Mountain Station
+summary: Write an endless iterator that checks its argument at the call, a lazy iterator that stops at the first gap, and an async stream that a WithCancellation token can stop.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Produces an endless schedule and checks the step at the call
+    file: 02-sample-times.cs
+    hidden: true
+  - name: Reads the source lazily and stops at the first gap
+    file: 03-until-gap.cs
+    hidden: true
+  - name: Streams the radio until OVER and honours both kinds of token
+    file: 04-listen.cs
+    hidden: true

@@ -1,0 +1,19 @@
+title: Climbing Card
+summary: Complete a class with private and static fields, a constructor, read-only and computed properties, and methods that change and describe each object.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Numbers the cards and keeps their owners
+    file: 02-numbers.cs
+    hidden: true
+  - name: Checks in, refuses an empty card and tops up
+    file: 03-visits.cs
+    hidden: true
+  - name: Describes a card in the exact form
+    file: 04-describe.cs
+    hidden: true

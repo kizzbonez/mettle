@@ -1,0 +1,19 @@
+title: Hostel Desk
+summary: Handle missing nicknames, beds and ratings with ??, null checks, TryGetValue and int?, returning null where a value is missing instead of crashing.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Chooses the nickname only when there is one
+    file: 02-call-name.cs
+    hidden: true
+  - name: Looks up beds and labels a missing one
+    file: 03-beds.cs
+    hidden: true
+  - name: Averages only the ratings that have a value
+    file: 04-ratings.cs
+    hidden: true

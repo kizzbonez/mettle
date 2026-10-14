@@ -1,0 +1,20 @@
+slug: tool-library-desk
+title: Tool Library Lending Desk
+summary: Track which member has which tool, charge late fees to the day, and replay the desk's text log without ever crashing on a bad line.
+language: csharp
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Replays the Saturday shift from the instructions
+    file: 01-saturday-shift.cs
+    hidden: false
+  - name: Enforces the rules for ids, lending and returning
+    file: 02-lending-rules.cs
+    hidden: true
+  - name: Charges late fees to the day and describes members exactly
+    file: 03-fees-and-summaries.cs
+    hidden: true
+  - name: Replays messy logs, line endings and refused lines without crashing
+    file: 04-replay-edge-cases.cs
+    hidden: true

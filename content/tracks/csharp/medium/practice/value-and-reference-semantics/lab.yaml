@@ -1,0 +1,19 @@
+title: Car Park Gate
+summary: Override Equals and GetHashCode so that a HashSet treats two spellings of a number plate as one car, and use a ref parameter to replace a struct the caller holds.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Compares plates by value and hashes them to match
+    file: 02-equality.cs
+    hidden: true
+  - name: Lets each car in once and out again
+    file: 03-car-park.cs
+    hidden: true
+  - name: Extends the caller's ticket and refuses bad minutes
+    file: 04-extend.cs
+    hidden: true

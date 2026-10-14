@@ -1,0 +1,19 @@
+title: Theatre Booking
+summary: Turn a class into a readonly record struct, give a record a computed property, make changed copies with with expressions, and keep a record's list from being shared by its copies.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Compares and prints seats by value
+    file: 02-seat.cs
+    hidden: true
+  - name: Pays for and moves bookings without changing the originals
+    file: 03-booking.cs
+    hidden: true
+  - name: Adds to a party without touching the original's list
+    file: 04-party.cs
+    hidden: true

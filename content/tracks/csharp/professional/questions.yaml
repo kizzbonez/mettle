@@ -1,0 +1,544 @@
+- key: csharp-professional-01
+  type: single
+  category: csharp
+  tags: [threads, race-condition, thread-safety]
+  prompt: |
+    Four tasks share one `Counter` and each calls `Add()` 100,000 times. After
+    `await Task.WhenAll(...)` the program prints `counter.Count`.
+
+    ```csharp
+    class Counter
+    {
+        private int _count;
+        public void Add() => _count++;
+        public int Count => _count;
+    }
+    ```
+
+    Which statement is correct?
+  options:
+    - text: "It always prints 400000, because `++` on an `int` field is a single atomic instruction"
+    - text: "It can print less than 400000, because `_count++` reads, adds and writes as separate steps and two tasks can interleave between them"
+      correct: true
+    - text: "It throws an `InvalidOperationException` when two tasks call `Add` at the same time"
+    - text: "Declaring the field `volatile` makes it always print 400000"
+  explanation: |
+    `_count++` is a read-modify-write: load the value, add one, store it. If one task loads 41,
+    is preempted, and another task increments to 42 and 43, the first task then stores 42 and
+    two increments are lost. Nothing throws; the result is simply wrong. In this course's
+    one-CPU sandbox, two runs printed 398,759 and 220,838, so you do not need several cores to
+    see it: preemption between the steps is enough. `volatile` affects visibility and ordering
+    of single reads and writes, but does not make the three steps indivisible. Fix it with
+    `Interlocked.Increment(ref _count)` or by taking a private `Lock` around every access,
+    reads included.
+
+- key: csharp-professional-02
+  type: single
+  category: csharp
+  tags: [lock, async, compiler]
+  prompt: |
+    What happens when this class is compiled?
+
+    ```csharp
+    class Exporter(IStore store)
+    {
+        private readonly Lock _gate = new();
+
+        public async Task SaveAsync(Report report)
+        {
+            lock (_gate)
+            {
+                await store.WriteAsync(report);
+            }
+        }
+    }
+    ```
+  options:
+    - text: "It compiles; the lock is released at the `await` and taken again when the method resumes"
+    - text: "It compiles, but deadlocks at run time when two callers save at the same time"
+    - text: "It fails with error CS1996, because a lock is owned by a thread and the code after `await` may resume on a different thread"
+      correct: true
+    - text: "It compiles with a warning, because `Lock` should be converted to `object` for use with `async` code"
+  explanation: |
+    The compiler refuses `await` inside a `lock` body (error CS1996, "Cannot await in the body of
+    a lock statement"). Both `Lock` and `Monitor` belong to the thread that entered them, and
+    must be exited by that thread, but after an `await` the method may continue on another
+    thread pool thread. Nothing releases the lock automatically at an `await`. For mutual
+    exclusion across `await`, use `SemaphoreSlim(1, 1)`: `await gate.WaitAsync()` before the
+    critical section and `gate.Release()` in a `finally`. Converting a `Lock` to `object` is the
+    subject of a different diagnostic, warning CS9216, and only switches it to `Monitor`.
+
+- key: csharp-professional-03
+  type: multiple
+  category: csharp
+  tags: [lock, monitor, best-practice]
+  prompt: |
+    A class needs a lock object for its private state. Which of these are poor choices? Select
+    all that apply.
+  options:
+    - text: "`lock (this)`"
+      correct: true
+    - text: "`lock (typeof(OrderBook))`"
+      correct: true
+    - text: "`lock (\"orders\")`, a string literal"
+      correct: true
+    - text: "A field declared `private readonly Lock _gate = new();` used only for locking"
+  explanation: |
+    A lock object should be reachable only by the code it protects. `this` is visible to every
+    caller, who may lock it too. A `Type` object is shared by the whole process and can be
+    obtained by anyone with `typeof` or reflection. String literals are interned, so the same
+    string object can be locked by unrelated code anywhere in the process. Each of these invites
+    contention or deadlocks between code that was never meant to interact. A private readonly
+    field that exists only for locking avoids all of that, and since C# 13 and .NET 9 its type
+    should be `System.Threading.Lock`, which the `lock` statement uses through `EnterScope()`.
+
+- key: csharp-professional-04
+  type: single
+  category: csharp
+  tags: [concurrent-collections, concurrentdictionary]
+  prompt: |
+    Eight tasks call this at the same moment, and the key `"invoice"` is not in the dictionary
+    yet:
+
+    ```csharp
+    Template t = cache.GetOrAdd("invoice", name => LoadTemplateFromDisk(name));
+    ```
+
+    `cache` is a `ConcurrentDictionary<string, Template>`. What does the documentation guarantee?
+  options:
+    - text: "`LoadTemplateFromDisk` runs exactly once, because `GetOrAdd` is atomic"
+    - text: "`LoadTemplateFromDisk` may run more than once, but only one result is stored and every caller gets that stored value"
+      correct: true
+    - text: "Each task may get a different `Template`, and the dictionary keeps the last one written"
+    - text: "The other seven calls block until the first factory returns, holding the dictionary's lock"
+  explanation: |
+    `ConcurrentDictionary` calls the value factory outside its internal lock, so that slow or
+    unknown user code cannot block other threads. Several threads that miss the key can
+    therefore all run the factory. The first value to be added wins, and `GetOrAdd` returns
+    that stored value to every caller, so callers agree on the result even though some
+    factories ran in vain. That is fine for a cheap pure function and wrong for an expensive one
+    or one with side effects. The usual fix stores `Lazy<Template>` and reads `.Value`: several
+    `Lazy` wrappers may be created, but only the stored one is evaluated.
+
+- key: csharp-professional-05
+  type: single
+  category: csharp
+  tags: [channels, producer-consumer]
+  prompt: |
+    A producer writes 50 items to a bounded `Channel<int>` with `await writer.WriteAsync(item)`
+    and then returns. It never calls `writer.Complete()`. Two consumers read with
+    `await foreach (var item in reader.ReadAllAsync())`. What happens?
+  options:
+    - text: "The consumers process all 50 items and then wait forever, because the channel was never marked complete"
+      correct: true
+    - text: "The consumers stop as soon as the channel is empty"
+    - text: "`WriteAsync` throws `ChannelClosedException` once the capacity is reached"
+    - text: "The consumers process all items and the loops end when the producer's task completes"
+  explanation: |
+    `ReadAllAsync` ends only when the channel is both completed and empty. An empty channel
+    alone just means "nothing yet", so the readers wait for more, and a channel does not know
+    about the producer's task. Call `writer.Complete()` (or `TryComplete`, optionally with an
+    exception) when production ends; with several producers, call it once after all of them
+    have finished. A full bounded channel in the default `Wait` mode makes `WriteAsync` wait
+    for space, which is back pressure, not an error. `ChannelClosedException` is for writing to
+    a channel that has already been completed.
+
+- key: csharp-professional-06
+  type: multiple
+  category: csharp
+  tags: [semaphoreslim, throttling, async]
+  prompt: |
+    Which statements about `SemaphoreSlim` are accurate? Select all that apply.
+  options:
+    - text: "It has no thread affinity: a different thread may call `Release` than the one that waited"
+      correct: true
+    - text: "`WaitAsync` lets an async method wait for a slot without blocking a thread, so it can guard code that contains `await`"
+      correct: true
+    - text: "Calling `Release` more times than slots were taken throws `SemaphoreFullException` once the count would exceed its maximum"
+      correct: true
+    - text: "If a task throws while holding a slot, the slot is returned automatically when the task faults"
+  explanation: |
+    A semaphore counts free slots and does not track owners, which is exactly why it works
+    across `await`: the code after the await may run on another thread and can still release.
+    `WaitAsync` returns a task that completes when a slot is free, so no thread sits blocked.
+    Releasing past the maximum count throws `SemaphoreFullException`, which usually reveals a
+    double release. Nothing returns a slot for you: if the code between `WaitAsync` and
+    `Release` throws and `Release` is not in a `finally` block, the slot is lost for good, and
+    after enough failures every later caller waits forever.
+
+- key: csharp-professional-07
+  type: single
+  category: csharp
+  tags: [garbage-collector, generations, large-object-heap]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var big = new byte[90_000];
+    var small = new byte[100];
+    GC.Collect();
+    Console.WriteLine($"{GC.GetGeneration(big)} {GC.GetGeneration(small)}");
+    ```
+  options:
+    - text: "`0 0`"
+    - text: "`1 1`"
+    - text: "`2 1`"
+      correct: true
+    - text: "`3 1`"
+  explanation: |
+    New small objects start in generation 0, and one that survives a collection is promoted to
+    generation 1, so `small` reports 1. An object of 85,000 bytes or more is allocated on the
+    large object heap, which is logically part of generation 2: `big` reports 2 straight away,
+    before and after the collection. The LOH is sometimes called generation 3 because it is a
+    separate physical area, but `GC.GetGeneration` reports it as 2 and `GC.MaxGeneration` is 2.
+    The practical consequence: a temporary large array is reclaimed only by a full collection,
+    which is why large buffers should be pooled.
+
+- key: csharp-professional-08
+  type: multiple
+  category: csharp
+  tags: [allocation, boxing, closures, stackalloc]
+  prompt: |
+    Inside a method, which of these statements allocate on the managed heap? Select all that
+    apply. (`Point` is a `readonly record struct`, and `limit` is a local `int`.)
+  options:
+    - text: "`object o = 42;`"
+      correct: true
+    - text: "`Func<int, bool> above = x => x > limit;`"
+      correct: true
+    - text: "`Span<int> buffer = stackalloc int[8];`"
+    - text: "`var p = new Point(1, 2);`"
+  explanation: |
+    Converting a value type to `object` boxes it: a new heap object holds a copy of the value
+    (24 bytes on 64-bit, measured in this course's sandbox). A lambda that captures a local
+    needs a compiler-generated object to hold the captured variable plus a delegate; the
+    sandbox measured 88 bytes for this one. `stackalloc` reserves memory on the stack frame,
+    which disappears when the method returns, and a struct local lives in the frame as well, so
+    both measured 0 bytes. `new` on a struct does not mean heap: it means "call the
+    constructor", and where the value is stored depends on the variable.
+
+- key: csharp-professional-09
+  type: true_false
+  category: csharp
+  tags: [finalization, garbage-collector]
+  prompt: |
+    True or false: an object whose class has a finalizer (`~TempFile()`) has its memory
+    reclaimed in the same garbage collection that first finds it unreachable.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. When the GC finds a finalizable object unreachable, it cannot free it yet: the object
+    is queued for the finalizer thread, so it survives that collection (and is promoted). Only
+    after the finalizer has run can a later collection reclaim the memory. In the lesson's
+    demonstration a weak reference still saw the object after the first collection and not
+    after the second. Finalizers also run at an unspecified time, on an unspecified thread, in no
+    guaranteed order. That is why cleanup belongs in `Dispose`, operating system handles belong
+    in a `SafeHandle`, and `Dispose` calls `GC.SuppressFinalize(this)` when a finalizer exists.
+
+- key: csharp-professional-10
+  type: single
+  category: csharp
+  tags: [arraypool, spans, allocation]
+  prompt: |
+    What does `Make(5).Length` return?
+
+    ```csharp
+    static string Make(int length)
+    {
+        char[] buffer = ArrayPool<char>.Shared.Rent(length);
+        try
+        {
+            buffer.AsSpan(0, length).Fill('x');
+            return new string(buffer);
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(buffer);
+        }
+    }
+    ```
+  options:
+    - text: "5"
+    - text: "It depends on the pool: at least 5, and in this course's sandbox 16"
+      correct: true
+    - text: "It throws `ArgumentException`, because `Rent` returns an array of exactly 5 and `Fill` overruns it"
+    - text: "0, because `Return` clears the array before the string is created"
+  explanation: |
+    `Rent(minimumLength)` returns an array of at least that length, often larger (the shared
+    pool uses size buckets), and the sandbox handed back 16 characters for a request of 5.
+    `new string(buffer)` uses the whole array, so the result includes the unused tail, which
+    may hold zeros or data from a previous renter. The fix is `new string(buffer, 0, length)`
+    or `new string(buffer.AsSpan(0, length))`: always work with the length you asked for. The
+    string is created before the `finally` runs, and `Return` clears only when you pass
+    `clearArray: true`.
+
+- key: csharp-professional-11
+  type: single
+  category: csharp
+  tags: [spans, csharp-14, extension-methods]
+  prompt: |
+    A project defines this extension method:
+
+    ```csharp
+    static class SpanExtensions
+    {
+        public static int CountOf<T>(this ReadOnlySpan<T> items, T value) where T : IEquatable<T>
+        {
+            int count = 0;
+            foreach (T item in items) if (item.Equals(value)) count++;
+            return count;
+        }
+    }
+    ```
+
+    Which statement is accurate about `"banana".CountOf('a')` and `new[] { 1, 2, 1 }.CountOf(1)`?
+  options:
+    - text: "Both compile in C# 13 and C# 14, because user-defined conversions to spans have always applied to extension receivers"
+    - text: "Both compile in C# 14 and fail in C# 13 with error CS1929, because C# 14 added implicit span conversions that also apply to the receiver of an extension method"
+      correct: true
+    - text: "Only the array call compiles in C# 14; strings never convert implicitly to `ReadOnlySpan<char>`"
+    - text: "Neither compiles in any version without calling `.AsSpan()` first"
+  explanation: |
+    Before C# 14 the conversions from `string` and arrays to spans were ordinary user-defined
+    operators, and the language does not consider user-defined conversions when it looks for an
+    extension method's receiver, so both calls failed with CS1929 (verified with
+    `-langversion:13` in the sandbox). C# 14 makes spans first-class: implicit span conversions
+    from `T[]` to `Span<T>` and `ReadOnlySpan<T>`, from `Span<T>` to `ReadOnlySpan<T>`, and from
+    `string` to `ReadOnlySpan<char>`, which also count for extension receivers and type
+    inference. Library authors can now write one span overload instead of separate array,
+    span and string versions. The same rule can change which overload existing code binds to,
+    which is why .NET 10 added an array overload of LINQ's `Reverse`.
+
+- key: csharp-professional-12
+  type: single
+  category: csharp
+  tags: [spans, memory, async]
+  prompt: |
+    Why does the compiler reject a `Span<byte>` field in a class, or a `Span<byte>` local that
+    is used after an `await`?
+  options:
+    - text: "Because spans are slower than arrays when stored on the heap"
+    - text: "Because `Span<T>` is a ref struct that may point into a stack frame, and a heap object or a suspended async method can outlive that frame"
+      correct: true
+    - text: "Because `Span<T>` is a class, and classes cannot be captured by async state machines"
+    - text: "Because spans are not thread-safe, and fields and awaits may involve other threads"
+  explanation: |
+    A span can refer to `stackalloc` memory or to a local array element. If a span could be
+    stored in a heap object, or kept in an async method's state while the method is suspended,
+    it could still be used after the stack frame it points into has been popped and reused.
+    So `Span<T>` is a `ref struct`: the compiler keeps it on the stack and enforces that it
+    never escapes. When a buffer must live in a field or across `await`, use `Memory<T>` or
+    `ReadOnlyMemory<T>` and call `.Span` in the synchronous parts. Thread safety and speed have
+    nothing to do with the restriction, and `Span<T>` is a struct, not a class.
+
+- key: csharp-professional-13
+  type: multiple
+  category: csharp
+  tags: [performance, benchmarking, stopwatch]
+  prompt: |
+    A developer times one call to `Parse()` with `Stopwatch` and reports the number. Which of
+    these can make the number misleading? Select all that apply.
+  options:
+    - text: "The project was built in the Debug configuration"
+      correct: true
+    - text: "The first call includes JIT compilation and runs quickly-generated tier 0 code"
+      correct: true
+    - text: "The return value of `Parse()` is ignored, so the JIT may remove part of the work"
+      correct: true
+    - text: "`Stopwatch` only measures in whole milliseconds on Linux"
+  explanation: |
+    Debug builds turn optimisation off. With tiered compilation the first call pays for JIT
+    compilation and runs unoptimised tier 0 code; the method is recompiled with full
+    optimisation later, so early timings describe different machine code (in the lesson the
+    first call took 40 to 70 times the median). Discarded results invite dead code
+    elimination, and a single sample also absorbs whatever else happened: a GC, another
+    process. `Stopwatch` uses a high-resolution timer where one exists and reports ticks well
+    below a millisecond; its precision is not the problem. Warm up, keep results, take many
+    samples, or use BenchmarkDotNet in Release.
+
+- key: csharp-professional-14
+  type: single
+  category: csharp
+  tags: [benchmarkdotnet, memory-diagnoser]
+  prompt: |
+    A BenchmarkDotNet run with `[MemoryDiagnoser]` reports `Gen0 = 0.9537` and
+    `Allocated = 3.9 KB` for a benchmark. What do these two columns mean?
+  options:
+    - text: "Gen0: about 0.95 generation 0 collections per 1,000 calls; Allocated: about 3.9 KB allocated per single call"
+      correct: true
+    - text: "Gen0: the share of objects that died in generation 0; Allocated: the total heap size at the end of the run"
+    - text: "Gen0: seconds spent in generation 0 collections; Allocated: bytes allocated across all iterations together"
+    - text: "Gen0: the number of collections during the whole run; Allocated: bytes still alive after the run"
+  explanation: |
+    BenchmarkDotNet's memory diagnoser normalises GC counts to 1,000 operations, so a fractional
+    Gen0 value such as 0.95 means a gen 0 collection roughly every thousand calls. Allocated is
+    the managed memory allocated per operation (BenchmarkDotNet uses 1 KB = 1,024 B), not what
+    survives. Allocations are often the more stable number to compare between two versions,
+    and they explain future GC work even when a short benchmark shows few collections.
+
+- key: csharp-professional-15
+  type: single
+  category: csharp
+  tags: [dependency-injection, lifetimes, captive-dependency]
+  prompt: |
+    A web app registers `AddScoped<CartContext>()` and `AddSingleton<PriceService>()`, and
+    `PriceService` takes a `CartContext` in its constructor. Scope validation is turned off.
+    What happens?
+  options:
+    - text: "Each request gets a new `PriceService` with that request's `CartContext`"
+    - text: "The container quietly creates a new `CartContext` for every method call on `PriceService`"
+    - text: "`PriceService` is built once and keeps the first `CartContext` it received, so every later request shares one request's context"
+      correct: true
+    - text: "Startup always fails with an exception, whatever the settings"
+  explanation: |
+    This is a captive dependency: a long-lived service holds a shorter-lived one. The singleton
+    is constructed once, receives one `CartContext`, and keeps it for the life of the
+    application, so data leaks between requests and the context is never disposed at the end
+    of a request. A service may only depend on services that live at least as long. With
+    scope validation on (the default in the Development environment with the generic host) the
+    container throws "Cannot consume scoped service ... from singleton ...". The fix is to make
+    `PriceService` scoped, or to inject `IServiceScopeFactory` and create a scope when the
+    singleton needs a context.
+
+- key: csharp-professional-16
+  type: single
+  category: csharp
+  tags: [dependency-injection, registration]
+  prompt: |
+    The container has these registrations:
+
+    ```csharp
+    services.AddSingleton<IMessageWriter, ConsoleWriter>();
+    services.AddSingleton<IMessageWriter, LoggingWriter>();
+    services.TryAddSingleton<IMessageWriter, FileWriter>();
+    ```
+
+    A class takes `IMessageWriter writer, IEnumerable<IMessageWriter> all` in its constructor.
+    What does it receive?
+  options:
+    - text: "`writer` is `ConsoleWriter`; `all` is ConsoleWriter, LoggingWriter, FileWriter"
+    - text: "`writer` is `LoggingWriter`; `all` is ConsoleWriter, LoggingWriter"
+      correct: true
+    - text: "`writer` is `FileWriter`; `all` is ConsoleWriter, LoggingWriter, FileWriter"
+    - text: "Resolution throws, because `IMessageWriter` is registered more than once"
+  explanation: |
+    Registering the same service type again does not replace the earlier registration in the
+    collection; it adds to it. A single resolve returns the last registration, while
+    `IEnumerable<IMessageWriter>` returns all of them in registration order. `TryAdd...`
+    registers only if nothing is registered for the service type yet, so `FileWriter` is
+    ignored here. Libraries use `TryAdd` for defaults that an application can override by
+    registering its own implementation first.
+
+- key: csharp-professional-17
+  type: single
+  category: csharp
+  tags: [logging, structured-logging, ilogger]
+  prompt: |
+    Why is `logger.LogInformation($"Order {order.Id} shipped to {country}")` worse than
+    `logger.LogInformation("Order {OrderId} shipped to {Country}", order.Id, country)`?
+  options:
+    - text: "It is not worse; both produce identical structured events"
+    - text: "The interpolated string is built even when Information is disabled, and the values become plain text instead of named fields, so every order produces a different template"
+      correct: true
+    - text: "Interpolated strings are not allowed by `ILogger` and throw `FormatException`"
+    - text: "The template version is slower, because placeholders are looked up by name at run time"
+  explanation: |
+    With a message template, the logger receives the template and the arguments separately. A
+    structured provider stores `OrderId` and `Country` as fields that can be filtered and
+    counted, the template stays constant so identical events group together, and nothing is
+    formatted if the level is disabled. Interpolation formats the string first and hands the
+    logger only the result. Analyzer rule CA2254 warns about it. Placeholders bind to arguments
+    by position, not by name, and for hot paths the `[LoggerMessage]` source generator removes
+    the remaining overhead.
+
+- key: csharp-professional-18
+  type: single
+  category: csharp
+  tags: [configuration, options]
+  prompt: |
+    An app built with `Host.CreateApplicationBuilder` has `"Billing": { "RetryCount": 3 }` in
+    `appsettings.json`, the environment variable `Billing__RetryCount=5`, and is started with
+    `--Billing:RetryCount=7`. A singleton reads the value through `IOptions<BillingOptions>`.
+    What does it see?
+  options:
+    - text: "3, because files are the primary source of configuration"
+    - text: "5, because environment variables always override everything else"
+    - text: "7, because the command line is added last and later sources override earlier ones"
+      correct: true
+    - text: "It fails to bind, because the three sources disagree"
+  explanation: |
+    The default builder adds `appsettings.json`, then `appsettings.{Environment}.json`, user
+    secrets in Development, environment variables, and finally command-line arguments. When
+    the same key appears in several sources, the one added last wins, so the command line
+    beats the environment, which beats the file. `__` in an environment variable name stands
+    for the `:` separator. `IOptions<T>` computes its value once; to follow reloads of a file
+    source in a singleton you would use `IOptionsMonitor<T>.CurrentValue`.
+
+- key: csharp-professional-19
+  type: single
+  category: csharp
+  tags: [testing, test-doubles]
+  prompt: |
+    A unit test builds `ReminderJob` with a `StubClock` fixed at 2 April, a `FakeStore` that
+    keeps invoices in a list, and a `SpyMailer` that records every message. It runs the job and
+    then asserts that `spyMailer.Sent` contains exactly one message. Which double is acting as
+    a mock in that test?
+  options:
+    - text: "The clock, because it replaces a system dependency"
+    - text: "The store, because it is a working in-memory implementation"
+    - text: "The mailer, because the test's assertion is made against it"
+      correct: true
+    - text: "None; only doubles generated by a mocking library are mocks"
+  explanation: |
+    A stub supplies canned answers so the code can run (the fixed clock). A fake is a working
+    but simplified implementation (the in-memory store); here it is also only feeding data in.
+    A double becomes a mock, or a spy, when the test verifies how it was used, as Microsoft's
+    unit testing guidance puts it: it stays a fake until it enters an assert. Libraries such as
+    Moq can generate doubles, but hand-written ones are just as much stubs, fakes and mocks,
+    and they are often easier to read. Naming them precisely tells readers which objects the
+    test is checking.
+
+- key: csharp-professional-20
+  type: multiple
+  category: csharp
+  tags: [publishing, native-aot, trimming]
+  prompt: |
+    Which statements about publishing with `PublishAot=true` (Native AOT) are accurate? Select
+    all that apply.
+  options:
+    - text: "Runtime code generation such as `System.Reflection.Emit` is not available"
+      correct: true
+    - text: "Loading assemblies dynamically at run time, for example with `Assembly.LoadFile`, is not supported"
+      correct: true
+    - text: "The app is trimmed, so reflection over code the trimmer cannot see may break, and the build reports warnings for it"
+      correct: true
+    - text: "The result still needs the .NET runtime installed on the target machine"
+  explanation: |
+    Native AOT compiles IL to native code at publish time and ships no JIT, so nothing can be
+    compiled at run time: no `Reflection.Emit` and no dynamically loaded assemblies. It always
+    implies trimming and single-file output, which is why reflection-heavy code (classic
+    serializers, for example) produces trim and AOT warnings that you must fix and test. The
+    output is self-contained: it runs without an installed runtime, starts fast and uses less
+    memory, but it is built per OS and architecture and takes longer to compile. Set
+    `PublishAot` in the project file so the analyzers warn during ordinary builds too.
+
+- key: csharp-professional-21
+  type: true_false
+  category: csharp
+  tags: [nuget, versioning]
+  prompt: |
+    True or false: `<PackageReference Include="Contoso.Json" Version="4.1.0" />` pins the
+    project to exactly version 4.1.0 of the package.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. In NuGet a bare version is a minimum: "4.1.0" means 4.1.0 or higher, and NuGet
+    resolves it to the lowest version that satisfies every requirement in the dependency graph.
+    It usually picks 4.1.0, but if another package requires `[4.2,5.0)` the project gets the
+    lowest version in that range instead. An exact pin is written `[4.1.0]`, and Microsoft
+    advises against tight pins and upper bounds on packages you do not own. For repeatable
+    restores, commit a `packages.lock.json` and restore with `--locked-mode` in CI.

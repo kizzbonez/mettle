@@ -1,0 +1,19 @@
+title: Back-Office Container
+summary: Write the scope of a small dependency injection container that keeps singleton, scoped and transient lifetimes, refuses a captive dependency, and disposes what each scope built, newest first.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Keeps one instance per container, per scope, or per request as registered
+    file: 02-lifetimes.cs
+    hidden: true
+  - name: Refuses a scoped service inside a singleton and allows longer lifetimes
+    file: 03-captive.cs
+    hidden: true
+  - name: Disposes what each scope and the container own, newest first, once
+    file: 04-disposal.cs
+    hidden: true

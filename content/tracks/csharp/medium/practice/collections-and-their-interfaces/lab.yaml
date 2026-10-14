@@ -1,0 +1,19 @@
+title: Restaurant Kitchen
+summary: Cook orders from a queue, expose what was served through a read-only wrapper that stays current, and count dishes from any sequence into a sorted dictionary with a case-insensitive comparer.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Cooks orders in the order they arrived
+    file: 02-orders.cs
+    hidden: true
+  - name: Shows what was served without letting callers change it
+    file: 03-served.cs
+    hidden: true
+  - name: Tallies any sequence in alphabetical order, ignoring case
+    file: 04-tally.cs
+    hidden: true

@@ -1,0 +1,703 @@
+- key: csharp-medium-01
+  type: single
+  category: csharp
+  tags: [enums, flags]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var a = Access.Read | Access.Delete;
+    Console.WriteLine(a);
+    Console.WriteLine((int)a);
+
+    [Flags]
+    enum Access { None = 0, Read = 1, Write = 2, Delete = 4 }
+    ```
+  options:
+    - text: "`Read, Delete`, then `5`"
+      correct: true
+    - text: "`5`, then `5`"
+    - text: "`Delete`, then `4`, because the larger flag wins"
+    - text: "`Read | Delete`, then `5`"
+  explanation: |
+    `|` combines the bits of `Read` (1) and `Delete` (4), giving the value 5. Because the enum is
+    marked `[Flags]`, `ToString` lists every member contained in the value, separated by a comma
+    and a space: `Read, Delete`. Without `[Flags]`, 5 matches no single member and would print as
+    `5`. Nothing is lost when flags are combined, so no flag "wins", and `ToString` never prints
+    C# operators such as `|`.
+
+- key: csharp-medium-02
+  type: single
+  category: csharp
+  tags: [enums, default-values]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var level = (Level)7;
+    Console.WriteLine($"{level} {(int)Level.High} {default(Level)}");
+
+    enum Level { Low = 1, Medium, High }
+    ```
+  options:
+    - text: "`7 3 0`"
+      correct: true
+    - text: "`High 3 Low`"
+    - text: "`7 3 Low`"
+    - text: Nothing; the cast `(Level)7` throws `InvalidCastException`
+  explanation: |
+    Any integer can be cast to an enum, defined or not, and a value with no matching member prints
+    as its number, so the first part is `7`. Members count up from the previous value, so `Medium`
+    is 2 and `High` is 3. The default value of every enum is the all-zero value, `(Level)0`, even
+    when no member has that value; it prints as `0`, not `Low`, because `Low` is 1. This is why an
+    enum should have a sensible member for 0, and why numbers from outside should be checked with
+    `Enum.IsDefined`.
+
+- key: csharp-medium-03
+  type: single
+  category: csharp
+  tags: [structs, value-semantics, copying]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var a = new Counter { Value = 1 };
+    var b = a;
+    b.Value = 5;
+    var list = new List<Counter> { a };
+    var c = list[0];
+    c.Value = 9;
+    Console.WriteLine($"{a.Value} {b.Value} {list[0].Value}");
+
+    struct Counter { public int Value; }
+    ```
+  options:
+    - text: "`1 5 1`"
+      correct: true
+    - text: "`5 5 9`"
+    - text: "`1 5 9`"
+    - text: "`5 5 1`"
+  explanation: |
+    `Counter` is a struct, a value type, so every assignment copies the whole value. `b = a` makes an
+    independent copy, so changing `b` leaves `a` at 1. Adding `a` to the list stores another copy,
+    and reading `list[0]` hands out yet another copy, so changing `c` does not touch the element
+    in the list. With a class, all of these variables would share one object and the program would
+    print `9 9 9`. To change a struct stored in a list, change a copy and assign it back with
+    `list[0] = c;`, or better, make the struct immutable.
+
+- key: csharp-medium-04
+  type: multiple
+  category: csharp
+  tags: [equality, hashing, boxing]
+  prompt: |
+    Which statements about equality in C# are true? Select all that apply.
+  options:
+    - text: For a class that overrides nothing, `a == b` is `false` for two separate objects that hold the same data
+      correct: true
+    - text: Overriding `Equals` without `GetHashCode` can make `HashSet<T>.Contains` return `false` for an object that `Equals` says is in the set
+      correct: true
+    - text: "`==` compiles for any struct and compares every field"
+    - text: "`ReferenceEquals(5, 5)` is `true` because the two values are equal"
+  explanation: |
+    A plain class uses reference equality: `==` and `Equals` ask whether two references point at
+    the same object. Hash-based collections pick a bucket with `GetHashCode` before calling
+    `Equals`, so equal objects must have equal hash codes; with the default, identity-based hash
+    code, an equal object is looked for in the wrong bucket. A struct gets value equality through
+    `Equals`, but no `==` operator unless it declares one (`a == b` is error CS0019; records and
+    tuples are the exceptions). `ReferenceEquals` takes `object` parameters, so each `5` is boxed
+    into its own object, and two different boxes are never the same reference.
+
+- key: csharp-medium-05
+  type: single
+  category: csharp
+  tags: [boxing, unboxing]
+  prompt: |
+    What happens when this program runs?
+
+    ```csharp
+    int n = 10;
+    object o = n;
+    n++;
+    long big = (long)o;
+    Console.WriteLine($"{n} {big}");
+    ```
+  options:
+    - text: It prints `11 10`
+    - text: It prints `11 11`
+    - text: It throws `InvalidCastException` at `(long)o`
+      correct: true
+    - text: It does not compile, because an `object` cannot be cast to `long`
+  explanation: |
+    `object o = n` boxes the value: a new object holding a *copy* of 10, so `n++` would not affect
+    it. The program never gets to print, though. Unboxing must name the exact type that was boxed.
+    The box holds an `int`, and asking for a `long` throws `InvalidCastException` ("Unable to cast
+    object of type 'System.Int32' to type 'System.Int64'"), even though an `int` converts to a
+    `long` implicitly. The compiler accepts the cast because an `object` *might* hold a boxed
+    `long`. The fix is `(long)(int)o`: unbox to `int`, then convert.
+
+- key: csharp-medium-06
+  type: single
+  category: csharp
+  tags: [inheritance, virtual, override, hiding]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    Base b = new Derived();
+    Console.WriteLine($"{b.A()} {b.B()} {((Derived)b).B()}");
+
+    class Base
+    {
+        public virtual string A() => "base-A";
+        public string B() => "base-B";
+    }
+
+    class Derived : Base
+    {
+        public override string A() => "derived-A";
+        public new string B() => "derived-B";
+    }
+    ```
+  options:
+    - text: "`derived-A base-B derived-B`"
+      correct: true
+    - text: "`derived-A derived-B derived-B`"
+    - text: "`base-A base-B derived-B`"
+    - text: "`base-A base-B base-B`"
+  explanation: |
+    `A` is virtual and `Derived` overrides it, so a call through a `Base` variable still runs the
+    version for the object's run-time type: `derived-A`. `B` is not virtual; `Derived` *hides* it
+    with `new`. For a hidden member, the variable's compile-time type decides, so `b.B()` runs
+    `Base.B` and the same object cast to `Derived` runs `Derived.B`. One object giving two answers
+    is why hiding is rarely what you want; use `virtual` and `override` for polymorphism.
+
+- key: csharp-medium-07
+  type: multiple
+  category: csharp
+  tags: [inheritance, abstract, sealed, protected]
+  prompt: |
+    Which statements are true? Select all that apply.
+  options:
+    - text: An abstract class can have constructors and fully implemented methods
+      correct: true
+    - text: A non-abstract class that derives from an abstract class must override every abstract member it inherits
+      correct: true
+    - text: A sealed class can be used as a base class as long as it declares no virtual members
+    - text: A `protected` member can be used by any code in the same project
+  explanation: |
+    An abstract class is an incomplete base: it cannot be instantiated, but it can contain
+    constructors (run by derived constructors through `base(...)`), fields and ordinary methods
+    alongside its abstract members. Any concrete derived class must override all of those abstract
+    members, or the compiler reports CS0534. `sealed` forbids derivation completely, whatever the
+    class contains (CS0509). `protected` means "this class and derived classes"; access for all code
+    in the same assembly is what `internal` means.
+
+- key: csharp-medium-08
+  type: single
+  category: csharp
+  tags: [interfaces, default-interface-methods]
+  prompt: |
+    What happens when you build this program?
+
+    ```csharp
+    var bot = new Bot();
+    IGreeter greeter = bot;
+    Console.WriteLine(greeter.Greet());
+    Console.WriteLine(bot.Greet());
+
+    interface IGreeter
+    {
+        string Name { get; }
+        string Greet() => $"Hello, {Name}";
+    }
+
+    class Bot : IGreeter
+    {
+        public string Name => "R2";
+    }
+    ```
+  options:
+    - text: It builds and prints `Hello, R2` twice
+    - text: "It fails with error CS1061 on `bot.Greet()`: a default interface method can be called only through the interface type"
+      correct: true
+    - text: "It fails because `Bot` does not implement the interface member `Greet`"
+    - text: It builds, and the second line prints an empty string because `Bot` has no `Greet` of its own
+  explanation: |
+    `Greet` has a body in the interface, so it is a **default interface method**: `Bot` satisfies
+    the interface without writing it. The default implementation belongs to the interface, not to
+    the class, so it is reachable only through an expression of type `IGreeter`. `greeter.Greet()`
+    is fine; `bot.Greet()` has static type `Bot`, which has no such member, so the compiler reports
+    CS1061. Either call it through the interface or give `Bot` its own public `Greet`.
+
+- key: csharp-medium-09
+  type: single
+  category: csharp
+  tags: [interfaces, icomparable, sorting]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var jobs = new List<Job> { new Job("b", 1), new Job("a", 3), new Job("c", 3) };
+    jobs.Sort();
+    Console.WriteLine(string.Join(" ", jobs.Select(j => j.Name)));
+
+    class Job : IComparable<Job>
+    {
+        public Job(string name, int priority) { Name = name; Priority = priority; }
+        public string Name { get; }
+        public int Priority { get; }
+
+        public int CompareTo(Job? other)
+        {
+            if (other is null) return 1;
+            int byPriority = other.Priority.CompareTo(Priority);
+            return byPriority != 0 ? byPriority : string.CompareOrdinal(Name, other.Name);
+        }
+    }
+    ```
+  options:
+    - text: "`a c b`"
+      correct: true
+    - text: "`b a c`"
+    - text: "`c a b`"
+    - text: "`b c a`"
+  explanation: |
+    `Sort()` with no arguments uses `CompareTo`. A negative result puts this instance first.
+    Comparing `other.Priority` with `Priority`, the reverse of the usual order, sorts the highest
+    priority first, so both priority-3 jobs come before `b`. On a tie, the names are compared in
+    the normal direction, so `a` comes before `c`. Swapping the receiver and the argument is the
+    standard way to reverse one key while keeping the others ascending.
+
+- key: csharp-medium-10
+  type: single
+  category: csharp
+  tags: [records, with-expressions, equality]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var p = new Point(1, 2);
+    var q = p with { Y = 5 };
+    var r = q with { Y = 2 };
+    Console.WriteLine($"{p == r} {ReferenceEquals(p, r)} {q}");
+
+    record Point(int X, int Y);
+    ```
+  options:
+    - text: "`True False Point { X = 1, Y = 5 }`"
+      correct: true
+    - text: "`False False Point { X = 1, Y = 5 }`"
+    - text: "`True True Point { X = 1, Y = 5 }`"
+    - text: Nothing; it fails to compile because positional record properties are read-only and `with` cannot change them
+  explanation: |
+    A `with` expression copies the record into a **new** object and then sets the listed
+    properties; positional properties are `init`, which `with` is allowed to set. `r` ends up with
+    the same values as `p`, and records generate value equality, so `p == r` is `True`, while
+    `ReferenceEquals` confirms that they are different objects. The generated `ToString` prints the
+    type name and every property in braces.
+
+- key: csharp-medium-11
+  type: true_false
+  category: csharp
+  tags: [records, immutability, with-expressions]
+  prompt: |
+    True or false: in the code below, the `with` expression gives `copy` its own new list, so
+    adding to `copy.Members` does not change `team.Members`.
+
+    ```csharp
+    var team = new Team("Blue", new List<string> { "Ada" });
+    var copy = team with { Name = "Red" };
+    copy.Members.Add("Grace");
+
+    record Team(string Name, List<string> Members);
+    ```
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. A `with` expression makes a **shallow** copy: it copies each property's value, and the
+    value of a reference-type property is a reference. Both records point at the same
+    `List<string>`, so after the `Add`, `team.Members` has two names as well. `init` only stops
+    the property from being pointed at another list; it does not freeze the list. For deep
+    immutability, store immutable or read-only collections, or create a new list explicitly:
+    `team with { Members = new List<string>(team.Members) }`.
+
+- key: csharp-medium-12
+  type: single
+  category: csharp
+  tags: [properties, field-keyword, null-conditional-assignment]
+  prompt: |
+    What does this C# 14 program print?
+
+    ```csharp
+    int calls = 0;
+    Box? a = new Box();
+    Box? b = null;
+    a?.Size = -5;
+    b?.Size = Log(3);
+    a?.Size += 2;
+    Console.WriteLine($"{a?.Size} {calls}");
+
+    int Log(int value) { calls++; return value; }
+
+    class Box
+    {
+        public int Size { get; set => field = Math.Max(0, value); }
+    }
+    ```
+  options:
+    - text: "`2 0`"
+      correct: true
+    - text: "`-3 1`"
+    - text: "`2 1`"
+    - text: Nothing; `?.` cannot appear on the left of an assignment
+  explanation: |
+    The setter uses the C# 14 `field` keyword to store into the compiler's backing field, and it
+    clamps negative values to 0, so `a?.Size = -5` stores 0 and `a?.Size += 2` makes it 2. C# 14
+    also allows `?.` on the left of `=` and compound assignments: when the receiver is `null`, the
+    whole assignment is skipped, **including the right-hand side**, so `Log` is never called for
+    `b` and `calls` stays 0. Only `++` and `--` are not allowed in this form.
+
+- key: csharp-medium-13
+  type: multiple
+  category: csharp
+  tags: [access-modifiers, encapsulation]
+  prompt: |
+    A class `Engine` is compiled into one assembly. A class `TurboEngine : Engine` is written in a
+    *different* assembly. Which members of `Engine` can code inside `TurboEngine` use? Select all
+    that apply.
+  options:
+    - text: A `protected` member
+      correct: true
+    - text: A `protected internal` member
+      correct: true
+    - text: A `private protected` member
+    - text: An `internal` member
+  explanation: |
+    `protected` opens a member to derived classes wherever they are. `protected internal` is the
+    *union* of `protected` and `internal`: derived classes anywhere, or any code in the same
+    assembly. `private protected` is the *intersection*: derived classes, but only those in the
+    same assembly, so `TurboEngine` is excluded. `internal` means the same assembly only, and
+    being a derived class does not help.
+
+- key: csharp-medium-14
+  type: single
+  category: csharp
+  tags: [generics, constraints]
+  prompt: |
+    Given this method:
+
+    ```csharp
+    static T Max<T>(T a, T b) where T : IComparable<T> => a.CompareTo(b) >= 0 ? a : b;
+    ```
+
+    Which call fails to compile?
+  options:
+    - text: "`Max(3, 7)`"
+    - text: "`Max(\"apple\", \"pear\")`"
+    - text: "`Max(new object(), new object())`"
+      correct: true
+    - text: "`Max(2.5, 1.0)`"
+  explanation: |
+    The constraint `where T : IComparable<T>` lets the body call `CompareTo` and, in return,
+    requires every type argument to implement `IComparable<T>`. `int`, `string` and `double` all
+    do, and the compiler infers `T` from the arguments. `object` does not, so the call fails with
+    error CS0311: "There is no implicit reference conversion from 'object' to
+    'System.IComparable<object>'". The mistake is caught at compile time, which is the point of
+    generics over methods that take `object` and cast.
+
+- key: csharp-medium-15
+  type: single
+  category: csharp
+  tags: [generics, operators]
+  prompt: |
+    Why does this method not compile?
+
+    ```csharp
+    static bool Same<T>(T a, T b) => a == b;
+    ```
+  options:
+    - text: "`==` is not defined for every possible `T`, so the compiler rejects it (CS0019)"
+      correct: true
+    - text: A generic method cannot return `bool`
+    - text: "`T` must be given explicitly at the call site before `==` can be used"
+    - text: Generic methods must be declared inside a generic class
+  explanation: |
+    Inside a generic method, the compiler allows only operations that are valid for *every* type
+    `T` could be. Not every type has an `==` operator (a struct without one does not), so error
+    CS0019 follows. Use `EqualityComparer<T>.Default.Equals(a, b)`, which works for any `T` and
+    uses `IEquatable<T>` when it is available, or add a constraint that provides what you need.
+    Note that `where T : class` would make `==` compile but compare references only.
+
+- key: csharp-medium-16
+  type: single
+  category: csharp
+  tags: [collections, interfaces, arrays]
+  prompt: |
+    What happens when this program runs?
+
+    ```csharp
+    ICollection<int> items = new[] { 1, 2, 3 };
+    items.Add(4);
+    Console.WriteLine(items.Count);
+    ```
+  options:
+    - text: It prints `4`
+    - text: It does not compile, because arrays do not implement `ICollection<T>`
+    - text: It compiles, and `Add` throws `NotSupportedException`
+      correct: true
+    - text: It prints `3`, because `Add` is silently ignored for arrays
+  explanation: |
+    Arrays implement `ICollection<T>` and `IList<T>`, so the assignment compiles. But an array has a
+    fixed size, so its `Add` throws `NotSupportedException` with "Collection was of a fixed size."
+    An interface promises the member exists, not that every implementation supports it; check
+    `IsReadOnly` (true for arrays) when it matters. If a method needs to add items, ask for a type
+    that really supports it, such as `List<T>`, or return a new collection instead.
+
+- key: csharp-medium-17
+  type: single
+  category: csharp
+  tags: [lambdas, closures, captured-variables]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var actions = new List<Func<int>>();
+    for (int i = 0; i < 3; i++)
+    {
+        actions.Add(() => i * 10);
+    }
+    Console.WriteLine(string.Join(",", actions.Select(f => f())));
+    ```
+  options:
+    - text: "`0,10,20`"
+    - text: "`30,30,30`"
+      correct: true
+    - text: "`20,20,20`"
+    - text: Nothing; a lambda cannot use a loop variable
+  explanation: |
+    A lambda captures the **variable**, not its value at the time the lambda is created. A `for`
+    loop has a single `i` for the whole loop, so all three lambdas share it, and they run only
+    after the loop has finished, when `i` is 3. A `foreach` loop is different: it creates a fresh
+    variable on each pass, so the same code with `foreach` over `0, 1, 2` prints `0,10,20`. To fix
+    the `for` version, copy `i` into a local inside the loop body and capture the copy.
+
+- key: csharp-medium-18
+  type: single
+  category: csharp
+  tags: [linq, deferred-execution]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var names = new List<string> { "ada", "bo" };
+    var shortNames = names.Where(n => n.Length <= 2);
+    names.Add("cy");
+    var snapshot = shortNames.ToList();
+    names.Add("di");
+    Console.WriteLine($"{shortNames.Count()} {snapshot.Count}");
+    ```
+  options:
+    - text: "`1 1`"
+    - text: "`2 2`"
+    - text: "`3 2`"
+      correct: true
+    - text: "`3 3`"
+  explanation: |
+    `Where` uses deferred execution: `shortNames` stores the query, not its results, and reads
+    `names` each time it is enumerated. `ToList()` runs it once, after `cy` was added, and keeps
+    the two matches `bo` and `cy` in a new list that never changes. `Count()` runs the query again
+    at the end, when `di` is there too, so it finds three. Use `ToList` or `ToArray` when you need
+    a fixed snapshot.
+
+- key: csharp-medium-19
+  type: single
+  category: csharp
+  tags: [linq, sorting, thenby]
+  prompt: |
+    The intent is to sort by age and then, for equal ages, by name. What does this print?
+
+    ```csharp
+    var people = new[] { ("bo", 30), ("ada", 25), ("cy", 25) };
+    var sorted = people.OrderBy(p => p.Item2).OrderBy(p => p.Item1);
+    Console.WriteLine(string.Join(" ", sorted.Select(p => p.Item1)));
+    ```
+  options:
+    - text: "`ada cy bo`"
+    - text: "`ada bo cy`"
+      correct: true
+    - text: "`cy ada bo`"
+    - text: Nothing; `OrderBy` cannot follow `OrderBy`
+  explanation: |
+    A second `OrderBy` starts a completely new sort by its own key, so the result is ordered by
+    name only: `ada bo cy`. The age order survives only among items with equal names, because the
+    sort is stable. The intended result, `ada cy bo`, needs `ThenBy`, which adds a tie-breaker to
+    the previous ordering: `people.OrderBy(p => p.Item2).ThenBy(p => p.Item1)`.
+
+- key: csharp-medium-20
+  type: multiple
+  category: csharp
+  tags: [linq, aggregation, empty-sequences]
+  prompt: |
+    `int[] empty = [];` Which of these calls throw an exception? Select all that apply.
+  options:
+    - text: "`empty.Sum()`"
+    - text: "`empty.Max()`"
+      correct: true
+    - text: "`empty.First()`"
+      correct: true
+    - text: "`empty.FirstOrDefault()`"
+  explanation: |
+    `Sum` of nothing is 0, a meaningful answer. `Max` (like `Min` and `Average`) of an empty
+    sequence of numbers has no meaningful answer, so it throws `InvalidOperationException`
+    ("Sequence contains no elements"). `First` throws for the same reason when there is no element.
+    `FirstOrDefault` returns `default(int)`, which is 0, instead of throwing; for an `int` that 0
+    cannot be told apart from a real element, so pass your own fallback, as in
+    `FirstOrDefault(-1)`, when the difference matters.
+
+- key: csharp-medium-21
+  type: true_false
+  category: csharp
+  tags: [linq, any, all]
+  prompt: |
+    True or false: `numbers.All(n => n > 100)` returns `false` when `numbers` is an empty sequence.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. `All` returns `true` unless it finds an element that fails the test, and an empty
+    sequence has no element to fail, so the answer is `true`. This is called being *vacuously*
+    true. It surprises people in checks such as "all payments are cleared", which then pass when
+    there are no payments at all. If an empty input should count as a failure, write
+    `numbers.Any() && numbers.All(...)`, materializing the sequence first if it is a query.
+
+- key: csharp-medium-22
+  type: single
+  category: csharp
+  tags: [pattern-matching, switch-expressions]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    Console.WriteLine($"{Kind(500)}|{Kind("hey")}|{Kind(2.0)}|{Kind(null)}");
+
+    static string Kind(object? o) => o switch
+    {
+        int n when n > 100 => "big int",
+        int => "int",
+        string { Length: > 3 } s => $"long {s}",
+        string => "short string",
+        null => "null",
+        _ => "other",
+    };
+    ```
+  options:
+    - text: "`big int|short string|other|null`"
+      correct: true
+    - text: "`big int|long hey|other|null`"
+    - text: "`int|short string|other|other`"
+    - text: "`big int|short string|other|other`"
+  explanation: |
+    Arms are tried from top to bottom. 500 is an `int` and the guard `n > 100` holds, so the first
+    arm wins. `"hey"` is a string of length 3, which fails `{ Length: > 3 }`, so it falls to the
+    plain `string` arm. `2.0` is a `double`, which matches no type arm and reaches the discard.
+    Type patterns never match `null`, so `null` passes them all and is caught by the constant
+    pattern `null` before the discard.
+
+- key: csharp-medium-23
+  type: single
+  category: csharp
+  tags: [pattern-matching, logical-patterns, precedence]
+  prompt: |
+    Which expression is `true` exactly when the `char c` is **not** a lowercase ASCII letter?
+  options:
+    - text: "`c is not >= 'a' and <= 'z'`"
+    - text: "`c is not (>= 'a' and <= 'z')`"
+      correct: true
+    - text: "`c is not 'a' or 'z'`"
+    - text: "`c is < 'a' and > 'z'`"
+  explanation: |
+    `not` binds more tightly than `and`, which binds more tightly than `or`. The first option
+    therefore means `(not >= 'a') and <= 'z'`: it is false for `{` and every other character above
+    `z`, which are not lowercase letters either. The compiler hints at the problem with warning
+    CS9336, "The pattern is redundant". The third means `(not 'a') or 'z'`, true for almost
+    everything. The fourth can never be true, since no character is both below `a` and above `z`.
+    The parentheses in the second option make `not` apply to the whole range.
+
+- key: csharp-medium-24
+  type: single
+  category: csharp
+  tags: [pattern-matching, list-patterns]
+  prompt: |
+    `int[] v = [1, 2, 3, 4];` Which of these patterns does **not** match `v`?
+  options:
+    - text: "`v is [1, ..]`"
+    - text: "`v is [.., 3, 4]`"
+    - text: "`v is [_, _, ..]`"
+    - text: "`v is [1, _, 4]`"
+      correct: true
+  explanation: |
+    A list pattern without a slice matches only sequences of exactly its length. `[1, _, 4]` has
+    three elements, so it rejects any array of four. The slice pattern `..` matches zero or more
+    elements, which is why `[1, ..]` (starts with 1), `[.., 3, 4]` (ends with 3, 4) and
+    `[_, _, ..]` (at least two elements) all match. To say "starts with 1 and ends with 4", write
+    `[1, .., 4]`.
+
+- key: csharp-medium-25
+  type: single
+  category: csharp
+  tags: [extension-methods, binding]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var r = new Report();
+    Console.WriteLine($"{r.Title()} {r.Footer()}");
+
+    class Report
+    {
+        public string Title() => "own";
+    }
+
+    static class ReportExtensions
+    {
+        public static string Title(this Report r) => "extension";
+        public static string Footer(this Report r) => "ext-footer";
+    }
+    ```
+  options:
+    - text: "`own ext-footer`"
+      correct: true
+    - text: "`extension ext-footer`"
+    - text: Nothing; the compiler reports that the call to `Title` is ambiguous
+    - text: Nothing; extension methods must be declared in a `public` class
+  explanation: |
+    The compiler first looks for a matching member on the type itself and considers extension
+    methods only when there is none. `Report` has its own `Title()`, so that wins and the extension
+    with the same signature is silently ignored; an extension can add behaviour but never replace
+    it. `Footer` exists only as an extension, so it is used. The static class may be internal, as
+    here; it must be static, non-generic and not nested.
+
+- key: csharp-medium-26
+  type: multiple
+  category: csharp
+  tags: [extension-members, csharp-14]
+  prompt: |
+    Which of these can a C# 14 `extension` block declare for a type you do not own? Select all
+    that apply.
+  options:
+    - text: An extension property, such as `public bool IsEmpty => !source.Any();`
+      correct: true
+    - text: A static extension member called on the type itself, such as `TimeSpan.FromWorkDays(2)`
+      correct: true
+    - text: A user-defined operator, such as `+` for two values of the extended type
+      correct: true
+    - text: An instance field that stores extra data inside each object of the extended type
+  explanation: |
+    Extension blocks extend the old `this` syntax, which allowed only instance methods, with
+    extension properties, static extension members (in a block whose receiver has no name) and
+    operators. They are still static code compiled into the enclosing static class: they can
+    compute from the receiver's accessible members, but they cannot add storage to the extended
+    type, so an extension property can only be computed, never backed by a field of its own.

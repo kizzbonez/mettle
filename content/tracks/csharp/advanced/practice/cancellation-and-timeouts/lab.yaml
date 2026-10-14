@@ -1,0 +1,19 @@
+title: Harbour Crane
+summary: Unload a ship one container at a time and stop cleanly when the token is canceled, then build a request with a deadline from a linked token source that tells a timeout apart from the caller's own cancellation.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Lifts one container at a time and passes the token on
+    file: 02-unload-in-order.cs
+    hidden: true
+  - name: Stops between containers and ends in the Canceled state
+    file: 03-unload-stops.cs
+    hidden: true
+  - name: Turns a passed deadline into a timeout but leaves the caller's cancellation alone
+    file: 04-deadline.cs
+    hidden: true

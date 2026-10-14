@@ -1,0 +1,19 @@
+title: Vending Machine
+summary: Validate two properties with the field keyword, make a credit that only its own class can change, add an indexer over private slots, and restock through a reference that may be null.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Refuses bad prices and keeps the stock from going negative
+    file: 02-slot.cs
+    hidden: true
+  - name: Takes only real coins and refunds the credit
+    file: 03-credit.cs
+    hidden: true
+  - name: Reads, writes and restocks slots by number
+    file: 04-slots-and-restock.cs
+    hidden: true

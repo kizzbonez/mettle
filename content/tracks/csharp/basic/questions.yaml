@@ -1,0 +1,679 @@
+- key: csharp-basic-01
+  type: single
+  category: csharp
+  tags: [dotnet, compilation]
+  prompt: |
+    What does the C# compiler produce when it builds a program, and how does that become
+    something the processor can run?
+  options:
+    - text: Intermediate language (IL) in an assembly, which the .NET runtime's just-in-time compiler turns into native code as the program runs
+      correct: true
+    - text: Native machine code for the current processor, which runs without any .NET runtime installed
+    - text: Nothing; the runtime reads the `.cs` source files and interprets them line by line every time
+    - text: JavaScript, which the .NET runtime runs in a built-in browser engine
+  explanation: |
+    The compiler translates C# into **intermediate language** (IL, or CIL) and stores it with a
+    description of your types (metadata) in an assembly, usually a `.dll`. IL is not tied to a
+    processor. When the program runs, the runtime's **JIT compiler** turns each method's IL into
+    native code the first time it is called. That is why one assembly runs on both x64 and Arm64
+    machines. C# is compiled, not interpreted, and an ordinary build needs the .NET runtime on
+    the machine that runs it.
+
+- key: csharp-basic-02
+  type: multiple
+  category: csharp
+  tags: [tooling, top-level-statements]
+  prompt: |
+    Which statements are true? Select all that apply.
+  options:
+    - text: "With top-level statements, the compiler generates the class and the entry-point method that contain them"
+      correct: true
+    - text: "`dotnet run hello.cs` builds and runs a single-file program without a project file"
+      correct: true
+    - text: "Every file of a project may contain its own top-level statements"
+    - text: "`<ImplicitUsings>enable</ImplicitUsings>` in the project file turns on warnings about possible null references"
+  explanation: |
+    Top-level statements are the body of an entry point that the compiler writes for you, so a
+    program needs no explicit `class Program` and `static void Main`. Since .NET 10,
+    `dotnet run hello.cs` (or `dotnet hello.cs`) runs a **file-based app** with no `.csproj`.
+    Only **one** file in a project may contain top-level statements, because a program has one
+    entry point. `ImplicitUsings` imports common namespaces such as `System` into every file; the
+    null warnings come from a different setting, `<Nullable>enable</Nullable>`.
+
+- key: csharp-basic-03
+  type: single
+  category: csharp
+  tags: [variables, var, types]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```csharp
+    var floor = 3;
+    floor = "third";
+    Console.WriteLine(floor);
+    ```
+  options:
+    - text: "It fails to compile: `floor` is an `int`, and a `string` cannot be assigned to it"
+      correct: true
+    - text: "It prints `third`, because `var` lets a variable hold any type"
+    - text: "It prints `3`, because the second assignment is ignored"
+    - text: "It compiles, then throws an exception at run time when the string is assigned"
+  explanation: |
+    `var` asks the compiler to infer the type from the initializer. `3` is an `int`, so `floor`
+    is an `int` for the rest of its life, exactly as if you had written `int floor = 3;`. The
+    second line is error CS0029, "Cannot implicitly convert type 'string' to 'int'". `var` is not
+    a dynamic "any" type, and type errors in C# are found by the compiler, before anything runs.
+
+- key: csharp-basic-04
+  type: single
+  category: csharp
+  tags: [strings, operators, interpolation]
+  prompt: |
+    What does this line print?
+
+    ```csharp
+    Console.WriteLine("Total: " + 2 + 3);
+    ```
+  options:
+    - text: "`Total: 23`"
+      correct: true
+    - text: "`Total: 5`"
+    - text: "`Total: 2 3`"
+    - text: Nothing; it does not compile, because a string and an int cannot be added
+  explanation: |
+    `+` is evaluated from left to right. `"Total: " + 2` is a string, `"Total: 2"`, so the next
+    `+ 3` appends the character `3` instead of adding numbers. Joining a string with any other
+    value is allowed and converts the value to text. To print `Total: 5`, write
+    `"Total: " + (2 + 3)` or, more readably, `$"Total: {2 + 3}"`.
+
+- key: csharp-basic-05
+  type: single
+  category: csharp
+  tags: [numbers, integer-division]
+  prompt: |
+    What does this line print?
+
+    ```csharp
+    Console.WriteLine($"{17 / 5} {-17 / 5} {-17 % 5} {17 / 5.0}");
+    ```
+  options:
+    - text: "`3 -3 -2 3.4`"
+      correct: true
+    - text: "`3.4 -3.4 -2 3.4`"
+    - text: "`3 -4 3 3.4`"
+    - text: "`3 -3 2 3.4`"
+  explanation: |
+    When both operands are integers, `/` is integer division and rounds **toward zero**: 3 and
+    -3, never -4. The remainder `%` takes the sign of the left operand, so `-17 % 5` is -2:
+    -3 × 5 is -15, and -17 is 2 below that. Only when one operand is a fractional type, as in `17 / 5.0`, is
+    the result 3.4. Answering -4 and 3 is the "round down" rule that some other languages use for
+    negative numbers.
+
+- key: csharp-basic-06
+  type: multiple
+  category: csharp
+  tags: [numbers, decimal, rounding]
+  prompt: |
+    Which of these expressions evaluate to `true`? Select all that apply.
+  options:
+    - text: "`0.1m + 0.2m == 0.3m`"
+      correct: true
+    - text: "`0.1 + 0.2 == 0.3`"
+    - text: "`Math.Round(2.5) == 2`"
+      correct: true
+    - text: "`Convert.ToInt32(7.9) == 7`"
+  explanation: |
+    `decimal` (the `m` suffix) stores decimal digits exactly, so 0.1 + 0.2 is exactly 0.3.
+    `double` stores binary fractions, and 0.1 + 0.2 is 0.30000000000000004, which is why money
+    belongs in `decimal`. `Math.Round` rounds a value exactly halfway to the **even** neighbour
+    by default, so 2.5 becomes 2; pass `MidpointRounding.AwayFromZero` to get 3.
+    `Convert.ToInt32(7.9)` rounds to the nearest integer, 8. Only a cast, `(int)7.9`, cuts the
+    fraction off to give 7.
+
+- key: csharp-basic-07
+  type: single
+  category: csharp
+  tags: [parsing, tryparse, out]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    bool ok = int.TryParse("4x2", out int n);
+    Console.WriteLine($"{ok} {n}");
+    ```
+  options:
+    - text: "`False 0`"
+      correct: true
+    - text: "`True 42`"
+    - text: "`False 4`"
+    - text: It throws a `FormatException`
+  explanation: |
+    `TryParse` never throws for bad text. It returns `false` and sets the `out` variable to 0.
+    It does not skip the letter to make 42, and it does not keep the digits it read before the
+    problem. `int.Parse("4x2")` is the method that would throw a `FormatException`. That is why
+    `TryParse` is the right choice for anything a person typed.
+
+- key: csharp-basic-08
+  type: single
+  category: csharp
+  tags: [strings, immutability]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    string code = " ab ";
+    code.Trim();
+    code.ToUpper();
+    Console.WriteLine($"[{code}]");
+    ```
+  options:
+    - text: "`[ ab ]`"
+      correct: true
+    - text: "`[AB]`"
+    - text: "`[ab]`"
+    - text: "`[ AB ]`"
+  explanation: |
+    Strings are **immutable**. `Trim` and `ToUpper` do not change `code`; each returns a new
+    string, and here both results are thrown away. The variable still holds `" ab "`. To keep
+    the changes, assign the result: `code = code.Trim().ToUpper();`, which gives `[AB]`. The
+    compiler does not warn about the discarded results, so this is an easy bug to miss.
+
+- key: csharp-basic-09
+  type: single
+  category: csharp
+  tags: [strings, split]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    string[] parts = "red,,blue,".Split(',');
+    Console.WriteLine(parts.Length);
+    ```
+  options:
+    - text: "`4`"
+      correct: true
+    - text: "`2`"
+    - text: "`3`"
+    - text: "`5`"
+  explanation: |
+    `Split` returns every piece between separators, including empty ones. The pieces are
+    `"red"`, `""` (between the two commas), `"blue"` and `""` (after the final comma), so there
+    are 4. Answering 2 counts only the non-empty pieces, which is what you get with
+    `StringSplitOptions.RemoveEmptyEntries`. Counting commas plus one, as here, is the reliable
+    rule for the default behavior.
+
+- key: csharp-basic-10
+  type: single
+  category: csharp
+  tags: [switch, control-flow]
+  prompt: |
+    What happens when this program is compiled and run?
+
+    ```csharp
+    string day = "Mon";
+    switch (day)
+    {
+        case "Mon":
+            Console.WriteLine("Maintenance");
+        case "Tue":
+            Console.WriteLine("Open");
+            break;
+    }
+    ```
+  options:
+    - text: "It fails to compile, because the `\"Mon\"` section does not end with `break`"
+      correct: true
+    - text: "It prints `Maintenance` and then `Open`, falling through as in C"
+    - text: "It prints only `Maintenance`, because a missing `break` is added automatically"
+    - text: "It compiles with a warning and prints `Maintenance`"
+  explanation: |
+    C# never lets one `switch` section fall through into the next. Every section that contains
+    statements must end with `break`, `return`, `throw` or `goto`, so the compiler reports error
+    CS0163, "Control cannot fall through from one case label ('case "Mon":') to another". This
+    rule removes a classic C bug. To share code between values, stack the labels instead:
+    `case "Sat": case "Sun":` followed by one section.
+
+- key: csharp-basic-11
+  type: single
+  category: csharp
+  tags: [conditions, short-circuit, operators]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    int calls = 0;
+    bool a = Check(false) && Check(true);
+    bool b = Check(true) || Check(false);
+    Console.WriteLine($"{a} {b} {calls}");
+
+    bool Check(bool result)
+    {
+        calls++;
+        return result;
+    }
+    ```
+  options:
+    - text: "`False True 2`"
+      correct: true
+    - text: "`False True 4`"
+    - text: "`True True 2`"
+    - text: "`False False 4`"
+  explanation: |
+    `&&` and `||` **short-circuit**: they evaluate the right-hand side only when it can change
+    the result. `false && anything` is already `false`, so the second `Check` is not called.
+    `true || anything` is already `true`, so again only one call happens. That makes two calls
+    in total. Short-circuiting is what makes `s != null && s.Length > 0` safe. The operators `&`
+    and `|` evaluate both sides and would give 4.
+
+- key: csharp-basic-12
+  type: single
+  category: csharp
+  tags: [loops, do-while]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    int n = 10;
+    int steps = 0;
+    do
+    {
+        n -= 4;
+        steps++;
+    } while (n > 0);
+    Console.WriteLine($"{n} {steps}");
+    ```
+  options:
+    - text: "`-2 3`"
+      correct: true
+    - text: "`2 2`"
+    - text: "`-2 2`"
+    - text: "`6 1`"
+  explanation: |
+    Trace it: 10 becomes 6 (step 1), then 2 (step 2), then -2 (step 3). The condition is checked
+    **after** each run of the body, so the loop stops only once `n > 0` is false, which is when
+    `n` is -2. Answering `2 2` stops one iteration early, as if the condition were checked before
+    subtracting. A `do` loop always runs its body at least once; a `while` loop checks first.
+
+- key: csharp-basic-13
+  type: single
+  category: csharp
+  tags: [methods, ref, parameters]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    int a = 5;
+    int b = 5;
+    AddOne(a);
+    AddOneRef(ref b);
+    Console.WriteLine($"{a} {b}");
+
+    static void AddOne(int x) => x++;
+    static void AddOneRef(ref int x) => x++;
+    ```
+  options:
+    - text: "`5 6`"
+      correct: true
+    - text: "`6 6`"
+    - text: "`5 5`"
+    - text: "Nothing: `ref` can only be used with reference types"
+  explanation: |
+    By default an argument is **passed by value**: `AddOne` receives a copy of `a` and increments
+    the copy, so `a` stays 5. `ref` passes the variable itself, so `AddOneRef` changes `b` to 6.
+    `ref` works with any type, and it must be written both in the method's parameter list and at
+    the call, as in `AddOneRef(ref b)`. In everyday code, returning the new value is usually
+    clearer than `ref`.
+
+- key: csharp-basic-14
+  type: multiple
+  category: csharp
+  tags: [methods, optional-arguments, named-arguments]
+  prompt: |
+    Given this method, which calls compile? Select all that apply.
+
+    ```csharp
+    static class Shop
+    {
+        public static decimal Cost(decimal weight, int boxes = 1, bool express = false) =>
+            (weight + boxes) * (express ? 2 : 1);
+    }
+    ```
+  options:
+    - text: "`Shop.Cost(2m, express: true)`"
+      correct: true
+    - text: "`Shop.Cost(express: true, weight: 2m)`"
+      correct: true
+    - text: "`Shop.Cost(2m, , true)`"
+    - text: "`Shop.Cost(boxes: 2)`"
+  explanation: |
+    `boxes` and `express` are optional because they have default values. A **named argument**
+    skips straight to a parameter, so `Cost(2m, express: true)` leaves `boxes` at 1, and named
+    arguments may come in any order when all of them are named. C# has no syntax for an empty
+    gap: `Cost(2m, , true)` is error CS0839, "Argument missing". `weight` has no default, so
+    leaving it out is error CS7036, which names the missing required parameter.
+
+- key: csharp-basic-15
+  type: single
+  category: csharp
+  tags: [lists, loops, exceptions]
+  prompt: |
+    What happens when this program runs?
+
+    ```csharp
+    List<string> names = ["Ama", "", "Bo"];
+    foreach (string name in names)
+    {
+        if (name == "")
+        {
+            names.Remove(name);
+        }
+    }
+    Console.WriteLine(names.Count);
+    ```
+  options:
+    - text: "It throws an `InvalidOperationException`, because the list changed during the `foreach` loop"
+      correct: true
+    - text: "It prints `2`"
+    - text: "It prints `3`, because `Remove` inside a loop is ignored"
+    - text: "It fails to compile, because the loop variable is read-only"
+  explanation: |
+    A `foreach` loop over a `List<T>` checks on every step that the list has not changed. After
+    `Remove`, the next step throws `InvalidOperationException`: "Collection was modified;
+    enumeration operation may not execute." The loop variable is read-only, but calling a
+    method on the list is allowed, so it compiles. To remove while looping, walk the indexes
+    backwards with `for` and `RemoveAt`, or use `names.RemoveAll(...)` after the loop.
+
+- key: csharp-basic-16
+  type: single
+  category: csharp
+  tags: [arrays, lists, references]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    int[] a = [1, 2, 3];
+    int[] b = a;
+    b[0] = 9;
+    List<int> c = new List<int>(a);
+    c[1] = 8;
+    Console.WriteLine($"{a[0]} {a[1]}");
+    ```
+  options:
+    - text: "`9 2`"
+      correct: true
+    - text: "`1 2`"
+    - text: "`9 8`"
+    - text: "`1 8`"
+  explanation: |
+    Arrays are reference types. `int[] b = a;` copies the **reference**, so `a` and `b` are two
+    names for one array, and writing through `b` changes what `a` sees: 9. `new List<int>(a)`
+    creates a **new** list with copies of the elements, so changing `c[1]` leaves the array
+    alone: 2. Assignment shares; constructing a new collection copies.
+
+- key: csharp-basic-17
+  type: single
+  category: csharp
+  tags: [dictionaries]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var stock = new Dictionary<string, int>();
+    stock["bolt"] = 5;
+    stock["nut"] = 2;
+    stock["bolt"] = 8;
+    stock["nut"] += 1;
+    Console.WriteLine($"{stock.Count} {stock["bolt"]} {stock["nut"]} {stock.GetValueOrDefault("gear")}");
+    ```
+  options:
+    - text: "`2 8 3 0`"
+      correct: true
+    - text: "`3 13 3 0`"
+    - text: "`2 13 3 0`"
+    - text: It throws `KeyNotFoundException` for `"gear"`
+  explanation: |
+    Assigning through the indexer **adds** a missing key and **replaces** the value of an
+    existing one, so `bolt` is 8 (not 13) and there are still two keys. `stock["nut"] += 1`
+    reads 2 and stores 3. Reading a missing key with the indexer would throw
+    `KeyNotFoundException`, but `GetValueOrDefault` returns the default, 0, instead. Only
+    `Add("bolt", 8)` would have thrown, because `Add` refuses duplicate keys.
+
+- key: csharp-basic-18
+  type: multiple
+  category: csharp
+  tags: [hashset, collections]
+  prompt: |
+    Which statements about `HashSet<T>` are true? Select all that apply.
+  options:
+    - text: "`Add` returns `false` when the value is already in the set, and the set is unchanged"
+      correct: true
+    - text: "A `HashSet<T>` returns its values in the order they were added"
+    - text: "`Contains` stays fast as the set grows, unlike `Contains` on a `List<T>`, which checks the elements one by one"
+      correct: true
+    - text: "`IntersectWith` returns a new set and leaves the original unchanged"
+  explanation: |
+    A set holds each value once, and `Add` tells you whether the value was new, which makes "have
+    I seen this?" a single call. Sets are built for fast lookups, while `List<T>.Contains`
+    compares with every element in turn. A set promises **no** order: sort its values if order
+    matters. `IntersectWith`, `UnionWith` and `ExceptWith` change the set they are called on and
+    return nothing, so copy the set first, with `new HashSet<T>(original)`, to keep the original.
+
+- key: csharp-basic-19
+  type: single
+  category: csharp
+  tags: [classes, references, equality]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var a = new Box { Size = 1 };
+    var b = a;
+    b.Size = 2;
+    var c = new Box { Size = 2 };
+    Console.WriteLine($"{a.Size} {a == b} {a == c}");
+
+    class Box
+    {
+        public int Size { get; set; }
+    }
+    ```
+  options:
+    - text: "`2 True False`"
+      correct: true
+    - text: "`1 False False`"
+    - text: "`2 True True`"
+    - text: "`1 True True`"
+  explanation: |
+    A class is a reference type. `var b = a;` copies the reference, so there is one `Box` with
+    two names, and setting `b.Size` changes what `a.Size` shows: 2. For classes, `==` compares
+    **references** by default: `a == b` is `true` because they are the same object, and
+    `a == c` is `false` because `c` is a different object, even though its `Size` is equal.
+
+- key: csharp-basic-20
+  type: single
+  category: csharp
+  tags: [classes, properties]
+  prompt: |
+    This program does not compile. Why?
+
+    ```csharp
+    var badge = new Badge("Ines");
+    badge.Name = "Omar";
+
+    class Badge
+    {
+        public Badge(string name) => Name = name;
+
+        public string Name { get; }
+    }
+    ```
+  options:
+    - text: "`Name` has only a `get` accessor, so it can be set in the constructor but nowhere else"
+      correct: true
+    - text: "`Name` is private, because properties are private unless declared `public`"
+    - text: "A constructor cannot be written with `=>`"
+    - text: "`badge` was declared with `var`, so its properties cannot be assigned"
+  explanation: |
+    `{ get; }` makes a **read-only** auto-implemented property: the constructor may set it, and
+    every other assignment is error CS0200, "Property or indexer 'Badge.Name' cannot be assigned
+    to". The property is `public`, so reading it from outside is fine. Expression-bodied
+    constructors are allowed, and `var` has nothing to do with it. To allow changes, use
+    `{ get; set; }`; to allow setting only in an object initializer, use `{ get; init; }`.
+
+- key: csharp-basic-21
+  type: single
+  category: csharp
+  tags: ["null", nullable, operators]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    string? name = null;
+    int? length = name?.Length;
+    Console.WriteLine(length ?? -1);
+    name ??= "Ada";
+    Console.WriteLine(name.Length);
+    ```
+  options:
+    - text: "`-1`, then `3`"
+      correct: true
+    - text: It throws a `NullReferenceException` on the second line
+    - text: "`0`, then `3`"
+    - text: "Nothing: it does not compile, because `name` may be `null` on the last line"
+  explanation: |
+    `name?.Length` gives `null` instead of throwing when `name` is `null`, which is why its type
+    is `int?`. `?? -1` replaces that `null` with -1. `??=` assigns `"Ada"` only because `name` is
+    `null`, and after it the compiler's null-state analysis knows `name` is not `null`, so the
+    last line compiles without even a warning and prints 3. A missing value never silently
+    becomes 0.
+
+- key: csharp-basic-22
+  type: true_false
+  category: csharp
+  tags: ["null", nullable-reference-types]
+  prompt: |
+    True or false: writing the null-forgiving operator, as in `name!.Length`, makes the compiler
+    insert a check, so the line can no longer throw a `NullReferenceException`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    `!` only tells the compiler "trust me, this is not null" and silences its warning. It
+    generates no check: if `name` is `null` at run time, `name!.Length` still throws
+    `NullReferenceException`, and now without any warning that it might. Nullable annotations
+    and `!` exist only at compile time. Prefer a real check (`is not null`), a default with
+    `??`, or a non-nullable type.
+
+- key: csharp-basic-23
+  type: single
+  category: csharp
+  tags: [exceptions, try-catch-finally]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    try
+    {
+        Console.Write("A ");
+        int.Parse("x");
+        Console.Write("B ");
+    }
+    catch (FormatException)
+    {
+        Console.Write("C ");
+    }
+    finally
+    {
+        Console.Write("D ");
+    }
+    Console.WriteLine("E");
+    ```
+  options:
+    - text: "`A C D E`"
+      correct: true
+    - text: "`A B C D E`"
+    - text: "`A C E`"
+    - text: "`A C D` and then the program stops"
+  explanation: |
+    `int.Parse("x")` throws a `FormatException`, so the rest of the `try` block, including
+    `B`, is skipped. The matching `catch` runs (`C`), then the `finally` block, which always runs
+    when control leaves the `try` (`D`). Because the exception was handled, the program then
+    continues after the whole statement and prints `E`.
+
+- key: csharp-basic-24
+  type: multiple
+  category: csharp
+  tags: [exceptions, catch]
+  prompt: |
+    A method throws `new ArgumentOutOfRangeException(nameof(day), "Too early.")`. Which `catch`
+    clauses, placed around the call, catch it? Select all that apply.
+  options:
+    - text: "`catch (ArgumentOutOfRangeException)`"
+      correct: true
+    - text: "`catch (ArgumentException)`"
+      correct: true
+    - text: "`catch (Exception)`"
+      correct: true
+    - text: "`catch (InvalidOperationException)`"
+  explanation: |
+    A `catch` clause handles its exception type **and every type derived from it**.
+    `ArgumentOutOfRangeException` derives from `ArgumentException`, which derives from
+    `Exception`, so all three of those clauses match. `InvalidOperationException` is a separate
+    branch of the family and does not. This is also why specific clauses must come first: a
+    `catch (Exception)` placed first would catch everything, and the compiler rejects any clause
+    after it with error CS0160.
+
+- key: csharp-basic-25
+  type: single
+  category: csharp
+  tags: [input, parsing, loops]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    List<string> lines = ["# note", "3", "", "x", "5"];
+    List<int> bad = [];
+    for (int i = 0; i < lines.Count; i++)
+    {
+        string line = lines[i].Trim();
+        if (line.Length == 0 || line.StartsWith('#'))
+        {
+            continue;
+        }
+        if (!int.TryParse(line, out int value))
+        {
+            bad.Add(i + 1);
+        }
+    }
+    Console.WriteLine(string.Join(",", bad));
+    ```
+  options:
+    - text: "`4`"
+      correct: true
+    - text: "`3`"
+    - text: "`2`"
+    - text: "`1`"
+  explanation: |
+    The loop numbers **every** line, including the note and the blank line it skips, so the
+    numbers match what a person sees in an editor. `"x"` is at index 3, and `i + 1` reports line
+    4. Answering 3 forgets the `+ 1`; answering 2 numbers only the lines that were not skipped.
+    Number first, then decide what to skip.
+
+- key: csharp-basic-26
+  type: true_false
+  category: csharp
+  tags: [input, "null"]
+  prompt: |
+    True or false: when standard input has ended, `Console.ReadLine()` returns an empty string,
+    `""`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    It returns `null`, which is why its return type is `string?`. An empty string means the user
+    entered an empty line, which is ordinary input and should usually be skipped, not treated as
+    the end. A loop that reads all input therefore stops on `line is null`. Calling a method such
+    as `Trim()` on the result without checking gives warning CS8602 and a
+    `NullReferenceException` at the end of the input.

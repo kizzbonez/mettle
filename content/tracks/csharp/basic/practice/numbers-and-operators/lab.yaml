@@ -1,0 +1,19 @@
+title: Egg Packing
+summary: Split a day's eggs into cartons with integer division and remainder, average their weight as a double, and read pickers' notes with TryParse.
+language: csharp
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Counts full cartons and leftover eggs
+    file: 02-cartons.cs
+    hidden: true
+  - name: Keeps the fractional part of the average
+    file: 03-average.cs
+    hidden: true
+  - name: Reads a note without ever throwing
+    file: 04-notes.cs
+    hidden: true

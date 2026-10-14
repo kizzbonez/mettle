@@ -1,0 +1,20 @@
+slug: library-loans-desk
+title: Library Loans Desk
+summary: Build the fines rules, a generic waitlist for reserved items and the LINQ reports behind a public library's loans desk.
+language: csharp
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Handles the sample day from the instructions
+    file: 01-sample-day.cs
+    hidden: false
+  - name: Applies every fine rule, including dates, discounts and the cap
+    file: 02-fine-rules.cs
+    hidden: true
+  - name: Keeps a waitlist in order for any member type
+    file: 03-waitlist.cs
+    hidden: true
+  - name: Orders the reports, handles empty input and reads the loans once
+    file: 04-reports.cs
+    hidden: true

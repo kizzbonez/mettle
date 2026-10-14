@@ -1,0 +1,19 @@
+title: Stage Lights
+summary: Write a scene that disposes the spotlights it owns newest first but never the house lights it was handed, and a cue book that saves itself once with an awaited DisposeAsync.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Switches off its own spots, newest first, and leaves the house lights alone
+    file: 02-scene-owns-its-spots.cs
+    hidden: true
+  - name: Is safe to dispose twice and refuses work once disposed
+    file: 03-after-dispose.cs
+    hidden: true
+  - name: Awaits the save and saves only once
+    file: 04-cue-book.cs
+    hidden: true

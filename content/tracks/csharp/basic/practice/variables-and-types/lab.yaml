@@ -1,0 +1,19 @@
+title: Campsite Desk
+summary: Use a decimal constant, fix a concatenation that joins digits instead of adding them, and build a tent tag with string interpolation.
+language: csharp
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Prices a stay by the night
+    file: 02-stay-cost.cs
+    hidden: true
+  - name: Adds one to the pitch number instead of joining a digit
+    file: 03-next-pitch.cs
+    hidden: true
+  - name: Builds the tent tag from its four parts
+    file: 04-tent-tag.cs
+    hidden: true

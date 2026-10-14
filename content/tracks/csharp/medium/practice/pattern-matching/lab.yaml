@@ -1,0 +1,19 @@
+title: Smart Home Hub
+summary: Classify temperatures with relational patterns, describe messages of any type with type, property and positional patterns, and parse spoken commands with list patterns, each as one switch expression.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Classifies temperatures at every boundary, NaN included
+    file: 02-comfort.cs
+    hidden: true
+  - name: Describes thermometers, doors, notes and everything else
+    file: 03-describe.cs
+    hidden: true
+  - name: Matches commands by their exact shape
+    file: 04-command.cs
+    hidden: true

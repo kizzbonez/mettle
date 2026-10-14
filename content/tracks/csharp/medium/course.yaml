@@ -1,0 +1,18 @@
+title: Types, Generics and LINQ
+summary: >-
+  The C# type system in depth: structs, enums, tuples and records, value and reference
+  semantics, inheritance, interfaces and encapsulation, then generics, the collection
+  interfaces, delegates and lambdas, LINQ, pattern matching and the extension members of C# 14.
+  The level ends with a lab that builds a small library-loans service from all of them.
+outcomes:
+  - Design value types, classes, records and enums that fit their data, and predict how copying and equality behave for each
+  - Build class hierarchies with virtual, abstract and sealed members, and describe capabilities with interfaces such as IComparable and IEquatable
+  - Encapsulate state with access modifiers and properties, including the C# 14 field keyword, and write generic types and methods with constraints
+  - Process data with delegates, lambdas and LINQ queries, choosing the right collection and avoiding the traps of deferred execution
+  - Express decisions with pattern matching and switch expressions, and extend existing types with extension methods and C# 14 extension members
+exam:
+  title: Types, Generics and LINQ Mock Exam
+  description: Ten questions drawn from a larger bank on value and reference types, records, inheritance, interfaces, generics, collections, delegates, LINQ, pattern matching and extension members.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

@@ -1,0 +1,17 @@
+title: "C# Foundations"
+summary: >-
+  C# from zero. Install .NET and run a first program, learn variables, numbers, strings,
+  conditions, loops and methods, then arrays, lists, dictionaries and your own classes, and
+  finish with null safety, exceptions and a complete program that reads and checks real input.
+outcomes:
+  - Install the .NET SDK, run a single-file program and create, build and run a console project
+  - Write programs with variables, the built-in types, operators, strings, conditions and loops
+  - Organize code into methods and classes with properties, constructors and static members
+  - Store and look up data with arrays, List<T>, Dictionary<TKey, TValue> and HashSet<T>
+  - Handle missing values and bad input with nullable types, TryParse and exceptions
+exam:
+  title: "C# Foundations Mock Exam"
+  description: Ten questions drawn from the level's bank, from first programs and types to collections, classes, null safety and exceptions.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

@@ -1,0 +1,19 @@
+title: Road Trip
+summary: Add a classic extension method to string, an extension property and a static extension member to TimeSpan, and a property and a method to every sequence of legs with a C# 14 extension block.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Turns place names into codes
+    file: 02-code.cs
+    hidden: true
+  - name: Shows times on the clock and works out driving times
+    file: 03-time.cs
+    hidden: true
+  - name: Totals and routes any sequence of legs
+    file: 04-legs.cs
+    hidden: true

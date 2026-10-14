@@ -1,0 +1,19 @@
+title: Farmers' Market
+summary: Filter and sort a market's sales with a tie-breaker, group them into quantities per product, join them with the stalls they came from, and return a query that runs only when it is read.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Sorts the big sales and reads the source only when enumerated
+    file: 02-big-sales.cs
+    hidden: true
+  - name: Groups the sales into quantities per product
+    file: 03-quantity-by-product.cs
+    hidden: true
+  - name: Joins sales with their stalls and leaves out unknown ones
+    file: 04-origins.cs
+    hidden: true

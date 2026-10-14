@@ -1,0 +1,13 @@
+title: "C# Development"
+tagline: From your first program to concurrent, production-grade .NET services.
+description: >-
+  A full course in four levels on C# 14 and .NET 10. It starts from installing .NET and writing
+  a first program, teaches every fundamental one lesson at a time, and goes on to generics, LINQ,
+  async code, concurrency, performance and shipping .NET applications. Every level ends with a
+  mock exam and a hands-on lab that is compiled and tested in a sandbox using only the base class
+  library.
+icon: Hash
+category: csharp
+sortOrder: 4
+format: course
+revision: 1

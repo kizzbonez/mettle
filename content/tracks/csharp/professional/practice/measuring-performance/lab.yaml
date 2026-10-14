@@ -1,0 +1,19 @@
+title: Bench Kit
+summary: Build a small measuring kit that warms up before it samples, reports a median, counts the bytes one call allocates, and turns that count into an allocation budget a test can enforce.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Finds the median without changing the samples
+    file: 02-median.cs
+    hidden: true
+  - name: Warms up untimed, then reads the clock around each sample
+    file: 03-time.cs
+    hidden: true
+  - name: Counts one warmed-up call exactly and enforces the budget
+    file: 04-allocations.cs
+    hidden: true

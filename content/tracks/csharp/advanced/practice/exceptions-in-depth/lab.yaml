@@ -1,0 +1,19 @@
+title: Meter Readings
+summary: Write a custom exception that keeps the line number and the cause, an exception filter that logs without catching, and an async sum that rejects a null argument at the call and reports every failed task.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Has the standard constructors and wraps a bad line with its number
+    file: 02-total-and-exception.cs
+    hidden: true
+  - name: Logs from a filter and lets the same exception through
+    file: 03-watched.cs
+    hidden: true
+  - name: Checks its argument at the call and keeps every failure
+    file: 04-sum-async.cs
+    hidden: true

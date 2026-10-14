@@ -1,0 +1,18 @@
+title: Production .NET
+summary: >-
+  What it takes to run C# code in production: thread safety, concurrent collections and
+  channels, the garbage collector and low-allocation code with spans, honest performance
+  measurement, dependency injection, structured logging and options, unit testing with test
+  doubles, and building, publishing and securing what you ship.
+outcomes:
+  - Protect shared state with locks, Interlocked and concurrent collections, and throttle asynchronous work with channels, SemaphoreSlim and Parallel.ForEachAsync
+  - Explain how the garbage collector manages memory, and remove avoidable allocations with spans, stackalloc and ArrayPool
+  - Measure performance with a method that survives JIT warm-up and noise, and count allocations in tests
+  - Design testable services with constructor injection, correct lifetimes, validated options and structured logging, and test them with hand-written doubles
+  - Publish an application in the right mode, gate the build on analyzer warnings, and lock and audit its dependencies
+exam:
+  title: Production .NET Mock Exam
+  description: Ten questions drawn from a larger bank on threads and locks, concurrent collections, memory and spans, performance measurement, dependency injection, logging and options, testing, and shipping .NET applications.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

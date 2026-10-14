@@ -1,0 +1,19 @@
+title: Async and Advanced Language Features
+summary: >-
+  Nine lessons on the parts of C# that working .NET code leans on every day: tasks, async and
+  await, cancellation and timeouts, events, iterators and async streams, disposal, exceptions in
+  depth, variance and generic math, operators and conversions, and attributes with reflection.
+  Every example is compiled and run on .NET 10, and the lab is an SMS reminder dispatcher that
+  batches, retries and cancels.
+outcomes:
+  - Write asynchronous code with `async`, `await`, `Task.WhenAll` and `Task.WhenAny`, and explain what the compiler generates for it
+  - Make long operations cancellable and time-limited with cancellation tokens, and report failures precisely with custom exceptions, filters and correct rethrowing
+  - Publish and consume events, iterators and async streams without leaks or surprises from deferred execution
+  - Release resources deterministically with `using`, `await using` and the dispose pattern
+  - Design types with variance, static abstract members, operators, conversions and attributes, and read metadata with reflection
+exam:
+  title: Async and Advanced Language Features Mock Exam
+  description: Ten questions drawn from a bank that covers async and await, cancellation, events, iterators and async streams, disposal, exceptions, generics, operators and conversions, and attributes and reflection.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

@@ -1,0 +1,19 @@
+title: Bakery Boxes
+summary: Give a readonly struct its computed property, ToString and Deconstruct, test and clear allergen flags, check an enum value that came from outside, and return two numbers as a tuple.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Measures, prints and deconstructs box sizes, the default one included
+    file: 02-box-size.cs
+    hidden: true
+  - name: Tests and removes allergen flags
+    file: 03-allergens.cs
+    hidden: true
+  - name: Checks cake sizes and packs orders into boxes
+    file: 04-sizes-and-packing.cs
+    hidden: true

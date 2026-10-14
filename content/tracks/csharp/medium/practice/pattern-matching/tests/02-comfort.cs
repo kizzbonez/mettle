@@ -1,0 +1,12 @@
+Check.Equal(Hub.Comfort(-12), "cold", "a temperature below zero");
+Check.Equal(Hub.Comfort(0), "cold", "zero degrees");
+Check.Equal(Hub.Comfort(15.99), "cold", "just below 16");
+Check.Equal(Hub.Comfort(16), "comfortable", "exactly 16 is comfortable");
+Check.Equal(Hub.Comfort(20), "comfortable", "a temperature in the middle of the comfortable range");
+Check.Equal(Hub.Comfort(23.99), "comfortable", "just below 24");
+Check.Equal(Hub.Comfort(24), "warm", "exactly 24 is warm");
+Check.Equal(Hub.Comfort(38.5), "warm", "a hot day");
+Check.Equal(Hub.Comfort(double.PositiveInfinity), "warm", "positive infinity is above every limit");
+Check.Equal(Hub.Comfort(double.NegativeInfinity), "cold", "negative infinity is below every limit");
+Check.Equal(Hub.Comfort(double.NaN), "no reading", "NaN, which fails every comparison");
+Check.Equal(Hub.Comfort(0.0 / 0.0), "no reading", "a NaN made by dividing zero by zero");

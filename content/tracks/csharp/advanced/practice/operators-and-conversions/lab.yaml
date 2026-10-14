@@ -1,0 +1,19 @@
+title: Radio Playlist
+summary: Give a duration an explicit conversion that checks its input, an implicit one to TimeSpan and a + operator, give a class value equality that all five members agree on, and grow a playlist in place with a C# 14 instance += operator.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Converts both ways and adds durations
+    file: 02-duration.cs
+    hidden: true
+  - name: Keeps ==, !=, both Equals and GetHashCode in agreement, null included
+    file: 03-track-code.cs
+    hidden: true
+  - name: Adds tracks in place with +=
+    file: 04-playlist.cs
+    hidden: true

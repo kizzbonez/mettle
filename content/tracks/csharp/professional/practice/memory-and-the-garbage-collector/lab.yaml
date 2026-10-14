@@ -1,0 +1,19 @@
+title: Surge Zones
+summary: Find the hidden allocations of three hot helpers (a capturing lambda with LINQ, a list that grows, a struct boxed behind an interface) and remove them, checked by counting the bytes each call allocates.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Counts the pings of a zone without allocating
+    file: 02-count-in-zone.cs
+    hidden: true
+  - name: Allocates only the result array, at its final size
+    file: 03-drivers-in-zone.cs
+    hidden: true
+  - name: Counts with a struct rule without boxing it
+    file: 04-count-where.cs
+    hidden: true

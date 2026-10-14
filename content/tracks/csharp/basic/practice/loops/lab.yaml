@@ -1,0 +1,19 @@
+title: Step Counter
+summary: Add up days of steps with foreach, find the best day and the day a goal was reached with for and break, and raise a daily goal with while.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Totals the days and finds the earliest best day
+    file: 02-total-and-best.cs
+    hidden: true
+  - name: Finds the first day the goal is reached
+    file: 03-goal-reached.cs
+    hidden: true
+  - name: Counts the weeks to the target
+    file: 04-weeks.cs
+    hidden: true

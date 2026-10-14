@@ -1,0 +1,19 @@
+title: Race Results
+summary: Write a default interface method, implement an interface in a struct, give a class IComparable and IEquatable so that Sort and Contains work, and pick a winner from any mix of entries.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Formats result lines and times relay teams
+    file: 02-result-and-relay.cs
+    hidden: true
+  - name: Sorts and compares runners in every way the collections ask
+    file: 03-compare-and-equal.cs
+    hidden: true
+  - name: Picks the winner from runners and relays, ties included
+    file: 04-winner.cs
+    hidden: true

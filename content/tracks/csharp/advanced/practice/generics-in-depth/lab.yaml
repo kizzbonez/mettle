@@ -1,0 +1,19 @@
+title: Farm Shop
+summary: Make a producer interface covariant and a consumer interface contravariant, compute a spread for any number type with INumber<T>, and build items from barcodes through static abstract interface members.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Converts stalls and inspectors in the safe directions and keeps the stall order
+    file: 02-variance-and-accepted.cs
+    hidden: true
+  - name: Computes the spread for every number type, negatives included
+    file: 03-spread.cs
+    hidden: true
+  - name: Reads the barcodes of each type through its static prefix
+    file: 04-scan.cs
+    hidden: true

@@ -1,0 +1,19 @@
+title: Departure Board
+summary: Write Console.WriteLine and Console.Write statements that put a ferry terminal's welcome, its sailings and a gate label on the screen, character for character.
+language: csharp
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Prints the screen from the instructions
+    file: 01-whole-screen.cs
+    hidden: false
+  - name: Prints the welcome on a line of its own
+    file: 02-welcome.cs
+    hidden: true
+  - name: Prints the two sailings and hides the staff note
+    file: 03-sailings.cs
+    hidden: true
+  - name: Leaves the gate label's line open
+    file: 04-gate-label.cs
+    hidden: true

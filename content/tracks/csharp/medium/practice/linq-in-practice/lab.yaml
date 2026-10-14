@@ -1,0 +1,19 @@
+title: Fitness Club
+summary: Summarise a week of workouts without failing on an empty one, total the minutes per member into a dictionary, pick the longest workout safely, and test every workout while reading the input only once.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Summarises any week, the empty one included, in one read
+    file: 02-summary.cs
+    hidden: true
+  - name: Totals minutes per member and finds the longest workout
+    file: 03-members-and-longest.cs
+    hidden: true
+  - name: Tests every workout, with no workouts counting as false
+    file: 04-all-at-least.cs
+    hidden: true

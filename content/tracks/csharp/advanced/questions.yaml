@@ -1,0 +1,593 @@
+- key: csharp-advanced-01
+  type: single
+  category: csharp
+  tags: [async, await, control-flow]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var gate = new TaskCompletionSource();
+    Task t = RunAsync(gate.Task);
+    Console.Write("B ");
+    gate.SetResult();
+    await t;
+    Console.WriteLine("D");
+
+    static async Task RunAsync(Task signal)
+    {
+        Console.Write("A ");
+        await signal;
+        Console.Write("C ");
+    }
+    ```
+  options:
+    - text: "`A B C D`"
+      correct: true
+    - text: "`B A C D`"
+    - text: "`A C B D`"
+    - text: "`B A D C`"
+  explanation: |
+    Calling an async method runs its body **synchronously** up to the first `await` on a task
+    that has not finished, so `A` is printed during the call. At `await signal` the task is
+    still pending, so `RunAsync` is suspended and returns an incomplete task, and the caller
+    prints `B`. `SetResult` completes the signal, `RunAsync` resumes and prints `C`, and
+    `await t` then finds it finished, so `D` comes last. `B A ...` assumes the method starts
+    later, as if calling it only scheduled it. `A C B D` assumes `await` blocks the thread
+    until the task completes, which is exactly what it does not do.
+
+- key: csharp-advanced-02
+  type: single
+  category: csharp
+  tags: [async, task-whenall, concurrency]
+  prompt: |
+    `SlowAsync` awaits `Task.Delay(1000)` and returns its argument. Roughly how long does each
+    version take?
+
+    ```csharp
+    // Version 1
+    int a = await SlowAsync(1);
+    int b = await SlowAsync(2);
+
+    // Version 2
+    Task<int> ta = SlowAsync(1);
+    Task<int> tb = SlowAsync(2);
+    int a = await ta;
+    int b = await tb;
+    ```
+  options:
+    - text: Version 1 about 2 seconds, version 2 about 1 second
+      correct: true
+    - text: Both about 2 seconds, because each task starts running only when it is awaited
+    - text: Both about 1 second, because the runtime runs independent awaits in parallel
+    - text: Version 1 about 1 second, version 2 about 2 seconds
+  explanation: |
+    In C#, a task starts running when the method is **called**, not when it is awaited. Version
+    2 calls both methods before awaiting either, so both delays run at the same time and the
+    whole thing takes about one second; awaiting `ta` and then `tb` only collects results that
+    are already on their way. Version 1 awaits the first call before making the second, so the
+    delays happen one after the other. The runtime never reorders your awaits. This is why the
+    advice is: start independent operations first, then await them, or combine them with
+    `Task.WhenAll`.
+
+- key: csharp-advanced-03
+  type: multiple
+  category: csharp
+  tags: [async, async-void, valuetask, blocking]
+  prompt: |
+    Which statements are true? Select all that apply.
+  options:
+    - text: "`async` and `await` do not create threads; while an awaited I/O operation is pending, the thread is free to do other work"
+      correct: true
+    - text: "An `async void` method cannot be awaited, and its caller cannot catch the exceptions it throws"
+      correct: true
+    - text: "A `ValueTask<T>` may be awaited as many times as you like, just like a `Task<T>`"
+    - text: "Reading `.Result` on an unfinished task is a cheap way to wait, because it releases the thread until the result arrives"
+  explanation: |
+    `await` registers the rest of the method as a continuation and returns, so no thread sits
+    waiting; nothing about it creates threads. An `async void` method gives its caller no task
+    to await, so the caller cannot know when it ends, and its exceptions are raised outside
+    the caller's `try` (they can crash the process), which is why `async void` is reserved
+    for event handlers. A `ValueTask<T>` may be awaited **once** only; call `AsTask()` if you
+    need more. `.Result` does the opposite of releasing the thread: it **blocks** until the
+    task completes, and in apps with a synchronization context it can deadlock.
+
+- key: csharp-advanced-04
+  type: single
+  category: csharp
+  tags: [cancellation, cooperative]
+  prompt: |
+    What happens when this program runs?
+
+    ```csharp
+    using var cts = new CancellationTokenSource();
+    cts.Cancel();
+    Console.WriteLine(await CountAsync(cts.Token));
+
+    static async Task<int> CountAsync(CancellationToken token)
+    {
+        int total = 0;
+        for (int i = 1; i <= 3; i++)
+        {
+            await Task.Delay(1);
+            total += i;
+        }
+        return total;
+    }
+    ```
+  options:
+    - text: It prints `6`
+      correct: true
+    - text: It throws `OperationCanceledException` at the first `await`, because the token is already canceled
+    - text: It prints `0`, because a canceled method stops before its loop
+    - text: "`Task.Delay` throws `TaskCanceledException`, because it sees that the token was canceled"
+  explanation: |
+    .NET cancellation is **cooperative**: canceling a source only sets a flag that code must
+    look at. `CountAsync` accepts the token but never checks it and never passes it on;
+    `Task.Delay(1)` was not given the token, so it cannot know about it. The loop runs to the
+    end and the method returns 6. To honour the request, call
+    `token.ThrowIfCancellationRequested()` in the loop or pass the token on, as in
+    `Task.Delay(1, token)`. Nothing in the runtime stops a method by force.
+
+- key: csharp-advanced-05
+  type: single
+  category: csharp
+  tags: [cancellation, timeouts, task-status]
+  prompt: |
+    What does this print?
+
+    ```csharp
+    using var cts = new CancellationTokenSource();
+    cts.CancelAfter(TimeSpan.FromMilliseconds(50));
+    Task work = Task.Delay(Timeout.Infinite, cts.Token);
+    try
+    {
+        await work;
+    }
+    catch (OperationCanceledException e)
+    {
+        Console.WriteLine($"{e.GetType().Name} {work.Status}");
+    }
+    ```
+  options:
+    - text: "`TaskCanceledException Canceled`"
+      correct: true
+    - text: "`TimeoutException Faulted`"
+    - text: "`OperationCanceledException Faulted`"
+    - text: Nothing; the catch clause does not match a `TaskCanceledException`, so the exception is unhandled
+  explanation: |
+    `CancelAfter` simply cancels the source when the time is up; a timeout built this way is
+    an ordinary cancellation, not a `TimeoutException`. `Task.Delay` reacts by ending its task
+    in the `Canceled` state (not `Faulted`), and awaiting it throws `TaskCanceledException`.
+    That type derives from `OperationCanceledException`, so the catch clause matches it, which
+    is exactly why you should catch the base type. If you want callers to see a
+    `TimeoutException`, translate it yourself, for example with an exception filter that
+    checks the caller's own token.
+
+- key: csharp-advanced-06
+  type: single
+  category: csharp
+  tags: [events, delegates, unsubscribe]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var door = new Door();
+    door.Opened += (s, e) => Console.Write("chime ");
+    door.Opened -= (s, e) => Console.Write("chime ");
+    door.Open();
+    Console.WriteLine(door.Listeners);
+
+    class Door
+    {
+        public event EventHandler? Opened;
+        public int Listeners => Opened?.GetInvocationList().Length ?? 0;
+        public void Open() => Opened?.Invoke(this, EventArgs.Empty);
+    }
+    ```
+  options:
+    - text: "`chime 1`"
+      correct: true
+    - text: "`0`"
+    - text: "`chime 0`"
+    - text: "Nothing: it fails to compile, because `-=` on an event is only allowed inside the class"
+  explanation: |
+    `-=` removes a delegate **equal** to the one you pass, and two lambdas written separately
+    are two different delegates, even with identical text. The removal finds no match and
+    silently does nothing, so the handler still runs and is still counted. To unsubscribe,
+    keep the delegate you subscribed in a variable or field (or subscribe a named method) and
+    remove that. Outside the class, `+=` and `-=` are precisely the two things an event does
+    allow; it is raising it or assigning it with `=` that is reserved to the declaring class.
+
+- key: csharp-advanced-07
+  type: multiple
+  category: csharp
+  tags: [events, memory-leaks, observer-pattern]
+  prompt: |
+    Which statements about C# events are true? Select all that apply.
+  options:
+    - text: "Outside the declaring class, an event supports only `+=` and `-=`; only the class itself can raise it"
+      correct: true
+    - text: A publisher holds a reference to each subscriber through its delegates, so a subscriber that never unsubscribes lives at least as long as the publisher
+      correct: true
+    - text: If one handler throws, the remaining handlers still run, and the exception is reported after the last one
+    - text: The handlers of an event run in parallel on thread-pool threads
+  explanation: |
+    The `event` keyword turns a delegate field into a guarded list: outsiders may add and
+    remove handlers but not invoke or overwrite it (`CS0070`). Each delegate in that list holds
+    a reference to its target object, which keeps the subscriber reachable; a long-lived
+    publisher with short-lived subscribers that never unsubscribe is a classic .NET memory
+    leak. Raising an event is an ordinary synchronous call that runs the handlers one after
+    another on the raising thread, and an exception in one stops the rest and propagates to
+    the code that raised the event.
+
+- key: csharp-advanced-08
+  type: single
+  category: csharp
+  tags: [iterators, yield, deferred-execution]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    var seq = Numbers();
+    Console.Write("created ");
+    Console.WriteLine(seq.First());
+
+    static IEnumerable<int> Numbers()
+    {
+        Console.Write("start ");
+        yield return 1;
+        Console.Write("middle ");
+        yield return 2;
+    }
+    ```
+  options:
+    - text: "`created start 1`"
+      correct: true
+    - text: "`start created 1`"
+    - text: "`created start middle 1`"
+    - text: "`start middle created 1`"
+  explanation: |
+    Calling an iterator method runs **none** of its body: it returns an object that will run
+    the body when someone enumerates it. So `created` comes first. `First()` then asks for
+    one item: the body runs until the first `yield return`, printing `start`, and pauses there
+    with the value 1. Nothing asks for a second item, so `middle` is never printed. Deferred
+    execution is why an iterator can describe an endless sequence, and also why argument
+    checks inside an iterator run late.
+
+- key: csharp-advanced-09
+  type: true_false
+  category: csharp
+  tags: [iterators, finally, dispose]
+  prompt: |
+    True or false: when a `foreach` loop over an iterator method stops early with `break`, a
+    `finally` block inside the iterator still runs.
+  options:
+    - text: "True"
+      correct: true
+    - text: "False"
+  explanation: |
+    `foreach` wraps its loop in `try`/`finally` and disposes the enumerator at the end, however
+    the loop is left. Disposing a paused iterator runs the `finally` blocks that enclose the
+    `yield return` where it stopped. That is why a `using` inside an iterator reliably closes
+    its file even when the caller stops after the first few lines. Only code after the pause
+    point that is not in a `finally` is skipped.
+
+- key: csharp-advanced-10
+  type: single
+  category: csharp
+  tags: [idisposable, using, disposal-order]
+  prompt: |
+    `Noisy` prints `open x ` in its constructor and `close x ` in `Dispose`. What does this
+    program print?
+
+    ```csharp
+    using var a = new Noisy("a");
+    using (var b = new Noisy("b"))
+    {
+        Console.Write("work ");
+    }
+    using var c = new Noisy("c");
+    Console.Write("end ");
+    ```
+  options:
+    - text: "`open a open b work close b open c end close c close a`"
+      correct: true
+    - text: "`open a open b work close b open c end close a close c`"
+    - text: "`open a open b work open c end close c close b close a`"
+    - text: "`open a open b work close b open c close c end close a`"
+  explanation: |
+    The block form disposes `b` at its closing brace. A `using` declaration has no block: the
+    object is disposed when the enclosing scope ends, here the end of the program, after
+    `end`. Several declarations are disposed in **reverse** order of declaration, `c` before
+    `a`, because a later resource may depend on an earlier one, just as a writer depends on
+    the stream under it. Disposal always runs in a compiler-generated `finally`, so the same
+    order holds if an exception leaves the scope.
+
+- key: csharp-advanced-11
+  type: multiple
+  category: csharp
+  tags: [dispose-pattern, finalizers, idisposable]
+  prompt: |
+    Which statements about disposal are true? Select all that apply.
+  options:
+    - text: "Calling `Dispose` a second time should do nothing and must not throw"
+      correct: true
+    - text: A class that holds only managed objects, such as streams it created, does not need a finalizer
+      correct: true
+    - text: "The garbage collector calls `Dispose` automatically on objects that are no longer referenced"
+    - text: On .NET 5 and later, finalizers are guaranteed to run for every remaining object when the process exits
+  explanation: |
+    `Dispose` must be idempotent: cleanup code often runs from several paths, and a second
+    call should be harmless. A class that owns only managed objects disposes them from its own
+    `Dispose`; a finalizer is for unmanaged handles held directly, and even then a `SafeHandle`
+    is the better tool. The garbage collector never calls `Dispose`; it frees memory at a time
+    of its own choosing and may call a finalizer, which is a different method. And .NET 5
+    and later (like .NET Core before them) do not run finalizers at process exit at all,
+    which is one more reason never to rely on them for cleanup that matters.
+
+- key: csharp-advanced-12
+  type: single
+  category: csharp
+  tags: [exceptions, exception-filters, finally]
+  prompt: |
+    What does this program print?
+
+    ```csharp
+    try
+    {
+        try { throw new InvalidOperationException("jam"); }
+        finally { Console.Write("finally "); }
+    }
+    catch (Exception e) when (Log(e))
+    {
+        Console.WriteLine("caught");
+    }
+
+    static bool Log(Exception e)
+    {
+        Console.Write("filter ");
+        return true;
+    }
+    ```
+  options:
+    - text: "`filter finally caught`"
+      correct: true
+    - text: "`finally filter caught`"
+    - text: "`filter caught finally`"
+    - text: "`finally caught`"
+  explanation: |
+    An exception filter is evaluated while the runtime is still **searching** for a handler,
+    before the stack is unwound. So `Log` runs first, with the throwing frame still intact.
+    Only once a handler has been chosen does unwinding begin: the inner `finally` runs, and
+    then the `catch` body. This is what makes filters useful for logging and diagnostics, and
+    why `when (Log(e))` with a `Log` that returns `false` can watch exceptions pass without
+    handling them. The filter is never skipped: `finally caught` would require it not to run.
+
+- key: csharp-advanced-13
+  type: single
+  category: csharp
+  tags: [exceptions, rethrow, stack-trace]
+  prompt: |
+    Inside a `catch (IOException ex)` block, what is the difference between `throw;` and
+    `throw ex;`?
+  options:
+    - text: "`throw;` rethrows the exception with its original stack trace; `throw ex;` rethrows the same object but resets its stack trace to the current line"
+      correct: true
+    - text: "`throw ex;` wraps the exception in a new one whose `InnerException` is `ex`"
+    - text: There is no difference; the compiler turns `throw ex;` into `throw;`
+    - text: "`throw;` is allowed only in a `finally` block, so inside a `catch` you must write `throw ex;`"
+  explanation: |
+    Both throw the same exception object, but `throw ex;` treats it as a new throw from the
+    current method and overwrites the stack trace, so every frame between the original throw
+    and this `catch` disappears from the report (code analysis rule CA2200 flags it). Use
+    `throw;` to pass an exception on. Wrapping is a third, deliberate option:
+    `throw new ImportException("...", ex)` gives callers a new type and message and keeps the
+    original as `InnerException`. `throw;` with no operand is valid only inside a `catch`.
+
+- key: csharp-advanced-14
+  type: single
+  category: csharp
+  tags: [exceptions, tasks, aggregateexception, whenall]
+  prompt: |
+    Both tasks fail. What does this print?
+
+    ```csharp
+    Task all = Task.WhenAll(FailAsync("A"), FailAsync("B"));
+    try
+    {
+        await all;
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"{e.GetType().Name} {e.Message} {all.Exception!.InnerExceptions.Count}");
+    }
+
+    static async Task FailAsync(string name)
+    {
+        await Task.Yield();
+        throw new InvalidOperationException(name);
+    }
+    ```
+  options:
+    - text: "`InvalidOperationException A 2`"
+      correct: true
+    - text: "`AggregateException One or more errors occurred. (A) (B) 2`"
+    - text: "`InvalidOperationException B 1`"
+    - text: "`InvalidOperationException A 1`"
+  explanation: |
+    A faulted task stores its exceptions in an `AggregateException`, and the task from
+    `WhenAll` holds the failures of all its tasks, in the order the tasks were passed. `await`
+    unwraps and rethrows only the **first** one, so ordinary `catch` clauses keep working; the
+    others are not lost and remain in `all.Exception.InnerExceptions`. The
+    `AggregateException` itself is what you get from the blocking calls `.Wait()` and
+    `.Result`, which is one more reason to await instead.
+
+- key: csharp-advanced-15
+  type: multiple
+  category: csharp
+  tags: [generics, covariance, contravariance]
+  prompt: |
+    Which of these lines compile? Select all that apply.
+  options:
+    - text: "`IEnumerable<object> a = new List<string>();`"
+      correct: true
+    - text: "`List<object> b = new List<string>();`"
+    - text: "`Action<object> log = o => Console.WriteLine(o); Action<string> c = log;`"
+      correct: true
+    - text: "`IEnumerable<object> d = new List<int>();`"
+  explanation: |
+    `IEnumerable<out T>` is **covariant**: it only hands values out, so a sequence of strings
+    can safely be read as a sequence of objects. `Action<in T>` is **contravariant**: an
+    action that accepts any object can accept a string. `List<T>` is a class, and classes are
+    always invariant: a `List<object>` would let you add a number to a list of strings, so the
+    conversion is rejected (`CS0029`). Variance also works only between reference types:
+    turning an `int` into an `object` needs boxing, so `IEnumerable<int>` does not convert to
+    `IEnumerable<object>`.
+
+- key: csharp-advanced-16
+  type: single
+  category: csharp
+  tags: [generics, generic-math, static-abstract]
+  prompt: |
+    What does this print?
+
+    ```csharp
+    using System.Numerics;
+
+    Console.WriteLine($"{Half(7)} {Half(7.0)} {Half(7m)}");
+
+    static T Half<T>(T value) where T : INumber<T> => value / T.CreateChecked(2);
+    ```
+  options:
+    - text: "`3 3.5 3.5`"
+      correct: true
+    - text: "`3.5 3.5 3.5`"
+    - text: "`3 3 3`"
+    - text: "Nothing: it fails to compile, because operators cannot be applied to a type parameter"
+  explanation: |
+    `INumber<T>` declares its operators and helpers such as `CreateChecked` as **static
+    abstract** interface members, so a method constrained to it may use `/` and call
+    `T.CreateChecked(2)` through the type parameter. Each call runs with the real type's own
+    rules: for `int` that is integer division, which truncates 3.5 to 3, while `double` and
+    `decimal` keep the fraction. Generic math does not convert anything to `double` behind your
+    back, and before C# 11 and .NET 7 the compile error in the last option would indeed have
+    been the answer.
+
+- key: csharp-advanced-17
+  type: single
+  category: csharp
+  tags: [operators, compound-assignment, csharp-14]
+  prompt: |
+    With C# 14, what does this print?
+
+    ```csharp
+    var cart = new Cart();
+    Cart same = cart;
+    cart += 5;
+    Console.WriteLine($"{cart.Items} {same.Items} {ReferenceEquals(cart, same)}");
+
+    class Cart
+    {
+        public int Items { get; private set; }
+        public static Cart operator +(Cart c, int n) => new() { Items = c.Items + n };
+        public void operator +=(int n) => Items += n;
+    }
+    ```
+  options:
+    - text: "`5 5 True`"
+      correct: true
+    - text: "`5 0 False`"
+    - text: "`5 5 False`"
+    - text: "Nothing: it fails to compile, because compound assignment operators cannot be overloaded"
+  explanation: |
+    C# 14 lets a type declare compound assignment operators as **instance** methods: no
+    `static`, one parameter, a `void` result, and the job of changing `this`. When the left
+    side is a variable and such an operator exists, `cart += 5` calls it, so the existing
+    object is updated in place and `same`, which refers to the same object, sees 5 items.
+    `5 0 False` is what earlier versions did, and still do without the instance operator:
+    `cart += 5` meant `cart = cart + 5`, building a new `Cart` with the static `+`.
+
+- key: csharp-advanced-18
+  type: single
+  category: csharp
+  tags: [conversions, implicit, explicit]
+  prompt: |
+    Which numbered line fails to compile?
+
+    ```csharp
+    Meters a = (Meters)2.5;   // 1
+    double b = a + 1;         // 2
+    Meters c = 4.0;           // 3
+
+    readonly struct Meters(double value)
+    {
+        public double Value { get; } = value;
+        public static explicit operator Meters(double d) => new(d);
+        public static implicit operator double(Meters m) => m.Value;
+    }
+    ```
+  options:
+    - text: Line 3
+      correct: true
+    - text: Line 1
+    - text: Line 2
+    - text: None of them
+  explanation: |
+    The conversion from `double` to `Meters` is declared `explicit`, so it happens only with a
+    cast. Line 1 has the cast; line 3 does not, and the compiler says that an explicit
+    conversion exists and asks whether you are missing a cast (`CS0266`). Line 2 is fine:
+    `Meters` has no `+` operator, but the **implicit** conversion to `double` lets the
+    compiler use `double + double`, giving 3.5. The design follows the rule for conversions:
+    implicit only when it can never fail or lose information, explicit otherwise.
+
+- key: csharp-advanced-19
+  type: single
+  category: csharp
+  tags: [attributes, caller-information, nameof]
+  prompt: |
+    With C# 14, what does this print?
+
+    ```csharp
+    using System.Runtime.CompilerServices;
+
+    int stock = 0;
+    Require(stock > 0);
+    Console.WriteLine(nameof(Dictionary<,>));
+
+    static void Require(bool ok, [CallerArgumentExpression(nameof(ok))] string text = "")
+    {
+        if (!ok) Console.WriteLine($"failed: {text}");
+    }
+    ```
+  options:
+    - text: "`failed: stock > 0`, then `Dictionary`"
+      correct: true
+    - text: "`failed: False`, then ``Dictionary`2``"
+    - text: "`failed: ok`, then `Dictionary<TKey, TValue>`"
+    - text: "Nothing: it fails to compile, because `nameof` needs a closed generic type such as `Dictionary<string, int>`"
+  explanation: |
+    `CallerArgumentExpression` asks the compiler to pass the **source text** of the argument
+    given for `ok` when the caller leaves `text` out, so the message shows the condition that
+    failed, not its value or the parameter name. `nameof` produces the simple name of a
+    symbol at compile time, without type arguments or the metadata arity suffix. Since C# 14
+    it also accepts unbound generic types such as `Dictionary<,>`; earlier versions required
+    a closed type, which is the error the last option describes.
+
+- key: csharp-advanced-20
+  type: true_false
+  category: csharp
+  tags: [attributes, reflection, metadata]
+  prompt: |
+    True or false: applying a custom attribute such as `[Audited]` to a method makes the
+    runtime execute extra code every time that method is called.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    An attribute is metadata stored in the assembly: a label, not behaviour. Nothing happens
+    when the method is called unless some code goes looking for the label, either the
+    compiler (for attributes it knows, such as `[Obsolete]` or the caller information
+    attributes) or a program using reflection, such as `GetCustomAttribute<AuditedAttribute>()`,
+    which a test framework, serializer or web framework might call. To make `[Audited]` do
+    something, you would have to write that reader yourself.

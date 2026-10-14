@@ -1,0 +1,17 @@
+slug: appointment-reminder-dispatcher
+title: Appointment Reminder Dispatcher
+summary: Send a clinic's evening SMS reminders in batches through a flaky gateway, with retries, cancellation, an event per delivered message and results in the order of the list.
+language: csharp
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Sends tonight's reminders and reports them in order
+    file: 01-tonights-reminders.cs
+    hidden: false
+  - name: Retries busy answers, gives up correctly and checks its arguments
+    file: 02-retries-and-failures.cs
+    hidden: true
+  - name: Keeps to the batch size, keeps the order and stops cleanly on cancellation
+    file: 03-batches-order-and-cancellation.cs
+    hidden: true

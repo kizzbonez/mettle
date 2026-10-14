@@ -1,0 +1,19 @@
+title: Photo Filters
+summary: Pass a filter into a method as a delegate, build new filters from lambdas that capture their arguments, chain several into one, and keep a count between calls in a closure.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Applies filters to a copy and brightens within the limits
+    file: 02-apply-and-brighter.cs
+    hidden: true
+  - name: Chains filters in the order given
+    file: 03-chain.cs
+    hidden: true
+  - name: Names files with a count that each namer keeps
+    file: 04-namer.cs
+    hidden: true

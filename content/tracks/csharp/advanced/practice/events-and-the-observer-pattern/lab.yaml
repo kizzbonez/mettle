@@ -1,0 +1,19 @@
+title: Greenhouse Sensor
+summary: Raise a standard EventHandler event safely, reach every subscriber even when one of them throws, and let a sprinkler subscribe and unsubscribe with the same delegate.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Raises the event safely, with the sensor as the sender
+    file: 02-raise.cs
+    hidden: true
+  - name: Reaches every handler and counts the ones that threw
+    file: 03-report-to-everyone.cs
+    hidden: true
+  - name: Waters below the threshold and unsubscribes cleanly
+    file: 04-sprinkler.cs
+    hidden: true

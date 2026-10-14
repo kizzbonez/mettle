@@ -1,0 +1,19 @@
+title: Lift Passes
+summary: Price a ski pass with if and else if, combine conditions with && and ||, turn a run's colour into a level with switch, and choose a word with the conditional operator.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Prices a pass at every edge of the age table
+    file: 02-pass-price.cs
+    hidden: true
+  - name: Lets the right skiers ride the chairlift
+    file: 03-may-ride.cs
+    hidden: true
+  - name: Names every run level and words the sign
+    file: 04-levels-and-sign.cs
+    hidden: true

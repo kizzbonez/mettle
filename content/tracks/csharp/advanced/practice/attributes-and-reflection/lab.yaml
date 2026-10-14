@@ -1,0 +1,19 @@
+title: Library Export
+summary: Read a custom [Column] attribute with reflection to build a CSV header and row for any type, sorted by a named attribute argument, and let CallerArgumentExpression record what the caller wrote.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Lists the column titles of any type, sorted by Order
+    file: 02-header.cs
+    hidden: true
+  - name: Reads the values of the run-time type, with empty fields for null
+    file: 03-row.cs
+    hidden: true
+  - name: Shows the source text of the argument next to its value
+    file: 04-show.cs
+    hidden: true

@@ -1,0 +1,19 @@
+title: Hotel Bill
+summary: Derive three kinds of room from an abstract base class, override the members each one changes, build on the base versions with base, and total a bill through base-class variables.
+language: csharp
+minutes: 12
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Prices standard rooms and suites, with and without breakfast
+    file: 02-standard-and-suite.cs
+    hidden: true
+  - name: Prices family rooms through every kind of variable
+    file: 03-family-room.cs
+    hidden: true
+  - name: Totals a bill of mixed rooms
+    file: 04-bill.cs
+    hidden: true

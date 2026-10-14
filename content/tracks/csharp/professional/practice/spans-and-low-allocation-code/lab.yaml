@@ -1,0 +1,19 @@
+title: Parcel Labels
+summary: Parse parcel dimensions and format tracking labels with spans and TryFormat without allocating, and normalise addresses in a stackalloc or pooled buffer so that only the result string is allocated.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Accepts three positive sides only, without allocating
+    file: 02-dimensions.cs
+    hidden: true
+  - name: Writes the label only when it fits, without allocating
+    file: 03-label.cs
+    hidden: true
+  - name: Uses the stack or the pool as told and allocates only the result
+    file: 04-normalise.cs
+    hidden: true

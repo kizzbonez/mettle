@@ -1,0 +1,23 @@
+slug: meter-reading-relay
+title: Meter Reading Relay
+summary: Parse a night's smart-meter readings without allocating, total them in a thread-safe ledger, and relay batches to billing with bounded concurrency, retries and cancellation.
+language: csharp
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Follows the example in the instructions
+    file: 01-walkthrough.cs
+    hidden: false
+  - name: Parses valid lines, rejects malformed ones, and allocates nothing
+    file: 02-parsing.cs
+    hidden: true
+  - name: Counts each reading once and keeps exact totals under concurrent use
+    file: 03-ledger.cs
+    hidden: true
+  - name: Retries transient failures only, reports failures and keeps going
+    file: 04-retries.cs
+    hidden: true
+  - name: Never exceeds the concurrency limit and honours cancellation
+    file: 05-throttle.cs
+    hidden: true

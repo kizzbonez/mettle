@@ -1,0 +1,19 @@
+title: Rebalancing Vans
+summary: Move bikes between two docking stations by holding both stations' locks in one fixed order, give up after a short wait instead of deadlocking, and count the moves with Interlocked.
+language: csharp
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Locks the station with the lower id first in both directions
+    file: 02-lock-order.cs
+    hidden: true
+  - name: Gives up without holding a lock or changing a station
+    file: 03-giving-up.cs
+    hidden: true
+  - name: Counts every move exactly once while four vans share the rebalancer
+    file: 04-counters.cs
+    hidden: true

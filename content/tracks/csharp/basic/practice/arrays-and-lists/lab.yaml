@@ -1,0 +1,19 @@
+title: Setlist
+summary: Total and search arrays of song lengths, remove covers from a List while looping backwards, and build a new list without changing the one you were given.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Totals the set and finds the earliest longest song
+    file: 02-total-and-longest.cs
+    hidden: true
+  - name: Removes every cover from the list itself
+    file: 03-drop-covers.cs
+    hidden: true
+  - name: Puts the opener first in a new list
+    file: 04-with-opener.cs
+    hidden: true

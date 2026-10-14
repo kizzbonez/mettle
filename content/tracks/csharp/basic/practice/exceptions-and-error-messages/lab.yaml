@@ -1,0 +1,19 @@
+title: Vending Machine
+summary: Throw ArgumentOutOfRangeException and InvalidOperationException with useful messages in the right order, then catch each one and turn it into a friendly text.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Checks the constructor's arguments
+    file: 02-constructor.cs
+    hidden: true
+  - name: Throws the right exception in the right order
+    file: 03-buy.cs
+    hidden: true
+  - name: Turns every exception into the button's text
+    file: 04-press.cs
+    hidden: true

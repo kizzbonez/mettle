@@ -1,0 +1,19 @@
+title: Weigh-In Sheet
+summary: Read a fishing competition's weigh-in sheet line by line, skip notes, report every bad line by its number without throwing, and total the catches in a class.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Reads the sheet from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Numbers every line and skips notes and blank lines
+    file: 02-lines.cs
+    hidden: true
+  - name: Reports each bad line in the exact form
+    file: 03-weights.cs
+    hidden: true
+  - name: Keeps totals across sheets and names the leader
+    file: 04-totals-and-leader.cs
+    hidden: true

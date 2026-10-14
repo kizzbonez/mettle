@@ -1,0 +1,19 @@
+title: Kitchen Pass
+summary: Start every dish of a table at once and collect the plates in order with Task.WhenAll, take the first courier who answers with Task.WhenAny, and see where an async method hands control back to its caller.
+language: csharp
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.cs
+    hidden: false
+  - name: Starts every dish before waiting and keeps the order of the ticket
+    file: 02-cook-table.cs
+    hidden: true
+  - name: Takes the first courier to answer, or that courier's failure
+    file: 03-first-courier.cs
+    hidden: true
+  - name: Logs before the first await and again after it
+    file: 04-serve.cs
+    hidden: true
