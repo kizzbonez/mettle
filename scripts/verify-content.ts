@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import type { RunnerRequest, RunnerResponse } from '@mettle/shared';
 import { loadContent } from '../apps/api/src/content/load';
 import type { ContentCourse, ContentLab, ContentTrack } from '../apps/api/src/content/types';
+import { ignoredContent } from './ignored-content';
 
 process.env.RUNNER_TOKEN ??= 'content-verify';
 const { execute } = await import('../apps/runner/src/execute');
@@ -135,6 +136,9 @@ const tracks = loadContent(contentDir, filterTrack ? [filterTrack] : undefined);
 if (tracks.length === 0) problems.push(`No track matches "${filterTrack}"`);
 console.log(`Verifying ${tracks.length} track(s)\n`);
 for (const track of tracks) await checkTrack(track);
+for (const file of ignoredContent(contentDir)) {
+  if (!filterTrack || file.startsWith(`tracks/${filterTrack}/`)) problems.push(`content/${file}: ignored by git, so a clone would not have it`);
+}
 
 if (problems.length > 0) {
   console.error(`\n${problems.length} problem(s):\n`);

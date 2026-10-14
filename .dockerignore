@@ -9,6 +9,7 @@ docs/screenshots
 playwright-report
 test-results
 **/*.log
+!content/**/*.log
 apps/web/public/monaco
 apps/web/AGENTS.md
 e2e
