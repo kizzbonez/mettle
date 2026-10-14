@@ -89,10 +89,11 @@ quick.
 | **Rust Development** | Rust Foundations | Idiomatic Rust | Concurrency and Systems | Production Rust |
 | **C# Development** | C# Foundations | Types, Generics and LINQ | Async and Advanced Language Features | Production .NET |
 | **Linux Command Line** | Shell Foundations | Text and Automation | Robust Shell Scripting | Systems Administration |
+| **Python Development** | Python Foundations | Idiomatic Python | The Data Model and Concurrency | Production Python |
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** | Security Foundations | in development | in development | in development |
 
-151 lessons, 307 exam questions with explanations and 153 labs. Every lab is verified in the
+198 lessons, 400 exam questions with explanations and 204 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -117,6 +118,14 @@ administration topics of LPIC-1 (users, systemd, logs, scheduling, disks, networ
 security). It was written from the man pages, the GNU and Bash manuals, the Bash wiki and the
 LPIC-1 objectives. Its question banks hold 93 questions, each level ends with a lab, and every
 lesson ends with a practice lab that runs real Bash.
+**Python Development is the fourth**: 47 lessons on Python 3.15, planned against the Python
+Institute's PCEP and PCAP syllabi. It starts from what Python is, installing it and a first
+program, and goes on to modules and imports, packages and virtual environments, classes,
+files, generators, decorators, the data model, type hints, threads, processes and asyncio,
+then packaging, testing, logging, command-line programs, performance, memory and security. It
+was written from the Python documentation and the PEPs, with every example run on Python 3.15.
+Its question banks hold 93 questions, each level ends with a lab, and every lesson ends with a
+practice lab.
 
 AI Development and Cyber Security are still in the original short format (three lessons a
 level) and are next to be expanded.
