@@ -4,6 +4,43 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-10-15
+
+Python Development, a full course.
+
+### Added
+
+- **Python Development**: 47 lessons in four levels on Python 3.15, in the same full-course
+  format as Rust, C# and Linux, planned against the Python Institute's PCEP and PCAP syllabi.
+  It starts from what Python is, installing it and a first program, and teaches one idea per
+  lesson through numbers, strings, collections, functions and exceptions; every form of
+  `import`, packages and virtual environments, Unicode, comprehensions, closures, classes,
+  files, generators and pattern matching; decorators, the data model, dataclasses, context
+  managers, type hints, protocols, descriptors, threads, processes and asyncio; and packaging,
+  testing, logging, command-line programs, data formats, performance, memory, security and
+  code-quality tools. It was written from the Python documentation and the PEPs, and covers
+  what is new in 3.15 where it matters, with every example run on 3.15.
+  - Python Foundations (14 lessons), Idiomatic Python (13), The Data Model and Concurrency
+    (10) and Production Python (10).
+  - 93 exam questions; each attempt at a level's mock exam draws ten.
+  - An end-of-level lab for each level, from a choir's rehearsal headcount to a food co-op's
+    bulk-order command-line tool.
+  - A practice lab for every lesson, each using only what has been taught so far.
+- Python lab tests can run the learner's file as a program: `run_script(stdin=..., args=...)`
+  types input into it and returns what it printed, its errors and its exit status, and
+  `printed_by(function, ...)` returns what one call printed. A beginner's script that reads
+  with `input()` is tested as it is written.
+- Python files among a lab's fixtures (`data/*.py`) are modules the learner's file can import
+  at the top, as it would in a real project.
+- When a learner's Python file fails as it loads, the test shows the traceback that
+  `python solution.py` would print, starting at their own file, without the test loader's lines.
+
+### Changed
+
+- The Python sandbox runs **Python 3.15** with NumPy 2.5, instead of Python 3.12. The AI
+  track's labs pass unchanged; their notes name the new version, and the track's revision is
+  raised so installed sites receive them.
+
 ## [1.7.0] - 2026-10-14
 
 Linux Command Line, a full course.
