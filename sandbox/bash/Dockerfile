@@ -1,8 +1,9 @@
-# Sandbox image for Linux and shell labs: a small Debian with the usual text tools.
+# Sandbox image for Linux and shell labs: a small Debian with the usual text tools,
+# archive tools, and ShellCheck for the labs about writing scripts well.
 FROM debian:bookworm-slim
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends gawk jq procps \
+ && apt-get install -y --no-install-recommends gawk jq procps file bc xz-utils zip unzip bsdextrautils tree shellcheck \
  && rm -rf /var/lib/apt/lists/* \
  && useradd --uid 10001 --user-group --no-create-home --home-dir /work --shell /usr/sbin/nologin sandbox \
  && mkdir /work && chown sandbox:sandbox /work
