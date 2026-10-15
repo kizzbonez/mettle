@@ -1,0 +1,5 @@
+{"bike_id": "0042", "member": "007", "checked_at": "2026-04-01 18:30", "brakes_ok": true, "tyre_mm": 2.5}
+{"bike_id": "0107", "member": "012", "checked_at": "2026-04-01 18:45", "brakes_ok": false, "tyre_mm": 1.1}
+{"bike_id": "0230", "member": "031", "checked_at": "2026-04-08 19:05", "brakes_ok": true, "tyre_mm": null}
+{"bike_id": "0042", "member": "007", "checked_at": "2026-04-22 18:10", "brakes_ok": true, "tyre_mm": 2.2}
+{"bike_id": "0315", "member": "100", "checked_at": "2026-04-22 18:40", "brakes_ok": false, "tyre_mm": 0.8}

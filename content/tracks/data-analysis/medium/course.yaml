@@ -1,0 +1,18 @@
+title: pandas Foundations
+summary: >-
+  pandas from the first DataFrame. Read CSV and JSON files, inspect what you loaded, select
+  and filter rows and columns, sort, add and change columns, handle missing data and data
+  types, understand copy-on-write in pandas 3, write results out, and answer first questions
+  by grouping and aggregating.
+outcomes:
+  - Build Series and DataFrames and read CSV and JSON files with the right options
+  - Inspect a dataset and select, filter and sort it with loc, iloc and boolean masks
+  - Add and change columns without chained assignment, as copy-on-write requires
+  - Handle missing values and choose data types, including pandas 3's string type and categoricals
+  - Write data out, and summarise it with groupby and named aggregations
+exam:
+  title: pandas Foundations Mock Exam
+  description: Ten questions drawn from the level's bank, from Series and DataFrames to selection, missing data, types, copy-on-write and grouping.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

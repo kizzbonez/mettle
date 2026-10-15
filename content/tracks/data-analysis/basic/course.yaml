@@ -1,0 +1,18 @@
+title: NumPy Foundations
+summary: >-
+  NumPy from the first array. Learn why arrays beat lists, create arrays of every shape and
+  type, index, slice and mask them, compute without loops through vectorised operations and
+  broadcasting, summarise along axes, draw reproducible random numbers, load and save data,
+  and solve a first system of equations.
+outcomes:
+  - Create arrays of the right shape and data type, and reshape, stack and split them
+  - Select data with indexing, slicing, boolean masks and integer arrays, knowing when you get a view or a copy
+  - Replace Python loops with vectorised arithmetic, universal functions and broadcasting
+  - Summarise data along an axis, handle NaN, and draw reproducible random numbers with a Generator
+  - Load and save array data, and use basic linear algebra
+exam:
+  title: NumPy Foundations Mock Exam
+  description: Ten questions drawn from the level's bank, from arrays and data types to indexing, broadcasting, aggregation and random numbers.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

@@ -1,0 +1,19 @@
+title: Seed Library
+summary: Take seed packet labels apart with str.extract and named groups, clean free-text answers into a fixed set of categories with strip, lower, regex replace and map, and search notes literally with str.contains.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Tidies the example packets
+    file: 01-example.py
+    hidden: false
+  - name: Takes apart only labels that match the pattern exactly
+    file: 02-split-labels.py
+    hidden: true
+  - name: Maps every known spelling and leaves the rest missing
+    file: 03-seed-kind.py
+    hidden: true
+  - name: Finds a phrase literally, ignoring case
+    file: 04-mentions.py
+    hidden: true

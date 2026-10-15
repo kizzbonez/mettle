@@ -1,0 +1,23 @@
+slug: classroom-air-quality-pipeline
+title: Classroom Air Quality Pipeline
+summary: Build a command-line pipeline that reads a school's daily CO2 sensor files as text, validates every row against stated rules and quarantines the bad ones with a reason, cleans and types the rest, summarises each room's day, writes Parquet and CSV outputs that read back exactly, and prints a short quality report.
+language: python
+minutes: 60
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Runs the two school days from the instructions through every function
+    file: 01-two-school-days.py
+    hidden: false
+  - name: Applies every validation rule, in order, with its boundaries and duplicates
+    file: 02-validation-rules.py
+    hidden: true
+  - name: Summarises rooms and days and writes the report, with ties and missing temperatures
+    file: 03-summary-and-report.py
+    hidden: true
+  - name: Writes Parquet, CSV and report files and exits with the right status
+    file: 04-command-line-and-files.py
+    hidden: true
+  - name: Handles another column layout, file order and empty files
+    file: 05-another-day-and-empty-files.py
+    hidden: true

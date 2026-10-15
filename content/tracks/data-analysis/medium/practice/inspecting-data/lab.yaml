@@ -1,0 +1,19 @@
+title: Loans Check
+summary: Inspect a library's loans export before using it, counting the gaps per column, reporting a category column with nunique and value_counts, drawing a reproducible sample, and rounding describe's summary.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Checks the example loans export
+    file: 01-example.py
+    hidden: false
+  - name: Counts the gaps in every column
+    file: 02-missing-counts.py
+    hidden: true
+  - name: Reports a category column with gaps, ties and a single value
+    file: 03-category-report.py
+    hidden: true
+  - name: Samples reproducibly and summarises the numbers
+    file: 04-sample-and-describe.py
+    hidden: true

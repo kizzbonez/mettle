@@ -1,0 +1,9 @@
+order_id,dish,spice,price,qty,paid
+D101,korma,mild,11.50,2,Y
+D102,vindaloo,fiery,12.95,1,Y
+D103,jalfrezi,hot,12.25,two,N
+D104,madras,hot,10.95,1,Y
+D105,raita,mild,1.15,3,N
+D106,phaal,fiery,free,1,Y
+D107,dal,mild,8.50,,Y
+D108,bhuna,medium,11.75,1,N

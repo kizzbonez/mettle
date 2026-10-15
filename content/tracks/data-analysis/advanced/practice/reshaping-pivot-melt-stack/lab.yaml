@@ -1,0 +1,19 @@
+title: Running Club Log
+summary: Melt a coach's wide weekly sheet into long rows, build a weekly table of total distances with pivot_table, fill_value and margins, and count kit items per size with explode and crosstab.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Reshapes the example sheet, runs and kit orders
+    file: 01-example.py
+    hidden: false
+  - name: Melts every reported distance into sorted long rows
+    file: 02-sheet-to-long.py
+    hidden: true
+  - name: Totals repeated runs per week with All totals
+    file: 03-weekly-totals.py
+    hidden: true
+  - name: Counts every item of every order per size
+    file: 04-kit-table.py
+    hidden: true

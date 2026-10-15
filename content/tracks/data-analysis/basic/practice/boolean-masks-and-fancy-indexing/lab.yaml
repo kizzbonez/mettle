@@ -1,0 +1,19 @@
+title: Bike Hire Log
+summary: Filter a bike-hire log with boolean masks joined by &, price every hire with nested np.where, and find the positions of overdue hires with np.nonzero, without changing the log.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Filters, prices and chases the example hires
+    file: 01-example.py
+    hidden: false
+  - name: Keeps fair hires, limits included, in order
+    file: 02-fair-rides.py
+    hidden: true
+  - name: Prices every hire at the boundaries
+    file: 03-fees.py
+    hidden: true
+  - name: Finds the positions of overdue hires
+    file: 04-overdue.py
+    hidden: true

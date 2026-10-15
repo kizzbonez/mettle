@@ -1,0 +1,19 @@
+title: Honey Stall
+summary: Build a Series from a dict and a DataFrame from a list of records, let Series arithmetic match prices by label, multiply two columns for the day's takings, and find the str columns from their dtypes.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Handles the example prices and market day
+    file: 01-example.py
+    hidden: false
+  - name: Keeps the dict's order and matches price changes by name
+    file: 02-prices.py
+    hidden: true
+  - name: Builds the day's table from records and adds up the takings
+    file: 03-market-day.py
+    hidden: true
+  - name: Finds the text columns from their dtypes
+    file: 04-text-columns.py
+    hidden: true

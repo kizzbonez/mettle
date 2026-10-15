@@ -1,0 +1,19 @@
+title: Tea Room Weeks
+summary: Reshape a tea room's daily sales into a table of weeks with -1, total each day of the week along the right axis, and stack two tea rooms' days side by side as columns.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Lays out the example fortnight
+    file: 01-example.py
+    hidden: false
+  - name: Puts each week in a row, Monday first
+    file: 02-by-week.py
+    hidden: true
+  - name: Totals each day of the week over every week
+    file: 03-weekday-totals.py
+    hidden: true
+  - name: Stacks the two tea rooms as columns
+    file: 04-side-by-side.py
+    hidden: true

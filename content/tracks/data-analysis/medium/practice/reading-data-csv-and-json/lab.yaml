@@ -1,0 +1,19 @@
+title: Club Rides
+summary: Read a German rides export with sep, skiprows, usecols, decimal, thousands, na_values and a date format, a member list without a header with names and index_col, and bike checks from JSON Lines, keeping every code as text.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Reads the three sample files
+    file: 01-example.py
+    hidden: false
+  - name: Reads another rides export with every number, date and gap right
+    file: 02-rides.py
+    hidden: true
+  - name: Reads another member list without losing its first line or its zeros
+    file: 03-members.py
+    hidden: true
+  - name: Reads another JSON Lines file with the codes kept as text
+    file: 04-checks.py
+    hidden: true

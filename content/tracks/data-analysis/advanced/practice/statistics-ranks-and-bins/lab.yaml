@@ -1,0 +1,19 @@
+title: Giant Vegetable Class
+summary: Place a village show's giant vegetables within each class with a dense rank, share each class's entries across weight bands with cut and a row-normalised crosstab, and compare z-scores with the 1.5 x IQR rule for suspicious weights.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Judges the example entries
+    file: 01-example.py
+    hidden: false
+  - name: Places entries within each vegetable with shared places and no gaps
+    file: 02-places.py
+    hidden: true
+  - name: Shares entries across every band, lower edges included
+    file: 03-band-shares.py
+    hidden: true
+  - name: Flags outliers strictly past the fences, with gaps
+    file: 04-outliers.py
+    hidden: true

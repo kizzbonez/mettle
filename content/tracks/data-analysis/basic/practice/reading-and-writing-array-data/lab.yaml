@@ -1,0 +1,19 @@
+title: River Gauge Readings
+summary: Read a canoe club's CSV of river depths with np.loadtxt past its comment and header, write a file of changes with np.savetxt and a format per column, and keep the season exactly in an .npz file.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Reads, writes and saves the example season
+    file: 01-example.py
+    hidden: false
+  - name: Loads gauge files of any size, even a single post
+    file: 02-load-gauges.py
+    hidden: true
+  - name: Writes the changes file line for line
+    file: 03-write-changes.py
+    hidden: true
+  - name: Saves the season with its dtypes and every digit
+    file: 04-save-season.py
+    hidden: true

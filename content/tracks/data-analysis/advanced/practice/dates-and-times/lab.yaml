@@ -1,0 +1,19 @@
+title: Radio Schedule
+summary: Parse a radio station's day-first show log with an exact format and coerce, measure real show lengths across clock changes with tz_localize, show start times on listeners' clocks with tz_convert, and repeat a slot weekly by calendar days.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Schedules the example shows
+    file: 01-example.py
+    hidden: false
+  - name: Parses only day-first times in the exact layout
+    file: 02-parse-log.py
+    hidden: true
+  - name: Measures real show lengths across both clock changes
+    file: 03-show-table.py
+    hidden: true
+  - name: Converts to listeners' zones and repeats a slot weekly
+    file: 04-zones-and-slots.py
+    hidden: true

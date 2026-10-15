@@ -1,0 +1,13 @@
+loan_id,branch,item,days_out,renewals,borrower_age
+L001,Central,book,14,0,34
+L002,Riverside,dvd,7,1,
+L003,Central,book,21,2,67
+L004,Hillcrest,audiobook,14,0,41
+L005,Central,book,,0,29
+L006,Riverside,book,28,3,15
+L007,riverside,book,14,0,52
+L008,Central,dvd,3,0,
+L009,Hillcrest,book,14,1,73
+L010,Central,book,35,4,38
+L011,Riverside,audiobook,14,0,44
+L012,Central,,14,0,23

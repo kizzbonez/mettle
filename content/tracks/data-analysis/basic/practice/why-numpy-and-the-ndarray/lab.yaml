@@ -1,0 +1,19 @@
+title: Club Ride Log
+summary: Turn a cycling club's ride log into a NumPy array, report its shape, size and dtype, and convert every distance from miles to kilometres in one vectorised expression.
+language: python
+minutes: 10
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Reports on the example ride log
+    file: 01-example.py
+    hidden: false
+  - name: Reads the shape and size of any log
+    file: 02-shape-and-size.py
+    hidden: true
+  - name: Reports the dtype NumPy picked
+    file: 03-dtype.py
+    hidden: true
+  - name: Converts every distance with one array expression
+    file: 04-vectorised-km.py
+    hidden: true

@@ -1,0 +1,545 @@
+- key: data-professional-01
+  type: single
+  category: data
+  tags: [validation, duplicates]
+  prompt: |
+    A clinic exports its visits:
+
+    ```python
+    import pandas as pd
+
+    visits = pd.DataFrame({
+        "patient": ["P1", "P2", "P1", "P3", "P2"],
+        "day": ["Mon", "Mon", "Mon", "Tue", "Wed"],
+    })
+    print(visits.duplicated(subset="patient", keep=False).sum(), len(visits.drop_duplicates()))
+    ```
+
+    What does it print?
+  options:
+    - text: "`4 4`"
+      correct: true
+    - text: "`2 4`"
+    - text: "`4 3`"
+    - text: "`2 3`"
+  explanation: |
+    `duplicated(subset="patient", keep=False)` marks **every** row whose patient appears more
+    than once: both P1 rows and both P2 rows, so 4. With the default `keep="first"` only the
+    repeats would be marked, giving 2, which is the tempting answer. `drop_duplicates()` with no
+    `subset` compares whole rows: only rows 0 and 2 (P1, Mon) are identical, so one is removed
+    and 4 of the 5 rows remain. P2's two visits are on different days, so as whole rows they are
+    not duplicates.
+
+- key: data-professional-02
+  type: single
+  category: data
+  tags: [validation, quarantine, np-select]
+  prompt: |
+    ```python
+    import numpy as np
+    import pandas as pd
+
+    price = pd.Series([-5.0, np.nan, 12.0])
+    rules = {
+        "missing price": price.isna(),
+        "negative price": price < 0,
+        "price out of range": ~price.between(0, 10),
+    }
+    reason = np.select(list(rules.values()), list(rules), default="ok")
+    print(reason.tolist())
+    ```
+
+    What does it print?
+  options:
+    - text: "`['negative price', 'missing price', 'price out of range']`"
+      correct: true
+    - text: "`['price out of range', 'price out of range', 'price out of range']`"
+    - text: "`['negative price', 'price out of range', 'price out of range']`"
+    - text: "`['ok', 'missing price', 'price out of range']`"
+  explanation: |
+    `np.select` gives each row the choice of the **first** condition that is true, in list order.
+    -5.0 is not missing but is negative, so it gets `negative price`, even though it is also out of
+    range. NaN is missing; it would also be "out of range", because `between` is `False` for NaN,
+    but `missing price` comes first. 12.0 breaks only the range rule. That is why the order of the
+    rules matters: put the most precise reason first, or a missing value is reported as an
+    impossible one.
+
+- key: data-professional-03
+  type: single
+  category: data
+  tags: [testing, assertions]
+  prompt: |
+    A test ends with this line:
+
+    ```python
+    assert result == expected  # both are DataFrames
+    ```
+
+    What happens when it runs?
+  options:
+    - text: "It raises `ValueError: The truth value of a DataFrame is ambiguous`, whether or not the frames are equal"
+      correct: true
+    - text: "It passes when every value is equal and raises `AssertionError` otherwise"
+    - text: "It passes when the frames have the same shape, whatever their values"
+    - text: "It raises `AssertionError` that lists the cells that differ"
+  explanation: |
+    `result == expected` compares element by element and returns a **DataFrame** of booleans.
+    `assert` must turn that into one `True` or `False`, and pandas refuses because it cannot know
+    whether you mean "all" or "any": `ValueError: The truth value of a DataFrame is ambiguous`.
+    Use `pandas.testing.assert_frame_equal(result, expected)`, which checks values, dtypes, index
+    and column names and explains the first difference.
+
+- key: data-professional-04
+  type: single
+  category: data
+  tags: [testing, assert-frame-equal]
+  prompt: |
+    ```python
+    import pandas as pd
+    import pandas.testing as pdt
+
+    counts = pd.DataFrame({"n": [1, 2]})
+    expected = pd.DataFrame({"n": [1.0, 2.0]})
+    pdt.assert_frame_equal(counts, expected)
+    ```
+
+    Which statement is true?
+  options:
+    - text: "It raises `AssertionError` because the dtypes differ (`int64` and `float64`); `check_dtype=False` makes it pass"
+      correct: true
+    - text: "It passes, because `1 == 1.0` and `2 == 2.0`"
+    - text: "It raises `AssertionError`, and only `check_exact=False` makes it pass"
+    - text: "It raises `TypeError`, because integers and floats cannot be compared"
+  explanation: |
+    `assert_frame_equal` checks each column's dtype by default (`check_dtype=True`), so an `int64`
+    column does not equal a `float64` one even with equal values: the error says
+    `Attribute "dtype" are different`. Pass `check_dtype=False` when the dtype does not matter to
+    the caller. Keep the check when it does: a count that silently became a float is often the
+    sign of a missing value. `check_exact` and the tolerances `rtol`/`atol` are about float
+    values, not dtypes.
+
+- key: data-professional-05
+  type: single
+  category: data
+  tags: [performance, vectorization]
+  prompt: |
+    A script labels 2 million taxi trips:
+
+    ```python
+    trips["band"] = trips.apply(lambda row: "long" if row["km"] > 10 else "short", axis=1)
+    ```
+
+    Which replacement gives the same column and is vectorised?
+  options:
+    - text: '`trips["band"] = np.where(trips["km"] > 10, "long", "short")`'
+      correct: true
+    - text: '`trips["band"] = trips["km"].apply(lambda km: "long" if km > 10 else "short")`'
+    - text: '`trips["band"] = np.vectorize(lambda km: "long" if km > 10 else "short")(trips["km"])`'
+    - text: '`trips["band"] = ["long" if trip.km > 10 else "short" for trip in trips.itertuples()]`'
+  explanation: |
+    `np.where(condition, a, b)` evaluates the comparison on the whole column in compiled code
+    and picks `"long"` or `"short"` for every row at once. The other three still call Python code
+    once per row: `Series.apply` and the comprehension over `itertuples` are faster than
+    `apply(axis=1)`, which builds a Series for every row, but they are loops. `np.vectorize` is a
+    convenience, and the NumPy docs say its implementation is essentially a for loop.
+
+- key: data-professional-06
+  type: single
+  category: data
+  tags: [performance, timeit]
+  prompt: |
+    You time a function with `timeit.repeat(..., number=10, repeat=5)` and get these five totals in
+    seconds:
+
+    ```text
+    [0.84, 0.81, 1.37, 0.82, 0.95]
+    ```
+
+    Which number best describes the function's speed, and why?
+  options:
+    - text: "0.81, the minimum: the larger values come from other activity on the machine, not from the code"
+      correct: true
+    - text: "0.958, the mean, because it averages out the noise"
+    - text: "1.37, the maximum, because it is the worst case the code can have"
+    - text: "0.84, the first run, because later runs are sped up by caching"
+  explanation: |
+    The `timeit` documentation recommends the minimum: the lowest value is the best the machine
+    can do for that code, and higher values are typically caused by other processes interfering,
+    not by variation in the code itself. The mean is pulled up by one disturbed run (1.37).
+    Remember that each total covers `number=10` calls, so one call took about 0.081 s here, and
+    compare timings only on the same machine.
+
+- key: data-professional-07
+  type: single
+  category: data
+  tags: [memory, categorical]
+  prompt: |
+    A DataFrame holds 2 million survey answers. Which column shrinks the most when converted with
+    `astype("category")`?
+  options:
+    - text: "`country`, with 190 different values"
+      correct: true
+    - text: "`respondent_id`, a different text id on every row"
+    - text: "`comment`, free text that is almost never repeated"
+    - text: "`submitted_at`, a timestamp different on nearly every row"
+  explanation: |
+    A categorical stores each distinct value once and a small integer code per row. With 190
+    countries over 2 million rows, each row needs a one- or two-byte code instead of its own text,
+    a large saving. For a column whose values are nearly all different, the category table is as
+    big as the original column and the codes come on top, so the column gets **bigger**. Timestamps
+    should be `datetime64` (8 bytes each), not categories.
+
+- key: data-professional-08
+  type: single
+  category: data
+  tags: [memory, chunksize, aggregation]
+  prompt: |
+    This code computes the mean fare per line from a file too big to load at once:
+
+    ```python
+    means = []
+    with pd.read_csv("taps.csv", chunksize=100_000) as reader:
+        for chunk in reader:
+            means.append(chunk.groupby("line")["fare_pence"].mean())
+    overall = pd.concat(means, axis=1).mean(axis=1)
+    ```
+
+    What is wrong with it?
+  options:
+    - text: "It averages the chunk means, giving every chunk equal weight; it should add up sums and counts per chunk and divide once at the end"
+      correct: true
+    - text: "Nothing: the mean of the chunk means always equals the mean of all rows"
+    - text: "`read_csv` with `chunksize` cannot be used in a `with` statement"
+    - text: "`pd.concat(..., axis=1)` drops lines that are missing from some chunks"
+  explanation: |
+    A chunk where a line has 10 taps counts as much as one where it has 30,000, so the result is
+    wrong whenever the groups are spread unevenly over the chunks. Means do not combine, but sums
+    and counts do: keep running totals with `Series.add(..., fill_value=0)` and compute
+    `sum / count` after the loop. `read_csv(chunksize=...)` returns a `TextFileReader` that is
+    meant to be used in a `with` statement. `concat(axis=1)` aligns on the line names and fills
+    gaps with NaN, which `mean(axis=1)` skips, so no line is dropped.
+
+- key: data-professional-09
+  type: single
+  category: data
+  tags: [parquet, dtypes, csv]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    gusts = pd.DataFrame({"gust_kph": pd.array([41, None, 38], dtype="Int64")})
+    gusts.to_csv("g.csv", index=False)
+    gusts.to_parquet("g.parquet")
+    print(pd.read_csv("g.csv")["gust_kph"].dtype, pd.read_parquet("g.parquet")["gust_kph"].dtype)
+    ```
+
+    What does it print?
+  options:
+    - text: "`float64 Int64`"
+      correct: true
+    - text: "`Int64 Int64`"
+    - text: "`int64 Int64`"
+    - text: "`float64 float64`"
+  explanation: |
+    CSV is plain text: the missing gust is an empty field, and `read_csv` has to guess the type
+    again. A column of integers with a gap becomes `float64`, because NaN is a float. Parquet
+    stores the column's type, and pandas' dtype in its metadata, so the nullable `Int64` with its
+    `<NA>` comes back unchanged. Use Parquet for data that moves between steps of a pipeline, or
+    give `read_csv` the dtype explicitly.
+
+- key: data-professional-10
+  type: single
+  category: data
+  tags: [parquet, filters]
+  prompt: |
+    `obs.parquet` holds four rows:
+
+    ```text
+      station  temp_c
+    0    Oslo    12.0
+    1    Oslo    26.5
+    2  Bergen    27.0
+    3  Bergen    18.0
+    ```
+
+    How many rows does each of these reads return?
+
+    ```python
+    first = pd.read_parquet("obs.parquet", filters=[[("station", "==", "Oslo")], [("temp_c", ">", 25)]])
+    second = pd.read_parquet("obs.parquet", filters=[("station", "==", "Oslo"), ("temp_c", ">", 25)])
+    ```
+  options:
+    - text: "`first` has 3 rows and `second` has 1"
+      correct: true
+    - text: "`first` has 1 row and `second` has 3"
+    - text: "Both have 1 row"
+    - text: "Both have 3 rows"
+  explanation: |
+    In `filters`, the tuples inside one list are combined with **and**; a list of lists combines
+    its inner lists with **or**. `second` is one list, so it keeps rows from Oslo **and** above
+    25 degrees: only row 1. `first` is two lists, so it keeps Oslo rows **or** rows above 25: rows
+    0, 1 and 2. The filter is applied while reading, so rows that do not match are never loaded
+    into the DataFrame.
+
+- key: data-professional-11
+  type: multiple
+  category: data
+  tags: [parquet, partitioning]
+  prompt: |
+    A frame of hourly observations is written with
+    `obs.to_parquet("by_station", partition_cols=["station"])`. Which statements are true?
+  options:
+    - text: "The folder holds one subfolder per station, named like `station=Oslo`"
+      correct: true
+    - text: "Reading the folder back gives `station` as a categorical column"
+      correct: true
+    - text: "Running the same line again replaces the files written the first time"
+    - text: "A column with a different value on almost every row, such as a trip id, makes a good partition column"
+  explanation: |
+    `partition_cols` writes the Hive layout: one `column=value` folder per value (characters
+    outside ASCII are percent-encoded in the name), and the partition column is stored in the
+    folder names rather than in the files. Reading it back rebuilds the column as a `category`,
+    placed after the others. Writing again adds new files next to the old ones, so the dataset
+    then holds every row twice: delete the folder first to replace it. Partitioning by a column
+    with thousands of values creates thousands of tiny files and slows reading down; partition by
+    columns with few values that you often filter on.
+
+- key: data-professional-12
+  type: single
+  category: data
+  tags: [numerical-accuracy, overflow, nep-50]
+  prompt: |
+    ```python
+    import numpy as np
+
+    counts = np.array([200, 30], dtype=np.uint8)
+    print((counts + 100).tolist(), (counts + 100).dtype, counts.sum())
+    ```
+
+    What does NumPy 2 print?
+  options:
+    - text: "`[44, 130] uint8 230`"
+      correct: true
+    - text: "`[300, 130] uint16 230`"
+    - text: "`[44, 130] uint8 -26`"
+    - text: "It raises `OverflowError` because 300 does not fit in `uint8`"
+  explanation: |
+    Under NEP 50 a Python `int` is a **weak** scalar: it takes the array's type, so the result is
+    `uint8`, and 200 + 100 = 300 wraps around to 300 - 256 = 44 without any warning. Before NumPy 2
+    the value-based rules promoted the result to a wider type, which is the `uint16` answer.
+    `OverflowError` is raised only when the Python integer itself does not fit the type, as in
+    `counts + 300`. `sum` on a small integer type accumulates in the platform's 64-bit integer,
+    so it returns the correct 230.
+
+- key: data-professional-13
+  type: single
+  category: data
+  tags: [numerical-accuracy, missing-values]
+  prompt: |
+    A rain gauge reported nothing at all this week:
+
+    ```python
+    import numpy as np
+    import pandas as pd
+
+    rain = pd.Series([np.nan, np.nan])
+    print(rain.sum(), rain.sum(min_count=1), np.array([np.nan, 1.0]).sum())
+    ```
+
+    What does it print?
+  options:
+    - text: "`0.0 nan nan`"
+      correct: true
+    - text: "`nan nan nan`"
+    - text: "`0.0 nan 1.0`"
+    - text: "`nan 0.0 1.0`"
+  explanation: |
+    pandas skips missing values by default, and the sum of nothing is 0, so a week with no data
+    sums to `0.0`, which looks exactly like a dry week. `min_count=1` asks for at least one real
+    value and returns NaN otherwise. NumPy does not skip NaN: any NaN makes the whole sum NaN
+    (`np.nansum` would skip it). Knowing which library propagates and which skips is what keeps a
+    missing day from turning into a measured zero.
+
+- key: data-professional-14
+  type: single
+  category: data
+  tags: [numerical-accuracy, rounding, decimal]
+  prompt: |
+    A shop's rule is to round prices half up to whole cents, so 1.005 must become 1.01. Which
+    expression gives 1.01?
+  options:
+    - text: '`Decimal("1.005").quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)`'
+      correct: true
+    - text: "`round(1.005, 2)`"
+    - text: "`pd.Series([1.005]).round(2)`"
+    - text: '`Decimal(1.005).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)`'
+  explanation: |
+    The float 1.005 is stored in binary as 1.00499999999999989..., just below the half, so
+    Python's `round` and pandas' `.round` both give 1.0, before even applying their round-half-to-
+    even rule. `Decimal(1.005)` built from the float inherits the same binary error and
+    rounds to 1.00. Only a `Decimal` built from the **string** `"1.005"` holds the exact value,
+    and `quantize` with `ROUND_HALF_UP` then gives 1.01. (`quantize` without `rounding=` would
+    round half to even, giving 1.00.)
+
+- key: data-professional-15
+  type: single
+  category: data
+  tags: [reproducibility, random]
+  prompt: |
+    ```python
+    import numpy as np
+
+    rng = np.random.default_rng(42)
+    a = rng.integers(0, 100, 3)
+    b = rng.integers(0, 100, 3)
+    c = np.random.default_rng(42).integers(0, 100, 3)
+    ```
+
+    Which statement is true?
+  options:
+    - text: "`a` and `c` are equal; `b` continues the sequence and is generally different"
+      correct: true
+    - text: "`a`, `b` and `c` are all equal, because they come from the same seed"
+    - text: "All three differ, because each call draws fresh random numbers"
+    - text: "`a` and `b` are equal; `c` differs because it uses a new generator"
+  explanation: |
+    A generator's sequence is fixed by its seed, and each draw moves it forward. `a` takes the
+    first three numbers of the seed-42 sequence and `b` the next three. `c` comes from a new
+    generator with the same seed, so it starts again at the beginning and equals `a`. This is why
+    adding a draw early in a script changes every later draw, and why reproducible code creates
+    one seeded generator and passes it explicitly.
+
+- key: data-professional-16
+  type: multiple
+  category: data
+  tags: [reproducibility, idempotence, output]
+  prompt: |
+    A pipeline writes `summary.csv` every night. Which choices help make two runs on the same
+    input produce byte-for-byte identical files?
+  options:
+    - text: "Sorting the rows by columns that together have no ties before writing"
+      correct: true
+    - text: "Writing with fixed `float_format`, `date_format` and `lineterminator`"
+      correct: true
+    - text: "Adding a column with the time the script ran"
+    - text: "Appending each run's rows with `to_csv(..., mode=\"a\")`"
+  explanation: |
+    Identical output needs a defined row order and fixed formatting. A sort key with no ties
+    defines the order by the data alone, whatever the sorting algorithm. Fixed formats stop
+    floats, dates and line endings from varying. A "run at" timestamp changes on every run by
+    design, so the files can never match; keep it in the log instead. Appending is not
+    idempotent: a second run writes the same rows a second time.
+
+- key: data-professional-17
+  type: single
+  category: data
+  tags: [pipeline, argparse]
+  prompt: |
+    ```python
+    import argparse
+
+    parser = argparse.ArgumentParser(prog="bikeshare")
+    parser.add_argument("trips")
+    parser.add_argument("--min-minutes", type=float, default=2.0)
+    args = parser.parse_args(["trips.csv", "--min-minutes", "two"])
+    ```
+
+    What happens on the last line?
+  options:
+    - text: "argparse prints the usage and `invalid float value: 'two'` to standard error and exits with status 2"
+      correct: true
+    - text: "`args.min_minutes` is the string `'two'`"
+    - text: "`args.min_minutes` is `2.0`, the default, because the value could not be converted"
+    - text: "A `ValueError` traceback is shown and the program exits with status 1"
+  explanation: |
+    `type=float` makes argparse call `float("two")`. It catches the `ValueError` and reports a
+    **usage error**: the usage line and `bikeshare: error: argument --min-minutes: invalid float
+    value: 'two'` on standard error, then exits with status 2, the convention for a wrongly
+    called command. The default is used only when the option is absent, never to paper over a
+    bad value. On success the value would be in `args.min_minutes`, with the dashes turned into
+    an underscore.
+
+- key: data-professional-18
+  type: single
+  category: data
+  tags: [pipeline, logging, exit-status]
+  prompt: |
+    A pipeline logs with `logging.basicConfig(...)`, prints its results with `print`, and its
+    `main()` catches `ValueError`, logs it with `logger.error` and returns 1; the file ends with
+    `sys.exit(main())`. A scheduler runs:
+
+    ```console
+    $ python pipeline.py old-export.csv > report.txt
+    ```
+
+    `old-export.csv` lacks a required column. What happens?
+  options:
+    - text: "The error line appears on standard error, `report.txt` is empty, and the exit status is 1"
+      correct: true
+    - text: "The error line is written into `report.txt`, and the exit status is 0"
+    - text: "A traceback appears and the exit status is 2"
+    - text: "Nothing is printed anywhere, and the exit status is 0"
+  explanation: |
+    `logging.basicConfig` sends log records to standard error by default, and `>` redirects only
+    standard output, so the error stays visible while `report.txt` gets no results. `main`
+    returns 1 and `sys.exit(main())` turns that into the exit status, which tells the scheduler
+    the run failed. Status 2 is argparse's code for usage errors, and a traceback appears only for
+    exceptions the program does not catch. Keeping diagnostics out of standard output is exactly
+    what stops error text from ending up inside a results file.
+
+- key: data-professional-19
+  type: single
+  category: data
+  tags: [reports, pivot-table, margins]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    orders = pd.DataFrame({"shop": ["North", "North", "North", "South"], "basket": [10.0, 20.0, 30.0, 100.0]})
+    table = orders.pivot_table(index="shop", values="basket", aggfunc="mean", margins=True)
+    print(table.loc["All", "basket"])
+    ```
+
+    What does it print?
+  options:
+    - text: "`40.0`"
+      correct: true
+    - text: "`60.0`"
+    - text: "`120.0`"
+    - text: "`160.0`"
+  explanation: |
+    The shop means are 20.0 and 100.0. The margin row is not computed from those cells: with
+    `margins=True`, pivot_table applies `aggfunc` to the underlying rows, so `All` is the mean of
+    all four baskets, 160 / 4 = 40.0. The mean of the two shop means, 60.0, would give South's
+    single order as much weight as North's three. For sums the two methods agree; for means and
+    other non-additive functions, label the total row for what it is.
+
+- key: data-professional-20
+  type: single
+  category: data
+  tags: [data-quality, missing-values, reports]
+  prompt: |
+    A quality check compares this week's batch with last week's:
+
+    ```python
+    import numpy as np
+    import pandas as pd
+
+    previous = pd.DataFrame({"temp": [20.1, np.nan, 19.8, 21.0]})
+    current = pd.DataFrame({"temp": [np.nan, np.nan, 20.5]})
+    print((current.isna().mean() - previous.isna().mean())["temp"].round(2))
+    ```
+
+    What does it print, and why is this a better measure than comparing `isna().sum()`?
+  options:
+    - text: "`0.42`: the share of missing values rose from 25% to 67%, which a count difference of 1 hides because the batches differ in size"
+      correct: true
+    - text: "`1`: one more value is missing, which is all that matters"
+    - text: "`0.67`: the share of missing values this week"
+    - text: "`-0.42`: fewer values are missing this week"
+  explanation: |
+    `isna()` gives booleans and `mean()` treats `True` as 1, so `isna().mean()` is the share of
+    missing values per column: 1 of 4 (0.25) last week and 2 of 3 (0.67) this week, a rise of
+    0.42. The counts differ by only 1, which looks harmless, but this week's batch is smaller, so
+    two thirds of the readings are gone. Rates make batches of different sizes comparable, which
+    is why quality checks compare null rates, not null counts.

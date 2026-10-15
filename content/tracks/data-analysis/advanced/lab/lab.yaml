@@ -1,0 +1,23 @@
+slug: hive-scale-season-report
+title: Hive Scale Season Report
+summary: Melt a beekeepers' wide scale export into long readings on local time, clean and join the hive register to its apiaries with a validated merge, find stray scales with an anti join, build daily weights with a row for every date, and rank the colonies by their gain with tie rules and bands.
+language: python
+minutes: 55
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Builds the May report from the instructions
+    file: 01-may-report.py
+    hidden: false
+  - name: Reads exports with messy cells, rows out of order and the clock change
+    file: 02-reading-rules.py
+    hidden: true
+  - name: Cleans the register, validates the apiary join and counts stray scales
+    file: 03-register-and-strays.py
+    hidden: true
+  - name: Builds daily weights on local days with a row for every date
+    file: 04-daily-weights.py
+    hidden: true
+  - name: Summarises gains with ties, band edges, missing days and an empty result
+    file: 05-summary.py
+    hidden: true

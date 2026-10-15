@@ -1,0 +1,19 @@
+title: Curry House Orders
+summary: Turn a web form's all-text columns into real dtypes with to_numeric(errors="coerce"), Int64, map and an ordered CategoricalDtype, list the values that silently became gaps, filter and sort by spice level, and round prices before casting to whole pence.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Cleans the example orders
+    file: 01-example.py
+    hidden: false
+  - name: Gives every column its dtype and keeps all four spice levels
+    file: 02-clean-types.py
+    hidden: true
+  - name: Lists the values that are not numbers
+    file: 03-unreadable.py
+    hidden: true
+  - name: Sorts by heat with ties in order and rounds prices to pence
+    file: 04-heat-and-pence.py
+    hidden: true

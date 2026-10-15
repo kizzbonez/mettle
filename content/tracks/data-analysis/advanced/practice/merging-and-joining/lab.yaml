@@ -1,0 +1,19 @@
+title: Bike Workshop Parts
+summary: Price a bike workshop's repair jobs with a validated left merge on differently named keys, list the jobs with unknown part codes with an anti join, and add each part's total use with a join on the index.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Prices the example jobs
+    file: 01-example.py
+    hidden: false
+  - name: Keeps every job, sorts it and refuses a duplicated code
+    file: 02-price-jobs.py
+    hidden: true
+  - name: Lists only the jobs with unknown codes
+    file: 03-unknown-parts.py
+    hidden: true
+  - name: Totals the use of every part, unused ones included
+    file: 04-parts-used.py
+    hidden: true

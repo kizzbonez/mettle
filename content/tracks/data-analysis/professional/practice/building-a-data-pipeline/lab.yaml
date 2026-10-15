@@ -1,0 +1,19 @@
+title: Weighbridge Totals
+summary: Turn a recycling centre's weighbridge export into a small pipeline program, with a reading step that fails loudly on missing columns, a step that cleans and totals, an argparse command line, logs on standard error and exit statuses a scheduler can trust.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Runs on the sample and stops on the old export
+    file: 01-example.py
+    hidden: false
+  - name: Reads text and names every missing column
+    file: 02-read-and-check.py
+    hidden: true
+  - name: Cleans, filters and totals the tickets
+    file: 03-totals.py
+    hidden: true
+  - name: Handles options, errors and exit statuses
+    file: 04-command-line.py
+    hidden: true

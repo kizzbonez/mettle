@@ -1,0 +1,19 @@
+title: Pet Weigh-ins
+summary: Give every bad row of a vet's weigh-in export the first rule it breaks with boolean masks and np.select, keep only the last copy of a re-sent visit with duplicated(keep="last"), split the export into clean rows and a quarantine, and count the reasons.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Checks the example export
+    file: 01-example.py
+    hidden: false
+  - name: Applies the rules in order and keeps the index
+    file: 02-rules-in-order.py
+    hidden: true
+  - name: Keeps only the last copy of a re-sent visit
+    file: 03-replaced-visits.py
+    hidden: true
+  - name: Splits cleanly, including empty results
+    file: 04-split-and-edge-cases.py
+    hidden: true

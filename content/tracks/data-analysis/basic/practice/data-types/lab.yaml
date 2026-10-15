@@ -1,0 +1,19 @@
+title: Pond Dipping Records
+summary: Fix the dtypes of a pond survey, adding uint8 counts without wrapping past 255, rounding float depths before converting them to int64, and counting missing temperatures with np.isnan.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Works through the example survey
+    file: 01-example.py
+    hidden: false
+  - name: Adds counts past 255 without wrapping
+    file: 02-net-totals.py
+    hidden: true
+  - name: Rounds depths before converting them to whole numbers
+    file: 03-whole-cm.py
+    hidden: true
+  - name: Counts only NaN as missing, in any shape
+    file: 04-missing-temps.py
+    hidden: true

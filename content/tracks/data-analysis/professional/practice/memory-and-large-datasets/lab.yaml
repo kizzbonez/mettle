@@ -1,0 +1,19 @@
+title: Till Scans
+summary: Shrink a garden centre chain's till scans with downcast integers, categoricals and parsed datetimes under a memory bound, read only the columns and types you need, and total a scan file chunk by chunk without ever holding it whole.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Shrinks, reads and totals the sample file
+    file: 01-example.py
+    hidden: false
+  - name: Shrinks 200,000 scans below the bound without changing a value
+    file: 02-shrink.py
+    hidden: true
+  - name: Reads only the needed columns, typed while reading
+    file: 03-read-less.py
+    hidden: true
+  - name: Totals a file chunk by chunk
+    file: 04-chunk-by-chunk.py
+    hidden: true

@@ -1,0 +1,14 @@
+Ashby Town Council public chargers, sessions export, March 2026
+session_id,site,connector,started,kwh,minutes,status
+S2701,LEI,Type 2,2026-03-01 08:00,20.00,180,ok
+S2702,hsp,Type 2,2026-03-01 09:30,18.00,170,ok
+S2703,STN,CCS,2026-03-02 07:45,25.60,38,ok
+S2704,MKT,CCS,2026-03-02 12:00,-,4,fault
+S2705,LEI,Type 2,2026-03-03 18:20,29.00,240,ok
+S2706,STN,CCS,2026-03-04 10:10,3.40,6,aborted
+S2707,HSP,Type 2,2026-03-04 14:00,21.00,190,ok
+S2708,mkt,Type 2,2026-03-05 16:40,,unknown,ok
+S2709,STN,Type 2,2026-03-05 19:15,14.80,130,ok
+S2710,HSP,CCS,2026-03-06 11:00,0.40,2,fault
+S2711,STN,CCS,2026-03-07 09:00,30.20,44,ok
+S2712,LEI,Type 2,2026-03-07 13:05,-,?,ok

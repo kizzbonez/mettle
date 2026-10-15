@@ -1,0 +1,19 @@
+title: Museum Visitors
+summary: Build a museum trust's weekly visitor table with pivot_table margins, format counts and shares for a plain-text report with to_string formatters, compare the week with the last for row counts, missing values and new or vanished museums, and write the report file.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Builds the example report
+    file: 01-example.py
+    hidden: false
+  - name: Totals and formats the visitor table
+    file: 02-table-and-text.py
+    hidden: true
+  - name: Warns about row counts, gaps and museums
+    file: 03-batch-checks.py
+    hidden: true
+  - name: Writes the whole report file
+    file: 04-report-file.py
+    hidden: true

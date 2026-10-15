@@ -1,0 +1,19 @@
+title: Hostel Nights
+summary: Build a hostel and month MultiIndex table with groupby, slice it by both levels with pd.IndexSlice after sorting, rank one month with xs and a stable sort, and flatten it into plain columns with unstack and reset_index.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Tabulates the example bookings
+    file: 01-example.py
+    hidden: false
+  - name: Totals and counts every booking per hostel and month
+    file: 02-monthly-table.py
+    hidden: true
+  - name: Slices a table in any order by both levels
+    file: 03-window.py
+    hidden: true
+  - name: Ranks one month with ties and flattens the table
+    file: 04-ranking-and-flat.py
+    hidden: true

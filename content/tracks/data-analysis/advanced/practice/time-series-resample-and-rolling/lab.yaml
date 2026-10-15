@@ -1,0 +1,19 @@
+title: Meter Readings
+summary: Resample a smart meter's irregular readings into daily totals that keep empty days missing, compare each day with the calendar day before using asfreq, diff and pct_change, and smooth the series with a 7-day time window and a running record.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Summarises the example meter readings
+    file: 01-example.py
+    hidden: false
+  - name: Totals each calendar date and keeps empty days missing
+    file: 02-daily-use.py
+    hidden: true
+  - name: Compares with the calendar day before when dates are skipped
+    file: 03-compare-days.py
+    hidden: true
+  - name: Averages over 7 calendar days, not 7 rows
+    file: 04-smooth.py
+    hidden: true

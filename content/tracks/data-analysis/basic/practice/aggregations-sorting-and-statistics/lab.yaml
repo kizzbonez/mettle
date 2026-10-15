@@ -1,0 +1,19 @@
+title: Quiz League Table
+summary: Total a pub quiz league's season with NaN-aware sums, rank the teams with a stable argsort that keeps ties in order, and find each week's median score over the teams that played.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Summarises the example season
+    file: 01-example.py
+    hidden: false
+  - name: Totals each team over the weeks it played
+    file: 02-team-totals.py
+    hidden: true
+  - name: Orders the league with ties kept in order
+    file: 03-league-table.py
+    hidden: true
+  - name: Finds each week's median over the teams that played
+    file: 04-week-medians.py
+    hidden: true

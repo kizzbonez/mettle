@@ -1,0 +1,19 @@
+title: Allotment Harvests
+summary: Summarise an allotment's harvest log per plot with named aggregation, fill unweighed pickings with their own plot's mean and add shares and picking numbers with transform and cumcount, and keep whole plots by their size.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Summarises the example harvest log
+    file: 01-example.py
+    hidden: false
+  - name: Counts pickings and weighed pickings, sorted by plot
+    file: 02-summary.py
+    hidden: true
+  - name: Fills, shares and numbers pickings within their own plot
+    file: 03-plot-columns.py
+    hidden: true
+  - name: Keeps whole plots with enough pickings
+    file: 04-regular-plots.py
+    hidden: true

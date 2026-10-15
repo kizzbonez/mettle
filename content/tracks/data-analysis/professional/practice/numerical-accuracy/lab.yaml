@@ -1,0 +1,19 @@
+title: Shop Books
+summary: Turn hand-typed prices into exact pence with Decimal and half-up rounding, multiply small integer columns without silent overflow, and reconcile till against bank with an absolute half-penny tolerance that treats missing amounts as mismatches.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Handles the example prices, lines and amounts
+    file: 01-example.py
+    hidden: false
+  - name: Rounds every price to exact pence
+    file: 02-exact-pence.py
+    hidden: true
+  - name: Totals lines beyond the int16 range
+    file: 03-totals-without-overflow.py
+    hidden: true
+  - name: Matches amounts to within half a penny
+    file: 04-half-a-penny.py
+    hidden: true

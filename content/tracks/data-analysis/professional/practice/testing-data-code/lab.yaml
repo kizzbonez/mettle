@@ -1,0 +1,19 @@
+title: Tests for the Training Register
+summary: Write unittest tests with small hand-made fixtures, assert_frame_equal and assert_allclose that pass on a football club's attendance and sprint-score code and catch every broken version of it, from rounded rates to missing values and empty registers.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Passes on the real code and catches the two broken versions from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: AttendanceTest checks the rate, its dtype and the row order
+    file: 02-rate-and-order-mistakes.py
+    hidden: true
+  - name: AttendanceTest checks missing statuses and an empty register
+    file: 03-missing-and-empty-mistakes.py
+    hidden: true
+  - name: SprintScoresTest catches every broken sprint_scores
+    file: 04-sprint-score-mistakes.py
+    hidden: true

@@ -1,0 +1,13 @@
+day,museum,ticket,visitors
+2026-08-31,Art,adult,880
+2026-08-31,Art,concession,310
+2026-08-31,Maritime,adult,1190
+2026-08-31,Maritime,child,790
+2026-08-31,Science,adult,2010
+2026-08-31,Science,child,3105
+2026-09-01,Art,adult,925
+2026-09-01,Maritime,adult,1215
+2026-09-01,Maritime,concession,240
+2026-09-01,Science,adult,1950
+2026-09-01,Science,child,2890
+2026-09-01,Science,concession,395

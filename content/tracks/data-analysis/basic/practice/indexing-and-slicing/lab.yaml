@@ -1,0 +1,19 @@
+title: Library Loans
+summary: Slice a library's weekly loans table into views, the weekend columns and one branch's days in reverse, and close a branch for three days in a copy that leaves the original unchanged.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Slices the example loans table
+    file: 01-example.py
+    hidden: false
+  - name: Returns the weekend as a view of the table
+    file: 02-weekend-view.py
+    hidden: true
+  - name: Reverses one branch's days as a view
+    file: 03-newest-first.py
+    hidden: true
+  - name: Closes a branch in a copy, leaving the table unchanged
+    file: 04-closed-copy.py
+    hidden: true

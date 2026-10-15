@@ -1,0 +1,19 @@
+title: Games Night Draws
+summary: Roll dice, seat guests and deal cards for a board-game café from a seeded Generator passed in by the caller, with integers, permutation and choice without replacement, so every game can be replayed.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Replays the example draws with seed 7
+    file: 01-example.py
+    hidden: false
+  - name: Rolls dice from 1 to 6 with the given rng
+    file: 02-dice.py
+    hidden: true
+  - name: Seats guests in a new order, leaving the list alone
+    file: 03-seating.py
+    hidden: true
+  - name: Deals different cards and refuses too many
+    file: 04-deal.py
+    hidden: true

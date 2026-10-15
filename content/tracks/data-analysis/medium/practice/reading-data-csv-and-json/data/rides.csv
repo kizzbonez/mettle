@@ -1,0 +1,13 @@
+Rides export, Velo Club Lindenberg
+Exported 03.05.2026, distances in km, climbing in m
+rider;ride_date;distance_km;climb_m;avg_speed_kmh;note
+007;02.04.2026;42,5;1.120;24,8;
+012;02.04.2026;68,0;860;27,1;windy
+007;05.04.2026;-;640;-;gps lost
+031;06.04.2026;105,3;2.045;25,6;
+012;11.04.2026;55,2;710;28,4;
+100;12.04.2026;23,9;310;19,7;first ride
+031;13.04.2026;88,1;1.530;26,0;
+045;18.04.2026;61,4;905;24,3;gravel loop
+007;19.04.2026;47,0;1.205;23,9;rain
+012;26.04.2026;120,6;1.870;-;battery flat

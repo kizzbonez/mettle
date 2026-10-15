@@ -1,0 +1,542 @@
+- key: data-advanced-01
+  type: single
+  category: data
+  tags: [groupby, transform, alignment]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    sales = pd.DataFrame({"shop": ["north", "north", "south"], "amount": [10, 30, 5]})
+    sales["share"] = sales["amount"] / sales.groupby("shop")["amount"].sum()
+    print(sales["share"].tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`[0.25, 0.75, 1.0]`"
+    - text: "`[nan, nan, nan]`"
+      correct: true
+    - text: "`[0.222, 0.667, 0.111]`, each amount divided by the grand total"
+    - text: It raises `ValueError` because the two Series have different lengths
+  explanation: |
+    `groupby(...).sum()` is an aggregation: it returns one value per shop, indexed by the shop
+    names `north` and `south`. Dividing aligns on the index, and the labels 0, 1, 2 of
+    `sales["amount"]` never match a shop name, so every result is `NaN` (and the shop labels
+    appear as extra rows of the quotient, which the assignment drops). pandas does not raise for
+    different lengths; it aligns. The intended `[0.25, 0.75, 1.0]` needs
+    `sales.groupby("shop")["amount"].transform("sum")`, which returns one value per original row.
+
+- key: data-advanced-02
+  type: single
+  category: data
+  tags: [groupby, categorical, observed, pandas-3]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    orders = pd.DataFrame({
+        "size": pd.Categorical(["S", "M", "S"], categories=["S", "M", "L"]),
+        "qty": [2, 1, 4],
+    })
+    print(orders.groupby("size")["qty"].sum())
+    ```
+
+    In pandas 3, which rows does the result have?
+  options:
+    - text: "`S 6` and `M 1` only"
+      correct: true
+    - text: "`S 6`, `M 1` and `L 0`"
+    - text: "`S 6`, `M 1` and `L NaN`"
+    - text: "`M 1` and `S 6`, sorted alphabetically"
+  explanation: |
+    pandas 3 changed the default of `observed` in `groupby` to `True`, so only categories that
+    occur in the data become groups and the unused `L` is left out. `observed=False` gives every
+    category, and then `L` appears with a sum of 0 (an empty sum), which was the pandas 2
+    default. Groups of a categorical follow the order of its categories (`S`, `M`, `L`), not the
+    alphabet, so `M` does not come first.
+
+- key: data-advanced-03
+  type: multiple
+  category: data
+  tags: [groupby, filter, transform, apply]
+  prompt: |
+    Which statements about `groupby` in pandas 3 are true? Choose all that apply.
+  options:
+    - text: "`filter` returns the original rows of the groups whose function returned `True`, in their original order"
+      correct: true
+    - text: "`transform(\"mean\")` returns one value for every original row, repeating each group's mean"
+      correct: true
+    - text: The function given to `apply` receives the grouping columns, so `g["route"]` works inside it
+    - text: Rows whose grouping key is missing form their own group unless you pass `dropna=True`
+  explanation: |
+    `filter` keeps or drops whole groups and returns the surviving rows as they were.
+    `transform` with a reduction broadcasts the group's value back to each row, which is what makes
+    it usable as a new column. In pandas 3 the grouping columns are excluded from the frame that
+    `apply` passes to your function (`g["route"]` raises `KeyError`, and `include_groups=True` is no
+    longer allowed). Missing keys are dropped by default (`dropna=True` is the default); pass
+    `dropna=False` to keep them as a group.
+
+- key: data-advanced-04
+  type: single
+  category: data
+  tags: [merge, duplicate-keys, validate]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    staff = pd.DataFrame({"name": ["Ada", "Ben", "Cas"], "grade": ["G1", "G2", "G3"]})
+    rates = pd.DataFrame({"grade": ["G1", "G1", "G2"], "hourly": [18.0, 19.5, 22.0]})
+    joined = staff.merge(rates, on="grade", how="left")
+    ```
+
+    How many rows does `joined` have, and what would have stopped this merge before it happened?
+  options:
+    - text: 3 rows; nothing needs stopping, because a left merge never adds rows
+    - text: 4 rows; adding `validate="many_to_one"` would raise `MergeError`
+      correct: true
+    - text: 4 rows; adding `validate="one_to_many"` would raise `MergeError`
+    - text: 2 rows; Cas has no rate, so a left merge drops him
+  explanation: |
+    `G1` appears twice in `rates`, so Ada matches two rows and appears twice: Ada, Ada, Ben and
+    Cas (with `NaN`), four rows. A left merge keeps every left row but can multiply them when the
+    right key is duplicated. `validate="many_to_one"` states that the keys must be unique on the
+    right, the normal case for a lookup table, and raises `MergeError` before merging.
+    `"one_to_many"` only checks the left side, where `grade` is unique, so it would pass.
+
+- key: data-advanced-05
+  type: single
+  category: data
+  tags: [merge, anti-join, pandas-3]
+  prompt: |
+    `customers` and `orders` both have a `customer_id` column. Which call returns the customers
+    who have never placed an order?
+  options:
+    - text: "`customers.merge(orders, on=\"customer_id\", how=\"left_anti\")`"
+      correct: true
+    - text: "`customers.merge(orders, on=\"customer_id\", how=\"right_anti\")`"
+    - text: "`customers.merge(orders, on=\"customer_id\", how=\"inner\")`"
+    - text: "`customers.merge(orders, on=\"customer_id\", how=\"left\")`"
+  explanation: |
+    pandas 3 added anti joins. `left_anti` keeps the rows of the left table whose key does not
+    appear in the right table: customers with no orders. `right_anti` gives the opposite, orders
+    whose `customer_id` matches no customer. `inner` keeps only matched keys, and `left` keeps
+    everyone, so it would still need a filter on the missing order columns (or `indicator=True`
+    and `_merge == "left_only"`, the way older code did it).
+
+- key: data-advanced-06
+  type: single
+  category: data
+  tags: [pivot-table, aggfunc]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    log = pd.DataFrame({"day": ["Mon", "Mon", "Tue"], "item": ["tea", "tea", "tea"],
+                        "qty": [4, 6, 3]})
+    print(log.pivot_table(index="day", columns="item", values="qty"))
+    ```
+
+    What value appears for `Mon`, `tea`?
+  options:
+    - text: "`10`"
+    - text: "`5.0`"
+      correct: true
+    - text: "`2`, the number of rows"
+    - text: It raises `ValueError` because Monday's tea appears twice
+  explanation: |
+    `pivot_table` aggregates repeated (index, column) pairs, and its default `aggfunc` is
+    `"mean"`, so Monday's tea is (4 + 6) / 2 = 5.0. To get the total of 10, say
+    `aggfunc="sum"`; for the number of rows, `aggfunc="size"`. It is `pivot`, not
+    `pivot_table`, that refuses duplicates with `ValueError: Index contains duplicate entries,
+    cannot reshape`.
+
+- key: data-advanced-07
+  type: single
+  category: data
+  tags: [melt, reshaping]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    wide = pd.DataFrame({"site": ["A", "B", "C", "D"],
+                         "jan": [1, 2, 3, 4], "feb": [5, 6, 7, 8], "mar": [9, 10, 11, 12]})
+    long = wide.melt(id_vars="site")
+    print(long.shape, long.columns.tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`(4, 4) ['site', 'jan', 'feb', 'mar']`"
+    - text: "`(12, 3) ['site', 'month', 'value']`"
+    - text: "`(12, 3) ['site', 'variable', 'value']`"
+      correct: true
+    - text: "`(3, 5) ['variable', 'A', 'B', 'C', 'D']`"
+  explanation: |
+    `melt` keeps `site` and folds the three other columns into rows: 4 sites times 3 months gives
+    12 rows, with one column for the old column name and one for the value. Without `var_name`
+    and `value_name` those columns are called `variable` and `value`; pandas cannot know they
+    are months, so pass `var_name="month", value_name="readings"` to say so.
+
+- key: data-advanced-08
+  type: single
+  category: data
+  tags: [str, regex, contains, replace]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    s = pd.Series(["1.5kg", "125kg"])
+    print(s.str.contains("1.5").tolist(), s.str.replace(".", ",").tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`[True, False] ['1,5kg', '125kg']`"
+    - text: "`[True, True] ['1,5kg', '125kg']`"
+      correct: true
+    - text: "`[True, False] [',,,,,', ',,,,,']`"
+    - text: "`[True, True] [',,,,,', ',,,,,']`"
+  explanation: |
+    `str.contains` treats its pattern as a regular expression by default, and `.` matches any
+    character, so `"1.5"` also matches the `125` in `"125kg"`. `str.replace` does the opposite: by
+    default (`regex=False`) it replaces the literal text, so only the real dot becomes a comma.
+    Pass `regex=False` to `contains` to search for a literal dot, and `regex=True` to `replace`
+    when you mean a pattern.
+
+- key: data-advanced-09
+  type: single
+  category: data
+  tags: [str, extract, named-groups]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    codes = pd.Series(["A-12", "B-7", "bad"])
+    out = codes.str.extract(r"(?P<letter>[A-Z])-(?P<num>\d+)")
+    print(out.shape, out["num"].dtype)
+    ```
+
+    What does this print?
+  options:
+    - text: "`(2, 2) int64`, because the non-matching row is dropped and digits become integers"
+    - text: "`(3, 2) int64`"
+    - text: "`(3, 2) str`"
+      correct: true
+    - text: "`(3, 1) str`, one column holding the whole match"
+  explanation: |
+    `extract` returns one row per input row and one column per group, named after the named
+    groups `letter` and `num`. A value that does not match, `"bad"`, gets a row of `NaN`; it is
+    not dropped. Extracted pieces are always text, so `num` has the `str` dtype in pandas 3 even
+    though it holds digits. Convert it with `pd.to_numeric(out["num"])`.
+
+- key: data-advanced-10
+  type: single
+  category: data
+  tags: [to-datetime, resolution, pandas-3]
+  prompt: |
+    In pandas 3, what is the dtype of
+    `pd.to_datetime(pd.Series(["2026-03-28 09:15"]))`?
+  options:
+    - text: "`datetime64[ns]`"
+    - text: "`datetime64[us]`"
+      correct: true
+    - text: "`datetime64[s]`, because the text has no fractional seconds"
+    - text: "`str`, because to_datetime returns text unless a format is given"
+  explanation: |
+    pandas 3 parses strings to microsecond resolution by default, falling back to nanoseconds
+    only when the text itself is more precise. Before pandas 3 the result was always
+    `datetime64[ns]`, which is what older tutorials show. The resolution is not chosen from the
+    digits present, so whole minutes still give `[us]`. The practical difference: converting to
+    integers now gives numbers 1000 times smaller than in pandas 2.
+
+- key: data-advanced-11
+  type: single
+  category: data
+  tags: [time-zones, day-offset, dst, pandas-3]
+  prompt: |
+    Clocks in London go forward one hour in the early hours of 29 March 2026.
+
+    ```python
+    import pandas as pd
+
+    t = pd.Timestamp("2026-03-28 12:00", tz="Europe/London")
+    print(t + pd.offsets.Day(1), t + pd.Timedelta(hours=24))
+    ```
+
+    What does this print?
+  options:
+    - text: "`2026-03-29 12:00:00+01:00 2026-03-29 12:00:00+01:00`"
+    - text: "`2026-03-29 13:00:00+01:00 2026-03-29 13:00:00+01:00`"
+    - text: "`2026-03-29 12:00:00+01:00 2026-03-29 13:00:00+01:00`"
+      correct: true
+    - text: "`2026-03-29 11:00:00+01:00 2026-03-29 12:00:00+01:00`"
+  explanation: |
+    In pandas 3, `Day` is a calendar day: it moves to the same clock time on the next date, noon,
+    whatever the length of the day. A `Timedelta` of 24 hours is absolute time, and 29 March in
+    London lasted only 23 hours, so 24 hours after noon on Saturday is 13:00 on Sunday. Use `Day`
+    (or `freq="D"`) for "same time tomorrow" and `Timedelta` for elapsed time.
+
+- key: data-advanced-12
+  type: multiple
+  category: data
+  tags: [time-zones, tz-localize, tz-convert]
+  prompt: |
+    `times` is a Series of naive datetimes recorded by a machine in Paris. Which statements are
+    true? Choose all that apply.
+  options:
+    - text: "`times.dt.tz_localize(\"Europe/Paris\")` attaches the zone without changing the clock times shown"
+      correct: true
+    - text: "After localizing, `.dt.tz_convert(\"Asia/Tokyo\")` shows the same moments on Tokyo's clock"
+      correct: true
+    - text: "`times.dt.tz_convert(\"Asia/Tokyo\")` works directly, assuming the naive times are UTC"
+    - text: Comparing a localized time with a naive one quietly treats the naive one as local time
+  explanation: |
+    `tz_localize` declares which zone naive times belong to, so 09:00 stays 09:00 but now means
+    09:00 in Paris. `tz_convert` then changes the clock reading, not the moment. Calling
+    `tz_convert` on naive times raises `TypeError: Cannot convert tz-naive timestamps, use
+    tz_localize to localize`; pandas refuses to guess. Comparing naive and aware timestamps also
+    raises `TypeError: Cannot compare tz-naive and tz-aware timestamps`.
+
+- key: data-advanced-13
+  type: single
+  category: data
+  tags: [resample, asfreq, missing-data]
+  prompt: |
+    A rain gauge has no record for 3 June.
+
+    ```python
+    import pandas as pd
+
+    days = pd.to_datetime(["2026-06-01", "2026-06-02", "2026-06-04"])
+    rain = pd.Series([3.0, 0.0, 5.0], index=days)
+    print(rain.resample("D").sum().tolist(), rain.asfreq("D").tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`[3.0, 0.0, 5.0] [3.0, 0.0, 5.0]`"
+    - text: "`[3.0, 0.0, nan, 5.0] [3.0, 0.0, nan, 5.0]`"
+    - text: "`[3.0, 0.0, 0.0, 5.0] [3.0, 0.0, nan, 5.0]`"
+      correct: true
+    - text: "`[3.0, 0.0, 0.0, 5.0] [3.0, 0.0, 0.0, 5.0]`"
+  explanation: |
+    Both put the series on a daily grid, so both have four values. `resample("D").sum()`
+    aggregates each day, and the sum of an empty bin is 0, which falsely reports a dry day.
+    `asfreq("D")` only reindexes to the grid, so the missing day shows as `NaN`. Use `asfreq` or
+    `count` to find gaps, or `sum(min_count=1)` to get `NaN` for empty bins.
+
+- key: data-advanced-14
+  type: single
+  category: data
+  tags: [rolling, time-window]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    s = pd.Series([1.0, 2.0, 4.0],
+                  index=pd.to_datetime(["2026-05-01", "2026-05-02", "2026-05-04"]))
+    print(s.rolling(2).sum().tolist(), s.rolling("2D").sum().tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`[nan, 3.0, 6.0] [nan, 3.0, 6.0]`"
+    - text: "`[nan, 3.0, 6.0] [1.0, 3.0, 4.0]`"
+      correct: true
+    - text: "`[1.0, 3.0, 6.0] [1.0, 3.0, 4.0]`"
+    - text: "`[nan, 3.0, 4.0] [1.0, 3.0, 6.0]`"
+  explanation: |
+    `rolling(2)` means the last two rows, and by default it needs a full window, so the first
+    value is `NaN`; the last window holds 2 and 4 although they are two days apart. `rolling("2D")`
+    means the last two days ending at each row: on 4 May it covers 3 and 4 May, and 3 May has no
+    data, so the sum is 4. A time window needs only one value by default, so it starts at 1.0.
+
+- key: data-advanced-15
+  type: single
+  category: data
+  tags: [multiindex, xs]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    pop = pd.DataFrame({"city": ["Oslo", "Oslo", "Bergen", "Bergen"],
+                        "year": [2024, 2025, 2024, 2025],
+                        "people": [709, 717, 291, 294]}).set_index(["city", "year"])
+    ```
+
+    Which expression returns the 2025 rows for every city?
+  options:
+    - text: "`pop.loc[2025]`"
+    - text: "`pop.xs(2025, level=\"year\")`"
+      correct: true
+    - text: "`pop[2025]`"
+    - text: "`pop.loc[[\"Oslo\", 2025]]`"
+  explanation: |
+    A partial key in `loc` only looks in the first level, `city`, so `pop.loc[2025]` raises
+    `KeyError: 2025`. `xs` selects a value on any named level and drops that level, giving one
+    row per city. `pop[2025]` looks for a column called 2025. A list in `loc` means several
+    first-level keys, so `["Oslo", 2025]` asks for the city `2025`, which fails; a single key
+    across levels is a tuple, `("Oslo", 2025)`.
+
+- key: data-advanced-16
+  type: single
+  category: data
+  tags: [multiindex, indexslice, sort-index]
+  prompt: |
+    With `pop` from the previous question (rows in the order Oslo 2024, Oslo 2025, Bergen 2024,
+    Bergen 2025) and `idx = pd.IndexSlice`, what does
+    `pop.loc[idx["Bergen":"Oslo", 2025], :]` do?
+  options:
+    - text: Returns the 2025 rows of Bergen and Oslo
+    - text: Returns an empty DataFrame, because Bergen comes after Oslo in the rows
+    - text: "Raises `UnsortedIndexError`; after `pop = pop.sort_index()` it returns the 2025 rows of Bergen and Oslo"
+      correct: true
+    - text: Raises `TypeError`, because a slice cannot mix strings and integers
+  explanation: |
+    Slicing a MultiIndex with ranges needs the index to be sorted (lexsorted), and the rows here
+    are in arrival order, so pandas raises `UnsortedIndexError: 'MultiIndex slicing requires the
+    index to be lexsorted: ...'`. It does not guess or return an empty result. `sort_index()`
+    sorts by city and then year, after which the slice includes both ends and returns Bergen 2025
+    and Oslo 2025. Each level may hold a different type.
+
+- key: data-advanced-17
+  type: multiple
+  category: data
+  tags: [method-chaining, pd-col, assign, pandas-3]
+  prompt: |
+    `df` has columns `price` and `qty`. Which of these work as steps of a method chain that starts
+    with `df`? Choose all that apply.
+  options:
+    - text: "`.loc[pd.col(\"qty\") > 2]`"
+      correct: true
+    - text: "`.assign(total=pd.col(\"price\") * pd.col(\"qty\"))`"
+      correct: true
+    - text: "`.assign(day=pd.to_datetime(pd.col(\"date\")))`"
+    - text: "`.dropna(inplace=True)` followed by `.sort_values(\"price\")`"
+  explanation: |
+    `pd.col("name")` (new in pandas 3) is a deferred column: operators and Series methods on it
+    build an expression that `loc` and `assign` evaluate on the frame at that step. A plain
+    function such as `pd.to_datetime` cannot take an expression (it raises `TypeError: boolean
+    value of an expression is ambiguous`); use a lambda, `lambda d: pd.to_datetime(d["date"])`.
+    `dropna(inplace=True)` returns `None`, so the next step fails with `AttributeError`; never use
+    `inplace` in a chain.
+
+- key: data-advanced-18
+  type: single
+  category: data
+  tags: [pipe, method-chaining]
+  prompt: |
+    In a method chain, what does the step `.pipe(clean_names, "snake", strict=True)` do?
+  options:
+    - text: "Calls `clean_names(df, \"snake\", strict=True)`, with the frame at that step as `df`, and continues the chain with what it returns"
+      correct: true
+    - text: Calls `clean_names` once for every row, like `apply(axis=1)`
+    - text: Calls `clean_names` on every column name and renames the columns with the results
+    - text: "Calls `clean_names(\"snake\", strict=True)` and ignores the DataFrame"
+  explanation: |
+    `pipe(func, *args, **kwargs)` calls `func` with the current DataFrame as its first argument,
+    followed by the other arguments, and the chain continues with its return value. It exists so
+    your own DataFrame-to-DataFrame functions can sit in a chain instead of wrapping it from the
+    outside. It calls the function once, on the whole frame, not per row or per column.
+
+- key: data-advanced-19
+  type: single
+  category: data
+  tags: [vectorization, apply, np-where]
+  prompt: |
+    ```python
+    def label(amount):
+        if amount > 100:
+            return "high"
+        return "low"
+    ```
+
+    `orders["amount"]` holds a million values. What happens with `label(orders["amount"])`, and
+    what is the best replacement?
+  options:
+    - text: It works and returns a Series of labels; no replacement is needed
+    - text: "It raises `ValueError: The truth value of a Series is ambiguous`; use `np.where(orders[\"amount\"] > 100, \"high\", \"low\")`"
+      correct: true
+    - text: "It raises `ValueError`; use `orders.apply(label, axis=1)`, which is vectorised"
+    - text: "It returns `\"high\"` if any amount is above 100"
+  explanation: |
+    `orders["amount"] > 100` is a whole boolean Series, and `if` needs one `True` or `False`, so
+    pandas raises `ValueError: The truth value of a Series is ambiguous. ...`. `np.where` chooses
+    between two values for every row in compiled code. `orders["amount"].apply(label)` would work
+    but runs Python once per value, and `apply` is a loop, not vectorisation, so it is many times
+    slower on a million rows.
+
+- key: data-advanced-20
+  type: single
+  category: data
+  tags: [np-select, vectorization]
+  prompt: |
+    ```python
+    import numpy as np
+    import pandas as pd
+
+    kg = pd.Series([0.5, 2.0, 7.0])
+    print(np.select([kg < 5, kg < 1], ["medium", "small"], default="large").tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`['small', 'medium', 'large']`"
+    - text: "`['medium', 'medium', 'large']`"
+      correct: true
+    - text: "`['small', 'small', 'large']`"
+    - text: It raises `ValueError` because the conditions overlap
+  explanation: |
+    For each row `np.select` uses the **first** condition that is true. 0.5 is below 5, so it is
+    `medium` before `kg < 1` is ever considered; `small` can never be chosen. Overlapping
+    conditions are allowed, which is exactly why their order matters. Put the narrowest condition
+    first: `[kg < 1, kg < 5]`.
+
+- key: data-advanced-21
+  type: single
+  category: data
+  tags: [rank, ties]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    points = pd.Series([90, 85, 85, 70])
+    print(points.rank(ascending=False, method="dense").tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`[1.0, 2.5, 2.5, 4.0]`"
+    - text: "`[1.0, 2.0, 2.0, 4.0]`"
+    - text: "`[1.0, 2.0, 2.0, 3.0]`"
+      correct: true
+    - text: "`[1.0, 2.0, 3.0, 4.0]`"
+  explanation: |
+    With `method="dense"`, tied values share the lowest rank and the next value continues without
+    a gap: 1, 2, 2, 3. The default `average` gives the tied pair 2.5 each; `min` gives 2 and 2 and
+    then jumps to 4, like a sports table; `first` breaks ties by order of appearance, 2 and 3.
+    Ranks are floats in every case.
+
+- key: data-advanced-22
+  type: single
+  category: data
+  tags: [cut, bins]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    print(pd.cut(pd.Series([0, 10, 20]), bins=[0, 10, 20]).tolist())
+    ```
+
+    Which value ends up as `NaN`, and why?
+  options:
+    - text: "`0`, because bins include their right edge by default, so the first bin is `(0, 10]`"
+      correct: true
+    - text: "`20`, because the last edge is excluded"
+    - text: "`10`, because it sits exactly on an edge between two bins"
+    - text: None; `cut` always widens the range by 0.1% to include the extremes
+  explanation: |
+    With the default `right=True`, the bins are `(0, 10]` and `(10, 20]`: each includes its right
+    edge and excludes its left one. 10 falls in the first bin, 20 in the second, and 0 in neither,
+    so it becomes `NaN`. `include_lowest=True` makes the first bin include 0. The 0.1% widening
+    only happens when `bins` is a number of equal-width bins, not when you give the edges.

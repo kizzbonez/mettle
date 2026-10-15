@@ -1,0 +1,18 @@
+title: Analysing and Reshaping Data
+summary: >-
+  The questions real analysis asks. Group and aggregate in depth, merge and join tables
+  without losing or duplicating rows, reshape between wide and long, clean text, work with
+  dates, time zones and time series, use MultiIndex, write readable method chains, know when
+  apply is a mistake, and describe data with statistics and bins.
+outcomes:
+  - Answer grouped questions with agg, transform and filter, and merge tables safely
+  - Reshape data with pivot tables, melt, stack and unstack
+  - Clean text with the str accessor and parse, convert and resample dates and times
+  - Select and reshape data with a MultiIndex, and write pipelines as method chains
+  - Replace apply with vectorised code, and describe data with statistics, ranks and bins
+exam:
+  title: Analysing and Reshaping Data Mock Exam
+  description: Ten questions drawn from the level's bank, from groupby and joins to reshaping, text, time series, MultiIndex and statistics.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

@@ -1,0 +1,19 @@
+title: Watch Log
+summary: Measure the gaps in a smartwatch log with isna, see what they do to sum, mean and count, keep the days with enough readings using dropna with thresh, and fill each column its own way with interpolate, ffill(limit=1) and fillna into Int64.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Summarises and fills the example week
+    file: 01-example.py
+    hidden: false
+  - name: Measures the gaps and sums only what was recorded
+    file: 02-gaps-and-steps.py
+    hidden: true
+  - name: Keeps the days with at least three readings
+    file: 03-usable-days.py
+    hidden: true
+  - name: Fills each column by its own rule
+    file: 04-fill.py
+    hidden: true

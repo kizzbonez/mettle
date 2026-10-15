@@ -1,0 +1,19 @@
+title: Shelter Board
+summary: Filter a shelter's animals with isin, between, & and ~, sort them with missing values first and stable ties, pick the longest waiting with nlargest, and build a board sorted by two columns in mixed directions.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Answers the example questions
+    file: 01-example.py
+    hidden: false
+  - name: Finds the animals a family could adopt
+    file: 02-available.py
+    hidden: true
+  - name: Sorts by weight with unweighed animals first and ties in order
+    file: 03-by-weight.py
+    hidden: true
+  - name: Picks the longest waiting and builds the board, ties in order
+    file: 04-waiting-and-board.py
+    hidden: true

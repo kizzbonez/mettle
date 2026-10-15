@@ -1,0 +1,19 @@
+title: Bakery Rounds
+summary: Price a bakery's café orders with broadcasting, prices per column and discounts per row as a column vector, centre every loaf's orders on its mean, and build a price list of every quantity and loaf.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Prices the example orders
+    file: 01-example.py
+    hidden: false
+  - name: Applies prices to columns and discounts to rows
+    file: 02-bill-lines.py
+    hidden: true
+  - name: Compares each order with its loaf's average
+    file: 03-versus-average.py
+    hidden: true
+  - name: Builds a price for every quantity and loaf
+    file: 04-price-list.py
+    hidden: true

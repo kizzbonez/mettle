@@ -1,0 +1,19 @@
+title: Taxi Fare Consultation
+summary: Price millions of taxi trips with whole-array arithmetic, np.clip and np.round, and divide by distances that can be zero inside np.errstate, with no loops and no warnings.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Prices the example trips
+    file: 01-example.py
+    hidden: false
+  - name: Keeps fares within the limits and rounds them
+    file: 02-fare-rules.py
+    hidden: true
+  - name: Divides by zero distances without a warning
+    file: 03-per-km.py
+    hidden: true
+  - name: Prices ten years of trips, a month at a time
+    file: 04-ten-years.py
+    hidden: true

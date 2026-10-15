@@ -1,0 +1,14 @@
+title: Data Analysis with NumPy and pandas
+tagline: From your first array to clean, tested data pipelines.
+description: >-
+  A full course in four levels on NumPy 2.5 and pandas 3, for people who already know Python.
+  It starts from what an array is and why it beats a list, teaches NumPy one idea at a time,
+  then pandas from the first DataFrame to grouping, joining, reshaping, text, dates and time
+  series, and ends with the work of real data projects: validation, tests, performance, memory,
+  Parquet and reproducible pipelines. Every level ends with a mock exam and a hands-on lab that
+  runs against hidden tests on real data files in a sandbox.
+icon: Database
+category: data
+sortOrder: 7
+format: course
+revision: 1

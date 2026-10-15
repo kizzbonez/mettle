@@ -1,0 +1,23 @@
+slug: village-hall-solar-panels
+title: Village Hall Solar Panels
+summary: Load a month of a cheap logger's solar readings with genfromtxt, clean impossible values with masks, total each day, compare every string with the day's median through broadcasting, find the weak string, and pick reproducible spot-check days with a seeded Generator.
+language: python
+minutes: 50
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Works through the five-day example from the instructions
+    file: 01-worked-example.py
+    hidden: false
+  - name: Loads both months and cleans readings at the boundaries
+    file: 02-load-and-clean.py
+    hidden: true
+  - name: Totals each day, keeping days without readings missing
+    file: 03-daily-totals.py
+    hidden: true
+  - name: Compares strings with each day's median and finds the weak ones
+    file: 04-relative-output.py
+    hidden: true
+  - name: Picks reproducible spot-check days from days with readings
+    file: 05-spot-check.py
+    hidden: true

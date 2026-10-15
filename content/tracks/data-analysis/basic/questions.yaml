@@ -1,0 +1,559 @@
+- key: data-basic-01
+  type: single
+  category: data
+  tags: [ndarray, vectorisation, lists]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    prices = [2.0, 3.5]
+    arr = np.array(prices)
+    print(prices * 2, arr * 2)
+    ```
+  options:
+    - text: "`[2.0, 3.5, 2.0, 3.5] [4. 7.]`"
+      correct: true
+    - text: "`[4.0, 7.0] [4. 7.]`"
+    - text: "`[2.0, 3.5, 2.0, 3.5] [2. 3.5 2. 3.5]`"
+    - text: "`[4.0, 7.0] [2. 3.5 2. 3.5]`"
+  explanation: |
+    For a list, `* 2` means repetition: the list is joined to itself, giving four elements.
+    For a NumPy array, arithmetic operators work element by element, so `arr * 2` doubles
+    each value. This is vectorisation: one expression for the whole array, with the loop
+    running in compiled code. Expecting the list to double its numbers is the classic
+    mistake that sends people to NumPy in the first place; expecting the array to repeat
+    applies list rules to an object that does not follow them.
+
+- key: data-basic-02
+  type: multiple
+  category: data
+  tags: [ndarray, dtype]
+  prompt: |
+    Which statements about a NumPy `ndarray` are true? Choose all that apply.
+  options:
+    - text: Every element has the same dtype, so every element takes the same number of bytes.
+      correct: true
+    - text: "`np.array([1, 2.5, \"3\"])` gives a string array, so arithmetic on it fails."
+      correct: true
+    - text: "Like a list, an array can grow in place with `arr.append(value)`."
+    - text: "`len(arr)` gives the total number of elements of a two-dimensional array."
+  explanation: |
+    An array is homogeneous: one dtype for all elements, stored side by side, which is what
+    makes it compact and fast. When you build an array from values of different kinds,
+    NumPy picks one dtype that holds them all, and a single string makes everything text
+    (`<U32` here), so `+ 1` raises `UFuncTypeError`. Arrays have a fixed size and no
+    `append` method (`AttributeError`); collect values in a list and convert once. `len`
+    gives only the length of the first axis; `size` is the total number of elements.
+
+- key: data-basic-03
+  type: single
+  category: data
+  tags: [creation, arange, linspace]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    print(len(np.arange(1.0, 1.3, 0.1)))
+    ```
+  options:
+    - text: "`4`, because floating-point rounding makes 1.3 itself appear"
+      correct: true
+    - text: "`3`, because `stop` is never included"
+    - text: "`2`"
+    - text: "It raises an error, because `arange` only accepts integers"
+  explanation: |
+    With a float step, `arange` computes its length as `ceil((stop - start) / step)`, and
+    `(1.3 - 1.0) / 0.1` is slightly more than 3 in floating point, so the result has four
+    values: `[1.  1.1 1.2 1.3]`. "Stop is excluded" is true for integer steps, which is why
+    3 is tempting. The reference warns that the length is not numerically stable with a
+    non-integer step and recommends `np.linspace`, which takes a count instead of a step.
+
+- key: data-basic-04
+  type: single
+  category: data
+  tags: [creation, zeros, shape]
+  prompt: |
+    You need a table of 2 rows and 3 columns, all zeros, to fill in later. Which call makes it?
+  options:
+    - text: "`np.zeros((2, 3))`"
+      correct: true
+    - text: "`np.zeros(2, 3)`"
+    - text: "`np.empty((2, 3))`"
+    - text: "`np.zeros([2][3])`"
+  explanation: |
+    The shape of a multi-dimensional array is one tuple, so it needs its own parentheses.
+    `np.zeros(2, 3)` passes 3 as the second argument, the dtype, and fails with
+    `TypeError: Cannot interpret '3' as a data type`. `np.empty((2, 3))` has the right shape
+    but does not initialise its values: it holds whatever was last in that memory, so it is
+    not a table of zeros. `[2][3]` indexes a one-element list and raises `IndexError`.
+
+- key: data-basic-05
+  type: single
+  category: data
+  tags: [dtype, promotion, nep50]
+  prompt: |
+    In NumPy 2, what does this print?
+
+    ```python
+    import numpy as np
+
+    small = np.array([10, 20], dtype=np.int8)
+    print((small + 1).dtype, (small * 1.5).dtype)
+    ```
+  options:
+    - text: "`int8 float64`"
+      correct: true
+    - text: "`int64 float64`"
+    - text: "`int8 float16`"
+    - text: "`int64 float32`"
+  explanation: |
+    Under NumPy 2's promotion rules (NEP 50), a Python `int`, `float` or `complex` is
+    "weak": only its kind matters, not its size. Adding the Python integer 1 keeps the
+    array's `int8`. Multiplying by the Python float 1.5 changes the kind to float, and an
+    integer array combined with a float gives `float64`. Answers with `int64` assume the
+    Python number brings its own 64-bit precision, which is how people often (wrongly)
+    picture it; a NumPy scalar such as `np.int64(1)` would promote, a Python `1` does not.
+
+- key: data-basic-06
+  type: single
+  category: data
+  tags: [dtype, overflow, uint8]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    visits = np.array([200, 100], dtype=np.uint8)
+    print(visits + 100)
+    ```
+  options:
+    - text: "`[ 44 200]`"
+      correct: true
+    - text: "`[300 200]`"
+    - text: "`[255 200]`"
+    - text: It raises `OverflowError`
+  explanation: |
+    `uint8` holds 0 to 255. The Python integer 100 fits in `uint8`, so it is accepted, and
+    the arithmetic is done in `uint8`. 200 + 100 = 300 does not fit, and integer arrays wrap
+    around silently: 300 - 256 = 44. NumPy does not stop at 255 (that would be saturation)
+    and does not warn for arrays. `OverflowError` is raised only when the Python number
+    itself does not fit, as in `visits + 300`. Convert to a wider dtype, such as
+    `visits.astype(np.int64) + 100`, before arithmetic that can leave the range.
+
+- key: data-basic-07
+  type: single
+  category: data
+  tags: [reshape, axis]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    print(np.arange(12).reshape(3, -1).sum(axis=0).shape)
+    ```
+  options:
+    - text: "`(4,)`"
+      correct: true
+    - text: "`(3,)`"
+    - text: "`(3, 4)`"
+    - text: "`(1, 4)`"
+  explanation: |
+    `reshape(3, -1)` makes 3 rows and works out the other length from the 12 elements: shape
+    `(3, 4)`. Summing along `axis=0` moves down the rows, so axis 0 disappears and one total
+    per column is left: shape `(4,)`. `(3,)` is what `axis=1` would give. `(1, 4)` would need
+    `keepdims=True`, which keeps the summed axis with length 1.
+
+- key: data-basic-08
+  type: single
+  category: data
+  tags: [stack, concatenate]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    mon = np.array([1, 2, 3])
+    tue = np.array([4, 5, 6])
+    print(np.stack([mon, tue]).shape, np.concatenate([mon, tue]).shape)
+    ```
+  options:
+    - text: "`(2, 3) (6,)`"
+      correct: true
+    - text: "`(6,) (2, 3)`"
+    - text: "`(2, 3) (2, 3)`"
+    - text: "`(3, 2) (6,)`"
+  explanation: |
+    `np.stack` joins arrays along a **new** axis, so two arrays of shape `(3,)` become one
+    of shape `(2, 3)`, one row each (`axis=0` is the default). `np.concatenate` joins along
+    an **existing** axis, so the result stays one-dimensional with six elements. `(3, 2)`
+    is what `np.stack([mon, tue], axis=1)` gives, with the inputs as columns.
+
+- key: data-basic-09
+  type: single
+  category: data
+  tags: [slicing, views]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    levels = np.arange(5)
+    middle = levels[1:4]
+    middle[0] = 99
+    print(levels)
+    ```
+  options:
+    - text: "`[ 0 99  2  3  4]`"
+      correct: true
+    - text: "`[0 1 2 3 4]`"
+    - text: "`[99  1  2  3  4]`"
+    - text: "`[ 0  1 99  3  4]`"
+  explanation: |
+    Basic slicing returns a **view**: `middle` is a new array object that looks at the same
+    memory as `levels`, starting at position 1. Writing into `middle[0]` writes into
+    `levels[1]`. With Python lists a slice is a copy, which is why `[0 1 2 3 4]` is the
+    tempting answer. Use `levels[1:4].copy()` when you need to change the piece without
+    touching the original.
+
+- key: data-basic-10
+  type: single
+  category: data
+  tags: [indexing, shape]
+  prompt: |
+    `kwh` has shape `(3, 6)`. What are the shapes of `kwh[1]` and `kwh[1:2]`?
+  options:
+    - text: "`(6,)` and `(1, 6)`"
+      correct: true
+    - text: "`(1, 6)` and `(1, 6)`"
+    - text: "`(6,)` and `(6,)`"
+    - text: "`(3,)` and `(1, 6)`"
+  explanation: |
+    An integer index removes its axis; a slice keeps it, even when it selects one element.
+    `kwh[1]` is row 1 as a one-dimensional array of six values. `kwh[1:2]` is a table with
+    one row, shape `(1, 6)`. `(3,)` would be a column, `kwh[:, 1]`. The difference matters
+    when later code expects a table, for example to concatenate rows.
+
+- key: data-basic-11
+  type: single
+  category: data
+  tags: [boolean-masks, operators]
+  prompt: |
+    `minutes = np.array([28, 41, 35, 19])`. Why does
+    `minutes[(minutes > 30) and (minutes < 45)]` fail, and what is the fix?
+  options:
+    - text: "`and` needs one True or False and an array of booleans has none; use `(minutes > 30) & (minutes < 45)`"
+      correct: true
+    - text: "The comparisons need to be written without parentheses: `minutes > 30 & minutes < 45`"
+    - text: "Masks cannot be combined; filter twice, `minutes[minutes > 30][minutes < 45]`"
+    - text: "`and` works on arrays but returns integers; wrap the condition in `bool()`"
+  explanation: |
+    Python's `and` asks each operand for a single truth value, and NumPy refuses to give one
+    for an array of several booleans: `ValueError: The truth value of an array with more
+    than one element is ambiguous`. The element-wise operators are `&`, `|` and `~`, and
+    each comparison needs its own parentheses because `&` binds more tightly than `>`.
+    Dropping the parentheses turns the expression into a chained comparison that fails the
+    same way. Filtering twice indexes the shorter result with a mask of the wrong length.
+
+- key: data-basic-12
+  type: single
+  category: data
+  tags: [fancy-indexing, copies, masks]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    stock = np.array([10, 40, 20, 50])
+    picked = stock[[1, 3]]
+    picked[:] = 0
+    stock[stock > 15] += 1
+    print(stock)
+    ```
+  options:
+    - text: "`[10 41 21 51]`"
+      correct: true
+    - text: "`[10  0 21  0]`"
+    - text: "`[10  0 20  0]`"
+    - text: "`[11 41 21 51]`"
+  explanation: |
+    Reading with an integer array (fancy indexing) always returns a **copy**, so setting
+    `picked` to zeros leaves `stock` untouched. On the left of `=` (or `+=`), a mask writes
+    into the original: every element above 15 (40, 20 and 50) gains 1. The tempting answers
+    treat `picked` as a view, like a slice, or add 1 to every element.
+
+- key: data-basic-13
+  type: single
+  category: data
+  tags: [ufuncs, rounding]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    print(np.round(np.array([0.5, 1.5, 2.5])))
+    ```
+  options:
+    - text: "`[0. 2. 2.]`"
+      correct: true
+    - text: "`[1. 2. 3.]`"
+    - text: "`[0. 1. 2.]`"
+    - text: "`[1 2 3]`"
+  explanation: |
+    `np.round` sends exact halves to the nearest **even** number, as Python's `round` does:
+    0.5 becomes 0, 1.5 becomes 2, and 2.5 becomes 2. "Round half up" from school gives
+    `[1. 2. 3.]`, the usual wrong guess. The result keeps the float dtype, so it prints with
+    decimal points; convert with `.astype(int)` if you need integers.
+
+- key: data-basic-14
+  type: single
+  category: data
+  tags: [division, errstate, nan, inf]
+  prompt: |
+    What is the result of `np.array([1.0, 0.0, -2.0]) / 0.0`?
+  options:
+    - text: "`[ inf  nan -inf]`, with `RuntimeWarning`s for the division by zero and the invalid value"
+      correct: true
+    - text: "It raises `ZeroDivisionError` at the first element"
+    - text: "`[0. 0. 0.]`, with a warning"
+    - text: "`[inf inf inf]`, silently"
+  explanation: |
+    NumPy does not stop a whole array computation for one bad element. Float division by
+    zero gives `inf` or `-inf` according to the sign, 0 / 0 gives `nan`, and NumPy prints a
+    `RuntimeWarning` for each kind of problem. Python raises `ZeroDivisionError` for
+    `1 / 0`, which is why that answer is tempting. To silence the expected warnings, wrap
+    the division in `with np.errstate(divide="ignore", invalid="ignore"):` and then replace
+    the bad results, for example with `np.where`.
+
+- key: data-basic-15
+  type: multiple
+  category: data
+  tags: [broadcasting, shapes]
+  prompt: |
+    `table` has shape `(4, 3)`. Which arrays can be added to it with `table + other`?
+    Choose all that apply.
+  options:
+    - text: "`other` of shape `(3,)`"
+      correct: true
+    - text: "`other` of shape `(4, 1)`"
+      correct: true
+    - text: "`other` of shape `(1, 3)`"
+      correct: true
+    - text: "`other` of shape `(4,)`"
+  explanation: |
+    Shapes are compared from the right; two lengths are compatible when they are equal or
+    one of them is 1, and a missing axis on the left counts as 1. `(3,)` lines up with the
+    3 columns. `(4, 1)` is a column: 1 stretches across 3 and 4 matches 4. `(1, 3)` is a
+    row. `(4,)` lines up with the **last** axis, so it compares 4 against 3 and fails with
+    `operands could not be broadcast together`, even though the table has 4 rows. Turn it
+    into a column with `other[:, np.newaxis]`.
+
+- key: data-basic-16
+  type: single
+  category: data
+  tags: [broadcasting, newaxis, centring]
+  prompt: |
+    `readings` has shape `(5, 3)`, one row per sensor, and `row_means = readings.mean(axis=1)`
+    has shape `(5,)`. Which expression subtracts each sensor's mean from its own row?
+  options:
+    - text: "`readings - row_means[:, np.newaxis]`"
+      correct: true
+    - text: "`readings - row_means`"
+    - text: "`readings - row_means.T`"
+    - text: "`readings - row_means.reshape(1, -1)`"
+  explanation: |
+    One value per row must be a column, shape `(5, 1)`, so that it stretches across the 3
+    columns. `[:, np.newaxis]` adds that axis (as does `reshape(-1, 1)`, or computing the
+    means with `keepdims=True`). `readings - row_means` compares 3 with 5 and raises the
+    broadcast error. `.T` of a one-dimensional array changes nothing. `reshape(1, -1)`
+    makes a row of shape `(1, 5)`, which still does not fit the 3 columns.
+
+- key: data-basic-17
+  type: single
+  category: data
+  tags: [aggregation, keepdims]
+  prompt: |
+    `scores` has shape `(4, 3)`. What is the shape of `scores.mean(axis=1, keepdims=True)`?
+  options:
+    - text: "`(4, 1)`"
+      correct: true
+    - text: "`(4,)`"
+    - text: "`(1, 3)`"
+    - text: "`(3,)`"
+  explanation: |
+    `axis=1` averages across the columns, one mean per row. Without `keepdims` the summarised
+    axis disappears and the shape is `(4,)`. `keepdims=True` keeps it with length 1, giving
+    a column of shape `(4, 1)` that broadcasts straight back against `scores`, for example
+    in `scores - scores.mean(axis=1, keepdims=True)`. `(1, 3)` would come from `axis=0`.
+
+- key: data-basic-18
+  type: single
+  category: data
+  tags: [nan, aggregation]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    flow = np.array([2.0, np.nan, 4.0])
+    print(flow.mean(), np.nanmean(flow))
+    ```
+  options:
+    - text: "`nan 3.0`"
+      correct: true
+    - text: "`2.0 3.0`"
+    - text: "`3.0 3.0`"
+    - text: "`nan 2.0`"
+  explanation: |
+    NaN spreads through arithmetic, so any mean that includes it is NaN. `np.nanmean` skips
+    NaN and averages the values that are there: (2 + 4) / 2 = 3.0. `2.0` would treat the
+    missing value as 0 and divide by 3, which is a different (and usually wrong) answer.
+    Report how many values were missing alongside a NaN-aware summary.
+
+- key: data-basic-19
+  type: single
+  category: data
+  tags: [random, generator, seed]
+  prompt: |
+    What does this print?
+
+    ```python
+    import numpy as np
+
+    a = np.random.default_rng(7).integers(0, 100, size=3)
+    b = np.random.default_rng(7).integers(0, 100, size=3)
+    rng = np.random.default_rng(7)
+    c = rng.integers(0, 100, size=3)
+    d = rng.integers(0, 100, size=3)
+    print(np.array_equal(a, b), np.array_equal(c, d))
+    ```
+  options:
+    - text: "`True False`"
+      correct: true
+    - text: "`True True`"
+    - text: "`False False`"
+    - text: "`False True`"
+  explanation: |
+    A seed sets the starting state of a generator. Two new generators with the same seed
+    produce the same sequence, so `a` and `b` are equal. One generator continues its
+    sequence with every call, so `d` is the next three numbers after `c`, not a repeat
+    (here `[94 62 68]` then `[89 57 77]`). That is why you create `rng` once and reuse it,
+    and why re-creating a seeded generator inside a loop gives the same numbers every time.
+
+- key: data-basic-20
+  type: single
+  category: data
+  tags: [random, integers, endpoint]
+  prompt: |
+    A dice simulation uses `rng.integers(1, 6, size=600)`. What is wrong with it?
+  options:
+    - text: "It never produces a 6, because `high` is excluded; use `rng.integers(1, 7, ...)` or `endpoint=True`"
+      correct: true
+    - text: "Nothing: `integers` includes both ends"
+    - text: "It can produce 0, because `low` is excluded"
+    - text: "It returns floats, so the results need `astype(int)`"
+  explanation: |
+    `Generator.integers(low, high)` draws from `low` (included) up to `high` (excluded), like
+    `range`, so the faces are 1 to 5. `rng.integers(1, 7, size=600)` or
+    `rng.integers(1, 6, size=600, endpoint=True)` gives a real die. `low` is included, and
+    the result is an integer array.
+
+- key: data-basic-21
+  type: single
+  category: data
+  tags: [loadtxt, io]
+  prompt: |
+    `np.loadtxt("rain.csv", delimiter=",")` on a file whose first line is `day,rain_mm`
+    fails with `ValueError: could not convert string 'day' to float64 at row 0, column 1.`
+    What is the simplest fix?
+  options:
+    - text: "Add `skiprows=1` to skip the header line"
+      correct: true
+    - text: "Remove `delimiter=\",\"`, because the default already splits on commas"
+    - text: "Add `dtype=str` so every value is read"
+    - text: "Use `np.load` instead, which understands CSV headers"
+  explanation: |
+    `loadtxt` converts every field to the dtype (float by default) and has no notion of a
+    header, so the column names are the first thing it cannot convert. `skiprows=1` skips
+    that line. The default delimiter is whitespace, so removing `delimiter=","` makes it
+    try to convert each whole line, starting with `'day,rain_mm'`. `dtype=str` reads everything as text, which you would then
+    have to convert. `np.load` reads NumPy's binary `.npy` and `.npz` files, not CSV.
+
+- key: data-basic-22
+  type: single
+  category: data
+  tags: [genfromtxt, missing-values, io]
+  prompt: |
+    What does this print?
+
+    ```python
+    import io
+
+    import numpy as np
+
+    print(np.genfromtxt(io.StringIO("1,2\n3,\n"), delimiter=","))
+    ```
+  options:
+    - text: "`[[ 1.  2.] [ 3. nan]]` (printed on two lines)"
+      correct: true
+    - text: "`[[1. 2.] [3. 0.]]` (printed on two lines)"
+    - text: "`[1. 2. 3.]`"
+    - text: "It raises `ValueError`, like `np.loadtxt`"
+  explanation: |
+    `genfromtxt` treats an empty field as missing and, in a float array, fills it with NaN,
+    so the shape stays `(2, 2)`. It fills with 0 only if you ask with `filling_values=0`,
+    and with `-1` if you read as integers, which is why reading as float is safer. It does
+    not drop the gap and shorten the data. `np.loadtxt` is the one that raises
+    `could not convert string '' to float64`.
+
+- key: data-basic-23
+  type: single
+  category: data
+  tags: [linear-algebra, matmul]
+  prompt: |
+    What does `m @ m` give for `m = np.array([[1, 2], [3, 4]])`?
+  options:
+    - text: "`[[ 7 10] [15 22]]`"
+      correct: true
+    - text: "`[[ 1  4] [ 9 16]]`"
+    - text: "`[[ 2  4] [ 6  8]]`"
+    - text: "`30`"
+  explanation: |
+    `@` is matrix multiplication: each element is a row of the left times a column of the
+    right, summed. Row 0 times column 0 is 1 × 1 + 2 × 3 = 7, row 0 times column 1 is
+    1 × 2 + 2 × 4 = 10, and so on. `[[1 4] [9 16]]` is `m * m`, the element-wise product.
+    `30` is the sum of the squares, `(m * m).sum()`, which is a dot product only for
+    one-dimensional vectors.
+
+- key: data-basic-24
+  type: multiple
+  category: data
+  tags: [linear-algebra, solve, allclose]
+  prompt: |
+    You want the `x` that satisfies `A @ x = b` for a square matrix `A`. Which statements are
+    true? Choose all that apply.
+  options:
+    - text: "`np.linalg.solve(A, b)` is preferred to `np.linalg.inv(A) @ b`"
+      correct: true
+    - text: "If `np.linalg.det(A)` is 0, `A` is singular and `solve` raises `LinAlgError`"
+      correct: true
+    - text: "Check the answer with `np.allclose(A @ x, b)`, not `==`"
+      correct: true
+    - text: "`A * x` gives the same result as `A @ x`"
+  explanation: |
+    `solve` finds `x` without building the inverse, which is less work and usually more
+    accurate. A determinant of 0 means the equations do not pin down one answer (one row is
+    a combination of others), and `solve` raises `LinAlgError: Singular matrix`. Results
+    are floats with tiny rounding errors, so compare with a tolerance using `np.allclose`.
+    `*` multiplies element by element (with broadcasting), which is a different operation
+    from the matrix product `@`.

@@ -1,0 +1,19 @@
+title: Reading Challenge
+summary: Make a school's prize draw and leaderboard reproducible with a seeded generator passed to sample, a full sort key that leaves no ties, recorded library versions and output files written with fixed formats that come out byte for byte the same on every run.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Draws, ranks and writes the example pupils
+    file: 01-example.py
+    hidden: false
+  - name: Draws the same winners from the same seed, every time
+    file: 02-prize-draw.py
+    hidden: true
+  - name: Ranks the same way whatever the row order
+    file: 03-leaderboard-order.py
+    hidden: true
+  - name: Writes the same bytes on every run
+    file: 04-same-bytes-every-run.py
+    hidden: true

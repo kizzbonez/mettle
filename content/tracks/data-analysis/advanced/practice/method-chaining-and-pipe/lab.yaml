@@ -1,0 +1,19 @@
+title: Food Bank Donations
+summary: Turn a food bank's donations file into a weekly table with one method chain, one step per line, using your own tidy_names and drop_small steps through pipe, assign with pd.col, groupby with named aggregation and a stable sort.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Builds the example donations table
+    file: 01-example.py
+    hidden: false
+  - name: Tidies every column name and keeps the values
+    file: 02-tidy-names.py
+    hidden: true
+  - name: Keeps only donations heavy enough
+    file: 03-drop-small.py
+    hidden: true
+  - name: Builds the report as one chain with pipe
+    file: 04-report-chain.py
+    hidden: true

@@ -1,0 +1,19 @@
+title: Ferry Log
+summary: Store a ferry company's crossings in Parquet with zstd compression and no stray index, write a dataset partitioned by route that replaces the old one, and read back only the columns and rows needed with columns and filters, keeping nullable integers and datetimes intact.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Saves and reads the example crossings
+    file: 01-example.py
+    hidden: false
+  - name: Saves a week compressed, without the index
+    file: 02-save-week.py
+    hidden: true
+  - name: Writes and replaces a dataset partitioned by route
+    file: 03-partitioned-folders.py
+    hidden: true
+  - name: Reads only the columns and rows needed
+    file: 04-read-only-what-is-needed.py
+    hidden: true

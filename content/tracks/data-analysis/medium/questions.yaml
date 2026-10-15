@@ -1,0 +1,579 @@
+- key: data-medium-01
+  type: single
+  category: data
+  tags: [series, alignment]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    stock = pd.Series({"apples": 10, "pears": 4})
+    sold = pd.Series({"pears": 1, "plums": 2})
+    print(stock - sold)
+    ```
+
+    What does this print?
+  options:
+    - text: "`apples NaN`, `pears 3.0`, `plums NaN`, with dtype `float64`"
+      correct: true
+    - text: "`apples 9`, `pears 2`, with dtype `int64`, because the values are paired by position"
+    - text: "`apples 10`, `pears 3`, `plums -2`, because a missing value counts as 0"
+    - text: "A `ValueError`, because the two Series have different labels"
+  explanation: |
+    Arithmetic between two Series matches values by **label**, not by position. The result has
+    the union of both indexes. Only `pears` is in both, so only it gets a real result, 4 - 1 = 3.
+    `apples` and `plums` exist on one side only and become NaN, and since NaN is a float the
+    whole result is `float64`. Pairing by position is what NumPy arrays do; pandas does not, and
+    it does not treat a missing label as 0 or raise.
+
+- key: data-medium-02
+  type: single
+  category: data
+  tags: [dataframe, dtypes]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    buses = pd.DataFrame({"route": ["12", "7A"], "stops": [14, None]})
+    print(buses.dtypes)
+    ```
+
+    Which dtypes does pandas 3 print?
+  options:
+    - text: "`route` is `str` and `stops` is `float64`"
+      correct: true
+    - text: "`route` is `object` and `stops` is `int64`"
+    - text: "`route` is `int64` and `stops` is `float64`"
+    - text: "`route` is `str` and `stops` is `object`, because it holds `None`"
+  explanation: |
+    In pandas 3 text columns get the dedicated `str` dtype; `object` was the pandas 2 default.
+    The route `"7A"` is text, and in any case values given as Python strings stay strings. In
+    the `stops` column, `None` becomes NaN, the missing marker for numbers, and NaN is a float, so
+    the column is `float64` although 14 is whole. It does not fall back to `object`: a number
+    column with a gap is still a number column.
+
+- key: data-medium-03
+  type: single
+  category: data
+  tags: [read-csv, dtype]
+  prompt: |
+    ```python
+    import io
+
+    import pandas as pd
+
+    stops = pd.read_csv(io.StringIO("code,town\n007,Leeds\n012,York\n"))
+    print(stops["code"].tolist())
+    ```
+
+    This prints `[7, 12]`, but the stop codes are `007` and `012`. What is the right fix?
+  options:
+    - text: "Pass `dtype={\"code\": \"str\"}` to `read_csv`"
+      correct: true
+    - text: "Pass `header=None` so the first line is read as data"
+    - text: "Convert afterwards with `stops[\"code\"].astype(\"str\")`"
+    - text: "Pass `na_values=[\"0\"]` so the zeros are not dropped"
+  explanation: |
+    `read_csv` infers each column's type, and `007` looks like the integer 7, so the leading
+    zeros are lost while reading. `dtype={"code": "str"}` tells pandas to keep the column as
+    text, exactly as written. Converting afterwards is too late: `astype("str")` turns 7 into
+    `"7"`, not `"007"`. `header=None` would read the header line as data, and `na_values` marks
+    values as missing; neither keeps zeros.
+
+- key: data-medium-04
+  type: single
+  category: data
+  tags: [read-csv, missing-values]
+  prompt: |
+    ```python
+    import io
+
+    import pandas as pd
+
+    rain = pd.read_csv(io.StringIO("day,rain_mm\nMon,2.5\nTue,-\nWed,0.0\n"))
+    print(rain["rain_mm"].dtype)
+    ```
+
+    The gauge writes `-` when it has no reading. What does this print, and why?
+  options:
+    - text: "`str`, because `-` is not a default missing marker, so the column is read as text; `na_values=[\"-\"]` fixes it"
+      correct: true
+    - text: "`float64`, because pandas treats `-` as missing by default"
+    - text: "`float64`, because `-` is read as the number 0"
+    - text: "It raises `ValueError: could not convert string to float: '-'`"
+  explanation: |
+    `read_csv` treats a list of common markers as missing (the empty field, `NA`, `N/A`, `n/a`,
+    `NULL`, `NaN` and others), but `-` is not among them. One value that is not a number makes
+    the whole column text, so the dtype is `str`, and `read_csv` does not raise. Adding
+    `na_values=["-"]` makes `-` missing too, and the column becomes `float64` with NaN for Tuesday.
+
+- key: data-medium-05
+  type: single
+  category: data
+  tags: [inspecting, unique, count]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    ratings = pd.Series([4.0, None, 4.0, 5.0])
+    print(len(ratings.unique()), ratings.nunique(), ratings.count())
+    ```
+
+    What does this print?
+  options:
+    - text: "`3 2 3`"
+      correct: true
+    - text: "`2 2 4`"
+    - text: "`3 3 3`"
+    - text: "`2 2 3`"
+  explanation: |
+    `unique()` returns each distinct value once, **including** NaN: 4.0, NaN and 5.0, so its
+    length is 3. `nunique()` counts distinct values but skips NaN by default, giving 2. `count()`
+    counts the values that are present, three of the four. The tempting `2 2 4` confuses
+    `count()` with `len()`, which counts rows.
+
+- key: data-medium-06
+  type: single
+  category: data
+  tags: [inspecting, value-counts]
+  prompt: |
+    You have just loaded a file of orders with a `payment` column (`card`, `cash`, `voucher`).
+    You want to see how many orders use each method and how many have no method recorded at
+    all. Which call shows both?
+  options:
+    - text: "`orders[\"payment\"].value_counts(dropna=False)`"
+      correct: true
+    - text: "`orders[\"payment\"].value_counts()`"
+    - text: "`orders[\"payment\"].nunique()`"
+    - text: "`orders[\"payment\"].describe()`"
+  explanation: |
+    `value_counts()` counts each distinct value, most common first, but leaves missing values
+    out unless you pass `dropna=False`, which adds a `NaN` row with their number. Without it, a
+    column with many gaps looks healthy. `nunique()` gives only how many distinct values there
+    are, and `describe()` on text gives the count, number of unique values, the top value and its
+    frequency, not every category.
+
+- key: data-medium-07
+  type: single
+  category: data
+  tags: [selection, loc, iloc]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    levels = pd.Series([10, 20, 30, 40], index=["a", "b", "c", "d"])
+    print(levels.loc["a":"c"].sum(), levels.iloc[0:2].sum())
+    ```
+
+    What does this print?
+  options:
+    - text: "`60 30`"
+      correct: true
+    - text: "`30 30`"
+    - text: "`60 60`"
+    - text: "`30 60`"
+  explanation: |
+    A label slice with `loc` includes **both** ends, so `loc["a":"c"]` is 10 + 20 + 30 = 60. A
+    position slice with `iloc` follows Python's rules and stops before the end, so `iloc[0:2]`
+    is positions 0 and 1, 10 + 20 = 30. Expecting `loc` to stop early, as Python slices do, gives
+    the wrong `30 30`.
+
+- key: data-medium-08
+  type: single
+  category: data
+  tags: [selection, series, pandas-3]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    rain = pd.Series([61.2, 48.0, 102.5], index=["ABN", "BRT", "CDF"])
+    print(rain[0])
+    ```
+
+    What happens in pandas 3?
+  options:
+    - text: "It raises `KeyError: 0`, because `[]` on a Series looks up labels; use `rain.iloc[0]`"
+      correct: true
+    - text: "It prints `61.2`, the first value"
+    - text: "It prints `61.2` with a `FutureWarning` about positional access"
+    - text: "It raises `IndexError`, because the index holds strings"
+  explanation: |
+    `[]` on a Series means a **label**, and there is no label `0` in this index, so pandas
+    raises `KeyError: 0`. Older pandas fell back to positions when the index held no integers,
+    first silently and later with a `FutureWarning`; pandas 3 removed that fallback. Say what you
+    mean: `rain.iloc[0]` for the first position, `rain.loc["ABN"]` for the label.
+
+- key: data-medium-09
+  type: single
+  category: data
+  tags: [filtering, boolean-masks]
+  prompt: |
+    ```python
+    family = flats[flats["rooms"] >= 2 and flats["rent"] <= 1200]
+    ```
+
+    This raises `ValueError: The truth value of a Series is ambiguous`. Which line does what
+    was meant?
+  options:
+    - text: "`flats[(flats[\"rooms\"] >= 2) & (flats[\"rent\"] <= 1200)]`"
+      correct: true
+    - text: "`flats[flats[\"rooms\"] >= 2 & flats[\"rent\"] <= 1200]`"
+    - text: "`flats[(flats[\"rooms\"] >= 2).all() and (flats[\"rent\"] <= 1200).all()]`"
+    - text: "`flats[bool(flats[\"rooms\"] >= 2) and bool(flats[\"rent\"] <= 1200)]`"
+  explanation: |
+    Python's `and` needs a single `True` or `False`, and a Series of booleans is neither, hence
+    the error. Element-wise "and" is `&`, and each comparison needs parentheses because `&` binds
+    more tightly than `>=` and `<=`. Without them, the second option is read as a chained
+    comparison around `2 & flats["rent"]` and fails the same way. `.all()` reduces each mask to
+    one boolean, which is not a row filter, and `bool()` of a Series raises the same error.
+
+- key: data-medium-10
+  type: multiple
+  category: data
+  tags: [filtering, isin, query]
+  prompt: |
+    `flats` has columns `district` and `rent`. Which expressions select exactly the flats in
+    Docks or Riverside that cost less than 1000? Choose all that apply.
+  options:
+    - text: "`flats[flats[\"district\"].isin([\"Docks\", \"Riverside\"]) & (flats[\"rent\"] < 1000)]`"
+      correct: true
+    - text: "`flats.query(\"district in ['Docks', 'Riverside'] and rent < 1000\")`"
+      correct: true
+    - text: "`flats[(flats[\"district\"] == \"Docks\") | (flats[\"district\"] == \"Riverside\") & (flats[\"rent\"] < 1000)]`"
+    - text: "`flats[flats[\"district\"].isin([\"Docks\", \"Riverside\"]) and flats[\"rent\"] < 1000]`"
+  explanation: |
+    `isin` combined with `&` and a parenthesised comparison is the standard form, and `query`
+    expresses the same condition as a string, where `and` and `in` are allowed. The third option
+    looks right but `&` binds more tightly than `|`, so it means "Docks at any rent, or Riverside
+    under 1000"; wrap the two district tests in their own parentheses to fix it. The last option
+    uses Python's `and` between two Series and raises `ValueError`.
+
+- key: data-medium-11
+  type: single
+  category: data
+  tags: [columns, map, replace]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    sizes = pd.Series(["S", "M", "XL"])
+    names = {"S": "small", "M": "medium"}
+    print(sizes.map(names).tolist(), sizes.replace(names).tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`['small', 'medium', nan] ['small', 'medium', 'XL']`"
+      correct: true
+    - text: "`['small', 'medium', 'XL'] ['small', 'medium', 'XL']`"
+    - text: "`['small', 'medium', nan] ['small', 'medium', nan]`"
+    - text: "A `KeyError` for `'XL'` from `map`"
+  explanation: |
+    `map` with a dict looks **every** value up; a value missing from the dict becomes NaN, so
+    `XL` turns into `nan`. `replace` changes only the values the dict lists and leaves the rest
+    alone, so `XL` stays. Use `map` for a complete translation where an unknown code should show
+    up as missing, and `replace` to correct a few known values. Neither raises for a missing key.
+
+- key: data-medium-12
+  type: single
+  category: data
+  tags: [columns, where, mask]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    queue = pd.Series([1, 2, 3, 4])
+    print(queue.where(queue > 2, 0).tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`[0, 0, 3, 4]`"
+      correct: true
+    - text: "`[1, 2, 0, 0]`"
+    - text: "`[3, 4]`"
+    - text: "`[False, False, True, True]`"
+  explanation: |
+    `where(cond, other)` **keeps** each value where the condition is `True` and puts `other`
+    where it is `False`. 3 and 4 pass `> 2` and stay; 1 and 2 become 0. The result has the same
+    length as the input: `where` never drops rows (that is filtering with a mask). `[1, 2, 0, 0]`
+    is what `mask(queue > 2, 0)` gives, since `mask` replaces where the condition is `True`.
+
+- key: data-medium-13
+  type: single
+  category: data
+  tags: [missing-data, aggregation]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    visitors = pd.Series([10, None, 20, None])
+    print(visitors.sum(), visitors.mean(), visitors.count(), len(visitors))
+    ```
+
+    What does this print?
+  options:
+    - text: "`30.0 15.0 2 4`"
+      correct: true
+    - text: "`30.0 7.5 2 4`"
+    - text: "`nan nan 2 4`"
+    - text: "`30.0 15.0 4 4`"
+  explanation: |
+    pandas aggregations skip missing values by default. The sum is 10 + 20 = 30.0 (a float,
+    since NaN made the Series `float64`), and the mean divides by the number of values
+    **present**, 2, giving 15.0, not by the four rows. `count()` counts present values (2) and
+    `len` counts rows (4). `7.5` is what you would get by filling the gaps with 0 first, and
+    `nan` is NumPy's `np.sum` behaviour, or pandas with `skipna=False`.
+
+- key: data-medium-14
+  type: multiple
+  category: data
+  tags: [missing-data, nullable-dtypes, pandas-3]
+  prompt: |
+    Which statements about missing values in pandas 3 are true? Choose all that apply.
+  options:
+    - text: "`np.nan == np.nan` is `False`, so missing values must be found with `isna()`"
+      correct: true
+    - text: "A missing value in a `str` column is NaN"
+      correct: true
+    - text: "In an `Int64` column, NaN is treated as missing and shown as `<NA>`"
+      correct: true
+    - text: "`fillna(0)` before `mean()` gives the same mean as skipping the gaps"
+  explanation: |
+    NaN is not equal to anything, itself included, so `==` never finds it; `isna()` does. The
+    pandas 3 `str` dtype uses NaN as its missing marker. Nullable dtypes such as `Int64` and
+    `Float64` mark gaps with `pd.NA`, and pandas 3 treats a NaN put into them as missing too, so
+    it shows as `<NA>` and `isna()` reports it. Filling with 0 changes the mean: the zeros are
+    counted as real values, which pulls the mean down.
+
+- key: data-medium-15
+  type: single
+  category: data
+  tags: [dtypes, to-numeric]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    readings = pd.Series(["3", "4.5", "n/a", "x"])
+    print(pd.to_numeric(readings, errors="coerce").sum())
+    ```
+
+    What does this print?
+  options:
+    - text: "`7.5`"
+      correct: true
+    - text: "`nan`"
+    - text: "It raises `ValueError: Unable to parse string \"n/a\"`"
+    - text: "`34.5n/ax`, because the strings are joined"
+  explanation: |
+    `errors="coerce"` converts every value it can (3.0 and 4.5) and turns the rest (`n/a` and
+    `x`) into NaN instead of raising. The result is a `float64` Series, and `sum` skips NaN, so it
+    prints 7.5. Without `errors="coerce"`, `to_numeric` would raise on `n/a`. Because coercing
+    hides bad values, count the NaN it produced before trusting the result.
+
+- key: data-medium-16
+  type: single
+  category: data
+  tags: [dtypes, str-dtype, pandas-3]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    names = pd.Series(["Ana", "Ben"])
+    names[1] = 42
+    ```
+
+    What happens in pandas 3?
+  options:
+    - text: "It raises `TypeError`, because a `str` column holds only strings and missing values"
+      correct: true
+    - text: "The column becomes `object` and holds `'Ana'` and `42`"
+    - text: "42 is stored as the string `'42'`"
+    - text: "42 is stored as NaN, with a warning"
+  explanation: |
+    The Series has the pandas 3 `str` dtype, which refuses anything that is not a string or a
+    missing value: `TypeError: Invalid value '42' for dtype 'str'. Value should be a string or
+    missing value, got 'int' instead.` It does not convert the number for you, and it does not
+    accept it the way the `object` columns of pandas 2 did. Assign `"42"` if you mean text, or
+    convert the column with `astype("object")` if it really must hold mixed values.
+
+- key: data-medium-17
+  type: single
+  category: data
+  tags: [copy-on-write, chained-assignment]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    rota = pd.DataFrame({"ward": ["A", "B", "A"], "hours": [8, 12, 10]})
+    rota[rota["ward"] == "A"]["hours"] = 6
+    print(rota["hours"].tolist())
+    ```
+
+    What does this print in pandas 3?
+  options:
+    - text: "`[8, 12, 10]`, after a `ChainedAssignmentError` warning"
+      correct: true
+    - text: "`[6, 12, 6]`"
+    - text: "`[6, 12, 6]`, after a `SettingWithCopyWarning`"
+    - text: "Nothing: the program stops with an exception"
+  explanation: |
+    This is chained assignment: `rota[mask]` creates a new object, and `["hours"] = 6` writes
+    to that object. Under Copy-on-Write the intermediate object always behaves as a copy, so
+    `rota` is never changed. pandas detects the pattern and warns with `ChainedAssignmentError`,
+    which, despite its name, is a warning, so the program continues. `SettingWithCopyWarning` was
+    the pandas 2 warning and no longer exists. The fix is one call:
+    `rota.loc[rota["ward"] == "A", "hours"] = 6`.
+
+- key: data-medium-18
+  type: single
+  category: data
+  tags: [copy-on-write]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    rota = pd.DataFrame({"ward": ["A", "B"], "hours": [8, 12]})
+    hours = rota["hours"]
+    hours.iloc[0] = 99
+    print(rota["hours"].tolist(), hours.tolist())
+    ```
+
+    What does this print in pandas 3?
+  options:
+    - text: "`[8, 12] [99, 12]`"
+      correct: true
+    - text: "`[99, 12] [99, 12]`"
+    - text: "`[8, 12] [8, 12]`"
+    - text: "It raises `ValueError: assignment destination is read-only`"
+  explanation: |
+    Under Copy-on-Write, anything derived from a DataFrame behaves as a copy. `hours` shares the
+    column's data only until it is written to; the write makes `hours` copy its data first, so
+    `hours` changes and `rota` does not. To change `rota`, write to `rota`:
+    `rota.loc[0, "hours"] = 99`. Before pandas 3 this could change both, which is the NumPy view
+    behaviour. The read-only error belongs to arrays returned by `to_numpy()`, not to a Series.
+
+- key: data-medium-19
+  type: multiple
+  category: data
+  tags: [copy-on-write, loc]
+  prompt: |
+    `rota = pd.DataFrame({"ward": ["A", "B", "A"], "hours": [8, 12, 10]})`. Which statements set
+    the hours of every ward A row of `rota` to 6? Choose all that apply.
+  options:
+    - text: "`rota.loc[rota[\"ward\"] == \"A\", \"hours\"] = 6`"
+      correct: true
+    - text: "`rota[\"hours\"] = rota[\"hours\"].where(rota[\"ward\"] != \"A\", 6)`"
+      correct: true
+    - text: "`rota[\"hours\"][rota[\"ward\"] == \"A\"] = 6`"
+    - text: "`rota.loc[rota[\"ward\"] == \"A\"][\"hours\"] = 6`"
+  explanation: |
+    A change reaches `rota` only when it is one operation on `rota` itself. The `loc` call
+    selects rows and column in one step, and assigning a whole new column with `rota["hours"] =`
+    is also a single step on `rota`. The other two are chained assignment: the first bracket
+    creates a new object and the second writes to it, so `rota` keeps `[8, 12, 10]` and pandas
+    warns with `ChainedAssignmentError`. Using `loc` for the first step does not help when a
+    second bracket follows it.
+
+- key: data-medium-20
+  type: single
+  category: data
+  tags: [writing-data, csv, index]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    scores = pd.DataFrame({"pupil": ["Ada", "Ben"], "score": [91, 78]})
+    scores.to_csv("scores.csv")
+    print(pd.read_csv("scores.csv").columns.tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`['Unnamed: 0', 'pupil', 'score']`"
+      correct: true
+    - text: "`['pupil', 'score']`"
+    - text: "`['index', 'pupil', 'score']`"
+    - text: "`['0', 'pupil', 'score']`"
+  explanation: |
+    `to_csv` writes the index by default, as a first column. This index has no name, so its
+    header field is empty, and `read_csv` names that column `Unnamed: 0`. Pass `index=False`
+    when the index is only row numbers. When the index carries data, give it a name or read it
+    back with `index_col`.
+
+- key: data-medium-21
+  type: multiple
+  category: data
+  tags: [writing-data, csv, dtypes]
+  prompt: |
+    A frame has a `day` column of dtype `datetime64[us]`, a `kind` column of dtype `category` and
+    an `n` column of dtype `Int64` with one missing value. It is written with
+    `to_csv("f.csv", index=False)` and read back with a plain `pd.read_csv("f.csv")`. Which of
+    these are lost? Choose all that apply.
+  options:
+    - text: "`day` comes back as text (`str`), not as dates"
+      correct: true
+    - text: "`kind` comes back as `str`; the categories are gone"
+      correct: true
+    - text: "`n` comes back as `float64`, not `Int64`"
+      correct: true
+    - text: "The column names come back as `0`, `1` and `2`"
+  explanation: |
+    A CSV file holds only text, so everything that is not plain text or a plain number is lost:
+    dates come back as strings unless you pass `parse_dates`, categoricals come back as `str`
+    unless you pass `dtype={"kind": "category"}`, and an integer column with a gap comes back as
+    `float64` unless you pass `dtype={"n": "Int64"}`. The header row is kept, so the column names
+    survive.
+
+- key: data-medium-22
+  type: single
+  category: data
+  tags: [groupby, size, count]
+  prompt: |
+    ```python
+    import pandas as pd
+
+    visits = pd.DataFrame(
+        {"vet": ["Ivo", "Ivo", "Mae", "Ivo"], "weight_kg": [4.2, None, 30.5, None]}
+    )
+    print(visits.groupby("vet").size().tolist(), visits.groupby("vet")["weight_kg"].count().tolist())
+    ```
+
+    What does this print?
+  options:
+    - text: "`[3, 1] [1, 1]`"
+      correct: true
+    - text: "`[3, 1] [3, 1]`"
+    - text: "`[1, 1] [1, 1]`"
+    - text: "`[3, 1] [2, 1]`"
+  explanation: |
+    `size()` counts the **rows** in each group, whatever they contain: Ivo saw three animals and
+    Mae one. `count()` counts the values that are **present** in the column: only one of Ivo's
+    three visits has a weight. The keys come out sorted, Ivo before Mae. Use `size` for "how many
+    visits" and `count` for "how many weights were recorded".
+
+- key: data-medium-23
+  type: single
+  category: data
+  tags: [groupby, named-aggregation]
+  prompt: |
+    ```python
+    result = visits.groupby("vet", as_index=False).agg(
+        patients=("vet", "size"),
+        avg_kg=("weight_kg", "mean"),
+    )
+    print(result.columns.tolist())
+    ```
+
+    With `visits` from the previous question, what does this print?
+  options:
+    - text: "`['vet', 'patients', 'avg_kg']`"
+      correct: true
+    - text: "`['patients', 'avg_kg']`"
+    - text: "`['vet', 'weight_kg']`"
+    - text: "`['vet_size', 'weight_kg_mean']`"
+  explanation: |
+    In named aggregation each keyword becomes an output column, named as you chose, computed
+    from the `(column, function)` tuple. `as_index=False` keeps the group key `vet` as an
+    ordinary first column instead of the index, so the result has three columns and a
+    RangeIndex. Without `as_index=False` the columns would be `['patients', 'avg_kg']`, with
+    `vet` as the index.

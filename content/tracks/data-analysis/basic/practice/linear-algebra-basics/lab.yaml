@@ -1,0 +1,19 @@
+title: Juice Bar Sums
+summary: Work out a juice bar's fruit use with a matrix product, recover the wholesaler's prices per kilogram with np.linalg.solve, and fit the weekly sales trend with np.linalg.lstsq.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Works through the example sums
+    file: 01-example.py
+    hidden: false
+  - name: Multiplies sales by recipes as matrices
+    file: 02-fruit-needed.py
+    hidden: true
+  - name: Solves for the prices and refuses a singular system
+    file: 03-fruit-prices.py
+    hidden: true
+  - name: Fits the least-squares sales line
+    file: 04-trend.py
+    hidden: true

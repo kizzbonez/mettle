@@ -1,0 +1,19 @@
+title: Parking Fees
+summary: Price millions of parking stays with whole-column operations instead of row loops, look each car park's rate up with map on an indexed Series instead of scanning, and keep the stays' own index throughout.
+language: python
+minutes: 15
+timeLimitMs: 15000
+memoryMb: 512
+tests:
+  - name: Prices the example stays
+    file: 01-example.py
+    hidden: false
+  - name: Applies every fee rule and keeps the index
+    file: 02-fee-rules.py
+    hidden: true
+  - name: Prices three million stays under eight tariffs in time
+    file: 03-three-million-fees.py
+    hidden: true
+  - name: Looks rates up among fifty thousand car parks in time
+    file: 04-fifty-thousand-car-parks.py
+    hidden: true

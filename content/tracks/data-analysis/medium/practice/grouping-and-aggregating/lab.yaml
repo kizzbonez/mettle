@@ -1,0 +1,19 @@
+title: Cinema Weekend
+summary: Sum up a cinema's screenings with groupby, sort grouped totals with stable ties, build a per-film report with named aggregation that tells size from count, average over two keys with as_index=False, and count per day with value_counts.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Sums up the sample weekend
+    file: 01-example.py
+    hidden: false
+  - name: Totals the takings per film with ties A to Z, for many films
+    file: 02-takings.py
+    hidden: true
+  - name: Builds the film report with gaps, ties, empty input and many films
+    file: 03-report.py
+    hidden: true
+  - name: Averages per screen and day and counts per day
+    file: 04-screen-day-and-counts.py
+    hidden: true

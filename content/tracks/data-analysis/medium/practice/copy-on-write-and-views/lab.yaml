@@ -1,0 +1,19 @@
+title: Plot Register
+summary: Under Copy-on-Write, change an allotment register in place with one loc call or a whole-column assignment, build a late list from a filtered frame without touching the register, and hand out a writable NumPy copy of the rents.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Updates the example register and leaves it alone where asked
+    file: 01-example.py
+    hidden: false
+  - name: Marks payments in the register itself
+    file: 02-mark-paid.py
+    hidden: true
+  - name: Raises and cuts the rents in the register itself
+    file: 03-raise-rent.py
+    hidden: true
+  - name: Builds the late list and the array without changing the register
+    file: 04-leave-alone.py
+    hidden: true

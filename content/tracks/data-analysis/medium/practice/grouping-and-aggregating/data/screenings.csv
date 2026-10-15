@@ -1,0 +1,11 @@
+film,screen,day,tickets,takings,rating
+Rocket Dog,1,Fri,64,512.0,4.6
+Moon Garden,2,Fri,88,880.0,4.2
+Rocket Dog,1,Sat,120,960.0,
+Moon Garden,2,Sat,130,1300.0,4.4
+Quiet Harbour,2,Sun,22,198.0,4.8
+Rocket Dog,1,Sun,95,760.0,4.5
+Moon Garden,1,Sun,70,700.0,
+Quiet Harbour,1,Fri,18,162.0,
+Night Ferry,2,Sun,95,950.0,4.1
+Night Ferry,2,Sat,62,620.0,3.9

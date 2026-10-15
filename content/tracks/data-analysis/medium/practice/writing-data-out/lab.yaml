@@ -1,0 +1,19 @@
+title: Veg Box Files
+summary: Save deliveries to CSV and read them back with index_col, parse_dates and a dtype dict until the frame is equal again, write a European spreadsheet CSV with float, date and encoding options, and a JSON Lines feed with ISO dates.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Writes and reloads the example deliveries
+    file: 01-example.py
+    hidden: false
+  - name: Saves and loads another week without losing a dtype
+    file: 02-save-and-load.py
+    hidden: true
+  - name: Writes the spreadsheet with every option right
+    file: 03-spreadsheet.py
+    hidden: true
+  - name: Writes the website feed as JSON Lines
+    file: 04-feed.py
+    hidden: true

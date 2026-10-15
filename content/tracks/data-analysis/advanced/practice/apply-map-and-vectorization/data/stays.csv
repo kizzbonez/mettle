@@ -1,0 +1,10 @@
+car_park,minutes,blue_badge
+station,25,False
+station,95,False
+high street,180,False
+leisure centre,241,False
+station,300,False
+high street,301,True
+hospital,60,False
+high street,1440,False
+leisure centre,121,False

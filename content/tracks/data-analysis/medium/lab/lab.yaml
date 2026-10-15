@@ -1,0 +1,23 @@
+slug: ev-charging-report
+title: EV Charging Report
+summary: Read the council chargers' messy monthly export and a JSON price list, fix types and missing values, price every session without chained assignment, filter a period, and build the per-site table with groupby and named aggregation.
+language: python
+minutes: 50
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Cleans, prices and summarises the February export from the instructions
+    file: 01-february-report.py
+    hidden: false
+  - name: Reads every column with the right type and missing values, for both months
+    file: 02-load-rules.py
+    hidden: true
+  - name: Loads the prices and adds cost by the rules, leaving the input unchanged
+    file: 03-prices-and-cost.py
+    hidden: true
+  - name: Keeps completed sessions within the period, both ends included
+    file: 04-period.py
+    hidden: true
+  - name: Summarises another month, a filtered week, ties and an empty input
+    file: 05-summary-edge-cases.py
+    hidden: true

@@ -1,0 +1,19 @@
+title: Room Desk
+summary: Move the room code into the index with set_index, read one rate with at, take an inclusive block of rooms and chosen columns with loc, and the last rooms by position with iloc and reset_index.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Answers the example questions
+    file: 01-example.py
+    hidden: false
+  - name: Indexes by room code and looks up a rate
+    file: 02-index-and-rate.py
+    hidden: true
+  - name: Takes a block of rooms by label, both ends included
+    file: 03-block.py
+    hidden: true
+  - name: Takes the last rooms by position, none included
+    file: 04-last-rooms.py
+    hidden: true

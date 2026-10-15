@@ -1,0 +1,19 @@
+title: Swimming Gala Board
+summary: Make a swimming gala's arrays with NumPy's creation functions, a filled results board, lane numbers with arange, evenly spaced heat starts with linspace, and race times through asarray without a needless copy.
+language: python
+minutes: 15
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Builds the example board, lanes, starts and times
+    file: 01-example.py
+    hidden: false
+  - name: Fills a board of any size and numbers every lane
+    file: 02-board-and-lanes.py
+    hidden: true
+  - name: Gives exactly one start per heat, evenly spaced
+    file: 03-heat-starts.py
+    hidden: true
+  - name: Converts times without copying a float64 array
+    file: 04-as-times.py
+    hidden: true

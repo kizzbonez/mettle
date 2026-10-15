@@ -1,0 +1,18 @@
+title: Production Data Work
+summary: >-
+  Data code that other people can trust and run again. Validate and clean data in a pipeline,
+  test data code, make it fast and small, read data that does not fit in memory, store it in
+  Parquet, keep analyses reproducible and numerically sound, and build a pipeline from raw
+  files to a report.
+outcomes:
+  - Validate data against a schema, remove duplicates and quarantine bad rows with a record of why
+  - Test data functions with pandas.testing and NumPy's testing tools
+  - Speed up data code by vectorising, and shrink it with the right types, chunks and columns
+  - Store and read data in Parquet with pyarrow, keeping types and reading only what is needed
+  - Build reproducible, numerically sound pipelines from raw files to a summary report
+exam:
+  title: Production Data Work Mock Exam
+  description: Ten questions drawn from the level's bank, from validation and testing to performance, memory, Parquet and reproducibility.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

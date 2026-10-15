@@ -1,0 +1,19 @@
+title: Car Park Charges
+summary: Replace a row-by-row car park pricing function with vectorised code, using map with a dict, clip, np.ceil and np.minimum, np.select and where, and price a million stays at once.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Prices the example stays
+    file: 01-example.py
+    hidden: false
+  - name: Follows every charging rule at its edges
+    file: 02-charge-rules.py
+    hidden: true
+  - name: Puts each stay in its band, limits included
+    file: 03-bands.py
+    hidden: true
+  - name: Prices a million stays without row-by-row code
+    file: 04-many-stays.py
+    hidden: true
