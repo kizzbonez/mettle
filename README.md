@@ -90,10 +90,11 @@ quick.
 | **C# Development** | C# Foundations | Types, Generics and LINQ | Async and Advanced Language Features | Production .NET |
 | **Linux Command Line** | Shell Foundations | Text and Automation | Robust Shell Scripting | Systems Administration |
 | **Python Development** | Python Foundations | Idiomatic Python | The Data Model and Concurrency | Production Python |
+| **Data Analysis with NumPy and pandas** | NumPy Foundations | pandas Foundations | Analysing and Reshaping Data | Production Data Work |
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** | Security Foundations | in development | in development | in development |
 
-198 lessons, 400 exam questions with explanations and 204 labs. Every lab is verified in the
+240 lessons, 489 exam questions with explanations and 250 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -126,6 +127,14 @@ then packaging, testing, logging, command-line programs, performance, memory and
 was written from the Python documentation and the PEPs, with every example run on Python 3.15.
 Its question banks hold 93 questions, each level ends with a lab, and every lesson ends with a
 practice lab.
+**Data Analysis with NumPy and pandas is the fifth**: 42 lessons on NumPy 2.5 and pandas 3 for
+people who know Python. It starts from what an array is and why it beats a list, and goes on
+to indexing, broadcasting and aggregation, then pandas from the first DataFrame to missing
+data, copy-on-write, grouping, joins, reshaping, text, time zones and time series, and ends
+with validation, testing, performance, memory, Parquet and reproducible pipelines. It was
+written from the NumPy and pandas documentation, with every example run in the sandbox. Its
+question banks hold 89 questions, and its labs, one per level and one per lesson, run NumPy and
+pandas on real data files.
 
 AI Development and Cyber Security are still in the original short format (three lessons a
 level) and are next to be expanded.
