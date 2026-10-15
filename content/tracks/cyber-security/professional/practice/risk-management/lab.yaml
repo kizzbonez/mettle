@@ -1,0 +1,19 @@
+title: Risk Register and Appetite Check
+summary: Score risks on a five-by-five matrix, value a control by the ALE it removes against its cost, and check every treatment in a brewery's risk register against the board's risk tolerances.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Rates every cell of the matrix and refuses bad values
+    file: 02-matrix.py
+    hidden: true
+  - name: Values controls with ALE before and after, rounded
+    file: 03-control-value.py
+    hidden: true
+  - name: Applies the tolerances at their boundaries
+    file: 04-tolerances.py
+    hidden: true

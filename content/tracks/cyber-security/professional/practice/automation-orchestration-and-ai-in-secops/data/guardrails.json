@@ -1,0 +1,12 @@
+{
+  "agent": "alert-triage-assistant",
+  "identity": "svc-ai-triage",
+  "tools": {
+    "siem.search": {"allowed": true, "max_rows": 10000},
+    "ip.reputation": {"allowed": true},
+    "ticket.comment": {"allowed": true},
+    "edr.isolate_host": {"allowed": true, "requires_approval": "soc-lead", "max_per_hour": 3},
+    "idp.disable_user": {"allowed": false}
+  },
+  "protected_hosts": ["dc-01", "dc-02", "radius-01"]
+}

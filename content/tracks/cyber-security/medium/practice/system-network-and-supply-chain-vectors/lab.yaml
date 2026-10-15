@@ -1,0 +1,19 @@
+title: Browser Extension Audit
+summary: Audit the extensions installed on managed laptops against an allow list of reviewed permissions and a supplier's advisory of malicious versions, catching compromised updates, unapproved extensions and new permissions.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Audits the sample report from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Finds new permissions across both lists, once each, sorted
+    file: 02-permissions.py
+    hidden: true
+  - name: Puts compromised before unapproved before new permissions, with exact versions
+    file: 03-precedence.py
+    hidden: true
+  - name: Sorts findings across devices and handles an empty report
+    file: 04-fleet.py
+    hidden: true

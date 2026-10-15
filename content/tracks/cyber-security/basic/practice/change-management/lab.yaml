@@ -1,0 +1,19 @@
+title: Change Request Gate
+summary: Check a water authority's requests for change against a written policy on owners, CAB approval, test results, backout plans, maintenance windows for restarts and the approved scope.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reviews the authority's six requests
+    file: 01-sample-changes.py
+    hidden: false
+  - name: Applies approval and testing by type of change
+    file: 02-approval-by-type.py
+    hidden: true
+  - name: Requires an owner and a backout or fail-forward plan
+    file: 03-owner-and-backout.py
+    hidden: true
+  - name: Keeps restarts in the window and changes in scope
+    file: 04-window-and-scope.py
+    hidden: true

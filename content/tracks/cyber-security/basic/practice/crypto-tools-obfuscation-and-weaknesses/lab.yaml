@@ -1,0 +1,19 @@
+title: Weak Crypto Review
+summary: Review a telehealth company's service configurations for weak ciphers, short keys, weak hashes, poor randomness, downgrade risks and hardcoded keys, and find nonces reused under one key in its encryption log.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reviews the sample services and encryption log
+    file: 01-sample-review.py
+    hidden: false
+  - name: Judges ciphers, key sizes and hashes
+    file: 02-algorithms-and-keys.py
+    hidden: true
+  - name: Judges token sources, old TLS versions and hardcoded keys, in order
+    file: 03-randomness-downgrade-keys.py
+    hidden: true
+  - name: Finds each nonce reused under one key
+    file: 04-nonce-log.py
+    hidden: true

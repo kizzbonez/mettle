@@ -1,0 +1,19 @@
+title: MFA Fatigue and Concurrent Sessions
+summary: Find users bombarded with MFA push prompts, and those who gave in, using exact time windows, then find sessions of one account open in two countries at once.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Finds the indicators in the sample logs from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Applies the fatigue window on its boundary and uses both arguments
+    file: 02-windows.py
+    hidden: true
+  - name: Counts only rejections in the window up to an approval
+    file: 03-approvals.py
+    hidden: true
+  - name: Pairs overlapping sessions from different countries, with open and touching sessions
+    file: 04-sessions.py
+    hidden: true

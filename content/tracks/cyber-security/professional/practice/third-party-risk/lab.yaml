@@ -1,0 +1,19 @@
+title: SaaS SLA Check and Bid Scoring
+summary: Measure a ticketing provider's monthly availability against its SLA, with the maintenance exclusion and service credit bands, and score replacement bids with weighted criteria while conflicted evaluators step out.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Computes availability with the maintenance exclusion
+    file: 02-availability.py
+    hidden: true
+  - name: Applies the service credit bands at their edges
+    file: 03-credits.py
+    hidden: true
+  - name: Ranks bids without conflicted scores, with ties by name
+    file: 04-bids.py
+    hidden: true

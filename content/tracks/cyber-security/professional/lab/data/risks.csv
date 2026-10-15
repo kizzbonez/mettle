@@ -1,0 +1,9 @@
+risk_id,title,host,exposure_factor,industry_aro,owner
+R01,Ransomware encrypts the booking platform,book-web-01,0.60,0.15,Head of Digital Sales
+R02,Card data stolen from the booking site,book-web-01,0.35,0.10,Chief Financial Officer
+R03,VPN gateway compromise gives remote network access,vpn-gw-01,0.50,0.20,Head of IT
+R04,Partner file transfer breach exposes manifests and payment files,mft-01,0.40,0.10,Chief Financial Officer
+R05,Gate controller failure stops boarding,gate-ctl-01,0.30,0.50,Head of Terminal Operations
+R06,Crew roster unavailable on a sailing day,roster-01,0.25,0.30,Head of Marine Operations
+R07,Passenger Wi-Fi portal defaced or abused,wifi-portal-01,0.20,0.50,Head of Passenger Services
+R08,Customer records leaked from the CRM,crm-01,0.50,0.05,Data Protection Officer

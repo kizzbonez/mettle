@@ -1,0 +1,19 @@
+title: Kernel Settings Baseline
+summary: Work out which value of each kernel setting wins across the files of /etc/sysctl.d (last value wins, files in name order) and compare the result with a hardening baseline.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Checks the sample files against the sample baseline
+    file: 01-example.sh
+    hidden: false
+  - name: Reads only .conf files, in byte order of names, last value winning
+    file: 02-file-order.sh
+    hidden: true
+  - name: Parses comments, spacing, dashes and slashes in the lines
+    file: 03-line-syntax.sh
+    hidden: true
+  - name: Falls back to kernel defaults and handles an empty baseline
+    file: 04-defaults.sh
+    hidden: true

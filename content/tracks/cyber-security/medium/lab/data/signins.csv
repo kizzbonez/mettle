@@ -1,0 +1,17 @@
+time,user,result,ip,city,country,lat,lon,app
+2026-10-14T06:00:12Z,j.pereira,success,198.51.100.201,Lisbon,PT,38.7223,-9.1393,Outlook
+2026-10-14T09:31:28Z,s.moreau,success,198.51.100.94,Singapore,SG,1.3521,103.8198,SharePoint
+2026-10-14T07:02:40Z,p.walsh,success,192.0.2.61,Dublin,IE,53.3498,-6.2603,Teams
+2026-10-14T07:58:03Z,s.moreau,success,203.0.113.180,London,GB,51.5074,-0.1278,Outlook
+2026-10-14T08:00:21Z,b.osei,success,203.0.113.180,Southampton,GB,50.9097,-1.4044,Teams
+2026-10-14T08:20:44Z,h.dlamini,success,203.0.113.181,Southampton,GB,50.9097,-1.4044,Outlook
+2026-10-14T08:41:09Z,s.moreau,failure,198.51.100.66,Lagos,NG,6.5244,3.3792,Outlook
+2026-10-14T09:00:15Z,r.chen,success,203.0.113.182,Manchester,GB,53.4808,-2.2426,Teams
+2026-10-14T09:20:47Z,r.chen,success,192.0.2.140,Leeds,GB,53.8008,-1.5491,Teams
+2026-10-14T10:00:05Z,t.huang,success,203.0.113.183,Southampton,GB,50.9097,-1.4044,Outlook
+2026-10-14T10:05:11Z,t.huang,success,192.0.2.15,London,GB,51.5074,-0.1278,Outlook
+2026-10-14T12:01:30Z,j.pereira,success,192.0.2.88,Madrid,ES,40.4168,-3.7038,Outlook
+2026-10-14T12:05:00Z,b.osei,success,203.0.113.180,Southampton,GB,50.9097,-1.4044,Outlook
+2026-10-14T13:10:52Z,h.dlamini,success,198.51.100.33,Johannesburg,ZA,-26.2041,28.0473,SharePoint
+2026-10-14T13:12:07Z,h.dlamini,failure,198.51.100.33,Johannesburg,ZA,-26.2041,28.0473,Teams
+2026-10-14T16:02:18Z,p.walsh,success,192.0.2.99,New York,US,40.7128,-74.0060,Teams

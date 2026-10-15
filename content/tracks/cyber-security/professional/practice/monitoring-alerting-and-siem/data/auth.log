@@ -1,0 +1,13 @@
+<38>1 2026-10-14T01:58:02.114Z bastion-01 sshd 4101 - - Accepted publickey for deploy from 10.44.8.15 port 50122 ssh2
+<86>1 2026-10-14T02:03:10.551Z bastion-01 sshd 4130 - - Failed password for lift-ops from 203.0.113.45 port 41022 ssh2
+<86>1 2026-10-14T02:04:41.020Z bastion-01 sshd 4133 - - Failed password for invalid user admin from 203.0.113.45 port 41040 ssh2
+<86>1 2026-10-14T02:05:12.300Z bastion-01 sshd 4136 - - Failed password for lift-ops from 203.0.113.45 port 41058 ssh2
+<86>1 2026-10-14T02:07:55.873Z bastion-01 sshd 4139 - - Failed password for ticketing from 203.0.113.45 port 41071 ssh2
+<190>1 2026-10-14T02:08:30.000Z lab-sim-01 sshd 77 - - Failed password for root from 192.0.2.10 port 50000 ssh2
+<86>1 2026-10-14T02:09:02.448Z bastion-01 sshd 4142 - - Failed password for svc-backup-old from 203.0.113.45 port 41090 ssh2
+<86>1 2026-10-14T02:12:40.006Z bastion-01 sshd 4150 - - Failed password for m.ferraro from 198.51.100.7 port 60110 ssh2
+<86>1 2026-10-14T02:13:01.210Z bastion-01 sshd 4151 - - Failed password for m.ferraro from 198.51.100.7 port 60112 ssh2
+<38>1 2026-10-14T02:13:20.774Z bastion-01 sshd 4152 - - Accepted password for m.ferraro from 198.51.100.7 port 60114 ssh2
+<86>1 2026-10-14T02:20:44.902Z bastion-01 sshd 4160 - - Failed password for invalid user oracle from 203.0.113.45 port 41301 ssh2
+<85>1 2026-10-14T02:31:18.385Z bastion-01 sudo 4188 - - deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart nginx
+<38>1 2026-10-14T03:02:09.117Z bastion-01 sshd 4201 - - Accepted password for admin-legacy from 10.44.3.9 port 52001 ssh2

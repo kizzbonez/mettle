@@ -1,0 +1,19 @@
+title: Tip Line Hybrid Encryption
+summary: Encrypt a newspaper's anonymous tips to its X25519 public key with an ephemeral key exchange, HKDF and AES-GCM, and open them safely with the private key.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Opens and rebuilds the sample tip
+    file: 01-sample-tip.py
+    hidden: false
+  - name: Opens packages built to the stated layout
+    file: 02-decrypt.py
+    hidden: true
+  - name: Builds packages with fresh ephemeral keys and nonces
+    file: 03-encrypt.py
+    hidden: true
+  - name: Returns None for wrong keys, changed bytes and short packages
+    file: 04-refusals.py
+    hidden: true

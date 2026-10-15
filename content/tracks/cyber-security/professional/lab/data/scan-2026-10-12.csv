@@ -1,0 +1,21 @@
+finding_id,host,ip,port,cve,cvss,title,first_seen
+F-0998,book-web-01,10.40.1.11,443,CVE-2021-44228,10.0,Apache Log4j2 JNDI remote code execution,2026-10-02
+F-1001,book-web-01,10.40.1.11,443,CVE-2021-44228,10.0,Apache Log4j2 JNDI remote code execution,2026-09-28
+F-1002,book-web-01,10.40.1.11,443,CVE-2023-44487,7.5,HTTP/2 Rapid Reset denial of service,2026-09-14
+F-1003,BOOK-WEB-01,10.40.1.11,22,cve-2023-48795,5.9,SSH Terrapin prefix truncation,2026-08-03
+F-1004,vpn-gw-01,10.40.0.2,443,CVE-2024-21762,9.8,FortiOS SSL VPN out-of-bounds write,2026-10-09
+F-1005,mft-01,10.40.2.21,443,CVE-2023-34362,9.8,MOVEit Transfer SQL injection,2026-10-01
+F-1006,roster-01,10.40.3.15,8080,CVE-2022-22965,9.8,Spring Framework remote code execution (Spring4Shell),2026-10-06
+F-1007,core-sw-01,10.40.0.1,443,CVE-2023-20198,10.0,Cisco IOS XE web UI privilege escalation,2026-10-05
+F-1008, gate-ctl-01 ,10.40.5.31,443,CVE-2022-0778,7.5,OpenSSL BN_mod_sqrt infinite loop,2026-07-20
+F-1009,gate-ctl-02,10.40.5.32,443,CVE-2022-0778,7.5,OpenSSL BN_mod_sqrt infinite loop,2026-07-20
+F-1010,kiosk-01,10.40.5.51,443,CVE-2016-2183,7.5,SWEET32 birthday attack on 64-bit block ciphers,2026-06-15
+F-1011,wifi-portal-01,10.40.8.10,80,CVE-2024-4577,9.8,PHP-CGI argument injection,2026-10-10
+F-1012,jump-01,10.40.0.20,22,CVE-2024-6387,8.1,OpenSSH regreSSHion signal handler race,2026-09-25
+F-1013,jump-01,10.40.0.20,22,CVE-2023-48795,5.9,SSH Terrapin prefix truncation,2026-08-21
+F-1014,build-01,10.40.3.40,0,CVE-2023-38545,9.8,curl SOCKS5 heap buffer overflow,2026-09-30
+F-1015, gate-ctl-01 ,10.40.5.31,22,,,SSH server allows password authentication,2026-07-20
+F-1016,wifi-portal-01,10.40.8.10,443,,,TLS certificate expires within 30 days,2026-10-10
+F-1017,nas-07,10.40.9.17,5001,CVE-2016-2183,7.5,SWEET32 birthday attack on 64-bit block ciphers,2026-09-07
+F-1018,nas-07,10.40.9.17,22,CVE-2023-48795,5.9,SSH Terrapin prefix truncation,2026-09-07
+F-1019,Mft-01,10.40.2.21,443,CVE-2023-34362,9.8,MOVEit Transfer SQL injection,2026-10-03

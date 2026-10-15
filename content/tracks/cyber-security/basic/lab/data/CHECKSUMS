@@ -1,0 +1,8 @@
+# Kestrel call-out service 3.2.0, release manifest built 2026-10-28
+# format: digest, space, mode (space = text, * = binary), file name
+
+20f44caa39450583f94636b76204e8599198f3638e2bdc09c9e3d25e619a5d02  callout.conf
+7fd87f05241329dda7871ca8b66386fcf59cb3646a24a4e7be02f0f20686475e  deploy.sh
+b625ceaf72ef79247482a38734576f9c479eeeb80b3b4bfc49515f18e25f1eb8 *rota.csv
+8a2ee3245070dd5aa54e8ca3e3e9b0e1  pager-gateway.yaml
+3f1b0c9d77a52e4e18c2a6d07a9a1f0e2b8c4d6f5e7a9b1c3d5e7f9a1b3c5d7e  radio-codes.txt

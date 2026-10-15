@@ -1,0 +1,13 @@
+host,ip,role,owner,criticality,exposure,asset_value_usd
+book-web-01,10.40.1.11,booking website and payment page,Digital Sales,critical,internet,480000
+vpn-gw-01,10.40.0.2,remote access VPN gateway,IT Infrastructure,critical,internet,150000
+core-sw-01,10.40.0.1,core switch,IT Infrastructure,critical,internal,90000
+mft-01,10.40.2.21,file transfer with the port authority and card processor,Finance,high,partner,220000
+roster-01,10.40.3.15,crew rostering application,Marine Operations,high,internal,180000
+crm-01,10.40.3.22,customer relationship management,Digital Sales,high,internal,200000
+jump-01,10.40.0.20,administrator jump host,IT Infrastructure,high,internal,40000
+gate-ctl-01,10.40.5.31,boarding gate controller (Harbour Terminal),Terminal Operations,medium,internal,25000
+gate-ctl-02,10.40.5.32,boarding gate controller (Harbour Terminal),Terminal Operations,medium,internal,25000
+kiosk-01,10.40.5.51,self-service ticket kiosk,Terminal Operations,medium,internal,12000
+build-01,10.40.3.40,software build server,Digital Sales,medium,internal,60000
+wifi-portal-01,10.40.8.10,onboard passenger Wi-Fi portal,Passenger Services,low,internet,30000

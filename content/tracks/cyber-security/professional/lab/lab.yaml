@@ -1,0 +1,23 @@
+slug: ferry-vulnerability-and-risk-report
+title: Ferry Line Vulnerability and Risk Report
+summary: Turn a ferry operator's messy vulnerability scan, asset inventory, CISA KEV excerpt and five years of loss history into a remediation list ordered by known exploitation, exposure, criticality and CVSS with service-level due dates, then compute SLE, ARO and ALE for each stated risk and build the risk register summary the committee acts on.
+language: python
+minutes: 60
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Builds the October report from the instructions
+    file: 01-october-report.py
+    hidden: false
+  - name: Loads a messy export with duplicates, informational rows, unknown hosts and an empty file
+    file: 02-loading-rules.py
+    hidden: true
+  - name: Applies every priority rule, the SLA due dates, the overdue boundary and the sort order
+    file: 03-priority-rules.py
+    hidden: true
+  - name: Computes SLE, ARO and ALE over the loss window, with the industry ARO fallback
+    file: 04-annual-loss.py
+    hidden: true
+  - name: Summarises the register with the appetite boundary, every action rule, ties and no findings
+    file: 05-register-summary.py
+    hidden: true

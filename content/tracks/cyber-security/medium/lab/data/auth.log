@@ -1,0 +1,63 @@
+2026-10-14T00:02:11.402118+00:00 jump01 sshd[2104]: Accepted publickey for deploy from 10.20.0.15 port 51022 ssh2: ED25519 SHA256:q3f9Zt0mXk8vY1bR2cL4nP7sD6hJ5wA0eU9iO3tG2yQ
+2026-10-14T00:02:11.410552+00:00 jump01 sshd[2104]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+2026-10-14T00:02:43.007315+00:00 jump01 sshd[2104]: Disconnected from user deploy 10.20.0.15 port 51022
+2026-10-14T01:14:05.118204+00:00 jump01 sshd[2311]: Failed password for root from 198.51.100.23 port 40101 ssh2
+2026-10-14T01:14:08.902610+00:00 jump01 sshd[2311]: Failed password for root from 198.51.100.23 port 40101 ssh2
+2026-10-14T01:14:12.661093+00:00 jump01 sshd[2311]: Failed password for root from 198.51.100.23 port 40101 ssh2
+2026-10-14T01:14:12.661870+00:00 jump01 sshd[2311]: error: maximum authentication attempts exceeded for root from 198.51.100.23 port 40101 ssh2 [preauth]
+2026-10-14T01:14:16.230418+00:00 jump01 sshd[2312]: Failed password for root from 198.51.100.23 port 40122 ssh2
+2026-10-14T01:14:19.884017+00:00 jump01 sshd[2312]: Failed password for root from 198.51.100.23 port 40122 ssh2
+2026-10-14T01:14:23.517726+00:00 jump01 sshd[2312]: Failed password for root from 198.51.100.23 port 40122 ssh2
+2026-10-14T01:14:27.140385+00:00 jump01 sshd[2313]: Failed password for root from 198.51.100.23 port 40139 ssh2
+2026-10-14T01:14:30.795021+00:00 jump01 sshd[2313]: Failed password for root from 198.51.100.23 port 40139 ssh2
+2026-10-14T01:14:34.422867+00:00 jump01 sshd[2313]: Failed password for root from 198.51.100.23 port 40139 ssh2
+2026-10-14T01:14:34.423410+00:00 jump01 sshd[2313]: Connection closed by authenticating user root 198.51.100.23 port 40139 [preauth]
+2026-10-14T01:14:38.061234+00:00 jump01 sshd[2314]: Failed password for root from 198.51.100.23 port 40150 ssh2
+2026-10-14T01:14:41.703310+00:00 jump01 sshd[2314]: Failed password for root from 198.51.100.23 port 40150 ssh2
+2026-10-14T01:14:45.348911+00:00 jump01 sshd[2314]: Failed password for root from 198.51.100.23 port 40150 ssh2
+2026-10-14T01:14:48.992045+00:00 jump01 sshd[2315]: Failed password for root from 198.51.100.23 port 40167 ssh2
+2026-10-14T01:14:52.637112+00:00 jump01 sshd[2315]: Failed password for root from 198.51.100.23 port 40167 ssh2
+2026-10-14T01:14:56.270964+00:00 jump01 sshd[2316]: Invalid user admin from 198.51.100.23 port 40181
+2026-10-14T01:14:59.915083+00:00 jump01 sshd[2316]: Failed password for invalid user admin from 198.51.100.23 port 40181 ssh2
+2026-10-14T01:15:03.551720+00:00 jump01 sshd[2316]: Failed password for invalid user admin from 198.51.100.23 port 40181 ssh2
+2026-10-14T01:15:03.552301+00:00 jump01 sshd[2316]: Connection closed by invalid user admin 198.51.100.23 port 40181 [preauth]
+2026-10-14T02:40:17.204511+00:00 jump01 sshd[2502]: Failed password for root from 192.0.2.200 port 55210 ssh2
+2026-10-14T02:40:21.008933+00:00 jump01 sshd[2502]: Failed password for root from 192.0.2.200 port 55210 ssh2
+2026-10-14T02:40:24.811604+00:00 jump01 sshd[2502]: Failed password for root from 192.0.2.200 port 55210 ssh2
+2026-10-14T02:40:28.617280+00:00 jump01 sshd[2503]: Failed password for root from 192.0.2.200 port 55231 ssh2
+2026-10-14T02:40:32.420819+00:00 jump01 sshd[2503]: Failed password for root from 192.0.2.200 port 55231 ssh2
+2026-10-14T02:40:36.224145+00:00 jump01 sshd[2503]: Failed password for root from 192.0.2.200 port 55231 ssh2
+2026-10-14T02:40:40.027960+00:00 jump01 sshd[2504]: Failed password for root from 192.0.2.200 port 55248 ssh2
+2026-10-14T02:40:43.831002+00:00 jump01 sshd[2504]: Failed password for root from 192.0.2.200 port 55248 ssh2
+2026-10-14T02:40:47.634518+00:00 jump01 sshd[2504]: Failed password for root from 192.0.2.200 port 55248 ssh2
+2026-10-14T02:40:47.635107+00:00 jump01 sshd[2504]: Connection closed by authenticating user root 192.0.2.200 port 55248 [preauth]
+2026-10-14T03:05:12.551208+00:00 jump01 sshd[2611]: Failed password for a.brennan from 203.0.113.77 port 60011 ssh2
+2026-10-14T03:06:49.198300+00:00 jump01 sshd[2612]: Failed password for b.osei from 203.0.113.77 port 60017 ssh2
+2026-10-14T03:08:27.870115+00:00 jump01 sshd[2613]: Failed password for c.varga from 203.0.113.77 port 60023 ssh2
+2026-10-14T03:10:05.004632+00:00 jump01 sshd[2614]: Failed password for d.kaur from 203.0.113.77 port 60029 ssh2
+2026-10-14T03:11:43.662910+00:00 jump01 sshd[2615]: Failed password for e.lindqvist from 203.0.113.77 port 60035 ssh2
+2026-10-14T03:13:21.340017+00:00 jump01 sshd[2616]: Invalid user gus from 203.0.113.77 port 60041
+2026-10-14T03:13:21.890452+00:00 jump01 sshd[2616]: Failed password for invalid user gus from 203.0.113.77 port 60041 ssh2
+2026-10-14T03:14:59.017364+00:00 jump01 sshd[2617]: Failed password for h.dlamini from 203.0.113.77 port 60047 ssh2
+2026-10-14T03:16:36.775120+00:00 jump01 sshd[2618]: Failed password for h.dlamini from 203.0.113.77 port 60053 ssh2
+2026-10-14T03:18:14.402889+00:00 jump01 sshd[2619]: Accepted password for h.dlamini from 203.0.113.77 port 60059 ssh2
+2026-10-14T03:18:14.412306+00:00 jump01 sshd[2619]: pam_unix(sshd:session): session opened for user h.dlamini(uid=1017) by (uid=0)
+2026-10-14T04:22:30.118440+00:00 jump01 sshd[2740]: Failed password for root from 198.51.100.140 port 33012 ssh2
+2026-10-14T04:22:33.902175+00:00 jump01 sshd[2741]: Failed password for oracle from 198.51.100.140 port 33019 ssh2
+2026-10-14T04:22:37.660458+00:00 jump01 sshd[2742]: Invalid user test from 198.51.100.140 port 33027
+2026-10-14T04:22:37.661022+00:00 jump01 sshd[2742]: Failed password for invalid user test from 198.51.100.140 port 33027 ssh2
+2026-10-14T04:22:41.419836+00:00 jump01 sshd[2743]: Failed password for ubuntu from 198.51.100.140 port 33036 ssh2
+2026-10-14T05:47:02.335190+00:00 jump01 sshd[2810]: Failed password for a.brennan from 203.0.113.9 port 41500 ssh2
+2026-10-14T05:47:31.904774+00:00 jump01 sshd[2811]: Failed password for b.osei from 203.0.113.9 port 41506 ssh2
+2026-10-14T05:48:01.471305+00:00 jump01 sshd[2812]: Failed password for c.varga from 203.0.113.9 port 41512 ssh2
+2026-10-14T05:48:31.039926+00:00 jump01 sshd[2813]: Failed password for d.kaur from 203.0.113.9 port 41518 ssh2
+2026-10-14T05:49:00.608517+00:00 jump01 sshd[2814]: Failed password for e.lindqvist from 203.0.113.9 port 41524 ssh2
+2026-10-14T05:49:30.177109+00:00 jump01 sshd[2815]: Failed password for e.lindqvist from 203.0.113.9 port 41530 ssh2
+2026-10-14T05:49:59.745700+00:00 jump01 sshd[2816]: Failed password for e.lindqvist from 203.0.113.9 port 41536 ssh2
+2026-10-14T05:50:29.314292+00:00 jump01 sshd[2817]: Failed password for e.lindqvist from 203.0.113.9 port 41542 ssh2
+2026-10-14T07:31:44.208913+00:00 jump01 sshd[2950]: Failed publickey for deploy from 10.20.0.15 port 51388 ssh2: ED25519 SHA256:Wm2k7RrT0bq4LxZ1yN8cV3pF6sG9hD5jA2uE7iO0tK4
+2026-10-14T07:31:44.981005+00:00 jump01 sshd[2950]: Accepted publickey for deploy from 10.20.0.15 port 51388 ssh2: ED25519 SHA256:q3f9Zt0mXk8vY1bR2cL4nP7sD6hJ5wA0eU9iO3tG2yQ
+2026-10-14T08:02:15.774310+00:00 jump01 sshd[3012]: Failed password for s.moreau from 10.20.0.31 port 49822 ssh2
+2026-10-14T08:02:24.120598+00:00 jump01 sshd[3012]: Accepted password for s.moreau from 10.20.0.31 port 49822 ssh2
+2026-10-14T08:02:24.131007+00:00 jump01 sshd[3012]: pam_unix(sshd:session): session opened for user s.moreau(uid=1009) by (uid=0)
+2026-10-14T09:15:40.640221+00:00 jump01 sshd[3127]: Received disconnect from 10.20.0.31 port 49822:11: disconnected by user

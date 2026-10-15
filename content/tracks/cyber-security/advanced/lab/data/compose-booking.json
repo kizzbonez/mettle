@@ -1,0 +1,43 @@
+{
+  "name": "booking",
+  "services": {
+    "api": {
+      "image": "registry.brightwater-vets.example/booking/api:3.2.0",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": ["ALL"],
+      "security_opt": ["no-new-privileges:true"],
+      "ports": [
+        {"mode": "ingress", "host_ip": "127.0.0.1", "target": 8080, "published": "8080", "protocol": "tcp"}
+      ],
+      "networks": {"backend": null}
+    },
+    "db": {
+      "image": "postgres:17.6",
+      "environment": {"POSTGRES_DB": "booking", "POSTGRES_PASSWORD_FILE": "/run/secrets/db_password"},
+      "ports": [
+        {"mode": "ingress", "target": 5432, "published": "5432", "protocol": "tcp"}
+      ],
+      "volumes": [{"type": "volume", "source": "dbdata", "target": "/var/lib/postgresql/data"}],
+      "networks": {"backend": null}
+    },
+    "web": {
+      "image": "nginx:1.28.0",
+      "read_only": true,
+      "ports": [
+        {"mode": "ingress", "host_ip": "10.30.0.10", "target": 443, "published": "443", "protocol": "tcp"}
+      ],
+      "networks": {"backend": null, "frontend": null}
+    },
+    "worker": {
+      "image": "registry.brightwater-vets.example/booking/worker:3.2.0",
+      "privileged": true,
+      "networks": {"backend": null}
+    }
+  },
+  "networks": {
+    "backend": {"name": "booking_backend", "internal": true},
+    "frontend": {"name": "booking_frontend"}
+  },
+  "volumes": {"dbdata": {"name": "booking_dbdata"}}
+}

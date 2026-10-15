@@ -1,0 +1,19 @@
+title: Sealed Candidate Notes
+summary: Encrypt a recruitment agency's candidate notes with AES-256-GCM and the record ID as associated data, open them safely, and list the notes that were altered, moved or sealed under another key.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Seals a note and finds the agency's altered records
+    file: 01-sample-notes.py
+    hidden: false
+  - name: Seals with the record ID as associated data and fresh nonces
+    file: 02-seal.py
+    hidden: true
+  - name: Refuses changed tokens, other keys and other records
+    file: 03-tampering.py
+    hidden: true
+  - name: Returns None for malformed tokens and reports a notes file in order
+    file: 04-malformed.py
+    hidden: true

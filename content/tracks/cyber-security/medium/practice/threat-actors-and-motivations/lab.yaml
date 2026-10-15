@@ -1,0 +1,19 @@
+title: Threat Actor Profiling
+summary: Classify a council's incidents into threat actor types with an ordered set of attribute rules, flag advanced persistent threats by resources, sophistication and dwell time, and summarize the threat landscape.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Profiles the sample register from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Applies the actor rules in order, ignoring case and spaces
+    file: 02-rules.py
+    hidden: true
+  - name: Flags APTs only when every condition holds
+    file: 03-apt.py
+    hidden: true
+  - name: Summarizes another register with mixed-case values
+    file: 04-landscape.py
+    hidden: true

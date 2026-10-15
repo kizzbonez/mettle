@@ -1,0 +1,12 @@
+{
+  "engagement": "PT-2026-11 external and partially known internal test",
+  "authorized_by": "CIO, signed 2026-10-30; hosting provider notified 2026-11-02",
+  "scope": {
+    "in": ["203.0.113.0/27", "portal.ashgrove.example", "10.40.0.0/16"],
+    "out": ["10.40.9.0/24", "payments.ashgrove.example"]
+  },
+  "window": {"start": "2026-11-09", "end": "2026-11-20", "hours_utc": [8, 18], "blackout": ["2026-11-16"]},
+  "passive": ["ct-log-search", "public-dns", "osint"],
+  "active": ["host-discovery", "port-scan", "service-scan", "vuln-scan", "exploit"],
+  "forbidden": ["denial-of-service", "phishing", "data-deletion", "persistence"]
+}

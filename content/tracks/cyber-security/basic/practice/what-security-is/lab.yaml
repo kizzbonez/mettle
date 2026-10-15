@@ -1,0 +1,19 @@
+title: AAA Log Triage
+summary: Read a library server's authentication log and sort its sudo lines into authentication failures, authorization granted and authorization denied, next to the sign-ins the starter already reports.
+language: bash
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Lists the AAA events in the library's log
+    file: 01-sample-log.sh
+    hidden: false
+  - name: Tells allowed commands from refused ones
+    file: 02-granted-and-denied.sh
+    hidden: true
+  - name: Treats wrong sudo passwords as authentication failures
+    file: 03-sudo-password-failures.sh
+    hidden: true
+  - name: Prints nothing for other lines and for an empty log
+    file: 04-other-lines.sh
+    hidden: true

@@ -1,0 +1,13 @@
+record_id,category,created,closed
+INV-2019-0310,invoice,2019-05-20,
+INV-2021-0088,invoice,2021-02-11,
+CCTV-1009,cctv,2026-10-09,
+CCTV-1102,cctv,2026-11-02,
+STF-2018-0007,staff-file,2018-01-08,2019-07-31
+STF-2020-0031,staff-file,2016-09-01,2020-02-29
+STF-2023-0012,staff-file,2023-04-17,
+ADM-2025-0410,admission-application,2025-03-01,2025-11-16
+ADM-2025-0533,admission-application,2025-03-01,2025-11-17
+PUP-2001-0142,pupil-record,2001-09-04,2008-07-18
+LIB-2022-0001,library-loan,2022-01-10,2022-02-07
+SAF-2019-0003,safeguarding-file,2019-03-12,2020-01-15

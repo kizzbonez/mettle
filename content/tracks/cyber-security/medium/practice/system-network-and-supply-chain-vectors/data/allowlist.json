@@ -1,0 +1,14 @@
+{
+  "kdlmgifhpcbjnegpaeoijbfhbmplcnek": {
+    "name": "SafeLink Inspector", "reviewed": "2026-03-04",
+    "permissions": ["storage", "tabs", "cookies"], "host_permissions": ["<all_urls>"]
+  },
+  "gbjmcaeoepkdonfhcllfiidmkaaplocm": {
+    "name": "Vaultline Password Manager", "reviewed": "2026-01-19",
+    "permissions": ["storage", "tabs", "contextMenus", "webRequest", "alarms"], "host_permissions": ["<all_urls>"]
+  },
+  "oafchlnmbedjgbfkeipniaocgimhedfn": {
+    "name": "Claims Grammar Helper", "reviewed": "2025-11-27",
+    "permissions": ["storage", "scripting"], "host_permissions": ["https://claims.ashdown.example/*"]
+  }
+}

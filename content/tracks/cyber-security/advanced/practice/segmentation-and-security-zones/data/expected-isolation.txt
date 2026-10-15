@@ -1,0 +1,9 @@
+# what the OT security standard expects between Tidewater zones
+# EXPECT  FROM    TO     PROTO/PORT
+deny      guest   plant  tcp/502
+deny      office  plant  tcp/502
+allow     mgmt    plant  tcp/22
+allow     wan     dmz    tcp/443
+deny      wan     hist   tcp/5432
+allow     office  hist   tcp/8080
+deny      office  plant  tcp/3389

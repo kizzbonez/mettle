@@ -1,0 +1,19 @@
+Received: from mail.hollandsteel.example (mail.hollandsteel.example [198.51.100.31])
+	by mx1.brightwell-build.example (Postfix) with ESMTPS id 4Hq2Pd7r4Vz9tN
+	for <accounts.payable@brightwell-build.example>; Thu, 15 Oct 2026 11:20:09 +0000 (UTC)
+Authentication-Results: mx1.brightwell-build.example;
+ spf=pass smtp.mailfrom=hollandsteel.example;
+ dkim=pass header.d=hollandsteel.example;
+ dmarc=pass header.from=hollandsteel.example
+Authentication-Results: mx.hollandsteel.example; spf=fail smtp.mailfrom=hollandsteel.example
+From: Holland Steel Accounts <accounts@hollandsteel.example>
+Reply-To: credit.control@hollandsteel.example
+To: accounts.payable@brightwell-build.example
+Subject: Overdue invoice HS-4471: final notice
+Date: Thu, 15 Oct 2026 11:19:58 +0000
+Message-ID: <hs-4471-reminder-3@hollandsteel.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Invoice HS-4471 for rebar delivered to Harbour Road is 45 days overdue.
+Our bank details are unchanged. Please call your account manager with any questions.

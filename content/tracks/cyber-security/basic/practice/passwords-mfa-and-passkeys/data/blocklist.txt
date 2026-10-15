@@ -1,0 +1,14 @@
+# Common, expected and breached passwords for the members' portal.
+# Sources: the club's breach monitoring feed (October 2026) and the most common passwords list.
+
+password123456789
+123456789012345
+qwertyuiopasdfgh
+iloveyou
+Summer2026!
+Autumn2026!
+football football football
+Millbrook4ever
+letmeinletmein
+P@ssw0rd
+correct horse battery staple

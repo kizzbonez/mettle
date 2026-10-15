@@ -1,0 +1,19 @@
+title: ARP Spoofing and Rogue DHCP Watch
+summary: Read arpwatch and DHCP snooping lines from a co-working space's syslog in Bash, normalize MAC addresses written two ways, and report ARP spoofing, a spoofed gateway and rogue DHCP servers.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Reports the findings in the sample log from the instructions
+    file: 01-example.sh
+    hidden: false
+  - name: Normalizes MAC addresses, lists each once and counts every change
+    file: 02-macs.sh
+    hidden: true
+  - name: Keeps first-change order and matches the gateway exactly
+    file: 03-gateway-and-order.sh
+    hidden: true
+  - name: Counts only server messages on untrusted ports, and reports a quiet log
+    file: 04-dhcp-and-quiet.sh
+    hidden: true

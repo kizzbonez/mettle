@@ -1,0 +1,19 @@
+title: TLS Configuration Audit
+summary: Audit a ticketing site's nginx TLS settings against RFC 8996 and RFC 9325, flagging deprecated or missing protocol versions and cipher suites without encryption, forward secrecy or AEAD.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Audits the two Encore configurations
+    file: 01-sample-configs.py
+    hidden: false
+  - name: Checks protocol versions by exact name
+    file: 02-protocols.py
+    hidden: true
+  - name: Gives each weak cipher suite its first reason
+    file: 03-cipher-reasons.py
+    hidden: true
+  - name: Audits whole files with comments, quotes and missing directives
+    file: 04-whole-files.py
+    hidden: true

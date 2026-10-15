@@ -1,0 +1,6 @@
+{
+  "LT-2207": {"owner": "mira", "os_patch_date": "2026-10-02", "edr_running": true, "disk_encrypted": true, "last_seen": "2026-10-15T08:40:00Z"},
+  "LT-2215": {"owner": "tomas", "os_patch_date": "2026-08-28", "edr_running": true, "disk_encrypted": true, "last_seen": "2026-10-15T07:55:00Z"},
+  "LT-2231": {"owner": "ines", "os_patch_date": "2026-10-09", "edr_running": false, "disk_encrypted": true, "last_seen": "2026-10-13T18:20:00Z"},
+  "MB-0904": {"owner": "devon", "os_patch_date": "2026-10-07", "edr_running": true, "disk_encrypted": true, "last_seen": "2026-10-15T08:58:00Z"}
+}

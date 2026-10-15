@@ -1,0 +1,9 @@
+HTTP/2 200
+date: Tue, 03 Nov 2026 10:14:09 GMT
+content-type: text/html; charset=utf-8
+strict-transport-security: max-age=31536000; includeSubDomains
+Set-Cookie: __Host-fb_session=Yq8vT2mWc4LrX0sJ; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=3600
+Set-Cookie: fb_staff=Kd93nQ0zPa71; Path=/staff; HttpOnly; SameSite=None; Max-Age=604800
+Set-Cookie: __Host-fb_basket=tm4C0q2V; Domain=fernbrook-library.example; Path=/; secure; httponly; samesite=strict
+Set-Cookie: fb_lang=en; Path=/
+cache-control: no-store

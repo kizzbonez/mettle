@@ -1,0 +1,19 @@
+title: Incident Timeline and Playbook Check
+summary: Rebuild a ransomware incident's response log in UTC with its phases, then check it against the playbook and GDPR's 72-hour rule, flagging late briefings, powered-off hosts and rebuilds without a memory capture.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Rebuilds and checks the sample log from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Converts every offset to UTC and keeps ties in file order
+    file: 02-timeline.py
+    hidden: true
+  - name: Checks the briefing deadline, power-offs and memory captures
+    file: 03-playbook.py
+    hidden: true
+  - name: Checks the authority notification deadline and an empty log
+    file: 04-authority.py
+    hidden: true

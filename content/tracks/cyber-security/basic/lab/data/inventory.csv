@@ -1,0 +1,6 @@
+file,hostname
+callout.pem,callout.kestrelrescue.test
+maps.pem,maps.kestrelrescue.test
+radio.pem,gw.radio.kestrelrescue.test
+vpn.pem,vpn.kestrelrescue.test
+wiki.pem,docs.kestrelrescue.test

@@ -1,0 +1,8 @@
+# deliveries received by the shop on 2026-11-09, as HEADER BODY
+sha256=3bc4a52881f72dd34b3a15093518ed43bf2138e5d5869a960d8049c22d567673 {"event": "payment.succeeded", "order": "SC-20418", "amount": "1249.00", "currency": "EUR"}
+sha256=fe56ab09c1194c91192060543a28d8bec6af75eaf9df0bff9305488252dac9b1 {"event": "payment.succeeded", "order": "SC-20419", "amount": "89.50", "currency": "EUR"}
+sha256=f8d281dc7df72b1e4d16687e46e15d3556c5f302be21289a81c3075162d5c14c {"event": "payment.refunded", "order": "SC-20402", "amount": "1249.00", "currency": "EUR"}
+
+sha1=04935085f6b250fccab74d94ac71866f4c500cc5 {"event": "payment.succeeded", "order": "SC-20420", "amount": "310.00", "currency": "EUR"}
+sha256=BD05E8691FDEF832644C8A35B7B8D08DBD80914E0B179E2D0BC9733A98E90285 {"event": "payout.paid", "payout": "PO-0931", "amount": "8420.15", "currency": "EUR"}
+sha256=c0f726584e0118523b5a444892c0b635ae5bf3d9bd80b0babef57c1b818a65f5 {"event": "payment.succeeded", "order": "SC-20421", "amount": "2899.00", "currency": "EUR"}

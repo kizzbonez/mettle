@@ -1,0 +1,18 @@
+title: Security Operations and Program Management
+summary: >-
+  Run security day to day and govern it, aligned with SY0-801 domains 4 and 5. Manage assets and
+  vulnerabilities, monitor and alert with a SIEM, automate safely (including with AI), respond to
+  incidents and investigate them, and build the governance, risk management, third-party risk,
+  compliance, privacy, audit and awareness program around it all.
+outcomes:
+  - Manage assets and vulnerabilities from discovery to verified remediation
+  - Monitor, alert and automate security operations, including AI-assisted workflows
+  - Lead incident response and support investigations with logs, images and chain of custody
+  - Write governance documents, run risk management with SLE, ARO and ALE, and manage third-party risk
+  - Meet compliance and privacy duties, plan audits and assessments, and run security awareness
+exam:
+  title: Security Operations and Program Management Mock Exam
+  description: Twenty multiple-choice questions drawn from the level's bank, in the style of the Security+ exam.
+  timeLimitMinutes: 20
+  passPercent: 80
+  questionCount: 20

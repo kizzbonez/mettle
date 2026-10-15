@@ -1,0 +1,10 @@
+{"time": "2026-10-13T23:52:00+01:00", "phase": "Identification", "action": "declare-incident", "by": "A. Byrne (incident commander)"}
+{"time": "2026-10-13T23:20:00Z", "phase": "Containment", "action": "power-off", "host": "srv-files-02", "by": "night operator"}
+{"time": "2026-10-14T01:05:00+02:00", "phase": "Containment", "action": "isolate", "host": "SRV-IMAGING-01", "by": "J. de Vries (SOC)"}
+{"time": "2026-10-14T02:07:00+02:00", "phase": "Notification and external reporting", "action": "brief-leadership", "by": "A. Byrne"}
+{"time": "2026-10-14T00:40:00+01:00", "phase": "Investigation", "action": "capture-memory", "host": "srv-imaging-01", "by": "M. Walsh (forensics)"}
+{"time": "2026-10-14T10:30:00+01:00", "phase": "Investigation", "action": "breach-confirmed", "by": "Legal"}
+{"time": "2026-10-14T16:00:00+02:00", "phase": " Eradication and recovery ", "action": "reimage", "host": "srv-files-02", "by": "infrastructure"}
+{"time": "2026-10-14T18:00:00+02:00", "phase": "Eradication and recovery", "action": "reimage", "host": "srv-imaging-01", "by": "infrastructure"}
+{"time": "2026-10-17T15:10:00+02:00", "phase": "Notification and external reporting", "action": "notify-authority", "by": "Data protection lead"}
+{"time": "2026-10-21T09:00:00+01:00", "phase": "Post-incident", "action": "lessons-learned", "by": "A. Byrne"}

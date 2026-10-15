@@ -1,0 +1,19 @@
+title: Member Password Rules
+summary: Check a football club's new member passwords against NIST SP 800-63B-4, with length rules that depend on MFA, Unicode normalization, a breached-password blocklist and context-specific words, and no composition rules.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Checks the six sample passwords
+    file: 01-sample-passwords.py
+    hidden: false
+  - name: Applies the length limits in normalized characters
+    file: 02-length.py
+    hidden: true
+  - name: Matches whole passwords against the folded blocklist
+    file: 03-blocklist.py
+    hidden: true
+  - name: Finds the club's name and the user name, and lists every problem in order
+    file: 04-context.py
+    hidden: true

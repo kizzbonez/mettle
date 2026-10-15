@@ -1,0 +1,12 @@
+# Exported from the call-out service user table on 2026-10-30
+# username:stored password record
+
+amorgan:$argon2id$v=19$m=19456,t=2,p=1$L6dJKAvryaHz/koDDRtoDg$ppwrz07wxFnk2SZyWPT0FStt8CCymrJdyBNzCndbkWQ
+bfinch:$2b$12$z5I1bP.NEXQr33dZmMT71G/kyVcwPAxpBL3A3xAFsxA3xWzBI5jkJ
+cwu:$pbkdf2-sha256$600000$9mbUlv5kSO05if6/6W7uLQ$BFWyB5wvGmSxU8h5Q24jaZTrkqH0R0tD.2nY3FM9EMY
+dkerr:5f4dcc3b5aa765d61d8327deb882cf99
+eokafor:$2b$08$l/DXr8ZCbDnXYctytXBpZ23VLveeIB4TdGQkbkg48a./xfg8GapkA
+fpatel:$argon2id$v=19$m=4096,t=3,p=1$LWpvxnsE23KNfbm37CBgkg$xon5GwPUF1IzlYh9LKlOb/g2Uo+q3Pn4m3OjlpwnVaA
+gnovak:$pbkdf2-sha256$29000$j9QeH5F/4u1/4I5xRFQ6jA$E/CpSabwxYC/1Xdd2MIoO9fZheqVpgTweXxSHtbV2BY
+hreyes:Summit2026!
+isato:54939c13a5b581d08600031e3403302b7ef7efd9

@@ -1,0 +1,19 @@
+title: Signed Release Check
+summary: Verify a weather station project's release files against their signatures with the publisher's public key and openssl dgst, reporting changed, unsigned and missing files.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Checks the signed sample release
+    file: 01-sample-release.sh
+    hidden: false
+  - name: Rejects other signers and broken signature files
+    file: 02-other-signers.sh
+    hidden: true
+  - name: Refuses private keys and unreadable key files
+    file: 03-unusable-keys.sh
+    hidden: true
+  - name: Handles spaced names, RSA keys and no files
+    file: 04-names-and-rsa.sh
+    hidden: true

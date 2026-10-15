@@ -1,0 +1,4 @@
+record,asset_tag,method,technique,validated_by
+SAN-2026-0041,HCL-0077,purge,crypto-erase,R. Alvarez
+SAN-2026-0042,HCL-0078,purge,overwrite,R. Alvarez
+SAN-2026-0043,HCL-0081,destroy,shred,

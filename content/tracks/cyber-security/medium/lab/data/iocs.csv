@@ -1,0 +1,10 @@
+type,value,source
+sha256,d1421388e30984358e50cf78be90dc21382412e414e71188b55542d6197f3f0b,GullHook loader (health ISAC report HS-2026-118)
+sha256,b3bcdf55fa2ccd99e9ef8d4a0aa630afff573b1f665c402bcc395057fff7b014,XMRig miner build (community feed)
+sha256,76ac5cec589ece2b4c4ce49efa919e813ef4ded43f7f4cce24e5fa1cf02104a7,Credential stealer (community feed)
+domain,telemetry-sync.example.net,GullHook loader C2
+domain,cdn-update.example.net,GullHook payload host
+domain,sync.example.org,GullHook fallback C2
+ipv4,203.0.113.77,SSH password spraying source (internal)
+ipv4,203.0.113.7,GullHook payload host
+ipv4,198.51.100.23,SSH brute force source (internal)

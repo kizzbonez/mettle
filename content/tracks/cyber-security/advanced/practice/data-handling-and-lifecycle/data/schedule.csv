@@ -1,0 +1,7 @@
+category,retain,trigger,disposal
+pupil-record,25y,created,shred
+safeguarding-file,25y,closed,shred
+admission-application,1y,closed,secure-delete
+cctv,30d,created,overwrite
+staff-file,6y,closed,secure-delete
+invoice,6y,created,secure-delete

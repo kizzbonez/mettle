@@ -1,0 +1,23 @@
+slug: dental-group-intrusion-triage
+title: Dental Group Intrusion Triage
+summary: Investigate one day of a dental clinic group's logs in Python, telling brute force from password spraying in an SSH log, finding impossible travel between sign-ins, catching double-encoded traversal and injection probes in web requests, matching processes against an IoC list by whole tokens, and writing the summary that goes into the incident record.
+language: python
+minutes: 50
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Finds every indicator in the day of logs and writes the summary from the instructions
+    file: 01-real-data.py
+    hidden: false
+  - name: Applies the SSH thresholds exactly, counts only failure lines and orders the results
+    file: 02-ssh-rules.py
+    hidden: true
+  - name: Sorts sign-ins, ignores failures and applies both travel thresholds and parameters
+    file: 03-travel-rules.py
+    hidden: true
+  - name: Decodes targets twice, classifies traversal and injection, and skips malformed requests
+    file: 04-probe-rules.py
+    hidden: true
+  - name: Matches IoCs by whole token in priority order, and formats the report on quiet and busy days
+    file: 05-ioc-rules-and-report.py
+    hidden: true

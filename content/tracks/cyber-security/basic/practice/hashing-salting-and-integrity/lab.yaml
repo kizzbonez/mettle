@@ -1,0 +1,19 @@
+title: Webhook Tag Check
+summary: Sign and verify a bicycle shop's payment notifications with HMAC-SHA-256 and a constant-time comparison, refusing SHA-1 tags, and audit a log of deliveries for forged and weak ones.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Signs a ping and audits the shop's delivery log
+    file: 01-sample-deliveries.py
+    hidden: false
+  - name: Verifies in constant time and refuses tampered, weak and malformed headers
+    file: 02-verify-rules.py
+    hidden: true
+  - name: Signs any body with HMAC-SHA-256
+    file: 03-sign.py
+    hidden: true
+  - name: Audits comments, blank lines, padded and empty bodies
+    file: 04-audit-edges.py
+    hidden: true

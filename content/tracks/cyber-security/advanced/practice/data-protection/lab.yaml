@@ -1,0 +1,19 @@
+title: De-identified Research Export
+summary: Prepare customer records for an outside analytics firm by filtering on consent and columns, replacing IDs with keyed-hash pseudonyms, generalizing postcodes and ages, masking card numbers, and finding quasi-identifier groups smaller than k.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Protects the sample customers from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Filters on consent and builds keyed pseudonyms
+    file: 02-consent-and-pseudonyms.py
+    hidden: true
+  - name: Generalizes postcodes and ages at the boundaries
+    file: 03-generalize.py
+    hidden: true
+  - name: Masks card numbers and finds small groups
+    file: 04-masks-and-groups.py
+    hidden: true

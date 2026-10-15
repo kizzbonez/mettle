@@ -1,0 +1,5 @@
+{
+  "drawings-vault": {"sensitivity": "high", "users": ["mira", "tomas", "ines"], "countries": ["IE", "GB"]},
+  "timesheets": {"sensitivity": "standard", "users": ["mira", "tomas", "ines", "devon", "ola.contractor"], "countries": ["IE", "GB", "PT"]},
+  "finance": {"sensitivity": "high", "users": ["devon"], "countries": ["IE"]}
+}

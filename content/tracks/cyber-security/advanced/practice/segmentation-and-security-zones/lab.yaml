@@ -1,0 +1,19 @@
+title: Zone Policy Tester
+summary: Evaluate a zone-to-zone firewall policy by the first-match rule with default deny, in numeric rule order, and test it against the isolation an OT plant's standard expects.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Tests the sample policy against the sample checks
+    file: 01-example.sh
+    hidden: false
+  - name: Applies the first match in numeric order with any, protocols and port ranges
+    file: 02-first-match.sh
+    hidden: true
+  - name: Reads checks with uneven spacing and comments, and sets the exit status
+    file: 03-checks-file.sh
+    hidden: true
+  - name: Denies by default with an empty policy and handles an empty checks file
+    file: 04-empty-files.sh
+    hidden: true

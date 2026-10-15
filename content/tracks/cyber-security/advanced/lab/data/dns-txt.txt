@@ -1,0 +1,16 @@
+; TXT records exported from the Brightwater DNS zones on 2026-10-01
+; owner                                   ttl  class type rdata
+brightwater-vets.example.                 3600 IN TXT "v=spf1 ip4:198.51.100.25 include:_spf.mailhost.example -" "all"
+brightwater-vets.example.                 3600 IN TXT "ms=ms48151623"
+_dmarc.brightwater-vets.example.          3600 IN TXT "v=DMARC1; p=quarantine; rua=mailto:dmarc@brightwater-vets.example"
+sel1._domainkey.brightwater-vets.example. 3600 IN TXT "v=DKIM1; k=rsa; " "p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx3vQ...IDAQAB"
+
+news.brightwater-vets.example.            3600 IN TXT "v=spf1 include:sendgrid.example ~all"
+news.brightwater-vets.example.            3600 IN TXT "v=spf1 include:mailchimp.example ~all"
+_dmarc.news.brightwater-vets.example.     3600 IN TXT "v=DMARC1; p=none; rua=mailto:dmarc@brightwater-vets.example"
+
+Brightwater-Pets.example.                 3600 IN TXT "v=spf1 a mx +all"
+_dmarc.brightwater-pets.example.          3600 IN TXT "v=DMARC1; p=reject; rua=mailto:dmarc@brightwater-vets.example"
+
+; typo domain registered to stop look-alike phishing; it sends no mail
+brightwatervets.example.                  3600 IN TXT "v=spf1 -all"

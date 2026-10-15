@@ -1,0 +1,19 @@
+title: ID Token Validation
+summary: Validate OpenID Connect ID tokens with the standard library, refusing malformed tokens, alg none and bad HS256 signatures, then checking issuer, audience and azp, expiry and issue time with leeway, the nonce and MFA in amr.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Validates the sample tokens from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Refuses malformed tokens, other algorithms and bad signatures
+    file: 02-structure-and-signature.py
+    hidden: true
+  - name: Checks issuer, audience, azp and the time claims at their boundaries
+    file: 03-issuer-audience-time.py
+    hidden: true
+  - name: Checks the nonce and MFA, and returns the claims
+    file: 04-nonce-and-mfa.py
+    hidden: true

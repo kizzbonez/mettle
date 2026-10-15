@@ -1,0 +1,9 @@
+user,device,network,resource,action,mfa
+ana,lt-0412,office,shipments,write,yes
+ana,lt-0412,hotel-wifi,customs-docs,read,yes
+ana,lt-0412,office,customs-docs,write,yes
+ravi,pc-home-ravi,office,shipments,read,yes
+ravi,tab-0077,home,fleet-tracking,read,no
+dmitri,lt-0419,office,payroll,read,yes
+dmitri,tab-0077,home,payroll,read,yes
+ravi,tab-0077,office,payroll,read,yes

@@ -1,14 +1,18 @@
 title: Security Foundations
 summary: >-
-  The vocabulary and habits of a defender: what you are protecting, how accounts are attacked,
-  and how to find an attack in a log file.
+  The ideas every security decision rests on, aligned with SY0-801 domain 1. Learn the CIA triad
+  and AAA, security controls, Zero Trust and least privilege, change management, then
+  cryptography from hashing and encryption to signatures, PKI, certificates and TLS, and finish
+  with passwords, MFA and passkeys.
 outcomes:
-  - Classify an incident by which security property it violates
-  - Explain why passwords are stored as slow, salted hashes
-  - Read TCP handshake behavior well enough to interpret a port scan
-  - Extract attack indicators from system logs with standard shell tools
+  - Explain CIA, AAA, non-repudiation and defense in depth, and classify controls by category and type
+  - Apply Zero Trust, least privilege and change management to everyday security decisions
+  - Choose hashing, symmetric and asymmetric encryption, signatures and key exchange for a need
+  - Read and check certificates, explain PKI, revocation and TLS, and spot weak cryptography
+  - Set password, MFA and passkey policy that follows current guidance
 exam:
   title: Security Foundations Mock Exam
-  description: Five questions on the CIA triad, authentication, networking and Linux permissions.
-  timeLimitMinutes: 10
-  passPercent: 70
+  description: Twenty multiple-choice questions drawn from the level's bank, in the style of the Security+ exam.
+  timeLimitMinutes: 20
+  passPercent: 80
+  questionCount: 20

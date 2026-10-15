@@ -1,0 +1,17 @@
+# Tidewater Creamery inter-zone policy, exported from the core firewall 2026-10-12
+# zones: wan, guest, office, dmz, hist (historian), plant (OT controllers), mgmt
+seq,from,to,proto,port,action
+10,office,wan,tcp,443,allow
+20,office,wan,udp,53,allow
+30,wan,dmz,tcp,443,allow
+40,dmz,hist,tcp,5432,allow
+
+# the historian polls the plant controllers over Modbus/TCP
+50,hist,plant,tcp,502,allow
+60,mgmt,any,tcp,22,allow
+70,guest,wan,any,any,allow
+80,office,hist,tcp,8000-8100,allow
+90,office,plant,any,any,deny
+100,mgmt,plant,tcp,44818,allow
+# added by the helpdesk in August
+25,office,any,tcp,3389,allow

@@ -1,0 +1,10 @@
+customer_id,full_name,email,phone,postcode,birth_date,card_number,plan,monthly_spend,research_consent,notes
+C-100231,Aoife Kelly,aoife.kelly@mail.example,07700 900123,BS1 4DJ,1991-03-14,4111 1111 1111 1111,fibre-500,42.00,yes,"Asked about moving house, mentioned a new job at the hospital"
+C-100232,Ben Okafor,ben.o@mail.example,07700 900456,bs6 7ex,1974-12-01,5555-5555-5555-4444,mobile-unl,25.50,Yes,
+C-100233,Chloe Martin,chloe.m@mail.example,07700 900789,BS3 1AA,1985-12-02,,fibre-100,30.00,no,Complained twice about outages
+C-100234,Dev Patel,dev.patel@mail.example,07700 900111,BS14DJ,1936-07-30,378282246310005,landline,12.00,yes,Carer manages the account
+C-100235,Emma Stone,emma.stone@mail.example,07700 900222,BS1 5QT,1992-12-01,6011 1111 1111 1117,fibre-500,42.00,yes,
+C-100236,Farah Aziz,farah@mail.example,07700 900333, bs6  2pl ,1977-06-15,,mobile-10,10.00,yes,Pays in cash at the shop
+C-100237,George Hale,g.hale@mail.example,07700 900444,BS3 9ZZ,2009-01-10,,mobile-10,10.00, YES ,
+C-100238,Hana Sato,hana.sato@mail.example,07700 900555,BS1 2AB,1988-04-04,4111111111111111,fibre-100,30.00,,
+C-100239,Ivan Petrov,ivan.p@mail.example,07700 900666,BS6 3LT,1966-12-02,5555555555554444,fibre-100,30.00,yes,"Disputed a bill in March; resolved"

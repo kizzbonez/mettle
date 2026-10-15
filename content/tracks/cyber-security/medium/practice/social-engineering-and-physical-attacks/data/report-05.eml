@@ -1,0 +1,17 @@
+Received: from out-7.webinars.example (out-7.webinars.example [203.0.113.140])
+	by mx1.brightwell-build.example (Postfix) with ESMTPS id 4Hq2Qe9t6Uz9tP
+	for <j.ortega@brightwell-build.example>; Thu, 15 Oct 2026 12:05:51 +0000 (UTC)
+Authentication-Results: mx1.brightwell-build.example;
+ spf=pass smtp.mailfrom=webinars.example;
+ dkim=none;
+ dmarc=pass header.from=webinars.example
+From: Brightwell Events <news@webinars.example>
+Reply-To: rsvp@eventbrite-mail.example
+To: j.ortega@brightwell-build.example
+Subject: Join our site safety webinar
+Date: Thu, 15 Oct 2026 12:05:40 +0000
+Message-ID: <wb-55120@webinars.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Register for the November site safety webinar. Reply to this email to save a seat.

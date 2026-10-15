@@ -1,0 +1,19 @@
+title: AI Assistant Log Review
+summary: Review a library AI assistant's JSON Lines log for direct and indirect prompt injection, tool calls outside the allow list and emails sent to anyone but the patron signed in to the same session.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reviews the sample log from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Finds injection phrases in any case and spacing, without near misses
+    file: 02-phrases.py
+    hidden: true
+  - name: Refuses unlisted tools and binds send_email to the session's own patron
+    file: 03-tools.py
+    hidden: true
+  - name: Keeps log order, skips blank lines and reports nothing for a quiet log
+    file: 04-order-and-quiet.py
+    hidden: true

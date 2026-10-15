@@ -1,0 +1,14 @@
+asset,category,type,control
+client portal,technical,preventive,Multifactor sign-in for every client account
+client portal,technical,detective,Alert after ten failed sign-ins to one account within an hour
+client portal,technical,corrective,Nightly database backup with a restore tested every quarter
+file server,technical,preventive,Share permissions limited to each client team
+file server,operational,detective,Office manager reviews the share access report every Friday
+file server,managerial,directive,Retention policy for client tax files
+office,physical,preventive,Badge reader on the records room door
+office,physical,deterrent;detective,Visible camera over the front entrance that records to the server
+office,physical,deterring,Alarmed premises signs on the front and back doors
+laptops,technical,preventive,Full disk encryption on every laptop
+laptops,technical,corrective,Remote wipe through device management
+email,technical,preventive,Attachment filtering at the mail gateway
+email,operational,directive,Staff forward suspicious email to the IT inbox

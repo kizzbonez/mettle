@@ -1,0 +1,36 @@
+[
+  {
+    "name": "video-gateway",
+    "cipher": "AES-256-GCM",
+    "rsa_bits": 3072,
+    "signature_hash": "sha256",
+    "token_source": "secrets",
+    "tls_versions": ["TLSv1.2", "TLSv1.3"],
+    "key_ref": "kms://pulse/video-gateway"
+  },
+  {
+    "name": "records-api",
+    "cipher": "AES-128-CBC",
+    "rsa_bits": 2048,
+    "signature_hash": "SHA1",
+    "token_source": "secrets",
+    "tls_versions": ["TLSv1.2", "TLSv1.3"],
+    "key_ref": "kms://pulse/records-api"
+  },
+  {
+    "name": "pharmacy-link",
+    "cipher": "3DES-CBC",
+    "rsa_bits": 1024,
+    "signature_hash": "md5",
+    "token_source": "os.urandom",
+    "tls_versions": ["TLSv1", "TLSv1.2"],
+    "key_ref": "kms://pulse/pharmacy-link"
+  },
+  {
+    "name": "reset-tokens",
+    "cipher": "ChaCha20-Poly1305",
+    "token_source": "random",
+    "tls_versions": ["TLSv1.3"],
+    "key": "6b1f0e9a2c7d4b3e8f5a1c0d9e6b2f7a4c8d1e5b3f0a7c2e9d6b4f1a8c5e2d0b"
+  }
+]

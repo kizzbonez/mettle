@@ -1,0 +1,17 @@
+Received: from mail.brightwel-build.example (mail.brightwel-build.example [198.51.100.212])
+	by mx1.brightwell-build.example (Postfix) with ESMTPS id 4Hq2Nc5p2Wz9tM
+	for <s.mensah@brightwell-build.example>; Thu, 15 Oct 2026 10:15:44 +0000 (UTC)
+Authentication-Results: mx1.brightwell-build.example;
+ spf=pass smtp.mailfrom=brightwel-build.example;
+ dkim=pass header.d=brightwel-build.example;
+ dmarc=pass header.from=brightwel-build.example
+From: IT Service Desk <servicedesk@brightwel-build.example>
+To: s.mensah@brightwell-build.example
+Subject: Your mailbox is almost full
+Date: Thu, 15 Oct 2026 10:15:30 +0000
+Message-ID: <77c2e0d1@brightwel-build.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Your mailbox has reached 98% of its quota. Sign in at the link below to keep
+receiving email: https://brightwel-build.example/owa/quota

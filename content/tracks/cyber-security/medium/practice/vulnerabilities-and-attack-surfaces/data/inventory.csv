@@ -1,0 +1,10 @@
+# Saltmarsh Hotels asset inventory, exported from the CMDB on 2026-10-16
+host,os,support_ends,last_patched,edr_agent,exposure,open_ports,owner
+pms-01,Windows Server 2019,2029-01-09,2026-10-07,yes,internal,443 1433,front office
+pms-02,Windows Server 2012 R2,2023-10-10,2025-09-12,yes,internal,443 3389,front office
+guest-wifi-ctl,Ubuntu 22.04 LTS,2027-06-01,2026-08-30,no,internet,22 443 8443,it
+kiosk-lobby-1,Windows 10 IoT Enterprise LTSC 2021,2032-01-13,2026-10-01,yes,internal,,
+lock-server,unknown,unknown,unknown,no,internal,80 9000,
+booking-web,Debian 12,2028-06-30,2026-10-14,yes,internet,80 443,digital
+door-vnc-pc,Windows 11 Pro 23H2,2025-11-11,2026-09-14,yes,internet,5900 3389 2222,maintenance
+ops-jump,Rocky Linux 9,2032-05-31,2026-09-16,yes,internet,22,it

@@ -1,0 +1,19 @@
+title: CSR Gatekeeper
+summary: Check a university's certificate signing requests with openssl req before its private CA signs them, refusing broken requests, missing SANs, wildcards, names outside the domain and weak keys.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Checks the three sample CSRs
+    file: 01-sample-csrs.sh
+    hidden: false
+  - name: Checks every SAN name against the domain
+    file: 02-names.sh
+    hidden: true
+  - name: Applies the key size rules for RSA, elliptic curves and Ed25519
+    file: 03-keys.sh
+    hidden: true
+  - name: Refuses changed CSRs, certificates and other files
+    file: 04-invalid.sh
+    hidden: true

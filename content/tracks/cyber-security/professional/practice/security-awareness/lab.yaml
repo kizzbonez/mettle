@@ -1,0 +1,19 @@
+title: Phishing Simulation and Behavior Risk Scores
+summary: Turn a construction firm's phishing simulation into click, submit and report rates per department, score each person with a stated behavior risk model, and build the aggregate-only report managers may see.
+language: python
+minutes: 20
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Builds the metrics, scores and report from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Reads messy flags and finds medians only among reporters
+    file: 02-metrics.py
+    hidden: true
+  - name: Applies every scoring rule, bound and threshold
+    file: 03-scores.py
+    hidden: true
+  - name: Aggregates a scores table by department without changing it
+    file: 04-manager-report.py
+    hidden: true

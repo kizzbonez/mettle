@@ -1,0 +1,24 @@
+{
+  "roles": {
+    "pharmacist": {"permissions": ["dispense", "approve-controlled", "view-stock"], "hours": ["07:00", "21:00"]},
+    "night-pharmacist": {"permissions": ["dispense", "view-stock"], "hours": ["20:00", "08:00"]},
+    "technician": {"permissions": ["pick", "receive-stock", "view-stock"], "hours": ["07:00", "19:00"]},
+    "buyer": {"permissions": ["order-stock", "view-stock"], "hours": ["08:00", "17:00"]},
+    "auditor": {"permissions": ["view-audit", "view-stock"], "hours": null}
+  },
+  "users": {
+    "a.mensah": {"roles": ["pharmacist"], "expires": null},
+    "l.byrne": {"roles": ["technician"], "expires": null},
+    "r.quinn": {"roles": ["night-pharmacist"], "expires": null},
+    "s.ahmed": {"roles": ["technician"], "expires": "2026-10-31"},
+    "p.walsh": {"roles": ["buyer", "technician"], "expires": null},
+    "k.oduya": {"roles": ["auditor"], "expires": null},
+    "m.fitz": {"roles": ["pharmacist", "auditor"], "expires": null},
+    "it.dara": {"roles": [], "expires": null}
+  },
+  "jit": [
+    {"user": "it.dara", "permission": "admin-console", "start": "2026-11-12T22:00", "minutes": 120, "ticket": "CHG-2291"},
+    {"user": "l.byrne", "permission": "approve-controlled", "start": "2026-11-12T09:00", "minutes": 480, "ticket": "CHG-2300"},
+    {"user": "it.dara", "permission": "dispense", "start": "2026-11-12T23:00", "minutes": 30, "ticket": ""}
+  ]
+}

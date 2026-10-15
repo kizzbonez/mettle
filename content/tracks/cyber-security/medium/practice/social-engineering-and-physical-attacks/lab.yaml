@@ -1,0 +1,19 @@
+title: Phishing Report Scoring
+summary: Score reported emails by header red flags, homograph and typo lookalike domains, our gateway's SPF, DKIM and DMARC results, Reply-To changes, executive display names and urgency, and rank the queue.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Scores the five reports from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Recognizes lookalike domains and executive display names
+    file: 02-senders.py
+    hidden: true
+  - name: Trusts only our gateway's results, and checks Reply-To and the subject
+    file: 03-headers.py
+    hidden: true
+  - name: Applies the verdict boundaries and orders ties by file name
+    file: 04-triage.py
+    hidden: true

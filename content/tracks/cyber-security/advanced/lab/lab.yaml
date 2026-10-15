@@ -1,0 +1,23 @@
+slug: architecture-controls-review
+title: Architecture and Controls Review
+summary: Review a veterinary group's firewall export, Docker Compose projects, directory accounts and email DNS records in Python, reporting shadowed and overly broad rules, exposed management ports, privileged or wide-open containers, stale and over-privileged accounts, and missing or weak SPF and DMARC.
+language: python
+minutes: 55
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reports every finding for the sample files from the instructions
+    file: 01-sample-review.py
+    hidden: false
+  - name: Finds shadowed and overly broad rules in numeric order, with exact containment
+    file: 02-shadowed-and-broad-rules.py
+    hidden: true
+  - name: Finds management ports allowed from outside the management zone
+    file: 03-management-exposure.py
+    hidden: true
+  - name: Flags privileged containers, all-interface ports, stale and over-privileged accounts
+    file: 04-containers-and-accounts.py
+    hidden: true
+  - name: Parses TXT records, applies the SPF and DMARC rules, and exits 0 when all is clean
+    file: 05-email-records-and-clean-run.py
+    hidden: true

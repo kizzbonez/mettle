@@ -1,0 +1,19 @@
+title: IPS Alert Triage
+summary: Read Suricata's eve.json with jq, leave out the threshold.config suppressions, group the alerts by signature and source, and list the ones the IPS only logged before the ones it blocked.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Triages the sample eve.json with the sample suppressions
+    file: 01-example.sh
+    hidden: false
+  - name: Groups, marks follow-ups and sorts in the stated order
+    file: 02-groups-and-order.sh
+    hidden: true
+  - name: Applies suppressions without a track, by source and by destination
+    file: 03-suppressions.sh
+    hidden: true
+  - name: Handles an empty log, an all-blocked night and a comment-only file
+    file: 04-quiet-nights.sh
+    hidden: true

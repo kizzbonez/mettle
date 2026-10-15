@@ -1,0 +1,17 @@
+Received: from smtp.brightwell-build.example (smtp.brightwell-build.example [192.0.2.25])
+	by mx1.brightwell-build.example (Postfix) with ESMTPS id 4Hq2Mb3k8Yz9tL
+	for <all-staff@brightwell-build.example>; Thu, 15 Oct 2026 09:02:13 +0000 (UTC)
+Authentication-Results: mx1.brightwell-build.example;
+ spf=pass smtp.mailfrom=brightwell-build.example;
+ dkim=pass header.d=brightwell-build.example;
+ dmarc=pass header.from=brightwell-build.example
+From: Facilities Team <facilities@brightwell-build.example>
+To: all-staff@brightwell-build.example
+Subject: Site access cards renewal for the Harbour Road project
+Date: Thu, 15 Oct 2026 09:02:01 +0000
+Message-ID: <20261015090201.1187@brightwell-build.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Site access cards for Harbour Road expire on 31 October. Collect new ones
+from the site office with photo ID. No action is needed by email.

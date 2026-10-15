@@ -1,0 +1,19 @@
+title: Recovery Plan Numbers
+summary: Check a disaster recovery plan with numbers, computing availability from MTBF and MTTR for one or more nodes, the worst gap between successful backups against the RPO, and the latest restore test against the RTO.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Checks the sample numbers from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Computes availability for one and several nodes
+    file: 02-availability.py
+    hidden: true
+  - name: Finds the worst gap between successful backups in the window
+    file: 03-backup-gaps.py
+    hidden: true
+  - name: Checks the latest restore test for age, duration and verification
+    file: 04-restore-tests.py
+    hidden: true

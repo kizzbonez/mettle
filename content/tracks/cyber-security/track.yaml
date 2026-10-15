@@ -1,10 +1,42 @@
 title: Cyber Security
-tagline: Think like an attacker, defend like an engineer.
+tagline: Security+ (SY0-801) from first principles to security operations.
 description: >-
-  Threat modeling, authentication, network fundamentals and log analysis, practiced on a real
-  Linux shell. This track is in early access: the Basic level is complete and further levels
-  are in development.
+  A full course in four levels aligned with the CompTIA Security+ SY0-801 (V8) exam objectives,
+  covering all five domains: general security concepts and cryptography; threats,
+  vulnerabilities and attacks; security architecture and controls; and security operations,
+  governance, risk and compliance. Every level ends with a mock exam and a hands-on lab on real
+  logs, configs, certificates and code in a sandbox, and a 90-question practice exam is drawn in
+  the official domain weights. Mettle is not affiliated with or endorsed by CompTIA; Security+ is
+  a trademark of CompTIA.
 icon: ShieldCheck
 category: cyber
 sortOrder: 3
-revision: 2
+format: course
+revision: 3
+exams:
+  - slug: security-plus-practice-exam
+    title: Security+ (SY0-801) Practice Exam
+    description: >-
+      90 multiple-choice questions in 90 minutes, drawn in the weights of the five SY0-801
+      domains, a new paper every attempt. Mettle's pass mark is 80%.
+    timeLimitMinutes: 90
+    passPercent: 80
+    rules:
+      - category: general-security-concepts
+        count: 14
+      - category: threats-vulnerabilities-and-attacks
+        count: 22
+      - category: security-architecture
+        count: 17
+      - category: security-operations
+        count: 24
+      - category: security-program-management-and-oversight
+        count: 13
+retired:
+  lessons:
+    - basic/cia-triad-and-threat-modeling
+    - basic/authentication-and-password-storage
+    - basic/finding-attacks-in-logs
+  labs:
+    - basic/failed-login-triage
+  questions: [cyber-basic-01, cyber-basic-02, cyber-basic-03, cyber-basic-04, cyber-basic-05]

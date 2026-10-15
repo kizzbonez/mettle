@@ -1,0 +1,764 @@
+- key: sec-basic-01
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.1, cia-triad, integrity]
+  prompt: |
+    An attacker with access to a distribution company's purchasing system changes the bank account
+    number stored for one supplier, so the next payment run sends 48,000 to the attacker. Logs show
+    no other records were viewed or exported, and the system stayed online throughout.
+
+    Which security goal did the attacker violate?
+  options:
+    - text: Integrity
+      correct: true
+    - text: Confidentiality
+    - text: Availability
+    - text: Non-repudiation
+  explanation: |
+    Integrity means information is not modified without authorization, and an unauthorized change
+    to a supplier's bank details is exactly that. Confidentiality was not the target: nothing was
+    read or taken. Availability was untouched, since the system stayed online. Non-repudiation is
+    about proving who performed an action; it would help the investigation, but the harm itself is
+    an integrity failure.
+
+- key: sec-basic-02
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.1, aaa, authorization]
+  prompt: |
+    A Linux server's authentication log contains these two lines:
+
+    ```text
+    Oct 16 10:02:11 files01 sshd[2231]: Accepted publickey for tomas from 198.51.100.40 port 50122 ssh2: ED25519 SHA256:Hq4c1VxJr2dZ9QwYbA0mE6uTnL3sKpX8fGiR7oW5yCe
+    Oct 16 10:03:48 files01 sudo:    tomas : user NOT in sudoers ; TTY=pts/0 ; PWD=/home/tomas ; USER=root ; COMMAND=/usr/sbin/useradd backup2
+    ```
+
+    Which function of AAA stopped Tomas from creating the account?
+  options:
+    - text: Accounting
+    - text: Identification
+    - text: Authorization
+      correct: true
+    - text: Authentication
+  explanation: |
+    Tomas authenticated successfully with his key on the first line, so authentication did not
+    stop him. The `sudo` policy then decided he was not permitted to run commands as root, which is
+    authorization: deciding what an authenticated subject may do. Accounting is the logging itself;
+    it recorded the attempt but did not block it. Identification is only the claim of a username,
+    which also succeeded.
+
+- key: sec-basic-03
+  type: multiple
+  category: general-security-concepts
+  tags: [obj-1.1, non-repudiation, digital-signatures]
+  prompt: |
+    The finance team of a logistics firm approves supplier payments by signing in to the payments
+    portal with one shared account, `finance-approver`. After a fraudulent payment, the auditors
+    cannot establish which employee approved it.
+
+    Which two changes would BEST provide non-repudiation for future approvals? (Choose two.)
+  options:
+    - text: Require each approval to be digitally signed with the approver's own private key
+      correct: true
+    - text: Lengthen the shared account's password to 20 characters
+    - text: Encrypt the payments database at rest
+    - text: Allow the portal to be reached only from the office network
+    - text: Give each approver an individual account and remove the shared one
+      correct: true
+  explanation: |
+    Non-repudiation needs every action tied to one person and evidence that person cannot credibly
+    deny. Individual accounts tie each approval to a single identity, and a digital signature made
+    with a private key only that approver holds is the standard mechanism for undeniable evidence.
+    A longer shared password improves authentication strength but still cannot say which person
+    used it. Encryption at rest protects confidentiality of stored data, and restricting the
+    network location reduces exposure; neither proves who approved a payment.
+
+- key: sec-basic-04
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.1, defense-in-depth]
+  prompt: |
+    A design firm protected its file server only with a perimeter firewall. An attacker phished a
+    designer, signed in through the VPN with the stolen password, and copied every project folder
+    without triggering any alert. The new security manager wants a design in which the failure of
+    any single control does not lead straight to a breach.
+
+    Which principle should the manager apply?
+  options:
+    - text: Directive controls
+    - text: Defense in depth
+      correct: true
+    - text: Non-repudiation
+    - text: Availability
+  explanation: |
+    Defense in depth layers independent controls (for example MFA, least-privilege folder
+    permissions, encryption and monitoring) so that an attacker who defeats one layer, here the
+    password, is stopped or detected by the next. Non-repudiation is about proving who did
+    something, not about stopping attacks. Availability is a security goal, not a design principle
+    for layering. Directive controls such as policies tell people what to do but would not have
+    stopped or detected the intrusion.
+
+- key: sec-basic-05
+  type: multiple
+  category: general-security-concepts
+  tags: [obj-1.1, control-types]
+  prompt: |
+    A warehouse installs clearly visible cameras over its loading dock, with signs reading "This
+    area is recorded". The recordings are kept for 30 days and reviewed whenever stock goes missing.
+
+    Which two control types does this measure provide? (Choose two.)
+  options:
+    - text: Detective
+      correct: true
+    - text: Preventive
+    - text: Corrective
+    - text: Compensating
+    - text: Deterring
+      correct: true
+  explanation: |
+    The visible cameras and signs discourage theft without physically stopping it, which makes them
+    deterring. The recordings identify what happened after the fact, which is detective. A camera
+    does not physically prevent anyone from taking stock (a locked cage would be preventive), it
+    does not restore anything (corrective), and nothing says it replaces a control that could not
+    be implemented (compensating).
+
+- key: sec-basic-06
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.1, compensating-controls]
+  prompt: |
+    A water utility runs a pump controller whose vendor supports only an operating system that no
+    longer receives security patches. Replacing it is scheduled for 18 months from now, and
+    patching it would void the vendor's support contract.
+
+    Which of the following is the BEST compensating control in the meantime?
+  options:
+    - text: Install the latest operating system patches anyway and accept the support risk
+    - text: Add a login banner warning that the controller is monitored
+    - text: Place the controller on an isolated network segment that only the engineering workstation can reach, and alert on any other connection attempt
+      correct: true
+    - text: Publish a policy that forbids staff from browsing the web on the controller
+  explanation: |
+    A compensating control provides comparable protection when the normal control (patching)
+    cannot be applied. Isolating the controller and alerting on unexpected connections addresses
+    the same risk, exploitation of unpatched flaws over the network. A policy is a directive
+    control that stops nothing on its own. Patching anyway is not a compensating control; it is the
+    original control the scenario rules out. A banner is a deterring control and does not reduce
+    the exposure of the vulnerable system.
+
+- key: sec-basic-07
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.1, control-categories]
+  prompt: |
+    A security team is building a control register for a small accounting practice and must label
+    each control with its category.
+
+    Which of the following is a managerial control?
+  options:
+    - text: A host firewall that blocks inbound connections to workstations
+    - text: An annual risk assessment that ranks the practice's threats and decides which controls to fund
+      correct: true
+    - text: A badge reader on the door to the server room
+    - text: A receptionist who checks the identification of every visitor
+  explanation: |
+    Managerial (administrative) controls govern the security program itself: risk assessments,
+    policies, planning and vendor reviews. The badge reader acts on the physical world, so it is a
+    physical control. A receptionist checking identification is a person carrying out a routine
+    security task, which makes it operational. The host firewall is enforced by software, so it is
+    technical.
+
+- key: sec-basic-08
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.1, zero-trust]
+  prompt: |
+    At a law firm, an employee plugs a personal laptop into a network port in a meeting room and
+    tries to open the case management system. Her credentials and MFA are valid, but the request is
+    denied because the laptop is not managed or encrypted. Under the old design, any device on the
+    office network could reach the system.
+
+    Which Zero Trust principle does the new behavior demonstrate?
+  options:
+    - text: Access is decided per request from verified identity, device health and context, not from network location
+      correct: true
+    - text: Devices inside the corporate perimeter are trusted once they pass the firewall
+    - text: Users are trusted for the whole day after one successful MFA sign-in
+    - text: Traffic on the internal network does not need to be encrypted
+  explanation: |
+    Zero Trust grants no implicit trust based on network location or ownership. Each request is
+    evaluated explicitly using all available signals, including device posture, so a valid user on
+    an unmanaged device can still be denied. The perimeter statement describes the implicit trust
+    zone Zero Trust removes. Trusting a user for the whole day ignores continuous evaluation, and
+    Zero Trust assumes breach and secures all communication regardless of where it travels.
+
+- key: sec-basic-09
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.1, least-privilege]
+  prompt: |
+    A backup application's service account is a member of the Domain Admins group because "the
+    installer asked for it". The application only needs to read the files on three file servers and
+    write to one backup share.
+
+    Which action BEST applies the principle of least privilege?
+  options:
+    - text: Remove the account from Domain Admins and grant it read access on the three file servers and write access on the backup share only
+      correct: true
+    - text: Keep the group membership but rotate the service account's password every 30 days
+    - text: Keep the group membership and enable detailed logging of everything the account does
+    - text: Replace the service account with a named administrator's account so actions can be traced
+  explanation: |
+    Least privilege gives an account only the access its task requires, which here means read on
+    the sources and write on the backup target. Rotating the password and adding logging may be
+    useful, but the account would still be able to control the whole domain if stolen. Using a
+    person's administrator account makes the over-privilege worse and ties a service to an
+    individual who may leave.
+
+- key: sec-basic-10
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.2, change-management, backout-plan]
+  prompt: |
+    A change request to upgrade the database engine of a ticketing system has a named owner, test
+    results from staging, CAB approval and a two-hour maintenance window. A reviewer notices one
+    item is still missing that would let the team return the system to its previous state if the
+    upgrade fails.
+
+    Which item is missing?
+  options:
+    - text: Standard operating procedure
+    - text: Stakeholder list
+    - text: Backout plan
+      correct: true
+    - text: Impact analysis
+  explanation: |
+    A backout plan states how to return to the previous state, how long it takes and when to decide
+    to use it. An impact analysis identifies what the change could affect, a standard operating
+    procedure documents a routine task step by step, and a stakeholder list names who is affected
+    or must act. All of these matter, but none of them restores the system when the change fails.
+
+- key: sec-basic-11
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.2, change-management, legacy-applications, dependencies]
+  prompt: |
+    An approved change disabled TLS 1.0 on a clinic's appointment server during the maintenance
+    window. Ten minutes later, the reception desks' check-in kiosks, which run an old version of the
+    kiosk software, can no longer connect. Nobody had listed the kiosks in the change request.
+
+    Which part of the change management process MOST likely failed?
+  options:
+    - text: The maintenance window was too short
+    - text: The change advisory board approved a change it should have rejected
+    - text: The configuration was not stored in version control
+    - text: The impact analysis did not identify the legacy kiosk software as a dependency
+      correct: true
+  explanation: |
+    Impact analysis is where dependencies such as legacy applications are found before a change.
+    The kiosks were never listed, so the analysis missed them. The window length did not cause the
+    failure. The CAB approved a sound change based on incomplete information; the gap is in the
+    analysis it was given. Version control helps with backout and traceability, but it would not
+    have revealed the kiosks' dependency on TLS 1.0.
+
+- key: sec-basic-12
+  type: multiple
+  category: general-security-concepts
+  tags: [obj-1.2, change-management, technical-implications]
+  prompt: |
+    A school district will replace the endpoint protection agent on 400 laptops and 20 servers. The
+    new agent is a new executable, and its installer stops the old agent's service and requires the
+    servers to restart.
+
+    Which two technical implications MUST the change request address? (Choose two.)
+  options:
+    - text: Moving the servers to a new IP address range
+    - text: Renewing the district's TLS certificates at the same time
+    - text: Adding the new agent to the application allow list so it is not blocked when it starts
+      correct: true
+    - text: Scheduling the server restarts and resulting downtime within an agreed maintenance window
+      correct: true
+    - text: Updating the acceptable use policy that staff sign each year
+  explanation: |
+    Two technical implications follow directly from the scenario. Systems that enforce application
+    allow lists will block an unknown executable, so the new agent must be added first. The server
+    restarts mean downtime, which must be planned inside a maintenance window. The acceptable use
+    policy is unrelated to this change. Re-addressing servers and renewing certificates are separate
+    changes; bundling unrelated work into one window breaks the restricted scope of an approved
+    change.
+
+- key: sec-basic-13
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, hashing-algorithms]
+  prompt: |
+    A software vendor still publishes an MD5 checksum for each installer. Customers want a way to
+    confirm that a downloaded installer has not been deliberately altered, using a current
+    algorithm.
+
+    Which algorithm should the vendor publish digests with?
+  options:
+    - text: SHA-1
+    - text: CRC32
+    - text: AES-256
+    - text: SHA-256
+      correct: true
+  explanation: |
+    SHA-256, from the SHA-2 family, is a current cryptographic hash with no practical collision
+    attacks; SHA-3 would also qualify. SHA-1 has had public collisions since 2017 and NIST is
+    retiring it, so it is no improvement over MD5 for security. CRC32 detects accidental errors but
+    anyone can craft a file with a chosen CRC. AES-256 is a symmetric encryption algorithm, not a
+    hash. A digest also needs a trusted channel or a signature to protect against an attacker who can
+    replace both file and checksum.
+
+- key: sec-basic-14
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, salting, password-storage]
+  prompt: |
+    During a review of a leaked user table, an analyst sees that 112 accounts have exactly the same
+    stored value:
+
+    ```text
+    5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
+    ```
+
+    Which weakness does this MOST clearly show?
+  options:
+    - text: The hash function produces outputs that are too short
+    - text: Passwords were stored in plaintext
+    - text: Passwords were hashed without a unique salt per account
+      correct: true
+    - text: Passwords were encrypted with a key that was too short
+  explanation: |
+    With a unique random salt per account, identical passwords produce different stored values.
+    Identical 64-character hex values show an unsalted hash (this one is a bare SHA-256), so all 112
+    accounts fall together and precomputed tables work against them. Nothing here is encrypted, and
+    256 bits of output is not too short. Plaintext would show the password itself, not a hex digest.
+    The fix is a salted, slow function such as Argon2id, scrypt, bcrypt or PBKDF2.
+
+- key: sec-basic-15
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, symmetric-encryption, modes]
+  prompt: |
+    A developer encrypts fixed-length 16-byte customer status records with AES-128 in ECB mode. A
+    tester who does not have the key notices that every customer with the status "ACTIVE" has the
+    same ciphertext.
+
+    Which change BEST fixes the problem?
+  options:
+    - text: Encode the ciphertext in Base64 before storing it
+    - text: Use an authenticated mode such as AES-GCM with a unique nonce for every record
+      correct: true
+    - text: Increase the key length to AES-256 and keep ECB mode
+    - text: Hash the records with SHA-256 instead of encrypting them
+  explanation: |
+    ECB encrypts equal blocks to equal ciphertext, so patterns leak no matter how long the key is.
+    AES-GCM with a unique nonce makes every ciphertext different and also detects tampering. A
+    longer key does not change ECB's behavior. Hashing would make the records impossible to decrypt
+    and equal statuses would still hash identically. Base64 is an encoding, not protection; equal
+    inputs still produce equal outputs.
+
+- key: sec-basic-16
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, encryption-level]
+  prompt: |
+    A health insurer's database administrators need full access to maintain the claims database,
+    but they must not be able to read members' national identification numbers stored in one
+    column.
+
+    Which level of encryption meets this requirement?
+  options:
+    - text: Record-level (column or field) encryption with keys held by the claims application
+      correct: true
+    - text: Full disk encryption on the database server
+    - text: Transparent database encryption of the data files
+    - text: Volume encryption of the backup drive
+  explanation: |
+    Record-level encryption encrypts the sensitive field itself, and administrators who do not hold
+    the application's key see only ciphertext. Full disk, transparent database and volume
+    encryption protect stored files against stolen disks or backups, but the database engine
+    decrypts the data for anyone it lets query, which includes the administrators.
+
+- key: sec-basic-17
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, aead, nonce-reuse, crypto-vulnerabilities]
+  prompt: |
+    A messaging service encrypts messages with AES-GCM. Each server builds the nonce from a counter
+    that starts at zero whenever the service restarts, and the key changes only once a month.
+
+    What is the MOST serious risk?
+  options:
+    - text: The same key and nonce will be reused after every restart, which can reveal plaintexts and allow forged messages
+      correct: true
+    - text: AES-GCM cannot authenticate messages, so tampering will go unnoticed
+    - text: The monthly key is too short for AES-GCM
+    - text: Counters make AES-GCM run too slowly for a messaging service
+  explanation: |
+    GCM's security depends on never repeating a nonce under the same key; NIST SP 800-38D treats
+    uniqueness as almost as important as the key's secrecy. A counter that resets on restart repeats
+    nonces, which exposes the relationship between plaintexts and lets attackers forge tags. GCM
+    does authenticate messages when used correctly, nothing indicates the key is short, and counters
+    are a normal, fast way to build nonces as long as they never repeat.
+
+- key: sec-basic-18
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, key-exchange, forward-secrecy]
+  prompt: |
+    A stolen backup reveals the RSA private key of an online shop's web server. The attacker had
+    also recorded months of encrypted traffic to the site. The server used only TLS 1.3.
+
+    What can the attacker decrypt from the recordings?
+  options:
+    - text: Only sessions from browsers that do not support AES-GCM
+    - text: Every session since the certificate was issued, but none before it
+    - text: None of the recorded sessions, because each used ephemeral key exchange whose keys were discarded
+      correct: true
+    - text: Every recorded session, because the session keys were wrapped with the RSA public key
+  explanation: |
+    TLS 1.3 always uses ephemeral (EC)DHE key exchange, which gives forward secrecy: session keys
+    came from one-time key pairs that no longer exist, and the RSA key only signed the handshake.
+    The stolen key lets the attacker impersonate the server in future until the certificate is
+    revoked, but not decrypt the past. Wrapping session keys with the RSA public key is static RSA
+    key transport, which TLS 1.3 removed. Cipher choice and the certificate's issue date are not
+    what protects the recordings.
+
+- key: sec-basic-19
+  type: multiple
+  category: general-security-concepts
+  tags: [obj-1.3, key-length, asymmetric-encryption]
+  prompt: |
+    A team must choose keys for a new internal signing service that should provide at least
+    128 bits of security strength, as defined in NIST SP 800-57.
+
+    Which two choices meet the requirement? (Choose two.)
+  options:
+    - text: ECDSA on curve P-256
+      correct: true
+    - text: RSA with a 2048-bit modulus
+    - text: RSA with a 1024-bit modulus
+    - text: ECDSA on curve P-224
+    - text: RSA with a 3072-bit modulus
+      correct: true
+  explanation: |
+    NIST SP 800-57 rates RSA-3072 and 256-bit elliptic curves such as P-256 at 128 bits of security
+    strength. RSA-2048 and P-224 provide 112 bits, today's minimum but below the requirement.
+    RSA-1024 provides about 80 bits and is disallowed for new signatures.
+
+- key: sec-basic-20
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, digital-signatures]
+  prompt: |
+    A hospital downloads firmware for its infusion pumps along with a `SHA256SUMS` file and a
+    `SHA256SUMS.sig` file. The security team wants assurance that the firmware came from the
+    manufacturer and was not altered, even if the download site itself was compromised.
+
+    Which step provides that assurance?
+  options:
+    - text: Re-download the files over HTTPS from the same site and compare the digests
+    - text: Verify SHA256SUMS.sig with the manufacturer's public key obtained in advance from a trusted source, then check the firmware against SHA256SUMS
+      correct: true
+    - text: Check the firmware against SHA256SUMS only, since SHA-256 has no known collisions
+    - text: Verify the signature with the public key published in the same download folder
+  explanation: |
+    A signature made with the manufacturer's private key cannot be forged by whoever controls the
+    download site, provided the verifying public key came from a trusted source beforehand. A
+    manifest alone can be replaced along with the firmware. A public key from the same compromised
+    folder could be the attacker's own. Downloading again from the same compromised site just
+    returns the same tampered files.
+
+- key: sec-basic-21
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, key-escrow, pki]
+  prompt: |
+    A company encrypts engineers' design files with per-user keys. Management wants to be able to
+    recover the files if an engineer leaves or loses a smart card, without weakening the
+    non-repudiation of the engineers' signed design approvals.
+
+    Which approach meets both requirements?
+  options:
+    - text: Escrow both the encryption and signing keys so that IT can act for any engineer
+    - text: Use one shared key pair for all engineers for both encryption and signing
+    - text: Disable encryption of design files and rely on folder permissions
+    - text: Escrow copies of the encryption keys in a protected recovery system, but never escrow the signing keys
+      correct: true
+  explanation: |
+    Key escrow keeps a protected copy of a key so encrypted data can be recovered, which suits
+    encryption keys. Signing keys must stay solely with their owner; if IT also holds a copy, an
+    engineer could credibly deny a signature. Escrowing both breaks non-repudiation, a shared key
+    pair destroys both individual confidentiality and non-repudiation, and dropping encryption
+    abandons the confidentiality requirement.
+
+- key: sec-basic-22
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, certificates, chain-of-trust]
+  prompt: |
+    After a certificate renewal, some mobile clients fail to connect to `api.example.test`, while
+    desktop browsers still work. An administrator runs:
+
+    ```console
+    $ openssl verify -CAfile public-roots.pem api.pem
+    CN = api.example.test
+    error 20 at 0 depth lookup: unable to get local issuer certificate
+    error api.pem: verification failed
+    ```
+
+    What is the MOST likely cause?
+  options:
+    - text: The new certificate has expired
+    - text: The certificate has been revoked by the CA
+    - text: The server is not sending the intermediate CA certificate along with its own certificate
+      correct: true
+    - text: The new certificate is self-signed
+  explanation: |
+    Error 20 means no issuer for the server certificate could be found among the trusted
+    certificates: the chain cannot be built up to the root. That is the classic missing
+    intermediate; some clients fetch or cache intermediates and still work, others fail. A
+    self-signed certificate gives error 18, an expired one error 10, and a revoked one error 23
+    (and only when revocation is checked).
+
+- key: sec-basic-23
+  type: multiple
+  category: general-security-concepts
+  tags: [obj-1.3, certificates, wildcard]
+  prompt: |
+    A company obtains a certificate whose Subject Alternative Name is `DNS:*.shop.example.test`.
+
+    Which two hostnames will clients accept the certificate for? (Choose two.)
+  options:
+    - text: "`eu.cart.shop.example.test`"
+    - text: "`shop.example.org`"
+    - text: "`cart.shop.example.test`"
+      correct: true
+    - text: "`www.shop.example.test`"
+      correct: true
+    - text: "`shop.example.test`"
+  explanation: |
+    A wildcard covers exactly one label in the leftmost position, so `cart.` and `www.` in front of
+    `shop.example.test` match. It does not cover the bare name `shop.example.test` (no label in the
+    wildcard position), two labels such as `eu.cart.`, or a different domain. Add those names to the
+    SAN list if they are needed.
+
+- key: sec-basic-24
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, ocsp, revocation]
+  prompt: |
+    A privacy review notes that each time a visitor opens the company's website, the visitor's
+    browser may contact the certificate authority to ask whether the site's certificate is revoked,
+    telling the CA which site the visitor is using. The team wants to keep live revocation status
+    but stop these lookups.
+
+    Which feature addresses this?
+  options:
+    - text: OCSP stapling
+      correct: true
+    - text: A wildcard certificate
+    - text: A longer certificate validity period
+    - text: A certificate signing request
+  explanation: |
+    With OCSP stapling, the web server fetches a signed, time-stamped OCSP response from the CA and
+    attaches it to the TLS handshake, so browsers get revocation status without contacting the CA
+    themselves. A wildcard certificate changes which names are covered, not how status is checked.
+    Longer validity makes revocation more important, not less, and public CAs now cap validity at
+    200 days. A CSR is how a certificate is requested.
+
+- key: sec-basic-25
+  type: multiple
+  category: general-security-concepts
+  tags: [obj-1.3, secure-protocols]
+  prompt: |
+    An audit of a manufacturing plant finds administrators managing switches over Telnet, engineers
+    uploading drawings with FTP, and the HR application authenticating users against the directory
+    with LDAP on port 389 without StartTLS.
+
+    Which three changes replace these with secure protocols? (Choose three.)
+  options:
+    - text: Manage the switches with SSH
+      correct: true
+    - text: Transfer drawings with SFTP
+      correct: true
+    - text: Require LDAPS (port 636) for directory authentication
+      correct: true
+    - text: Move the HTTP intranet to port 8080
+    - text: Use SNMPv2c with a long community string for switch monitoring
+    - text: Run FTP on a non-standard port
+  explanation: |
+    SSH replaces Telnet with an encrypted, authenticated channel; SFTP transfers files over SSH; and
+    LDAPS wraps directory traffic, including password binds, in TLS. Changing ports hides nothing:
+    HTTP and FTP on other ports are still cleartext. SNMPv2c sends its community string in the
+    clear however long it is; SNMPv3 with authentication and privacy is the secure version.
+
+- key: sec-basic-26
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, tls, downgrade, crypto-vulnerabilities]
+  prompt: |
+    A scan of a partner-facing VPN portal reports:
+
+    ```text
+    Protocols offered: SSLv3, TLS 1.0, TLS 1.1, TLS 1.2
+    Cipher suites include: TLS_RSA_WITH_RC4_128_SHA, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    ```
+
+    Which configuration change BEST follows current IETF guidance?
+  options:
+    - text: Disable TLS 1.2 so that clients cannot downgrade from it
+    - text: Disable only SSLv3 and keep TLS 1.0 and 1.1 for older partners
+    - text: Offer only TLS 1.2 and TLS 1.3, and remove the RC4 and static RSA cipher suites
+      correct: true
+    - text: Keep all versions for compatibility and put RC4 last in the preference order
+  explanation: |
+    RFC 9325 says implementations must not negotiate SSL 3.0, TLS 1.0, TLS 1.1 or RC4, should not
+    use static RSA key exchange, and must support TLS 1.2; RFC 8996 formally deprecated TLS 1.0 and
+    1.1. Leaving weak options enabled, even last in preference, is what downgrade attacks exploit.
+    Disabling TLS 1.2 would break most clients and is not recommended, and keeping TLS 1.0 and 1.1
+    ignores their deprecation.
+
+- key: sec-basic-27
+  type: single
+  category: general-security-concepts
+  tags: [obj-1.3, hsm, crypto-tools]
+  prompt: |
+    A payment processor runs its own certificate authority for terminal certificates. Auditors
+    require that the CA's private key never exists in plaintext outside tamper-resistant hardware,
+    and that the hardware be validated to FIPS 140-3.
+
+    Which tool should hold the CA key?
+  options:
+    - text: The TPM in the CA server's motherboard
+    - text: An encrypted PEM file on the CA server
+    - text: A tokenization vault
+    - text: A hardware security module (HSM)
+      correct: true
+  explanation: |
+    An HSM is a tamper-resistant device or service built to generate and use high-value keys
+    internally, and HSMs are validated against FIPS 140-3 for exactly this kind of requirement. A
+    TPM protects keys and boot integrity for one machine but is not designed as the signing engine
+    for a CA. An encrypted PEM file is decrypted into the server's memory whenever it is used.
+    Tokenization replaces sensitive values with tokens and does not perform signing.
+
+- key: sec-basic-28
+  type: multiple
+  category: general-security-concepts
+  tags: [obj-1.3, obfuscation, tokenization, data-masking]
+  prompt: |
+    An online retailer wants its order database and call-center screens to stop holding usable card
+    numbers, while the payment service can still charge returning customers.
+
+    Which two obfuscation techniques fit these needs? (Choose two.)
+  options:
+    - text: Storing an unsalted SHA-256 hash of each card number in place of the number
+    - text: Base64-encoding the card numbers in the order database
+    - text: Tokenization, storing random tokens in the order database and the real numbers only in a guarded vault
+      correct: true
+    - text: Data masking, showing call-center staff only the last four digits
+      correct: true
+    - text: Steganography, hiding the card numbers inside product images
+  explanation: |
+    Tokenization replaces each card number with a random token that has no mathematical link to it,
+    so the order database holds nothing usable while the payment service can still look up the real
+    number in the vault. Masking shows only what staff need to recognize a card. Steganography only
+    hides data and does not protect it once found. An unsalted hash of a 16-digit card number can be
+    reversed by trying every possible number. Base64 is a reversible encoding, not protection.
+
+- key: sec-basic-29
+  type: multiple
+  category: security-operations
+  tags: [obj-4.5, password-best-practices, nist-800-63b]
+  prompt: |
+    A university is rewriting its password standard for staff accounts that use a password as the
+    only authentication factor. The standard must follow NIST SP 800-63B-4.
+
+    Which two requirements belong in the new standard? (Choose two.)
+  options:
+    - text: New passwords are checked against a blocklist of common, breached and context-specific passwords
+      correct: true
+    - text: Passwords must contain an upper case letter, a digit and a symbol
+    - text: Passwords expire every 90 days
+    - text: Users set a security question for self-service resets
+    - text: Pasting into the password field is blocked
+    - text: Passwords must be at least 15 characters long
+      correct: true
+  explanation: |
+    SP 800-63B-4 requires at least 15 characters for passwords used as a single factor (8 when used
+    with another factor) and requires checking new passwords against a blocklist. It forbids
+    composition rules and periodic expiration (changes are forced only on evidence of compromise),
+    forbids security questions (knowledge-based authentication), and requires allowing password
+    managers, recommending that paste be permitted.
+
+- key: sec-basic-30
+  type: single
+  category: security-operations
+  tags: [obj-4.5, passkeys, phishing-resistance, mfa]
+  prompt: |
+    Staff at an engineering firm keep approving sign-ins on look-alike login pages: attackers relay
+    the password and the six-digit code from the authenticator app to the real site within seconds.
+
+    Which authentication method would BEST stop this?
+  options:
+    - text: One-time codes sent by SMS instead of the app
+    - text: Requiring passwords of at least 20 characters
+    - text: Passkeys (FIDO2/WebAuthn), whose signatures are bound to the real site's domain
+      correct: true
+    - text: Shorter TOTP intervals of 15 seconds instead of 30
+  explanation: |
+    A passkey signs a challenge together with the domain the browser actually visited, so a
+    signature produced on a look-alike page is useless at the real site; NIST classes WebAuthn as
+    phishing-resistant. Any code a user types, whether from an app or SMS, can be relayed in real
+    time, however short its lifetime, and SMS is additionally restricted by NIST because of SIM
+    swapping. A longer password does nothing once the user types it into the attacker's page.
+
+- key: sec-basic-31
+  type: multiple
+  category: security-operations
+  tags: [obj-4.5, compromised-credential-monitoring, account-auditing]
+  prompt: |
+    The compromised credential monitoring service alerts that the email address and current
+    password of a payroll clerk appear in a newly published breach collection from an unrelated
+    shopping site.
+
+    Which two actions should the security team take? (Choose two.)
+  options:
+    - text: Add character composition rules to the password policy
+    - text: Temporarily turn off MFA for the clerk to simplify the reset
+    - text: Force a password change for the clerk's account
+      correct: true
+    - text: Review the account's recent sign-ins and activity for misuse
+      correct: true
+    - text: Introduce 30-day expiry for every account in the organization
+  explanation: |
+    NIST SP 800-63B-4 requires forcing a change when there is evidence a password is compromised,
+    and the account should be checked for credential stuffing or other misuse since the password
+    was clearly reused. Organization-wide expiry and composition rules are practices the current
+    guidance forbids, and they do nothing about this one exposed password. Turning off MFA would
+    remove the control most likely to have blocked an attacker using the leaked password.
+
+- key: sec-basic-32
+  type: single
+  category: security-operations
+  tags: [obj-4.5, mfa, hard-token, aal3]
+  prompt: |
+    A government agency requires authenticator assurance level 3 (AAL3) for its cloud
+    administrators: a phishing-resistant authenticator whose private key cannot be exported.
+
+    Which option meets the requirement?
+  options:
+    - text: A device-bound passkey on a FIPS-validated hardware security key, unlocked with a PIN
+      correct: true
+    - text: A synced passkey stored in the administrator's cloud keychain
+    - text: A password together with a TOTP code from an authenticator app
+    - text: A password together with a fingerprint scan on the laptop's reader
+  explanation: |
+    AAL3 needs a cryptographic authenticator with a non-exportable private key that provides
+    phishing resistance, such as a hardware security key (a hard token) holding a device-bound
+    passkey. Synced passkeys are exportable by design, so NIST forbids them at AAL3. TOTP codes can
+    be phished. A fingerprint is a biometric, which NIST allows only together with a physical
+    authenticator, and a password plus a laptop sensor is not one.

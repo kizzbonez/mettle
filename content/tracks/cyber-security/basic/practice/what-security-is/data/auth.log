@@ -1,0 +1,10 @@
+Oct 16 08:02:11 books01 sshd[1022]: Accepted publickey for maya from 192.0.2.41 port 50122 ssh2: ED25519 SHA256:3vKxq0mZp1Lr8YtW2cQnA7dHfJ5sUeB9gTiVoR4kN6M
+Oct 16 08:03:40 books01 sudo:     maya : TTY=pts/0 ; PWD=/home/maya ; USER=root ; COMMAND=/usr/bin/systemctl restart booking.service
+Oct 16 08:03:40 books01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by maya(uid=1001)
+Oct 16 08:03:41 books01 sudo: pam_unix(sudo:session): session closed for user root
+Oct 16 08:15:09 books01 sshd[1104]: Failed password for owen from 203.0.113.77 port 41870 ssh2
+Oct 16 08:15:17 books01 sshd[1104]: Accepted password for owen from 203.0.113.77 port 41870 ssh2
+Oct 16 08:16:02 books01 sudo:     owen : user NOT in sudoers ; TTY=pts/1 ; PWD=/home/owen ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow
+Oct 16 08:40:55 books01 sshd[1188]: Failed password for invalid user admin from 198.51.100.9 port 60311 ssh2
+Oct 16 08:41:02 books01 CRON[1201]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Oct 16 09:05:30 books01 sudo:     maya : 1 incorrect password attempt ; TTY=pts/0 ; PWD=/home/maya ; USER=root ; COMMAND=/usr/bin/apt upgrade

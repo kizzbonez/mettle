@@ -1,0 +1,5 @@
+# every domain Brightwater owns; each must publish SPF and its own DMARC record
+brightwater-vets.example
+news.brightwater-vets.example
+brightwater-pets.example
+brightwatervets.example

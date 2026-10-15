@@ -1,0 +1,6 @@
+Skylark Weather Station firmware 2.4.0
+
+- Rain gauge readings are now averaged over 10 minutes instead of 5.
+- The anemometer no longer reports gusts above 250 km/h after a power cut.
+- Uploads to the community map retry with a back-off of up to 15 minutes.
+- Minimum supported board revision is now C.

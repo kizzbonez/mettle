@@ -1,0 +1,19 @@
+title: Security Architecture and Controls
+summary: >-
+  Design and defend the environment, aligned with SY0-801 domain 3 and the controls of domain 4.
+  Compare architecture models, segment networks into zones, build Zero Trust access, choose and
+  configure firewalls, intrusion detection and endpoint controls, secure applications and email,
+  manage identities and access, protect data through its life cycle, and plan for resilience and
+  recovery.
+outcomes:
+  - Compare cloud, on-premises, hybrid and OT architectures and their security implications
+  - Segment infrastructure, place devices and design Zero Trust and secure remote access
+  - Choose and configure firewalls, IDS/IPS, endpoint, application and email security controls
+  - Apply identity, federation, SSO and access control models, and review access
+  - Protect data by state and classification, and plan backups, recovery and continuity
+exam:
+  title: Security Architecture and Controls Mock Exam
+  description: Twenty multiple-choice questions drawn from the level's bank, in the style of the Security+ exam.
+  timeLimitMinutes: 20
+  passPercent: 80
+  questionCount: 20

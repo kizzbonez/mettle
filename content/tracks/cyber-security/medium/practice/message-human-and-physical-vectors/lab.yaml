@@ -1,0 +1,19 @@
+title: Attachment Triage
+summary: Identify quarantined attachments by their bytes, find VBA projects in Office zips, embedded objects in RTF and active keys in PDF, and block files whose extension hides what they are.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Triages the attachments from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Tells file kinds apart by signature, including a PDF header after junk
+    file: 02-kinds.py
+    hidden: true
+  - name: Lists VBA projects, RTF control words and PDF keys in rule order
+    file: 03-markers.py
+    hidden: true
+  - name: Blocks masquerading files and archives, and checks extensions ignoring case
+    file: 04-verdicts.py
+    hidden: true

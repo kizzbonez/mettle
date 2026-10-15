@@ -1,0 +1,20 @@
+Received: from mail.brіghtwell-build.example (unknown [203.0.113.88])
+	by mx1.brightwell-build.example (Postfix) with ESMTPS id 4Hq2Lw0x1Zz9tK
+	for <accounts.payable@brightwell-build.example>; Thu, 15 Oct 2026 08:41:07 +0000 (UTC)
+Authentication-Results: mx1.brightwell-build.example;
+ spf=fail smtp.mailfrom=brіghtwell-build.example;
+ dkim=none;
+ dmarc=fail (p=none) header.from=brіghtwell-build.example
+From: "Omar Haddad (CEO)" <omar.haddad@brіghtwell-build.example>
+Reply-To: omar.haddad.ceo@outlook-mail.example
+To: accounts.payable@brightwell-build.example
+Subject: Urgent: supplier payment today, confidential
+Date: Thu, 15 Oct 2026 08:40:52 +0000
+Message-ID: <a81f22c0-5d1e-4c5f-9b0e-3f1d2a7c9e11@brіghtwell-build.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Hi, I need a transfer of 48,600 GBP to a new supplier account before 3 pm.
+I am in meetings all day, so reply by email only. Keep this between us.
+Omar

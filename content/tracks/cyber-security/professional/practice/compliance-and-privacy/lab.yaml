@@ -1,0 +1,19 @@
+title: Data Subject Requests with Legal Holds
+summary: Apply a gym chain's erasure, opt-out, objection, restriction and correction requests in order, honoring an active legal hold and a seven-year invoice retention rule, and compute each request's one-month deadline.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Applies the sample requests from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Erases, restricts or holds by retention and legal holds
+    file: 02-erasure.py
+    hidden: true
+  - name: Applies corrections, opt-outs, objections and restrictions
+    file: 03-other-requests.py
+    hidden: true
+  - name: Computes deadlines at month ends and handles no requests
+    file: 04-deadlines-and-empty.py
+    hidden: true

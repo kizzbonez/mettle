@@ -1,0 +1,19 @@
+title: Box Office Code Fixes
+summary: Close an SQL injection with a parameterized SQLite query, a time-of-check/time-of-use race with O_NOFOLLOW, and payment replay with nonces and a time window that fails closed, while the tests send well-known probes to your own code.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the example from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Treats injection probes as values and keeps them out of the SQL text
+    file: 02-injection.py
+    hidden: true
+  - name: Refuses a file swapped for a link after any earlier check
+    file: 03-race.py
+    hidden: true
+  - name: Applies the replay window on both sides and fails closed on malformed requests
+    file: 04-replay.py
+    hidden: true

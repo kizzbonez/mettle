@@ -1,0 +1,19 @@
+title: Threat Feed Triage
+summary: Rate indicators with the likelihood and impact matrix, drop expired and TLP-restricted entries from a merged threat feed, merge duplicates by confidence and rank what is left for the SIEM.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Triages the sample feed from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Reads every cell of the risk matrix and refuses unknown ratings
+    file: 02-matrix.py
+    hidden: true
+  - name: Drops expired and restricted rows before merging
+    file: 03-expiry-and-tlp.py
+    hidden: true
+  - name: Merges by type and value, keeps the most confident row and orders the result
+    file: 04-merge-and-order.py
+    hidden: true

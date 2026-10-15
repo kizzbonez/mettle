@@ -1,0 +1,10 @@
+user,department,submitted_90d,clicked_90d,reported_90d,training_overdue,privileged,handles_payments,dlp_events_90d
+d.kim,Finance,1,2,0,yes,no,yes,1
+g.ivanova,Finance,1,1,0,no,no,yes,0
+e.santos,Finance,0,1,0,no,no,yes,0
+f.walsh,Finance,0,0,2,no,yes,yes,0
+b.ozturk,Estimating,0,1,1,yes,no,no,0
+i.larsen,Site Operations,0,1,0,yes,no,no,4
+h.mbeki,Site Operations,0,0,0,yes,yes,no,0
+k.nowak,Office,0,0,3,no,no,no,0
+r.admin,Office,1,1,0,yes,yes,yes,2

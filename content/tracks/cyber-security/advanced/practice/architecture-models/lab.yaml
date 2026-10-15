@@ -1,0 +1,19 @@
+title: Terraform Plan Policy Check
+summary: Read a Terraform plan as JSON and refuse admin ports open to the internet, wildcard IAM permissions and public or unencrypted databases, and report drift made outside the code.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reviews the sample plan from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Finds admin ports open to 0.0.0.0/0 and ::/0
+    file: 02-admin-ports.py
+    hidden: true
+  - name: Recognizes wildcard Allow statements in IAM policies
+    file: 03-wildcards.py
+    hidden: true
+  - name: Checks only creates and updates, in plan order, after the drift
+    file: 04-plan-actions.py
+    hidden: true

@@ -1,0 +1,19 @@
+title: Cookies and Form Validation
+summary: Check Set-Cookie headers for Secure, HttpOnly, SameSite, the __Host- prefix and a short Max-Age, and validate a booking form on the server with allow lists that reject injection probes instead of repairing them.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Checks the sample cookies and form from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Applies the cookie rules with mixed case, spacing and boundaries
+    file: 02-cookies.py
+    hidden: true
+  - name: Rejects probe inputs for card, room, day and hours
+    file: 03-booking-probes.py
+    hidden: true
+  - name: Validates names, missing fields and the shape of the result
+    file: 04-names-and-missing.py
+    hidden: true

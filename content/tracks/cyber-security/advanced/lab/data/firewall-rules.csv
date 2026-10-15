@@ -1,0 +1,16 @@
+seq,name,src_zone,src,dst_zone,dst,proto,port,action
+10,web-in,internet,any,dmz,203.0.113.10,tcp,443,allow
+20,web-redirect,internet,any,dmz,203.0.113.10,tcp,80,allow
+30,dmz-to-db,dmz,10.30.0.10,servers,10.20.0.21,tcp,5432,allow
+40,staff-web-out,staff,10.10.0.0/16,internet,any,tcp,443,allow
+50,staff-dns,staff,10.10.0.0/16,servers,10.20.0.53,udp,53,allow
+140,ssh-from-it-laptop,staff,10.10.5.23,servers,10.20.0.21,tcp,22,allow
+60,staff-to-servers,staff,10.10.0.0/16,servers,10.20.0.0/24,any,any,allow
+80,mgmt-ssh,mgmt,10.99.0.0/24,servers,10.20.0.0/24,tcp,22,allow
+90,mgmt-rdp,mgmt,10.99.0.0/24,servers,10.20.0.0/24,tcp,3389,allow
+100,vendor-support,internet,198.51.100.0/24,servers,10.20.0.40,tcp,3389,allow
+110,guest-out,guest,10.50.0.0/16,internet,any,any,any,allow
+120,label-printers,staff,10.10.0.0/16,servers,10.20.0.70,tcp,8000-8100,allow
+70,block-locum-rdp,staff,10.10.40.0/24,servers,10.20.0.30,tcp,3389,deny
+130,web-in-copy,internet,any,dmz,203.0.113.10,tcp,443,allow
+999,cleanup,any,any,any,any,any,any,deny

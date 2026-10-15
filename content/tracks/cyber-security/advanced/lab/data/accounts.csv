@@ -1,0 +1,11 @@
+sam_account,display_name,type,enabled,last_logon,groups
+amara.okoye,Amara Okoye,user,true,2026-09-30,Staff;Vets
+adm-amara,Amara Okoye (admin),admin,true,2026-09-12,Domain Admins;Staff
+jonas.weber,Jonas Weber,user,true,2026-06-20,Staff;Reception
+lena.marsh,Lena Marsh,user,true,2026-09-29,Staff;Domain Admins
+ravi.patel,Ravi Patel,user,false,2026-03-02,Staff;Billing
+svc-backup,Backup service,service,true,2026-09-30,Backup Operators;Domain Admins
+svc-scanner,Document scanner,service,true,,Scanners
+temp.locum,Locum vet (winter 2025),user,true,2025-12-19,Staff;Vets
+adm-noor,Noor Haddad (admin),admin,true,2026-07-03,Administrators
+kai.ng,Kai Ng,user,true,2026-07-02,Staff;Vets

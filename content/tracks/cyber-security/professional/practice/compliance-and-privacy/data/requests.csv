@@ -1,0 +1,9 @@
+request,received,member,type,field,value
+DSR-0412,2026-10-02,M-1005,correction,email,sofia.ricci@example.com
+DSR-0398,2026-09-14,M-1001,erasure,,
+DSR-0405,2026-09-30,M-1002,erasure,,
+DSR-0410,2026-10-01,M-1003,opt-out,,
+DSR-0409,2026-10-01,M-1003,erasure,,
+DSR-0411,2026-10-02,M-1004,objection,,
+DSR-0415,2026-10-05,M-1001,restriction,,
+DSR-0416,2026-10-06,M-1004,correction,date_of_birth,1990-04-12

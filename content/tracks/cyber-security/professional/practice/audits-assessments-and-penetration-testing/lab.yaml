@@ -1,0 +1,19 @@
+title: Rules of Engagement Check
+summary: Check a penetration tester's planned activities against signed rules of engagement, refusing forbidden and unknown techniques, targets outside the in-scope networks and names, and active work outside the testing window.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Checks the sample plan from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Decides scope at network edges, overlaps and host names
+    file: 02-scope.py
+    hidden: true
+  - name: Applies the testing window to active work only
+    file: 03-window.py
+    hidden: true
+  - name: Applies the rules in order and handles an empty plan
+    file: 04-rule-order.py
+    hidden: true

@@ -1,0 +1,9 @@
+gateway:
+  url: https://gw.radio.kestrelrescue.test/send
+  timeout_seconds: 8
+  retries: 3
+channels:
+  - name: team-a
+    talkgroup: 4101
+  - name: team-b
+    talkgroup: 4102

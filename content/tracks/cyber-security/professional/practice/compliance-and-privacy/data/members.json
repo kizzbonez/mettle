@@ -1,0 +1,7 @@
+[
+  {"id": "M-1001", "name": "Ana Petrova", "email": "ana.petrova@example.com", "marketing": true, "restricted": false},
+  {"id": "M-1002", "name": "Jonas Berg", "email": "jonas.berg@example.net", "marketing": true, "restricted": false},
+  {"id": "M-1003", "name": "Lea Moreau", "email": "lea.moreau@example.org", "marketing": false, "restricted": false},
+  {"id": "M-1004", "name": "Tomas Novak", "email": "t.novak@example.com", "marketing": true, "restricted": false},
+  {"id": "M-1005", "name": "Sofia Ricci", "email": "sofia.ricci@exmaple.com", "marketing": true, "restricted": false}
+]

@@ -1,0 +1,9 @@
+item,time,released_by,received_by,purpose,seal
+EV-2026-0912-01,2026-10-12 09:20,-,D. Osei,collected,yes
+EV-2026-0912-03,2026-10-12 09:31,-,D. Osei,collected,yes
+EV-2026-0912-02,2026-10-12 09:40,-,D. Osei,collected,yes
+EV-2026-0912-01,2026-10-12 10:05,D. Osei,L. Hart,review for privilege,yes
+EV-2026-0912-03,2026-10-12 09:10,D. Osei,F. Ruiz,analysis,yes
+EV-2026-0912-02,2026-10-12 16:00,P. Grant,F. Ruiz,imaging,yes
+EV-2026-0912-02,2026-10-13 08:10,F. Ruiz,D. Osei,return to locker,no
+EV-2026-0912-01,2026-10-13 14:30,L. Hart,D. Osei,return to locker,yes

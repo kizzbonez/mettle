@@ -1,0 +1,19 @@
+title: Zero Trust Access Decision
+summary: Decide each ZTNA session from entitlement, MFA strength, device inventory and health, posture age and country, returning allow, a limited browser-only session or deny with the reasons in order.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Decides the sample requests from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Checks entitlement and MFA strength by sensitivity
+    file: 02-entitlement-and-mfa.py
+    hidden: true
+  - name: Checks device health and posture age at the boundaries
+    file: 03-device-posture.py
+    hidden: true
+  - name: Limits unmanaged devices and applies country and unknown-app rules
+    file: 04-unmanaged-and-context.py
+    hidden: true

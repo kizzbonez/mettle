@@ -1,0 +1,13 @@
+id,opened,summary,origin,intent,motivation,resources,sophistication,dwell_days
+INC-0412,2025-10-21,Council tax portal defaced with slogans against a bus route closure,external,malicious,political,low,low,1
+INC-0433,2025-11-30,Ransomware on the planning file servers after a phished VPN password,external,malicious,extortion,high,medium,6
+INC-0451,2025-12-15,Booter DDoS on the parking permit site boasted about on a gaming forum,external,malicious,notoriety,very low,low,0
+INC-0467,2026-01-09,Payroll spreadsheet emailed to a contractor's personal address,internal,none,none,own access,low,0
+INC-0480,2026-02-02,Backdoored edge router found during a firmware audit,external,malicious,espionage,very high,very high,412
+INC-0496,2026-03-18,Former housing officer exported tenant records after resigning,internal,malicious,revenge,own access,medium,3
+INC-0502,2026-04-07,Leisure centre bid documents passed to a rival bidder through a hired intermediary,external,malicious,intellectual property,medium,medium,40
+INC-0519,2026-05-22,Supplier bank details changed by a lookalike email,external,malicious,financial,high,medium,2
+INC-0533,2026-06-30,Threats to disrupt the flood barrier control system,external,malicious,fear/chaos,low,low,0
+INC-0548,2026-08-14,Valid service account used through built-in tools for months,external,malicious,espionage,high,high,95
+INC-0560,2026-09-03,Port scans and a login page probe after a news story,external,malicious,general curiosity,very low,low,0
+INC-0571,2026-10-02,Phishing kit hosted on a forgotten council subdomain,external,malicious,unknown,medium,medium,12

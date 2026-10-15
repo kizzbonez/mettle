@@ -1,0 +1,970 @@
+- key: sec-advanced-01
+  type: single
+  category: security-architecture
+  tags: [obj-3.1, cloud, deployment-models]
+  prompt: |
+    Three university hospitals are regulated by the same health research authority. They want one
+    cloud platform for their shared research data, operated by a contractor and used by no other
+    organization. Which cloud deployment model does this describe?
+  options:
+    - text: Hybrid cloud
+    - text: Private cloud
+    - text: Community cloud
+      correct: true
+    - text: Public cloud
+  explanation: |
+    NIST SP 800-145 defines a **community cloud** as infrastructure provisioned for the exclusive
+    use of a community of organizations with shared concerns, such as the same compliance rules;
+    it may be run by a third party. A private cloud serves a single organization, not three. A
+    public cloud is open to the general public. A hybrid cloud is a composition of two or more
+    distinct clouds bound together, which is not what is described.
+
+- key: sec-advanced-02
+  type: single
+  category: security-architecture
+  tags: [obj-3.1, shared-responsibility, saas]
+  prompt: |
+    A company moves its email from servers in its own data center to a software as a service
+    (SaaS) email product. Which security task remains the company's responsibility after the move?
+  options:
+    - text: Patching the operating system of the mail servers
+    - text: Deciding who may access each mailbox and requiring MFA for users
+      correct: true
+    - text: Replacing failed disks in the storage arrays
+    - text: Controlling physical entry to the data center
+  explanation: |
+    Under the shared responsibility model the provider takes over more layers as you move from
+    IaaS to SaaS, but **data, identities and access permissions always stay with the customer**.
+    In SaaS the provider patches the operating system and application, maintains the hardware and
+    secures the facility, so the other three options move to the provider. Most SaaS breaches
+    come from the customer's side: weak authentication, over-shared mailboxes, permissive sharing.
+
+- key: sec-advanced-03
+  type: single
+  category: security-architecture
+  tags: [obj-3.1, infrastructure-as-code, drift]
+  prompt: |
+    A team defines its cloud network in Terraform files that are reviewed in pull requests.
+    During an outage an engineer added a rule in the provider's web console allowing TCP 3389
+    from `0.0.0.0/0` and never removed it. An audit finds the rule, but the Terraform files do not
+    contain it. Which of the following BEST describes the problem?
+  options:
+    - text: Vendor lock-in
+    - text: Privilege creep
+    - text: Data sovereignty
+    - text: Configuration drift
+      correct: true
+  explanation: |
+    **Drift** is when the real environment no longer matches the reviewed infrastructure as code,
+    usually because of manual changes. It defeats IaC's main security benefits: review,
+    repeatability and auditability. Teams detect drift (for example with a scheduled plan) and
+    forbid console changes. Privilege creep is about accumulated user access, vendor lock-in
+    about dependence on one provider, and data sovereignty about the laws that apply where data
+    is stored.
+
+- key: sec-advanced-04
+  type: multiple
+  category: security-architecture
+  tags: [obj-3.1, ot, ics]
+  prompt: |
+    A manufacturer is planning security for the network of programmable logic controllers (PLCs)
+    that run its packaging line. Which characteristics of OT environments should MOST shape the
+    choice of controls? (Choose two.)
+  options:
+    - text: Devices are replaced every two to three years, like office laptops
+    - text: Availability and human safety take priority over confidentiality
+      correct: true
+    - text: Active vulnerability scanning during production carries little risk
+    - text: Devices often run legacy software for many years and cannot be patched or rebooted on demand
+      correct: true
+    - text: Industrial protocols authenticate and encrypt traffic by default
+  explanation: |
+    NIST SP 800-82 Rev. 3 stresses OT's performance, reliability and safety requirements: a
+    stopped or misbehaving controller can halt production or hurt people, so **availability and
+    safety come first**, and devices run **for decades on software that cannot be patched or
+    rebooted at will**. That pushes controls toward isolation, passive monitoring and strict
+    change windows. Active scans can crash fragile controllers, OT hardware is not replaced like
+    laptops, and many industrial protocols have no authentication or encryption at all.
+
+- key: sec-advanced-05
+  type: single
+  category: security-architecture
+  tags: [obj-3.1, air-gap]
+  prompt: |
+    A defense contractor keeps its weapons design network air-gapped from all other networks.
+    Engineers occasionally need to bring in software updates and take out approved drawings.
+    Which control is MOST important to keep the air gap effective?
+  options:
+    - text: A next-generation firewall between the design network and the office network
+    - text: Scanning, controlling and logging every removable medium that crosses the gap
+      correct: true
+    - text: A split-tunnel VPN for engineers working from home
+    - text: Autoscaling the design workstations to handle peak demand
+  explanation: |
+    An air gap has no network connection, so data crosses it only on **removable media** and
+    maintenance devices, which is how Stuxnet reached its targets. Scanning, device control and
+    logged transfers keep that path guarded. A firewall between the networks would create a
+    network connection and end the air gap; a VPN would do the same. Autoscaling has nothing to
+    do with isolation.
+
+- key: sec-advanced-06
+  type: single
+  category: security-architecture
+  tags: [obj-3.2, device-placement, ids]
+  prompt: |
+    A security team wants to detect attacks against the web servers in its screened subnet. The
+    business insists that the new sensor must never be able to block or delay legitimate traffic,
+    even if it fails. Where and how should the sensor be connected?
+  options:
+    - text: As an inline network IPS between the internet edge firewall and the screened subnet
+    - text: As a host-based IDS on the internal domain controller
+    - text: As a network IDS on a SPAN port or network tap of the screened subnet switch
+      correct: true
+    - text: As a web application firewall in front of the internal file server
+  explanation: |
+    A **network IDS fed by a SPAN (mirror) port or a tap** receives copies of the traffic, so it can
+    detect and alert but never sits in the path; if it fails, traffic flows on. An inline IPS is
+    in the traffic path and can block or fail. A HIDS on the domain controller watches the wrong
+    system, and a WAF in front of the file server protects the wrong zone (and is also inline).
+
+- key: sec-advanced-07
+  type: single
+  category: security-architecture
+  tags: [obj-3.2, failure-modes]
+  prompt: |
+    An inline IPS protects the network of an emergency dispatch center, where any network outage
+    could delay ambulances. Leadership has formally accepted the risk of uninspected traffic for
+    the duration of an IPS failure. How should the IPS be configured to behave when it fails?
+  options:
+    - text: Fail-closed, blocking all traffic until the IPS is repaired
+    - text: Fail-secure, keeping the last known rule set and dropping new connections
+    - text: Removed from the path entirely, relying on firewall logs instead
+    - text: Fail-open through a bypass module, with an alert when the bypass engages
+      correct: true
+  explanation: |
+    The business chose **availability** over inspection, so the IPS should **fail open** (a
+    hardware or software bypass passes traffic) and alert, with monitoring compensating during
+    the gap. Fail-closed and fail-secure keep security at the cost of availability, which is the
+    wrong trade here. Removing the IPS gives up protection during normal operation too.
+
+- key: sec-advanced-08
+  type: multiple
+  category: security-architecture
+  tags: [obj-3.1, obj-4.1, segmentation, lateral-movement]
+  prompt: |
+    Ransomware on a receptionist's PC spread to the file servers and the backup server, all on
+    the same flat network. Which changes would MOST directly limit this kind of lateral movement
+    next time? (Choose two.)
+  options:
+    - text: Put user devices, servers and backup systems in separate zones with default-deny firewall rules between them
+      correct: true
+    - text: Allow SSH, RDP and other management ports only from a management zone through a jump host
+      correct: true
+    - text: Lengthen DHCP leases so device addresses change less often
+    - text: Enable split tunneling on the VPN client
+    - text: Replace the access switches with faster models
+    - text: Add a captive portal to the staff network
+  explanation: |
+    **Segmentation into zones with default-deny policies** forces malware to cross a control that
+    can block and log it, and **restricting management ports to a management zone** removes the
+    usual path (remote administration protocols) for spreading to servers. DHCP lease times and
+    switch speed do not filter anything, split tunneling concerns remote users' internet
+    traffic, and a captive portal only gates joining the network, not movement within it.
+
+- key: sec-advanced-09
+  type: single
+  category: security-architecture
+  tags: [obj-3.1, physical-segmentation]
+  prompt: |
+    A payment processor requires that its card-processing network share no switches, cabling or
+    firewalls with the corporate network, so that a misconfigured VLAN or trunk port can never
+    join the two. Which approach meets this requirement?
+  options:
+    - text: Physical segmentation
+      correct: true
+    - text: Logical segmentation with VLANs and ACLs
+    - text: Microsegmentation with host firewalls
+    - text: A screened subnet for the card systems
+  explanation: |
+    **Physical segmentation** uses separate hardware, so no configuration error on shared
+    equipment can connect the networks. VLANs and ACLs are logical segmentation on shared
+    switches, which is exactly what the requirement rules out. Microsegmentation is also logical,
+    applied per workload. A screened subnet is a zone for internet-facing services, not a
+    separation guarantee.
+
+- key: sec-advanced-10
+  type: single
+  category: security-architecture
+  tags: [obj-3.2, zero-trust, nist-800-207]
+  prompt: |
+    In the NIST SP 800-207 Zero Trust architecture, which component makes the decision to grant,
+    deny or revoke a subject's access to a resource, using enterprise policy and inputs such as
+    device posture from a CDM system and threat intelligence?
+  options:
+    - text: Policy enforcement point (PEP)
+    - text: Policy engine (PE)
+      correct: true
+    - text: Policy administrator (PA)
+    - text: Continuous diagnostics and mitigation (CDM) system
+  explanation: |
+    The **policy engine** is "responsible for the ultimate decision to grant access", feeding
+    policy and external inputs into a trust algorithm. The policy administrator executes that
+    decision by opening or closing the path and issuing session credentials; together they form
+    the policy decision point. The PEP enforces in the data path. The CDM system is one of the
+    inputs, reporting device state.
+
+- key: sec-advanced-11
+  type: single
+  category: security-architecture
+  tags: [obj-3.2, zero-trust, device-health]
+  prompt: |
+    Under a Zero Trust policy, a user with a valid password and a successful MFA prompt tries to
+    open the HR portal from a company laptop. Device management reports that the laptop's EDR
+    agent stopped running two hours ago. What should the access decision be?
+  options:
+    - text: Allow, because the user completed MFA
+    - text: Allow, because the laptop is a company-owned device on the corporate network
+    - text: Deny or limit access, because the device fails the health requirement
+      correct: true
+    - text: Allow after the user re-enters the password
+  explanation: |
+    Zero Trust decides every session from **user authentication, device health and inventory,
+    and entitlement** together. A managed device whose EDR has stopped fails the health check,
+    so access is denied or limited (for example to a remediation portal) until it is healthy.
+    MFA proves the user, not the device. Network location and ownership grant no implicit trust
+    in Zero Trust, and asking for the password again changes nothing about the device.
+
+- key: sec-advanced-12
+  type: multiple
+  category: security-architecture
+  tags: [obj-3.2, ztna, remote-access]
+  prompt: |
+    A contractor needs access to one internal web application for two months, from a laptop the
+    company does not manage. Which approaches BEST follow Zero Trust principles? (Choose two.)
+  options:
+    - text: A full-tunnel remote-access VPN onto the internal network
+    - text: A site-to-site VPN between the contractor's office and the data center
+    - text: A ZTNA broker that connects the verified contractor to that one application only
+      correct: true
+    - text: Per-session checks with MFA, plus browser-only access with downloads blocked because the device is unmanaged
+      correct: true
+    - text: Adding the contractor's home IP address to the server subnet's firewall allow list
+    - text: A shared service account so the contractor needs no personal identity
+  explanation: |
+    **ZTNA** grants access to a single application rather than a network, and **per-session
+    decisions with MFA** can impose limits suited to an unmanaged device, such as no downloads.
+    Both VPN options route the contractor's device onto internal networks, far beyond least
+    privilege. An IP allow list trusts network location and opens a whole subnet. A shared
+    account destroys accountability and authentication.
+
+- key: sec-advanced-13
+  type: single
+  category: security-architecture
+  tags: [obj-3.2, out-of-band-management]
+  prompt: |
+    During a denial-of-service attack that saturated the data center's internet link and core
+    switches, engineers could still reach the firewalls' consoles through a console server
+    connected to a cellular modem. Which concept does this design demonstrate?
+  options:
+    - text: Out-of-band management
+      correct: true
+    - text: Split tunneling
+    - text: A screened subnet
+    - text: Load balancing
+  explanation: |
+    **Out-of-band management** reaches devices through a path separate from production traffic
+    (a management network, console servers, cellular links), so administration works when the
+    production network is down or under attack. Split tunneling is a VPN routing choice, a
+    screened subnet hosts internet-facing services, and load balancing spreads requests across
+    servers.
+
+- key: sec-advanced-14
+  type: single
+  category: security-architecture
+  tags: [obj-3.2, sse]
+  prompt: |
+    A company has no data center left and staff work from everywhere. It wants cloud-delivered web
+    filtering, visibility and control of SaaS use, and per-application access to its few private
+    applications. It does not want to replace its branch networking with SD-WAN. Which solution
+    fits BEST?
+  options:
+    - text: Secure Access Service Edge (SASE)
+    - text: A unified threat management (UTM) appliance at headquarters
+    - text: A network IDS at the internet edge
+    - text: Security Service Edge (SSE)
+      correct: true
+  explanation: |
+    **SSE** delivers the security functions from the cloud: a secure web gateway (web filtering),
+    a CASB (SaaS visibility and control) and ZTNA (per-application access). **SASE** is SSE plus
+    SD-WAN, which the company explicitly does not want. A UTM at headquarters protects only
+    traffic that passes headquarters, and an IDS detects without providing access or filtering.
+
+- key: sec-advanced-15
+  type: single
+  category: security-operations
+  tags: [obj-4.1, firewall, rule-review]
+  prompt: |
+    A firewall policy is evaluated top down, first match wins:
+
+    ```text
+    #  Source         Destination    Service   Action  Hits (90 days)
+    1  any            10.20.0.15     tcp/443   allow   3,402,118
+    2  10.10.0.0/16   10.20.0.0/24   any       allow   210,664
+    3  10.10.5.0/24   10.20.0.30     tcp/3389  deny    0
+    4  any            any            any       deny    18,207
+    ```
+
+    Hosts in 10.10.5.0/24 can still open RDP sessions to 10.20.0.30. Why?
+  options:
+    - text: Rule 3 is shadowed by rule 2, which matches the same traffic first
+      correct: true
+    - text: The implicit deny in rule 4 is evaluated before rule 3
+    - text: Stateful inspection skips deny rules for RDP
+    - text: Rule 3 must be a layer 7 rule to match RDP
+  explanation: |
+    10.10.5.0/24 is inside 10.10.0.0/16, 10.20.0.30 is inside 10.20.0.0/24 and tcp/3389 is
+    inside "any", so **rule 2 matches every connection rule 3 could match**, first. Rule 3 is
+    shadowed, and its zero hit count is the tell. Move it above rule 2 and narrow rule 2's
+    services. The final deny is evaluated last, stateful inspection only matters for return
+    traffic of allowed connections, and a layer 4 rule matches RDP on tcp/3389 perfectly well.
+
+- key: sec-advanced-16
+  type: multiple
+  category: security-operations
+  tags: [obj-4.1, waf, rate-limiting]
+  prompt: |
+    An online shop sees two problems: credential stuffing against `/login` from thousands of IP
+    addresses, and SQL injection attempts in the search parameters. Which controls BEST address
+    these? (Choose two.)
+  options:
+    - text: A layer 4 firewall rule blocking TCP 443 from unknown addresses
+    - text: A web application firewall with a managed rule set inspecting HTTP parameters
+      correct: true
+    - text: Rate limiting on the login endpoint, combined with account-level throttling and MFA
+      correct: true
+    - text: A network IDS on a SPAN port in the screened subnet
+    - text: A wireless intrusion prevention system
+    - text: Disabling TLS so the perimeter firewall can read the requests
+  explanation: |
+    A **WAF** inspects HTTP requests and blocks injection patterns in parameters. **Rate limiting**
+    slows automated login attempts, and because the attack comes from thousands of addresses,
+    per-account throttling and MFA are needed alongside it. Blocking 443 from unknown addresses
+    would block the shop's customers. A SPAN-connected IDS can only detect. WIPS watches Wi-Fi.
+    Disabling TLS exposes every customer's data.
+
+- key: sec-advanced-17
+  type: single
+  category: security-operations
+  tags: [obj-4.1, ids, ips, suricata]
+  prompt: |
+    A Suricata sensor is connected to a switch mirror (SPAN) port and loads this rule:
+
+    ```text
+    drop tcp $EXTERNAL_NET any -> $HOME_NET 3389 (msg:"LOCAL Inbound RDP"; flow:to_server; flags:S; sid:1000004; rev:1;)
+    ```
+
+    Inbound RDP connection attempts still reach the server. What is the MOST likely reason?
+  options:
+    - text: Local rules must use signature IDs above 2000000
+    - text: The rule needs the `<>` direction operator to match inbound traffic
+    - text: The sensor only receives copies of the traffic, so it can alert but cannot drop
+      correct: true
+    - text: "`$EXTERNAL_NET` includes the home network by default"
+  explanation: |
+    A sensor on a SPAN port is a **passive IDS**: it sees copies, not the live packets, so a
+    `drop` rule can only generate an alert. Blocking requires Suricata running **inline** as an
+    IPS. Local rules conventionally use signature IDs from 1000000, the `->` operator correctly
+    matches inbound traffic to port 3389, and `$EXTERNAL_NET` is normally defined as everything
+    outside `$HOME_NET`.
+
+- key: sec-advanced-18
+  type: single
+  category: security-operations
+  tags: [obj-4.1, selinux]
+  prompt: |
+    After a web site was copied from an administrator's home directory to `/srv/site`, the web
+    server returns 403 errors although the file permissions allow reading. The audit log shows:
+
+    ```text
+    type=AVC msg=audit(1791625221.512:412): avc:  denied  { read } for  pid=2841 comm="httpd" name="index.html" dev="dm-0" ino=1311 scontext=system_u:system_r:httpd_t:s0 tcontext=unconfined_u:object_r:user_home_t:s0 tclass=file permissive=0
+    ```
+
+    What is the BEST fix?
+  options:
+    - text: Run `setenforce 0` so SELinux stops blocking the web server
+    - text: Add a file-context rule for `/srv/site` with type `httpd_sys_content_t` using `semanage fcontext`, then run `restorecon -R -v /srv/site`
+      correct: true
+    - text: Run `chmod -R 777 /srv/site`
+    - text: Add the web server's user to the root group
+  explanation: |
+    The denial shows the `httpd_t` process blocked from a file labeled `user_home_t`: the files
+    kept their home-directory **label**. Record the right label with `semanage fcontext` and apply
+    it with `restorecon`. Permissive mode turns off protection for the whole system, `chmod 777`
+    does not change the SELinux label (and makes the files writable by everyone), and group
+    membership is discretionary access control, which SELinux's mandatory policy overrides.
+
+- key: sec-advanced-19
+  type: multiple
+  category: security-operations
+  tags: [obj-4.1, hardening, containers]
+  prompt: |
+    A review finds this service in a Docker Compose file on a server with a public IP address:
+
+    ```yaml
+    services:
+      db:
+        image: postgres:17
+        privileged: true
+        ports: ["5432:5432"]
+    ```
+
+    Which changes MOST reduce the risk? (Choose two.)
+  options:
+    - text: Remove `privileged` so the container no longer has nearly all of the host's powers
+      correct: true
+    - text: Publish the port only on loopback (`127.0.0.1:5432:5432`) or not at all, using an internal network
+      correct: true
+    - text: "Add `restart: always`"
+    - text: "Set `pids_limit: -1`"
+    - text: Change the image tag to `postgres:latest`
+    - text: Mount `/var/run/docker.sock` so the container can report its own health
+  explanation: |
+    `privileged: true` gives the container nearly all of the host's capabilities, so remove it.
+    A port published without a host IP binds to **all interfaces**, which the Compose
+    documentation notes bypasses host firewall rules, putting the database on the internet;
+    bind to `127.0.0.1` or keep it on an internal network. A restart policy and an unlimited
+    process count do nothing for security, `latest` makes builds unpredictable, and mounting the
+    Docker socket hands the container control of the Docker daemon.
+
+- key: sec-advanced-20
+  type: single
+  category: security-operations
+  tags: [obj-4.1, nac, 802.1x, posture]
+  prompt: |
+    A hospital wants only managed devices with current antivirus and patches to join its wired
+    clinical network. Other devices must be placed in a remediation network until they comply.
+    Which solution meets this requirement?
+  options:
+    - text: A captive portal on every switch port
+    - text: Mobile device management with remote wipe
+    - text: An application allow list on the clinical workstations
+    - text: Network access control using 802.1X authentication with posture assessment
+      correct: true
+  explanation: |
+    **NAC** authenticates the device at the switch port with **802.1X** (supplicant, authenticator,
+    RADIUS authentication server) and then checks its **posture** (antivirus, patches), placing
+    non-compliant devices in a quarantine or remediation VLAN. A captive portal collects a guest
+    login or acceptance of terms, not device compliance. MDM manages enrolled devices but does
+    not gate a switch port, and an allow list controls which programs run, not who joins the
+    network.
+
+- key: sec-advanced-21
+  type: single
+  category: security-operations
+  tags: [obj-4.1, secure-cookies]
+  prompt: |
+    A web application sets its session cookie with `Set-Cookie: sid=9Qv3tq0LJm2x8Kc1; Path=/`.
+    A penetration test reports that a cross-site scripting flaw lets page JavaScript read the
+    cookie and that the cookie is also sent over plain HTTP. Which attributes fix both findings?
+  options:
+    - text: "`SameSite=None` and `Domain=example.com`"
+    - text: "`Max-Age=0` and `Path=/admin`"
+    - text: "`Secure` and `HttpOnly`"
+      correct: true
+    - text: The `__Secure-` prefix on its own
+  explanation: |
+    **`HttpOnly`** stops JavaScript from reading the cookie and **`Secure`** sends it only over
+    HTTPS. `SameSite=None` loosens cross-site sending, and `Domain` widens where it is sent.
+    `Max-Age=0` deletes the cookie and `Path` does not affect script access. The `__Secure-`
+    prefix requires the `Secure` attribute but does nothing about JavaScript access. (The XSS
+    flaw itself still needs fixing with output encoding.)
+
+- key: sec-advanced-22
+  type: single
+  category: security-operations
+  tags: [obj-4.1, dmarc, spf, email-security]
+  prompt: |
+    A phishing message shows `From: ceo@kestrel-freight.example`. Its SMTP envelope sender is
+    `bounce@bulk-mailer.example`, SPF passes for `bulk-mailer.example`, and the message has no
+    DKIM signature. `kestrel-freight.example` publishes `v=DMARC1; p=reject`. What is the DMARC
+    result and the expected handling?
+  options:
+    - text: DMARC fails, because the domain that passed SPF does not align with the From domain, so the receiver should reject it
+      correct: true
+    - text: DMARC passes, because SPF passed
+    - text: DMARC passes, because relaxed alignment accepts any domain that passes SPF
+    - text: DMARC cannot be evaluated without a DKIM signature, so the message is delivered
+  explanation: |
+    DMARC passes only if SPF or DKIM passes **for a domain that aligns with the From domain**.
+    SPF passed for `bulk-mailer.example`, which is unrelated to `kestrel-freight.example`, and
+    there is no DKIM signature, so DMARC fails and `p=reject` asks receivers to reject.
+    Relaxed alignment accepts only the same organizational domain, not any domain, and DMARC is
+    evaluated with SPF alone when there is no DKIM signature.
+
+- key: sec-advanced-23
+  type: multiple
+  category: security-operations
+  tags: [obj-4.1, dmarc, bimi, spf]
+  prompt: |
+    Marketing wants the company logo shown next to its email in recipients' inboxes, and security
+    wants to stop attackers spoofing the domain. The domain currently publishes
+    `v=DMARC1; p=none; rua=mailto:dmarc@corp.example`. Which steps achieve both goals?
+    (Choose two.)
+  options:
+    - text: Change the SPF record to end in `+all` so every marketing platform passes
+    - text: Use the aggregate reports to fix every legitimate sender, then move the DMARC policy to quarantine and then reject
+      correct: true
+    - text: Add `pct=50` to the DMARC record so half the failures are rejected
+    - text: Publish a BIMI record at `default._bimi` pointing to an SVG Tiny PS logo and a mark certificate
+      correct: true
+    - text: Publish a second SPF record listing the marketing platform's servers
+  explanation: |
+    Spoofing stops only when DMARC is at **enforcement** (`quarantine` or `reject`), reached safely
+    by fixing the legitimate senders that the `rua` reports reveal. **BIMI** then shows the logo,
+    and mailbox providers require that enforcement first. `+all` lets the whole internet pass
+    SPF. `pct` was removed by RFC 9989, and partial enforcement does not qualify for BIMI. A
+    second SPF record causes a `permerror`; add an `include` to the one record instead.
+
+- key: sec-advanced-24
+  type: multiple
+  category: security-operations
+  tags: [obj-4.1, secrets-scanning]
+  prompt: |
+    Secrets scanning reports that a cloud access key was committed to a public GitHub repository
+    three days ago. What should the team do FIRST? (Choose two.)
+  options:
+    - text: Revoke the key and issue a new one through the secrets manager
+      correct: true
+    - text: Search the cloud provider's logs for any use of the key since it was committed
+      correct: true
+    - text: Delete the commit and force-push, which removes the exposure
+    - text: Make the repository private
+    - text: Add the file to `.gitignore` so it is not committed again
+    - text: Run static code analysis on the repository
+  explanation: |
+    Once a secret has been public, assume it is compromised: **revoke and rotate** it, and
+    **investigate its use** in the provider's logs. Rewriting history or making the repository
+    private does not recall copies that clones, forks and scanners already took. `.gitignore`
+    and static analysis help prevent the next leak but do nothing about this one.
+
+- key: sec-advanced-25
+  type: single
+  category: security-operations
+  tags: [obj-4.5, deprovisioning]
+  prompt: |
+    An employee was dismissed at 09:00 and their account was disabled at 09:30. At 11:00, logs
+    show their mailbox still synchronizing to a personal phone through an app that uses OAuth
+    refresh tokens. Which deprovisioning step was missed?
+  options:
+    - text: Resetting the account's password
+    - text: Revoking the user's active sessions and refresh tokens
+      correct: true
+    - text: Scheduling the account for the next quarterly access review
+    - text: Removing the user's software license
+  explanation: |
+    Disabling an account stops new sign-ins, but **issued tokens and sessions can stay valid**
+    until they expire. A complete leaver process revokes sessions and refresh tokens at once. A
+    password reset has the same gap, an access review months later is far too late, and removing
+    a license does not invalidate tokens.
+
+- key: sec-advanced-26
+  type: single
+  category: security-operations
+  tags: [obj-4.5, oauth, oidc, sso]
+  prompt: |
+    A developer signs users in to a web application by accepting any valid OAuth 2.0 access
+    token issued by the company's identity provider, reasoning that "OAuth tells us who the user
+    is". What should the application do instead?
+  options:
+    - text: Use OpenID Connect and validate the ID token's signature, issuer, audience, expiry and nonce
+      correct: true
+    - text: Authenticate users with an LDAP simple bind on port 389
+    - text: Switch to the OAuth implicit grant
+    - text: Accept SAML assertions without checking the audience
+  explanation: |
+    OAuth is about **authorization**: an access token grants access to an API and does not, by
+    itself, authenticate a user to the application holding it (it may have been issued to a
+    different client). **OpenID Connect** adds the ID token, whose `aud` must name this client and
+    whose `iss`, `exp` and `nonce` must check out. LDAP simple bind on 389 sends passwords in
+    clear text, RFC 9700 says not to use the implicit grant, and skipping audience checks is a
+    classic SAML vulnerability.
+
+- key: sec-advanced-27
+  type: multiple
+  category: security-operations
+  tags: [obj-4.5, account-types, emergency-access]
+  prompt: |
+    A company is designing emergency access (break-glass) accounts for its cloud identity
+    provider, for use if SSO or MFA fails. Which practices should it follow? (Choose two.)
+  options:
+    - text: Use the emergency accounts for daily administration so they stay active
+    - text: Alert the security team on every sign-in to an emergency account
+      correct: true
+    - text: Apply the same conditional access policies that depend on the normal MFA service
+    - text: Store long random credentials securely and test the accounts on a schedule
+      correct: true
+    - text: Share one emergency password with the whole help desk
+    - text: Exclude the accounts from sign-in logging to reduce noise
+  explanation: |
+    Break-glass accounts must work when everything else fails and be watched closely: **alert on
+    every use**, keep **long random credentials** in a safe, and **test** them so they work when
+    needed. Daily use makes them ordinary admin accounts. Depending on the failed MFA service
+    defeats their purpose. Sharing the password removes accountability, and unlogged accounts
+    are a gift to attackers.
+
+- key: sec-advanced-28
+  type: single
+  category: security-architecture
+  tags: [obj-3.2, gmsa, identity-management]
+  prompt: |
+    Four Windows servers behind a load balancer run an IIS application pool under a domain user
+    account. Its password has not been changed in six years, because it is typed into each server
+    by hand. Which solution BEST removes this weakness?
+  options:
+    - text: A group Managed Service Account (gMSA) that the four servers are allowed to retrieve
+      correct: true
+    - text: The local Administrator account on each server
+    - text: A shared emergency access account
+    - text: A script that stores the password and changes it once a year
+  explanation: |
+    With a **gMSA**, domain controllers generate and rotate the password automatically (every 30
+    days by default) and only the named servers may retrieve it, so no person knows it and it is
+    never typed or stored in scripts. Local administrator accounts are over-privileged and not
+    shared across servers, an emergency account must never run a service, and a stored password
+    in a script is another secret to leak.
+
+- key: sec-advanced-29
+  type: single
+  category: security-operations
+  tags: [obj-4.5, access-control-models, mac]
+  prompt: |
+    In a records system, every document carries a label such as Confidential or Secret, and every
+    user has a clearance. Even the author of a Secret document cannot give it to a colleague
+    cleared only to Confidential. Which access control model is in use?
+  options:
+    - text: Discretionary access control
+    - text: Role-based access control
+    - text: Mandatory access control
+      correct: true
+    - text: Rule-based access control
+  explanation: |
+    In **mandatory access control**, the system compares object labels with subject clearances
+    under a central policy, and owners cannot override it. In discretionary access control the
+    owner decides, which is exactly what is prevented here. RBAC grants permissions through job
+    roles, and rule-based control applies conditions to every subject regardless of identity.
+
+- key: sec-advanced-30
+  type: single
+  category: security-operations
+  tags: [obj-4.5, just-in-time, privileged-access]
+  prompt: |
+    Administrators no longer hold permanent admin rights. To patch a server, an administrator
+    requests elevation quoting a change ticket, a second person approves, and the rights are
+    removed automatically after two hours. Which access control model does this describe?
+  options:
+    - text: Time-based access control
+    - text: Just-in-time access
+      correct: true
+    - text: Role-based access control
+    - text: Discretionary access control
+  explanation: |
+    **Just-in-time** access replaces standing privilege with elevation granted on request, for a
+    reason, with approval, for a limited time, then removed. Time-based control restricts access
+    to scheduled windows (business hours, shift times) but grants it to everyone in the window
+    without a request. RBAC assigns lasting permissions through roles, and DAC lets owners grant
+    access.
+
+- key: sec-advanced-31
+  type: multiple
+  category: security-operations
+  tags: [obj-4.5, access-review, privilege-creep]
+  prompt: |
+    An analyst moved from finance to marketing a year ago and still edits finance spreadsheets.
+    Another employee left in August but still has access to the billing system. Which controls
+    would MOST effectively prevent these findings in future? (Choose two.)
+  options:
+    - text: A mover and leaver process that removes the old role's access when a role changes or someone leaves
+      correct: true
+    - text: Periodic access reviews in which managers and data owners recertify each person's access
+      correct: true
+    - text: Mandatory access control labels on the spreadsheets
+    - text: Longer minimum password length
+    - text: Geofencing sign-ins to the head office country
+  explanation: |
+    The first finding is **privilege creep** and the second a **deprovisioning failure**. A
+    role-based **mover and leaver process** removes access at the moment it stops being needed,
+    and **access reviews** catch whatever that process missed. MAC labels would not remove the
+    stale rights, and password length and geofencing do not change what a valid account may do.
+
+- key: sec-advanced-32
+  type: single
+  category: security-architecture
+  tags: [obj-3.3, tokenization]
+  prompt: |
+    A retailer wants its order database to fall out of PCI DSS scope, while staff can still look
+    up past payments and issue refunds through the payment provider. Which method should replace
+    the card numbers in the order database?
+  options:
+    - text: Masking, showing only the last four digits
+    - text: Unsalted SHA-256 hashing of each card number
+    - text: Data transposition between order records
+    - text: Tokenization, with the card numbers held in the provider's vault
+      correct: true
+  explanation: |
+    **Tokenization** replaces each card number with a random token that has no mathematical link
+    to it; only the provider's vault maps tokens back, so refunds work and the database holds
+    nothing worth stealing. Masking changes only what is displayed: the full number is still
+    stored. A hash cannot be reversed for refunds, and card numbers are few enough to brute-force
+    an unsalted hash. Transposition shuffles values for statistics and would corrupt the orders.
+
+- key: sec-advanced-33
+  type: single
+  category: security-architecture
+  tags: [obj-3.3, data-states, data-in-use]
+  prompt: |
+    A hospital runs analytics on patient records in a public cloud. Its requirement is that the
+    provider's administrators must not be able to read the records even while they are being
+    processed in memory. Which control addresses this requirement?
+  options:
+    - text: Full-disk encryption of the analytics servers
+    - text: Confidential computing, processing the data inside hardware secure enclaves
+      correct: true
+    - text: TLS 1.3 between the hospital and the cloud
+    - text: Tokenizing the nightly backups
+  explanation: |
+    Data being processed is **data in use**, the hardest state to protect. **Confidential
+    computing** keeps it encrypted in memory inside secure enclaves, out of reach of the host and
+    its administrators. Full-disk encryption protects data at rest, TLS protects data in transit,
+    and tokenized backups are also at rest; none protects memory during processing.
+
+- key: sec-advanced-34
+  type: single
+  category: security-architecture
+  tags: [obj-3.3, data-roles]
+  prompt: |
+    The finance director decides how payroll data is classified and who may access it. The IT
+    operations team configures the payroll database's encryption, backups and access groups as
+    the director instructs. Which roles do they hold?
+  options:
+    - text: The finance director is the data owner; IT operations is the data custodian
+      correct: true
+    - text: The finance director is the data custodian; IT operations is the data owner
+    - text: The finance director is the data steward; IT operations is the data operator
+    - text: The finance director is the data processor; IT operations is the data subprocessor
+  explanation: |
+    The **data owner** is the accountable business person who classifies data and approves
+    access. The **data custodian** implements those decisions technically. A steward looks after
+    data quality and proper use, and an operator handles the data day to day. Processor and
+    subprocessor are GDPR roles for organizations processing personal data on a controller's
+    behalf, not internal roles.
+
+- key: sec-advanced-35
+  type: multiple
+  category: security-architecture
+  tags: [obj-3.3, de-identification]
+  prompt: |
+    A clinic will share a data set with university researchers who need statistics on age, area
+    and diagnosis but must not be able to identify patients. Which methods reduce the
+    re-identification risk while keeping the data useful? (Choose two.)
+  options:
+    - text: Use an unsalted SHA-256 hash of each national ID number as the research ID
+    - text: Remove names and replace patient IDs with keyed-hash (HMAC) pseudonyms whose key stays with the clinic
+      correct: true
+    - text: Encrypt the whole data set and give the researchers the key
+    - text: Mask the diagnosis column
+    - text: Generalize quasi-identifiers, such as ages into ten-year bands and postcodes into areas
+      correct: true
+    - text: Keep full dates of birth for accuracy
+  explanation: |
+    **De-identification** removes direct identifiers and generalizes **quasi-identifiers** that could
+    be combined to single someone out; **keyed-hash pseudonyms** keep records linkable without
+    letting outsiders recompute them. An unsalted hash of a national ID can be reversed by
+    hashing every possible number. Encryption with a shared key hides nothing from the
+    researchers. Masking the diagnosis removes the data they need, and full birth dates are a
+    strong quasi-identifier.
+
+- key: sec-advanced-36
+  type: single
+  category: security-architecture
+  tags: [obj-3.3, data-classification]
+  prompt: |
+    A logistics company's route-planning database would cause little harm if competitors read it,
+    but the company could not dispatch a single truck without it. Under the company's commercial
+    classification scheme, which level BEST fits this data?
+  options:
+    - text: Public
+    - text: Restricted
+    - text: Critical
+      correct: true
+    - text: Confidential
+  explanation: |
+    **Critical** marks data the organization cannot operate without; its handling stresses
+    availability and integrity (backups, tested restores, integrity checks). Public means
+    approved for anyone, and Confidential and Restricted rank the harm of disclosure, which is
+    low here. (Government levels such as Secret and Top Secret rank damage to national security.)
+
+- key: sec-advanced-37
+  type: single
+  category: security-architecture
+  tags: [obj-3.3, retention, legal-hold]
+  prompt: |
+    The retention schedule says car park CCTV footage is kept for 30 days. Footage from 40 days
+    ago shows a collision, and the company's lawyers have issued a legal hold because a claim is
+    expected. The automatic deletion job is about to run. What should happen?
+  options:
+    - text: Delete it, because the schedule says 30 days
+    - text: Preserve it, because the legal hold suspends disposal under the schedule
+      correct: true
+    - text: Blur the faces and keep it for another 30 days
+    - text: Move it to cheaper storage and delete it next month
+  explanation: |
+    A **legal hold** overrides the retention schedule for the records it covers: they must be
+    preserved until the hold is lifted, and deleting them could be spoliation of evidence.
+    Following the schedule ignores the hold, and editing the footage or setting a new deletion
+    date are not the legal team's instructions.
+
+- key: sec-advanced-38
+  type: single
+  category: security-architecture
+  tags: [obj-3.3, obj-3.1, data-sovereignty, data-location]
+  prompt: |
+    A German health insurer plans to store claims data with a SaaS provider whose only data
+    centers are in another country. Its lawyers object that the data would then be subject to
+    that country's laws, including orders to disclose it. Which consideration are they raising?
+  options:
+    - text: Data sovereignty
+      correct: true
+    - text: Data classification
+    - text: Geofencing
+    - text: Scalability
+  explanation: |
+    **Data sovereignty** means data is subject to the laws of the country where it is stored,
+    which drives decisions about data location and placement. Classification decides the level
+    of protection, geofencing restricts actions by location of the user or device, and
+    scalability is about growth, not jurisdiction.
+
+- key: sec-advanced-39
+  type: multiple
+  category: security-architecture
+  tags: [obj-3.3, regulated-data, coppa, pci-dss]
+  prompt: |
+    A US online learning service for children aged 8 to 12 collects each child's name and email
+    address and takes card payments from parents, storing the card numbers. Which laws or
+    standards apply? (Choose two.)
+  options:
+    - text: The Health Insurance Portability and Accountability Act (HIPAA)
+    - text: The Children's Online Privacy Protection Act (COPPA)
+      correct: true
+    - text: The Payment Card Industry Data Security Standard (PCI DSS)
+      correct: true
+    - text: The Sarbanes-Oxley Act (SOX)
+    - text: The Federal Information Security Modernization Act (FISMA)
+  explanation: |
+    **COPPA** applies to online services directed to children under 13 and requires verifiable
+    parental consent. Storing card numbers brings the service under **PCI DSS**. HIPAA covers
+    protected health information held by health care entities, SOX the financial reporting of
+    public companies, and FISMA US federal information systems.
+
+- key: sec-advanced-40
+  type: single
+  category: security-architecture
+  tags: [obj-3.3, labeling]
+  prompt: |
+    A company wants documents classified Confidential to stay encrypted and blocked from external
+    sharing even after they are downloaded, renamed or attached to an email. Which approach meets
+    this requirement?
+  options:
+    - text: A "CONFIDENTIAL" watermark in the document footer
+    - text: Keeping the documents in a folder with a restricted access control list
+    - text: Full-disk encryption on the file servers
+    - text: Sensitivity labels stored in the document's metadata that apply encryption and drive DLP rules
+      correct: true
+  explanation: |
+    A **label stored as metadata** travels with the file, so encryption and DLP rules follow it
+    wherever it is copied. A watermark is **marking**: it informs people but enforces nothing.
+    Folder permissions and disk encryption protect the copy in that location only, and are lost
+    as soon as the file is downloaded or attached.
+
+- key: sec-advanced-41
+  type: single
+  category: security-architecture
+  tags: [obj-3.4, mtbf, mttr, availability]
+  prompt: |
+    A storage controller has a mean time between failures (MTBF) of 1,000 hours and a mean time to
+    repair (MTTR) of 10 hours. What is its expected availability?
+  options:
+    - text: About 90.9%
+    - text: About 99.0%
+      correct: true
+    - text: About 99.9%
+    - text: About 99.99%
+  explanation: |
+    Availability = MTBF / (MTBF + MTTR) = 1000 / 1010 = 0.990, about **99.0%**, or roughly 87 hours
+    of downtime a year. 90.9% would be 100 / 110, confusing the hours. Higher figures need a
+    shorter repair time or redundancy: two such controllers, either able to carry the load, would
+    reach about 99.99%.
+
+- key: sec-advanced-42
+  type: single
+  category: security-architecture
+  tags: [obj-3.4, rpo, rto]
+  prompt: |
+    An order database is backed up every night at 01:00 and nothing else is copied. The business
+    states that losing more than one hour of orders is unacceptable. The database fails at 17:30.
+    Which statement is correct?
+  options:
+    - text: The recovery time objective is not met, because the restore will take longer than one hour
+    - text: The recovery point objective is not met, because up to 16.5 hours of orders are lost
+      correct: true
+    - text: The mean time between failures is too low
+    - text: The maximum tolerable downtime has been exceeded
+  explanation: |
+    One hour of acceptable data loss is a **recovery point objective**. The newest copy is from
+    01:00, so failing at 17:30 loses 16.5 hours of orders. Meeting it needs replication or log
+    shipping at least hourly. The scenario says nothing about restore duration (RTO), failure
+    frequency (MTBF) or tolerable outage length (MTD).
+
+- key: sec-advanced-43
+  type: single
+  category: security-architecture
+  tags: [obj-3.4, alternate-sites]
+  prompt: |
+    The recovery time objective for an online ordering system is two hours, and leadership has
+    approved the cost needed to meet it. The primary data center could be lost entirely. Which
+    alternate site type should be used?
+  options:
+    - text: A cold site
+    - text: A warm site
+    - text: A hot site
+      correct: true
+    - text: A mobile site delivered within 24 hours
+  explanation: |
+    A **hot site** is fully equipped, staffed and holds current data, so service can move in
+    minutes to hours. A warm site needs data restored and configuration finished (hours to days),
+    a cold site needs equipment bought and installed (days to weeks), and a mobile site arriving
+    in 24 hours already misses a two-hour RTO.
+
+- key: sec-advanced-44
+  type: multiple
+  category: security-architecture
+  tags: [obj-3.4, backups, immutability, ransomware]
+  prompt: |
+    Attackers who had stolen a domain administrator account encrypted both file servers and then
+    the backup share, which was on the same domain. Which changes would MOST improve the
+    company's ability to recover from the next attack? (Choose two.)
+  options:
+    - text: RAID 10 on the file servers
+    - text: Immutable backups, such as object storage with compliance-mode retention locks
+      correct: true
+    - text: Synchronous replication of the file servers to a second site
+    - text: An offline or separately administered backup copy that domain credentials cannot reach
+      correct: true
+    - text: More frequent snapshots stored on the same file share
+    - text: A larger uninterruptible power supply
+  explanation: |
+    Ransomware operators delete or encrypt every backup they can reach. **Immutable** copies
+    cannot be changed or deleted before their retention ends, even by administrators, and an
+    **offline or separately administered** copy is out of reach of the stolen domain credentials;
+    CISA recommends offline, encrypted backups. RAID and replication copy the encryption
+    instantly, snapshots on the same share fall with it, and a UPS addresses power, not
+    ransomware.

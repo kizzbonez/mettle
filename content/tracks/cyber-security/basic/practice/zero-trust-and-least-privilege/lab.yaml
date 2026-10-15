@@ -1,0 +1,19 @@
+title: Zero Trust Access Gate
+summary: Decide each access request to a freight company's systems on verified identity, device health and least-privilege entitlements, never on the network it came from.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Decides the freight company's sample requests
+    file: 01-sample-requests.py
+    hidden: false
+  - name: Checks identity, then device, then entitlement
+    file: 02-rule-order.py
+    hidden: true
+  - name: Applies every device health rule at its boundary
+    file: 03-device-health.py
+    hidden: true
+  - name: Grants only the access entitled and ignores the network
+    file: 04-least-privilege.py
+    hidden: true

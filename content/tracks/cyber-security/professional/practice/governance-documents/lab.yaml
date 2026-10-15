@@ -1,0 +1,19 @@
+title: Governance Document Register Check
+summary: Check a housing association's register of policies, standards, procedures, guidelines and plans for missing owners and approvals, policies approved below senior management, slack review cycles and overdue reviews.
+language: bash
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Checks the sample register from the instructions
+    file: 01-example.sh
+    hidden: false
+  - name: Checks owners and who approved each type of document
+    file: 02-owners-and-approvers.sh
+    hidden: true
+  - name: Checks review cycles and due dates around AS_OF
+    file: 03-cycles-and-dates.sh
+    hidden: true
+  - name: Passes a register in order and an empty one
+    file: 04-in-order.sh
+    hidden: true

@@ -1,0 +1,5 @@
+# Canary accounts: nobody uses them, so any logon attempt is an alert.
+# Reviewed by the SOC lead on 2026-09-01.
+
+svc-backup-old
+admin-legacy

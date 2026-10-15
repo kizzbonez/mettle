@@ -1,0 +1,3 @@
+# switched off after the vendor's debugging session
+kernel.dmesg_restrict = 0
+kernel.yama.ptrace_scope = 0

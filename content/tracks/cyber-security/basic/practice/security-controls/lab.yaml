@@ -1,0 +1,19 @@
+title: Control Coverage Check
+summary: Read an accounting firm's control register and report, for each asset, which of the preventive, detective and corrective control types it is missing.
+language: python
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Finds the gaps in the firm's register
+    file: 01-sample-register.py
+    hidden: false
+  - name: Counts every type a cell names
+    file: 02-several-types.py
+    hidden: true
+  - name: Uses the required list it is given, in its order
+    file: 03-other-required-types.py
+    hidden: true
+  - name: Handles spaced names, repeated rows and an empty register
+    file: 04-names-and-empty.py
+    hidden: true

@@ -1,0 +1,10 @@
+[
+  {"user": "mira", "device": "LT-2207", "app": "drawings-vault", "mfa": "passkey", "country": "IE"},
+  {"user": "mira", "device": "LT-2207", "app": "drawings-vault", "mfa": "push", "country": "IE"},
+  {"user": "tomas", "device": "LT-2215", "app": "drawings-vault", "mfa": "passkey", "country": "GB"},
+  {"user": "ines", "device": "LT-2231", "app": "timesheets", "mfa": "otp", "country": "IE"},
+  {"user": "ola.contractor", "device": "HOME-PC", "app": "timesheets", "mfa": "otp", "country": "PT"},
+  {"user": "devon", "device": "LT-2207", "app": "finance", "mfa": "passkey", "country": "ES"},
+  {"user": "devon", "device": "MB-0904", "app": "drawings-vault", "mfa": "passkey", "country": "IE"},
+  {"user": "mira", "device": "LT-2207", "app": "payroll-v1", "mfa": "passkey", "country": "IE"}
+]

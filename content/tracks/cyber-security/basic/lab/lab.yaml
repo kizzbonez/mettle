@@ -1,0 +1,23 @@
+slug: crypto-health-check
+title: Crypto Health Check
+summary: Audit a mountain rescue team's systems before an inspection by verifying release files against a checksum manifest, inspecting certificates for expiry, host name, key size, signature algorithm and self-signing, and flagging password records stored with fast or under-strength hashing.
+language: python
+minutes: 60
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the audit report for the shipped release, certificates and accounts
+    file: 01-sample-audit.py
+    hidden: false
+  - name: Verifies a manifest with comments, binary markers, spaces in names and weak digests
+    file: 02-manifest-rules.py
+    hidden: true
+  - name: Matches wildcards and applies every certificate rule at its boundaries
+    file: 03-certificate-rules.py
+    hidden: true
+  - name: Classifies each password hashing scheme at its exact cost floor
+    file: 04-hash-rules.py
+    hidden: true
+  - name: Builds the report on any date and exits 0 when everything is healthy
+    file: 05-audit-report.py
+    hidden: true

@@ -1,0 +1,19 @@
+title: Evidence Integrity and Chain of Custody
+summary: Verify evidence images against the SHA-256 hashes taken at acquisition and check a chain-of-custody record for out-of-order entries, unrecorded handovers and broken seals.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Checks the example evidence and records from the instructions
+    file: 01-example.sh
+    hidden: false
+  - name: Verifies hashes with spaces in names, comments and a missing file
+    file: 02-integrity.sh
+    hidden: true
+  - name: Follows each item's holder and time through mixed custody rows
+    file: 03-custody.sh
+    hidden: true
+  - name: Passes intact evidence and empty records
+    file: 04-intact.sh
+    hidden: true

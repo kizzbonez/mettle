@@ -1,0 +1,19 @@
+title: Threats, Vulnerabilities and Attacks
+summary: >-
+  Know the attacker and the ways in, aligned with SY0-801 domain 2. Learn threat intelligence,
+  threat actors and their motives, CVE and CVSS, the threat vectors from email to the supply
+  chain, the vulnerabilities and attack surfaces they exploit, and the indicators that malware,
+  network, application, credential and social engineering attacks leave behind, including the
+  new risks that come with AI.
+outcomes:
+  - Describe threat actors, their motivations and the intelligence sources that track them
+  - Score and prioritize vulnerabilities with CVE and CVSS
+  - Identify threat vectors and attack surfaces, from messages and media to cloud storage and suppliers
+  - Recognize malware, network, application, credential and social engineering attacks from their indicators
+  - Explain the threats and vulnerabilities that come with AI and large language models
+exam:
+  title: Threats, Vulnerabilities and Attacks Mock Exam
+  description: Twenty multiple-choice questions drawn from the level's bank, in the style of the Security+ exam.
+  timeLimitMinutes: 20
+  passPercent: 80
+  questionCount: 20

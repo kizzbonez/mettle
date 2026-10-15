@@ -1,0 +1,19 @@
+title: Bastion Spraying and Canary Rule
+summary: Write a SIEM-style correlation rule over RFC 5424 syslog, alerting when one source fails on a threshold of different accounts within a time window and whenever a canary account is touched.
+language: bash
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Alerts on the sample log from the instructions
+    file: 01-example.sh
+    hidden: false
+  - name: Counts different accounts within the window, once per source
+    file: 02-window.sh
+    hidden: true
+  - name: Filters by app and facility and catches every canary event
+    file: 03-filters-and-canaries.sh
+    hidden: true
+  - name: Prints no alerts for a quiet log and an empty one
+    file: 04-no-alerts.sh
+    hidden: true

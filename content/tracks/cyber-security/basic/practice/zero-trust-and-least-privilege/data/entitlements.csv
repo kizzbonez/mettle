@@ -1,0 +1,7 @@
+user,resource,access
+ana,shipments,write
+ana,customs-docs,read
+ravi,shipments,read
+ravi,fleet-tracking,read
+dmitri,payroll,write
+dmitri,shipments,read

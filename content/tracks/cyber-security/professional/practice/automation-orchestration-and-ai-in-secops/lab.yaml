@@ -1,0 +1,19 @@
+title: AI Agent Guardrail
+summary: Put a guardrail between an AI triage agent and its tools, denying disallowed tools, oversized queries and protected hosts, holding unapproved high-impact actions, and enforcing an hourly rate limit.
+language: python
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reviews the sample actions from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Applies the tool, row, protected host and approval rules in order
+    file: 02-rules.py
+    hidden: true
+  - name: Enforces the hourly rate limit at its boundary
+    file: 03-rate-limit.py
+    hidden: true
+  - name: Counts only allowed actions and handles blank lines and an empty file
+    file: 04-review.py
+    hidden: true

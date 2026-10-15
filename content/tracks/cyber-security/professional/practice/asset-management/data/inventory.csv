@@ -1,0 +1,10 @@
+asset_tag,hostname,mac,media,status
+HCL-0101,pc-central-01,3c:52:82:4a:10:01,flash,in-service
+HCL-0102,pc-central-02,3c:52:82:4a:10:02,flash,in-service
+HCL-0140,kiosk-north-01,b8:27:eb:11:22:33,flash,in-service
+HCL-0155,prn-central-01,00:1b:63:84:45:e6,magnetic,in-service
+HCL-0161,srv-ils-01,52:54:00:6b:2a:11,magnetic,in-service
+HCL-0120,pc-east-03,3c:52:82:4a:20:03,flash,in-repair
+HCL-0077,lt-staff-077,3c:52:82:19:aa:02,flash,disposed
+HCL-0078,lt-staff-078,3c:52:82:19:aa:03,flash,disposed
+HCL-0081,nas-old-01,00:11:32:7c:05:9e,magnetic,disposed

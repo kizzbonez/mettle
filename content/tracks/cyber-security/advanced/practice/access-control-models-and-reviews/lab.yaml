@@ -1,0 +1,19 @@
+title: Role, Shift and JIT Access
+summary: Decide pharmacy access by role within each role's shift hours (including windows past midnight), account expiry and ticketed just-in-time grants, then run an access review for expired accounts, separation-of-duties conflicts and invalid grants.
+language: python
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Decides and reviews the sample policy from the instructions
+    file: 01-example.py
+    hidden: false
+  - name: Applies roles in order and hour windows at their boundaries
+    file: 02-roles-and-hours.py
+    hidden: true
+  - name: Applies just-in-time grants and account expiry
+    file: 03-jit-and-expiry.py
+    hidden: true
+  - name: Reports expired accounts, conflicts and invalid grants
+    file: 04-review.py
+    hidden: true

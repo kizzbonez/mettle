@@ -1,0 +1,14 @@
+user,department,opened,clicked,submitted,reported,minutes_to_report
+a.reid,Estimating,yes,no,no,yes,6
+b.ozturk,Estimating,yes,yes,no,yes,14
+c.dubois,Estimating,no,no,no,no,
+d.kim,Finance,yes,yes,yes,no,
+e.santos,Finance,yes,yes,no,yes,22
+f.walsh,Finance,yes,no,no,yes,9
+g.ivanova,Finance,yes,yes,yes,no,
+h.mbeki,Site Operations,no,no,no,no,
+i.larsen,Site Operations,yes,yes,no,no,
+j.costa,Site Operations,yes,no,no,yes,31
+k.nowak,Office,yes,no,no,yes,3
+l.haddad,Office,yes,yes,no,yes,5
+m.ortiz,Office,Yes,No,No,YES,4

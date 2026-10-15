@@ -1,0 +1,13 @@
+Oct 16 09:58:02 mon01 arpwatch: new station 10.40.0.23 a4:83:e7:2:1d:9 eth0
+Oct 16 10:01:15 mon01 systemd[1]: Started arpwatch.service - Ethernet/FDDI station monitor daemon.
+Oct 16 10:02:41 mon01 arpwatch: changed ethernet address 10.40.0.1 0:c:29:5e:a1:7 (0:50:56:9a:10:1) eth0
+Oct 16 10:02:44 mon01 arpwatch: flip flop 10.40.0.1 0:50:56:9a:10:1 (0:c:29:5e:a1:7) eth0
+Oct 16 10:03:10 sw-floor2 1452: Oct 16 10:03:10: %DHCP_SNOOPING-5-DHCP_SNOOPING_UNTRUSTED_PORT: DHCP_SNOOPING drop message on untrusted port, message type: DHCPOFFER, MAC sa: 000c.295e.a107
+Oct 16 10:04:55 mon01 arpwatch: flip flop 10.40.0.1 0:c:29:5e:a1:7 (0:50:56:9a:10:1) eth0
+Oct 16 10:06:12 mon01 arpwatch: changed ethernet address 10.40.2.31 f8:75:a4:1:c3:9e (f8:75:a4:1:c3:9d) eth0
+Oct 16 10:07:00 sw-floor2 1453: Oct 16 10:07:00: %DHCP_SNOOPING-5-DHCP_SNOOPING_UNTRUSTED_PORT: DHCP_SNOOPING drop message on untrusted port, message type: DHCPACK, MAC sa: 000c.295e.a107
+Oct 16 10:07:30 sw-floor3 2210: Oct 16 10:07:30: %DHCP_SNOOPING-5-DHCP_SNOOPING_UNTRUSTED_PORT: DHCP_SNOOPING drop message on untrusted port, message type: DHCPOFFER, MAC sa: 3c52.821a.2b3c
+Oct 16 10:08:01 sw-floor2 1454: Oct 16 10:08:01: %DHCP_SNOOPING-4-DHCP_SNOOPING_ERRDISABLE_WARNING: DHCP Snooping received 30 DHCP packets on interface GigabitEthernet1/0/14
+Oct 16 10:09:15 sw-floor2 1455: Oct 16 10:09:15: %DHCP_SNOOPING-5-DHCP_SNOOPING_UNTRUSTED_PORT: DHCP_SNOOPING drop message on untrusted port, message type: DHCPOFFER, MAC sa: 000c.295e.a107
+Oct 16 10:10:02 mon01 arpwatch: new activity 10.40.3.8 b8:27:eb:44:a:1 eth0
+Oct 16 10:11:40 sw-floor3 2211: Oct 16 10:11:40: %DHCP_SNOOPING-5-DHCP_SNOOPING_MATCH_MAC_FAIL: DHCP_SNOOPING drop message because the chaddr doesn't match source mac, message type: DHCPDISCOVER, chaddr: 0000.5e00.5301, MAC sa: 3c52.821a.0001

@@ -1,0 +1,15 @@
+incident_id,date,risk_id,description,loss_usd
+INC-2020-014,2020-11-03,R05,Gate controller firmware crash; passengers boarded by hand for 6 hours,5100
+INC-2021-031,2021-10-15,R07,Wi-Fi portal login page defaced with a political message,2400
+INC-2021-033,2021-10-16,R05,Gate controllers rebooted in a loop after a power dip,6800
+INC-2022-008,2022-03-12,R05,Expired gate controller certificate blocked ticket scans,4300
+INC-2022-019,2022-07-30,R06,Roster database corrupted on a bank holiday weekend,39000
+INC-2023-004,2023-01-22,R07,Portal used to send spam through the captive page,1900
+INC-2023-027,2023-08-09,R05,Gate controller network card failure at peak sailing,8100
+INC-2024-011,2024-05-18,R03,Stolen VPN password used to log in; session cut within an hour,61000
+INC-2024-040,2024-11-02,R06,Roster application crashed after an unplanned update,22500
+INC-2024-052,2024-12-09,R99,Forklift damaged a terminal network cabinet,3700
+INC-2025-006,2025-02-14,R07,Captive portal redirected passengers to an advertising site,2600
+INC-2025-022,2025-06-30,R05,Gate controller time drift rejected valid tickets,5200
+INC-2026-017,2026-10-15,R07,Portal served a fake login page for 20 minutes,1500
+INC-2026-018,2026-10-16,R06,Roster sync failure this morning; still being assessed,0

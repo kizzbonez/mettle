@@ -1,0 +1,10 @@
+id,title,type,owner,approver,approved,review_months
+POL-001,Information Security Policy,policy,CISO,Board,2026-03-12,12
+POL-004,Acceptable Use Policy,policy,CISO,Executive Committee,2025-09-02,12
+POL-007,BYOD Policy,policy,Head of IT,CISO,2026-01-20,12
+STD-010,Encryption Standard,standard,Security Architect,CISO,2026-02-10,12
+STD-012,Password and Authentication Standard,standard,Identity Team,CISO,2023-06-01,36
+PRO-031,Tenant Data Disposal Procedure,procedure,,Head of Housing,2026-05-04,12
+GDL-002,Secure Remote Working Guideline,guideline,CISO,CISO,2025-04-15,18
+PLN-003,Disaster Recovery Plan,plan,Head of IT,,2026-02-27,12
+POL-009,Data Classification and Retention Policy,Policy,Data Protection Officer,Board,2025-10-16,12
