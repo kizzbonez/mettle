@@ -126,12 +126,12 @@ services:
     restart: 'no'
   sandbox-python:
     build: ./sandbox/python
-    image: mettle-sandbox-python:3
+    image: mettle-sandbox-python:4
     network_mode: none
     restart: 'no'
   sandbox-bash:
     build: ./sandbox/bash
-    image: mettle-sandbox-bash:1
+    image: mettle-sandbox-bash:2
     network_mode: none
     restart: 'no'
   sandbox-cpp:

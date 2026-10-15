@@ -32,8 +32,8 @@ export const config = {
   maxOutputBytes: int('RUNNER_MAX_OUTPUT_BYTES', 64 * 1024),
   images: {
     rust: process.env.SANDBOX_IMAGE_RUST ?? 'mettle-sandbox-rust:1',
-    python: process.env.SANDBOX_IMAGE_PYTHON ?? 'mettle-sandbox-python:3',
-    bash: process.env.SANDBOX_IMAGE_BASH ?? 'mettle-sandbox-bash:1',
+    python: process.env.SANDBOX_IMAGE_PYTHON ?? 'mettle-sandbox-python:4',
+    bash: process.env.SANDBOX_IMAGE_BASH ?? 'mettle-sandbox-bash:2',
     cpp: process.env.SANDBOX_IMAGE_CPP ?? 'mettle-sandbox-cpp:1',
     csharp: process.env.SANDBOX_IMAGE_CSHARP ?? 'mettle-sandbox-csharp:1',
     yaml: process.env.SANDBOX_IMAGE_YAML ?? 'mettle-sandbox-yaml:1',

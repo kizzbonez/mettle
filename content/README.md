@@ -226,8 +226,10 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   A Rust test can read what the code printed: `printed_by(|| greet("Ada"))` returns the text,
   so a lab about `println!` can check the output itself. To call a `main` in the learner's
   file, write `printed_by(solution::main)`; a bare `main` is the test program's own.
-- Python is 3.15 with NumPy 2.5, pandas 3 and pyarrow 26 (for Parquet). No other packages, no
-  network. Loading pandas takes about half a second and 110 MB, so give pandas labs
+- Bash is Bash 5.2 on Debian 12 with the GNU tools, gawk, jq, ShellCheck, the archive tools and
+  OpenSSL 3 (for certificate, hashing and encryption labs). No network, no root.
+- Python is 3.15 with NumPy 2.5, pandas 3, pyarrow 26 (for Parquet) and `cryptography` (for
+  encryption, signature and certificate labs). No other packages, no network. Loading pandas takes about half a second and 110 MB, so give pandas labs
   `memoryMb: 512` and `timeLimitMs: 10000`. Compare results with
   `check_frame(actual, expected, message, **options)` (DataFrames, Series and Indexes, with
   `pandas.testing`'s options such as `check_dtype=False` or `rtol=1e-9`) and

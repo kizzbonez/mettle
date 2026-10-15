@@ -1,8 +1,8 @@
-# Sandbox image for Python, AI and data labs: CPython 3.15 with NumPy, pandas and pyarrow
-# (for Parquet), nothing else.
+# Sandbox image for Python, AI, data and security labs: CPython 3.15 with NumPy, pandas, pyarrow
+# (for Parquet) and cryptography, nothing else.
 FROM python:3.15-slim
 
-RUN pip install --no-cache-dir --disable-pip-version-check "numpy>=2,<3" "pandas>=3,<4" "pyarrow>=26,<27" \
+RUN pip install --no-cache-dir --disable-pip-version-check "numpy>=2,<3" "pandas>=3,<4" "pyarrow>=26,<27" "cryptography>=46" \
  && useradd --uid 10001 --user-group --no-create-home --home-dir /work --shell /usr/sbin/nologin sandbox \
  && mkdir /work && chown sandbox:sandbox /work
 
