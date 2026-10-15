@@ -5,7 +5,8 @@ import { examRules, exams } from '../db/schema/assessment';
 import { courses, lessons, tracks } from '../db/schema/catalog';
 import { labs, labTestCases } from '../db/schema/labs';
 import { loadContent } from './load';
-import { upsertQuestion } from './seed-questions';
+import { retireShipped } from './retire';
+import { categoryId, upsertQuestion } from './seed-questions';
 import type { ContentCourse, ContentLab, ContentTrack } from './types';
 
 const published = 'published' as const;
@@ -62,10 +63,11 @@ interface ExamSeed {
   description: string;
   timeLimitMinutes: number;
   passPercent: number;
-  rules: { difficulty: Difficulty; count: number }[];
+  /** A rule without a difficulty or a category draws from every level or category. */
+  rules: { difficulty?: Difficulty | null; categoryId?: string | null; count: number }[];
 }
 
-/** A dynamic exam whose blueprint draws from this track's bank by difficulty. */
+/** A dynamic exam whose blueprint draws from this track's bank by difficulty and category. */
 async function upsertExam(seed: ExamSeed, tx: Tx): Promise<void> {
   const { rules, ...values } = seed;
   const row = { ...values, mode: 'dynamic' as const, status: published };
@@ -103,6 +105,18 @@ async function seedCourse(trackId: string, track: ContentTrack, course: ContentC
   }
 }
 
+/** The exams a track declares in track.yaml, each drawn by its own blueprint. */
+async function seedTrackExams(trackId: string, track: ContentTrack, tx: Tx, categories: Map<string, string>): Promise<void> {
+  for (const { rules: blueprint, ...exam } of track.exams) {
+    const rules = [];
+    for (const rule of blueprint) {
+      const category = rule.category ? await categoryId(rule.category, tx, categories) : null;
+      rules.push({ difficulty: rule.level ?? null, categoryId: category, count: rule.count });
+    }
+    await upsertExam({ trackId, courseId: null, ...exam, rules }, tx);
+  }
+}
+
 async function seedTrack(track: ContentTrack, tx: Tx, categories: Map<string, string>): Promise<void> {
   const values = { slug: track.slug, title: track.title, tagline: track.tagline, description: track.description, icon: track.icon, status: published, sortOrder: track.sortOrder };
   // `format` and `revision` describe the files, not the track: they are read by the checker and the sync.
@@ -112,7 +126,10 @@ async function seedTrack(track: ContentTrack, tx: Tx, categories: Map<string, st
     .onConflictDoUpdate({ target: tracks.slug, set: { ...values, updatedAt: new Date() } })
     .returning({ id: tracks.id });
   if (!row) throw new Error(`Could not save track ${track.slug}`);
+  // Retire first: anything the files still ship is published again as its level is seeded.
+  await retireShipped(row.id, track.retired, tx);
   for (const course of track.courses) await seedCourse(row.id, track, course, tx, categories);
+  await seedTrackExams(row.id, track, tx, categories);
 
   // With more than one level, add an assessment that samples across all of them.
   const levels = DIFFICULTIES.filter((level) => track.courses.some((c) => c.level === level && c.questions.length > 0));

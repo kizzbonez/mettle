@@ -33,7 +33,27 @@ category: rust       # default category for this track's questions
 sortOrder: 1
 format: course       # course | outline (see "Lessons")
 revision: 1          # raise it to update sites that already have the track
+exams:               # optional: track-wide exams with their own blueprint
+  - slug: certification-practice-exam
+    title: Certification Practice Exam
+    description: One sentence.
+    timeLimitMinutes: 90
+    passPercent: 80
+    rules:           # each rule draws `count` questions; `category` and `level` are optional filters
+      - category: network-security
+        count: 20
+      - level: professional
+        count: 10
+retired:             # optional: see "Revising a track that is already installed"
+  lessons: [basic/old-lesson-slug]
+  labs: [basic/old-lab-slug]
+  questions: [old-question-key]
 ```
+
+Every level's mock exam, and a short track assessment drawing three questions from each level,
+are made for you. `exams` adds more, such as a full-length practice exam drawn by a
+certification's domains: give each question the `category` of its domain, and one rule per
+domain. `content:verify` checks that the bank can fill every rule.
 
 ## course.yaml
 
@@ -110,6 +130,13 @@ lessons, questions, exams and labs are matched by slug and key, so **keep the sl
 you keep** (a lesson's slug is its file name without the number) and learners keep their
 progress. Renumbering a lesson file to move it is fine. Content a site created itself is not
 touched; edits a site made to shipped content are replaced.
+
+An update adds and replaces; it never removes on its own. When a revision drops a lesson, lab or
+question that an earlier one shipped, list it under `retired:` in `track.yaml` (lessons and labs
+as `level/slug`, a practice lab as `level/practice-<lesson-slug>`, questions by key). The update
+archives exactly those: learners no longer see them and new exam papers no longer draw them, but
+the progress, attempts and submissions that point at them are kept. `content:verify` refuses a
+retired item that is still shipped.
 
 ## questions.yaml
 

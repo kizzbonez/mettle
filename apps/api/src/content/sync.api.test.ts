@@ -1,10 +1,10 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 import { db, pool } from '../db/client';
-import { exams, examRules } from '../db/schema/assessment';
+import { exams, examRules, questions } from '../db/schema/assessment';
 import { courses, lessons, tracks } from '../db/schema/catalog';
 import { syncContent } from './sync';
 
@@ -12,8 +12,8 @@ const SLUG = `sync-probe-${Date.now()}`;
 const contentDir = mkdtempSync(join(tmpdir(), 'mettle-content-'));
 const level = join(contentDir, 'tracks', SLUG, 'basic');
 
-function writeTrack(revision: number): void {
-  const lines = ['title: Sync Probe', 'tagline: A track that exists to be synced.', 'description: Used by a test.', 'icon: Boxes', 'category: probe', `revision: ${revision}`];
+function writeTrack(revision: number, extra: string[] = []): void {
+  const lines = ['title: Sync Probe', 'tagline: A track that exists to be synced.', 'description: Used by a test.', 'icon: Boxes', 'category: probe', `revision: ${revision}`, ...extra];
   writeFileSync(join(contentDir, 'tracks', SLUG, 'track.yaml'), `${lines.join('\n')}\n`);
 }
 
@@ -36,7 +36,7 @@ writeFileSync(join(level, 'course.yaml'), `${course.join('\n')}\n`);
 
 async function lessonRows() {
   return db
-    .select({ id: lessons.id, slug: lessons.slug, title: lessons.title })
+    .select({ id: lessons.id, slug: lessons.slug, title: lessons.title, status: lessons.status })
     .from(lessons)
     .innerJoin(courses, eq(courses.id, lessons.courseId))
     .innerJoin(tracks, eq(tracks.id, courses.trackId))
@@ -91,9 +91,32 @@ describe('syncContent', () => {
     expect(await syncContent(contentDir)).toEqual({ add: [], update: [] });
   });
 
+  it('archives what a revision retires, and seeds the exams the track declares', async () => {
+    rmSync(join(level, 'lessons', '01-first-steps.md'));
+    writeQuestions(2);
+    const final = ['exams:', '  - slug: probe-final', '    title: Probe Final', '    timeLimitMinutes: 30', '    rules:', '      - category: probe', '        count: 2'];
+    writeTrack(3, [...final, 'retired:', '  lessons: [basic/first-steps]', `  questions: [${SLUG}-3]`]);
+    expect(await syncContent(contentDir)).toEqual({ add: [], update: [SLUG] });
+
+    const rows = (await lessonRows()).map((row) => [row.slug, row.status]).sort();
+    expect(rows).toEqual([['first-steps', 'archived'], ['hello', 'published']]);
+    const [retired] = await db.select({ status: questions.status }).from(questions).where(eq(questions.key, `${SLUG}-3`));
+    expect(retired?.status).toBe('archived');
+
+    const blueprint = await db
+      .select({ courseId: exams.courseId, minutes: exams.timeLimitMinutes, categoryId: examRules.categoryId, difficulty: examRules.difficulty, count: examRules.count })
+      .from(examRules)
+      .innerJoin(exams, eq(exams.id, examRules.examId))
+      .innerJoin(tracks, eq(tracks.id, exams.trackId))
+      .where(and(eq(exams.slug, 'probe-final'), eq(tracks.slug, SLUG)));
+    expect(blueprint).toHaveLength(1);
+    expect(blueprint[0]).toMatchObject({ courseId: null, minutes: 30, difficulty: null, count: 2 });
+    expect(blueprint[0]?.categoryId).toBeTruthy();
+  });
+
   it('does not bring back a track that was deleted here', async () => {
     await db.delete(tracks).where(eq(tracks.slug, SLUG));
-    writeTrack(3);
+    writeTrack(4);
     expect(await syncContent(contentDir)).toEqual({ add: [], update: [] });
     expect(await lessonRows()).toEqual([]);
   });

@@ -11,6 +11,7 @@ import type { RunnerRequest, RunnerResponse } from '@mettle/shared';
 import { loadContent } from '../apps/api/src/content/load';
 import type { ContentCourse, ContentLab, ContentTrack } from '../apps/api/src/content/types';
 import { ignoredContent } from './ignored-content';
+import { trackProblems } from './track-checks';
 
 process.env.RUNNER_TOKEN ??= 'content-verify';
 const { execute } = await import('../apps/runner/src/execute');
@@ -119,6 +120,7 @@ async function checkPractice(where: string, course: ContentCourse): Promise<void
 }
 
 async function checkTrack(track: ContentTrack): Promise<void> {
+  if (!filterLevel) problems.push(...trackProblems(track));
   for (const course of track.courses) {
     if (filterLevel && course.level !== filterLevel) continue;
     const where = `${track.slug}/${course.level}`;

@@ -1,7 +1,23 @@
-import { LAB_LANGUAGES, QUESTION_TYPES, type Difficulty } from '@mettle/shared';
+import { DIFFICULTIES, LAB_LANGUAGES, QUESTION_TYPES, type Difficulty } from '@mettle/shared';
 import { z } from 'zod';
 
 /** Shapes of the files under content/. See content/README.md. */
+
+const slug = z.string().regex(/^[a-z0-9-]+$/);
+
+/** An exam over the whole track with its own blueprint, for example one rule per certification domain. */
+const trackExam = z.object({
+  slug,
+  title: z.string().min(1),
+  description: z.string().default(''),
+  timeLimitMinutes: z.number().int().min(1).max(240),
+  passPercent: z.number().int().min(1).max(100).default(70),
+  /** Each rule draws `count` questions of its category and level; an omitted filter means any. */
+  rules: z.array(z.object({ category: slug.optional(), level: z.enum(DIFFICULTIES).optional(), count: z.number().int().min(1).max(100) })).min(1),
+});
+
+/** A lesson or lab named as `level/slug`. */
+const levelSlug = z.string().regex(/^(basic|medium|advanced|professional)\/[a-z0-9-]+$/);
 
 export const trackFile = z.object({
   title: z.string().min(1),
@@ -14,6 +30,12 @@ export const trackFile = z.object({
   format: z.enum(['outline', 'course']).default('outline'),
   /** Raise this when the shipped track changes, so installs that already have it take the new version. */
   revision: z.number().int().min(1).default(1),
+  /** Exams beyond each level's mock exam and the automatic track assessment. */
+  exams: z.array(trackExam).default([]),
+  /** What earlier revisions shipped and this one does not: an update archives exactly these. */
+  retired: z
+    .object({ lessons: z.array(levelSlug).default([]), labs: z.array(levelSlug).default([]), questions: z.array(slug).default([]) })
+    .default({ lessons: [], labs: [], questions: [] }),
 });
 
 export const courseFile = z.object({
