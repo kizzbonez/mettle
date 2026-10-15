@@ -199,7 +199,9 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   A Rust test can read what the code printed: `printed_by(|| greet("Ada"))` returns the text,
   so a lab about `println!` can check the output itself. To call a `main` in the learner's
   file, write `printed_by(solution::main)`; a bare `main` is the test program's own.
-- Python is 3.15 with NumPy. No other packages, no network. A Python test can treat the
+- Python is 3.15 with NumPy 2.5, pandas 3 and pyarrow 26 (for Parquet). No other packages, no
+  network. Loading pandas takes about half a second and 110 MB, so give pandas labs
+  `memoryMb: 512` and `timeLimitMs: 10000`. A Python test can treat the
   learner's file as a program: `run_script(stdin="Ada\n", args=["--loud"])` runs
   `python solution.py`, typing the input into it, and returns `.out`, `.err` and `.code`. So a
   beginner's script that reads with `input()` and prints is tested as it is written.
