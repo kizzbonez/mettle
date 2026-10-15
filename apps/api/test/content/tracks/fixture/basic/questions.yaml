@@ -1,0 +1,96 @@
+- key: cyber-basic-01
+  type: single
+  category: cyber
+  tags: [cia-triad]
+  prompt: |
+    Ransomware encrypts every file on a company's file server and demands payment for the key.
+    No data has left the network. Which security property is **primarily** violated?
+  options:
+    - text: Confidentiality
+    - text: Integrity
+    - text: Availability
+      correct: true
+    - text: Non-repudiation
+  explanation: |
+    The data still exists and has not been disclosed, but legitimate users cannot use it: that
+    is a loss of **availability**. Confidentiality would be the answer if the attacker had also
+    copied the files out (so-called double extortion), which the question rules out.
+
+- key: cyber-basic-02
+  type: single
+  category: cyber
+  tags: [passwords, hashing]
+  prompt: |
+    Why is bcrypt preferred over SHA-256 for storing user passwords?
+  options:
+    - text: bcrypt output is longer, so collisions are less likely
+    - text: bcrypt is deliberately slow and has a tunable cost, which makes offline guessing expensive
+      correct: true
+    - text: bcrypt is reversible with the server's key, so forgotten passwords can be recovered
+    - text: SHA-256 has been broken and can no longer be trusted for any purpose
+  explanation: |
+    SHA-256 is not broken; it is simply **fast**, and fast is what an attacker with a stolen
+    database wants. bcrypt builds in a salt and a cost factor so that each guess takes
+    meaningful time, and the cost can be raised as hardware improves. Password hashes are never
+    reversible.
+
+- key: cyber-basic-03
+  type: single
+  category: networking
+  tags: [tcp, scanning]
+  prompt: |
+    A scanner sends a TCP `SYN` to port 443 on a host, receives `SYN-ACK`, and immediately
+    replies with `RST`. What has the scanner learned?
+  options:
+    - text: The port is open; a service is listening
+      correct: true
+    - text: The port is closed
+    - text: A firewall is silently dropping packets to that port
+    - text: The host is offline
+  explanation: |
+    `SYN-ACK` is the second step of the three-way handshake, and only a listening service sends
+    it. The scanner then sends `RST` instead of `ACK` so the connection is never completed:
+    this is a half-open (SYN) scan. A closed port would have answered `RST`, and a filtered
+    port would not have answered at all.
+
+- key: cyber-basic-04
+  type: multiple
+  category: cyber
+  tags: [mfa, authentication]
+  prompt: |
+    A site already asks for a password. Which of these would add a **second factor**?
+    Select all that apply.
+  options:
+    - text: A six-digit code from an authenticator app on the user's phone
+      correct: true
+    - text: A hardware security key the user must touch
+      correct: true
+    - text: The answer to "What was the name of your first pet?"
+    - text: A second, longer password
+  explanation: |
+    A password is *something you know*. The authenticator app and the security key are
+    *something you have*, a different category, so each adds a factor. A security question
+    and a second password are both more things you know: more secrets, but still one factor.
+
+- key: cyber-basic-05
+  type: single
+  category: linux
+  tags: [permissions]
+  prompt: |
+    A file has the mode `640`.
+
+    ```text
+    -rw-r----- 1 deploy www-data 812 Oct 12 03:14 app.env
+    ```
+
+    Who can read it?
+  options:
+    - text: Only the user `deploy`
+    - text: The user `deploy` and members of the group `www-data`
+      correct: true
+    - text: Everyone on the system
+    - text: Nobody, because the execute bit is not set
+  explanation: |
+    The three digits are owner, group and others. `6` is read + write for the owner, `4` is
+    read for the group, and `0` is nothing for everyone else. The execute bit has nothing to do
+    with reading a regular file.

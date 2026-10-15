@@ -1,0 +1,17 @@
+slug: failed-login-triage
+title: Failed Login Triage
+summary: Turn a noisy SSH authentication log into a ranked list of the addresses attacking a server.
+language: bash
+minutes: 30
+timeLimitMs: 5000
+memoryMb: 128
+tests:
+  - name: Finds the offenders in the sample log
+    file: 01-sample-log.sh
+    hidden: false
+  - name: Applies the threshold exactly and ignores successful logins
+    file: 02-threshold.sh
+    hidden: true
+  - name: Orders ties predictably and handles a quiet log
+    file: 03-edge-cases.sh
+    hidden: true

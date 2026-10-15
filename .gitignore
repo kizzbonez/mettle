@@ -18,8 +18,9 @@ playwright-report/
 test-results/
 .eslintcache
 *.log
-# ...but log files in the curriculum are lab fixtures
+# ...but log files in the curriculum and in the API tests' fixture track are lab fixtures
 !content/**/*.log
+!apps/api/test/content/**/*.log
 
 # self-hosted editor assets, copied from node_modules at build time
 apps/web/public/monaco/

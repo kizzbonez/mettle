@@ -1,0 +1,9 @@
+# The track the API tests load: one small level in the outline format, frozen so that changes to
+# the shipped curriculum never change what the tests see. (It is the Cyber Security level that
+# shipped until 1.9.0.)
+title: Fixture Track
+tagline: A small track for the API tests.
+description: Three lessons, five questions and a Bash lab.
+icon: ShieldCheck
+category: cyber
+sortOrder: 1

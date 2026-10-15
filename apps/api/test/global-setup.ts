@@ -1,5 +1,9 @@
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { devEnv } from '../../../scripts/dev-env.mjs';
+
+/** The tests' own small track, so changes to the shipped curriculum never change what they see. */
+const FIXTURE_CONTENT = fileURLToPath(new URL('./content', import.meta.url));
 
 /** Recreates the test database, applies the migrations and loads one small track. */
 export default async function setup(): Promise<void> {
@@ -14,6 +18,6 @@ export default async function setup(): Promise<void> {
   const { pool, runMigrations } = await import('../src/db/client');
   const { seedContent } = await import('../src/content/seed');
   await runMigrations();
-  await seedContent(env.CONTENT_DIR, ['cyber-security']);
+  await seedContent(FIXTURE_CONTENT);
   await pool.end();
 }

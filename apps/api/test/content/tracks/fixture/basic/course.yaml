@@ -1,0 +1,14 @@
+title: Security Foundations
+summary: >-
+  The vocabulary and habits of a defender: what you are protecting, how accounts are attacked,
+  and how to find an attack in a log file.
+outcomes:
+  - Classify an incident by which security property it violates
+  - Explain why passwords are stored as slow, salted hashes
+  - Read TCP handshake behavior well enough to interpret a port scan
+  - Extract attack indicators from system logs with standard shell tools
+exam:
+  title: Security Foundations Mock Exam
+  description: Five questions on the CIA triad, authentication, networking and Linux permissions.
+  timeLimitMinutes: 10
+  passPercent: 70
