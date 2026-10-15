@@ -4,6 +4,34 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-15
+
+Data Analysis with NumPy and pandas, a full course.
+
+### Added
+
+- **Data Analysis with NumPy and pandas**: 42 lessons in four levels on NumPy 2.5 and pandas 3,
+  in the same full-course format as the others, for learners who know Python. It starts from
+  what an array is, and teaches one idea per lesson through data types, indexing and views,
+  boolean masks, vectorised maths, broadcasting, aggregation, seeded random numbers and basic
+  linear algebra; then pandas from Series and DataFrames through reading files, selection,
+  missing data, the new `str` type, copy-on-write and grouping; then joins (including the new
+  anti joins), reshaping, text, dates, time zones, time series, MultiIndex, method chains and
+  statistics; and finally validation pipelines, testing data code, performance, memory,
+  Parquet, numerical accuracy and reproducible pipelines. It follows pandas 3's new defaults
+  throughout and was written from the NumPy and pandas documentation, with every example run in
+  the sandbox.
+  - NumPy Foundations (12 lessons), pandas Foundations (11), Analysing and Reshaping Data (10)
+    and Production Data Work (9).
+  - 89 exam questions; each attempt at a level's mock exam draws ten.
+  - An end-of-level lab for each level, from a village hall's solar panel readings to a
+    school's air-quality pipeline that writes Parquet and a report.
+  - A practice lab for every lesson, each using only what has been taught so far.
+- The Python sandbox has pandas 3.0 and pyarrow 26 (for Parquet) next to NumPy.
+- Python lab tests can compare results with `check_frame` and `check_array`. A mismatch fails
+  with the test's own message, so a hidden test never shows the expected values, while a visible
+  test still prints pandas' or NumPy's full report.
+
 ## [1.8.0] - 2026-10-15
 
 Python Development, a full course.
