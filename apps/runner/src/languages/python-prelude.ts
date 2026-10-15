@@ -56,6 +56,42 @@ def printed_by(function, *args, stdin="", **kwargs):
     return printed.getvalue()
 
 
+def check_frame(actual, expected, message, **options):
+    """Asserts that two DataFrames, Series or Indexes are equal, with pandas.testing's OPTIONS.
+
+    pandas' own report, which shows the expected values, goes to stderr, which only a visible
+    test displays; the test then fails with MESSAGE alone, the one line a hidden test shows.
+    """
+    import pandas as pd
+    import pandas.testing as pdt
+
+    if isinstance(expected, pd.Series):
+        compare = pdt.assert_series_equal
+    elif isinstance(expected, pd.Index):
+        compare = pdt.assert_index_equal
+    else:
+        compare = pdt.assert_frame_equal
+    _fail_quietly(lambda: compare(actual, expected, **options), message)
+
+
+def check_array(actual, expected, message, **options):
+    """Asserts that two arrays are equal: within tolerance for floats (assert_allclose), exactly otherwise."""
+    import numpy as np
+    import numpy.testing as npt
+
+    exact = np.asarray(expected).dtype.kind not in "fc"
+    compare = npt.assert_array_equal if exact else npt.assert_allclose
+    _fail_quietly(lambda: compare(actual, expected, **options), message)
+
+
+def _fail_quietly(compare, message):
+    try:
+        compare()
+    except AssertionError as error:
+        print(error, file=sys.stderr)
+        raise AssertionError(message) from None
+
+
 def load_solution():
     """Imports solution.py and returns what \`from solution import *\` would give.
 

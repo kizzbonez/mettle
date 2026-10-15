@@ -6,7 +6,7 @@ import type { Harness, LanguageSpec } from './types';
 /** Everything the learner's file defines is in scope, as after `from solution import *`. */
 function caseSource(body: string, nonce: string): string {
   return [
-    'from lab_helpers import Ran, load_solution, printed_by, run_script  # noqa: F401',
+    'from lab_helpers import Ran, check_array, check_frame, load_solution, printed_by, run_script  # noqa: F401',
     'globals().update(load_solution())',
     '',
     body,

@@ -89,6 +89,19 @@ describe('python sandbox', () => {
     expect(stderr).not.toContain('importlib');
   });
 
+  it('compares pandas and NumPy results, failing with the test message only', async () => {
+    const code = 'import pandas as pd\n\n\ndef totals():\n    return pd.Series([3.0, 5.0], index=["east", "west"], name="rain")\n';
+    const tests = [
+      'import numpy as np\ncheck_array(np.array([0.1 + 0.2]), np.array([0.3]), "sums within tolerance")',
+      'import pandas as pd\ncheck_frame(totals(), pd.Series([3.0, 6.0], index=["east", "west"], name="rain"), "rain per region")',
+    ];
+    const result = await execute(request('python', code, tests, { timeLimitMs: 10_000, memoryMb: 512 }));
+    expect(result.tests[0]?.passed).toBe(true);
+    const stderr = result.tests[1]?.stderr.trim() ?? '';
+    expect(stderr.split('\n').at(-1)).toBe('AssertionError: rain per region');
+    expect(stderr).toContain('values are different');
+  });
+
   it('lets the learner import a module shipped with the fixtures', async () => {
     const code = 'import fair_data\n\n\ndef prizes():\n    return len(fair_data.PRIZES)\n\n\nif __name__ == "__main__":\n    print(prizes())\n';
     const fixtures = [{ path: 'data/fair_data.py', content: 'PRIZES = ["kite", "hamper"]\n' }];

@@ -201,7 +201,13 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   file, write `printed_by(solution::main)`; a bare `main` is the test program's own.
 - Python is 3.15 with NumPy 2.5, pandas 3 and pyarrow 26 (for Parquet). No other packages, no
   network. Loading pandas takes about half a second and 110 MB, so give pandas labs
-  `memoryMb: 512` and `timeLimitMs: 10000`. A Python test can treat the
+  `memoryMb: 512` and `timeLimitMs: 10000`. Compare results with
+  `check_frame(actual, expected, message, **options)` (DataFrames, Series and Indexes, with
+  `pandas.testing`'s options such as `check_dtype=False` or `rtol=1e-9`) and
+  `check_array(actual, expected, message, **options)` (NumPy; floats within tolerance), not with
+  `pandas.testing` directly: its report shows the expected values in the one line a hidden test
+  displays. The helpers print that report where only a visible test shows it, then fail with
+  `message`. Fixtures are text, so a test that needs a Parquet file writes it first. A Python test can treat the
   learner's file as a program: `run_script(stdin="Ada\n", args=["--loud"])` runs
   `python solution.py`, typing the input into it, and returns `.out`, `.err` and `.code`. So a
   beginner's script that reads with `input()` and prints is tested as it is written.

@@ -59,7 +59,7 @@ describe('python harness', () => {
   });
 
   it('gives test bodies run_script and printed_by', () => {
-    expect(file(harness.files, 'case_1.py')).toContain('from lab_helpers import Ran, load_solution, printed_by, run_script');
+    expect(file(harness.files, 'case_1.py')).toContain('from lab_helpers import Ran, check_array, check_frame, load_solution, printed_by, run_script');
     expect(file(harness.files, 'lab_helpers.py')).toContain('def run_script(stdin="", args=()):');
   });
 
