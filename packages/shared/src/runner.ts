@@ -2,6 +2,9 @@ import type { LabLanguage } from './domain';
 
 /** Contract between the API and the sandbox runner (POST /execute). */
 
+/** Most fixture files one lab may ship; their total size is capped separately by the runner. */
+export const MAX_LAB_FIXTURES = 64;
+
 export interface RunnerFile {
   path: string;
   content: string;

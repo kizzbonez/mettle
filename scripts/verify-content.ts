@@ -16,6 +16,7 @@ import { trackProblems } from './track-checks';
 
 process.env.RUNNER_TOKEN ??= 'content-verify';
 const { execute } = await import('../apps/runner/src/execute');
+const { executeSchema } = await import('../apps/runner/src/request-schema');
 
 const contentDir = fileURLToPath(new URL('../content', import.meta.url));
 const [filterTrack, filterLevel, filterLesson] = (process.argv[2] ?? '').split('/');
@@ -78,8 +79,8 @@ function checkStructure(where: string, track: ContentTrack, course: ContentCours
   }
 }
 
-function run(lab: ContentLab, code: string): Promise<RunnerResponse> {
-  const request: RunnerRequest = {
+function requestFor(lab: ContentLab, code: string): RunnerRequest {
+  return {
     language: lab.language,
     code,
     fixtures: lab.fixtures,
@@ -87,7 +88,18 @@ function run(lab: ContentLab, code: string): Promise<RunnerResponse> {
     timeLimitMs: lab.timeLimitMs,
     memoryMb: lab.memoryMb,
   };
-  return execute(request);
+}
+
+function run(lab: ContentLab, code: string): Promise<RunnerResponse> {
+  return execute(requestFor(lab, code));
+}
+
+/** What the runner's HTTP endpoint would say about this lab: verifying calls it directly, a site does not. */
+function runnerRefusal(lab: ContentLab): string | null {
+  const checked = executeSchema.safeParse(requestFor(lab, lab.solution));
+  if (checked.success) return null;
+  const issue = checked.error.issues[0];
+  return `the runner would refuse it (${issue?.path.join('.') || 'request'}: ${issue?.message ?? 'invalid'})`;
 }
 
 function describeFailure(lab: ContentLab, result: RunnerResponse): string {
@@ -99,6 +111,8 @@ function describeFailure(lab: ContentLab, result: RunnerResponse): string {
 }
 
 async function checkLab(where: string, lab: ContentLab): Promise<string> {
+  const refusal = runnerRefusal(lab);
+  expect(refusal === null, `${where}: ${refusal}`);
   const solution = await run(lab, lab.solution);
   expect(solution.status === 'passed', `${where}: reference solution ${describeFailure(lab, solution)}`);
   const starter = await run(lab, lab.starter);

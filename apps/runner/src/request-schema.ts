@@ -1,4 +1,4 @@
-import { LAB_LANGUAGES } from '@mettle/shared';
+import { LAB_LANGUAGES, MAX_LAB_FIXTURES } from '@mettle/shared';
 import { z } from 'zod';
 
 const KB = 1024;
@@ -20,7 +20,7 @@ export const executeSchema = z
   .object({
     language: z.enum(LAB_LANGUAGES),
     code: z.string().max(128 * KB),
-    fixtures: z.array(fixture).max(16),
+    fixtures: z.array(fixture).max(MAX_LAB_FIXTURES),
     tests: z.array(test).min(1).max(24),
     timeLimitMs: z.number().int().min(500).max(15_000),
     memoryMb: z.number().int().min(32).max(2048),

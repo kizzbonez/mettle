@@ -1,4 +1,4 @@
-import { LAB_LANGUAGES } from '@mettle/shared';
+import { LAB_LANGUAGES, MAX_LAB_FIXTURES } from '@mettle/shared';
 import { asc, eq } from 'drizzle-orm';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
@@ -29,7 +29,7 @@ const labBody = z.object({
   solutionCode: codeField.default(''),
   fixtures: z
     .array(z.object({ path: z.string().regex(/^data\/[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/, 'Fixture paths start with data/.').max(99), content: z.string().max(256 * 1024) }))
-    .max(16)
+    .max(MAX_LAB_FIXTURES)
     .default([]),
   timeLimitMs: z.number().int().min(500).max(15_000).default(5000),
   memoryMb: z.number().int().min(32).max(1024).default(256),
