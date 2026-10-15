@@ -11,6 +11,7 @@ import type { RunnerRequest, RunnerResponse } from '@mettle/shared';
 import { loadContent } from '../apps/api/src/content/load';
 import type { ContentCourse, ContentLab, ContentTrack } from '../apps/api/src/content/types';
 import { ignoredContent } from './ignored-content';
+import { privateKeysIn } from './private-keys';
 import { trackProblems } from './track-checks';
 
 process.env.RUNNER_TOKEN ??= 'content-verify';
@@ -140,6 +141,9 @@ console.log(`Verifying ${tracks.length} track(s)\n`);
 for (const track of tracks) await checkTrack(track);
 for (const file of ignoredContent(contentDir)) {
   if (!filterTrack || file.startsWith(`tracks/${filterTrack}/`)) problems.push(`content/${file}: ignored by git, so a clone would not have it`);
+}
+for (const file of privateKeysIn(contentDir)) {
+  if (!filterTrack || file.startsWith(`tracks/${filterTrack}/`)) problems.push(`content/${file}: holds a PEM private key, which secret scanners flag; generate it in the test instead`);
 }
 
 if (problems.length > 0) {

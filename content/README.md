@@ -267,7 +267,12 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
 - Each test is its own process with its own time limit.
 - Always give assertions a message: for hidden tests the message is all the learner sees.
   Say what was being checked, not what the answer is.
-- Fixtures go in `lab/data/` and appear in the sandbox as `data/<name>`.
+- Fixtures go in `lab/data/` and appear in the sandbox as `data/<name>`. Only files directly in
+  `data/` are read: subfolders are ignored, so keep fixtures flat (a test can build a folder
+  tree from them when it needs one). Fixtures are text.
+- Never ship a PEM private key, even a test one: secret scanners flag it and `content:verify`
+  refuses it. Generate keys inside the test, or ship a raw test seed that a helper turns into a
+  key. Example credentials use documentation values such as `AKIAIOSFODNN7EXAMPLE`.
 
 ### What `content:verify` requires of a lab
 
