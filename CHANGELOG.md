@@ -4,6 +4,50 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-10-16
+
+Cyber Security, a full course aligned with CompTIA Security+ SY0-801.
+
+### Added
+
+- **Cyber Security** is rebuilt as a full course of 47 lessons in four levels, aligned with the
+  CompTIA Security+ SY0-801 (V8) exam objectives, which launch on 17 November 2026. Every
+  objective of the five domains is taught: security concepts, controls, change management and
+  cryptography; threats, vulnerabilities, attacks and their indicators, including the new
+  objective on AI risks; security architecture, Zero Trust, controls, identity and access, data
+  protection and resilience; and security operations, incident response, forensics,
+  governance, risk, third parties, compliance, audits and awareness. It was written from NIST,
+  CISA, OWASP, MITRE ATT&CK, the RFCs and the CompTIA objectives, and follows current standards
+  such as SP 800-63B-4, SP 800-61 Rev. 3, CVSS v4.0, DMARC as RFC 9989, CISA BOD 26-04 and
+  ATT&CK v20.
+  - Security Foundations (12 lessons), Threats, Vulnerabilities and Attacks (12), Security
+    Architecture and Controls (11) and Security Operations and Program Management (12).
+  - 172 original multiple-choice questions in the exam's style (single answer, "choose two" and
+    "choose three"), each tagged with its SY0-801 domain. Each level's mock exam draws twenty.
+  - A **Security+ (SY0-801) Practice Exam**: 90 questions in 90 minutes, drawn in the official
+    domain weights, a new paper every attempt.
+  - An end-of-level lab for each level and a practice lab for every lesson, all defensive: on
+    real logs, configs, certificates, scan exports and the learner's own code. Mettle is not
+    affiliated with or endorsed by CompTIA.
+- `track.yaml` can declare **track-wide exams** with their own blueprint, rules that draw by
+  question category and level, and **retired items**: the lessons, labs and questions an earlier
+  revision shipped and this one drops, which an update archives. Archived items are hidden from
+  learners and new exam papers, and the progress and attempts that point at them are kept.
+  `content:verify` checks that every exam rule can be filled and that nothing retired is still
+  shipped.
+- The shell sandbox has OpenSSL 3, and the Python sandbox the `cryptography` package.
+
+### Changed
+
+- The original three-lesson Cyber Security level is retired: its lessons, questions and lab are
+  archived when an installed site updates, and the new course takes their place.
+- A lab may ship up to 64 data files (was 16), in the runner and in the admin lab editor alike;
+  their total size is still capped at 1 MB.
+- `content:verify` checks every lab against the runner's own request rules as well, so a lab the
+  runner would refuse on a live site can no longer pass verification.
+- The API tests load their own small fixture track instead of a shipped one, so changes to the
+  curriculum no longer change what they test.
+
 ## [1.9.0] - 2026-10-15
 
 Data Analysis with NumPy and pandas, a full course.
