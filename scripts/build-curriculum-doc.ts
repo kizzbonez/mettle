@@ -134,8 +134,18 @@ function courseSection(track: ContentTrack, course: ContentCourse): string {
   ].join('\n');
 }
 
+/** Exams the track declares itself, with the blueprint each attempt is drawn from. */
+function trackExamsSection(track: ContentTrack): string[] {
+  return track.exams.flatMap((exam) => {
+    const total = exam.rules.reduce((sum, rule) => sum + rule.count, 0);
+    const rules = exam.rules.map((rule) => `- ${rule.count} from ${[rule.category, rule.level].filter(Boolean).join(', ') || 'any question'}`);
+    return [`### Track exam: ${exam.title}`, '', `*${total} questions · ${exam.timeLimitMinutes} minutes · pass mark ${exam.passPercent}%.* ${exam.description}`, '', ...rules, ''];
+  });
+}
+
 function trackSection(track: ContentTrack): string {
-  return [`## ${track.title}`, '', `*${track.tagline}*`, '', track.description, '', ...track.courses.map((course) => courseSection(track, course))].join('\n');
+  const courses = track.courses.map((course) => courseSection(track, course));
+  return [`## ${track.title}`, '', `*${track.tagline}*`, '', track.description, '', ...trackExamsSection(track), ...courses].join('\n');
 }
 
 const tracks = loadContent(contentDir);

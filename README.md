@@ -92,9 +92,9 @@ quick.
 | **Python Development** | Python Foundations | Idiomatic Python | The Data Model and Concurrency | Production Python |
 | **Data Analysis with NumPy and pandas** | NumPy Foundations | pandas Foundations | Analysing and Reshaping Data | Production Data Work |
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
-| **Cyber Security** | Security Foundations | in development | in development | in development |
+| **Cyber Security** (Security+ SY0-801) | Security Foundations | Threats, Vulnerabilities and Attacks | Security Architecture and Controls | Security Operations and Program Management |
 
-240 lessons, 489 exam questions with explanations and 250 labs. Every lab is verified in the
+284 lessons, 656 exam questions with explanations and 300 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -135,9 +135,19 @@ with validation, testing, performance, memory, Parquet and reproducible pipeline
 written from the NumPy and pandas documentation, with every example run in the sandbox. Its
 question banks hold 89 questions, and its labs, one per level and one per lesson, run NumPy and
 pandas on real data files.
+**Cyber Security is the sixth, aligned with CompTIA Security+ SY0-801 (V8)**: 47 lessons that
+cover every objective of the exam's five domains, from the CIA triad, controls and
+cryptography through threats, vulnerabilities and attacks (including the new AI risks),
+security architecture and controls, to security operations, incident response, governance, risk
+and compliance. It was written from NIST, CISA, OWASP, MITRE ATT&CK, the RFCs and the
+CompTIA objectives, with every command and script run in the sandbox. Its 172 multiple-choice
+questions are original and written in the exam's style, each tagged with its domain, and
+besides each level's mock exam a **90-question, 90-minute Security+ practice exam** draws a new
+paper in the official domain weights. Every lesson ends with a defensive practice lab on real
+logs, configs, certificates and code. Mettle is not affiliated with or endorsed by CompTIA.
 
-AI Development and Cyber Security are still in the original short format (three lessons a
-level) and are next to be expanded.
+AI Development is still in the original short format (three lessons a level) and is next to be
+expanded.
 
 ## How it is built
 
