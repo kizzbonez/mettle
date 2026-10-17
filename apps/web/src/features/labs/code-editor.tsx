@@ -7,8 +7,11 @@ import { useRef } from 'react';
 import { Spinner } from '@/design/primitives/spinner';
 
 // Monaco is served from this origin (see scripts/copy-monaco.mjs), not a CDN,
-// so the Content Security Policy never has to allow a third-party host.
-loader.config({ paths: { vs: `/monaco/${monacoManifest.version}/vs` } });
+// so the Content Security Policy never has to allow a third-party host. The path
+// is absolute because language workers (TypeScript's) start from a blob: URL, where
+// a path without an origin cannot be resolved.
+const origin = typeof window === 'undefined' ? '' : window.location.origin;
+loader.config({ paths: { vs: `${origin}/monaco/${monacoManifest.version}/vs` } });
 
 const MONACO_LANGUAGE: Record<LabLanguage, string> = {
   rust: 'rust', python: 'python', bash: 'shell', cpp: 'cpp', csharp: 'csharp', yaml: 'yaml', typescript: 'typescript',
