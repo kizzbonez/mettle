@@ -1,0 +1,19 @@
+title: Laundromat Run
+summary: Wash loads with a worker pool that limits how many run at once and stops starting new ones when an AbortSignal fires, and pack items into bundles with a lazy async generator.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Limits the washes running at once and keeps results in load order
+    file: 02-worker-pool.ts
+    hidden: true
+  - name: Starts no new wash once the signal is aborted
+    file: 03-abort.ts
+    hidden: true
+  - name: Bundles lazily, closes the source, and never yields an empty bundle
+    file: 04-bundles.ts
+    hidden: true

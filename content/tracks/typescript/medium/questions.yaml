@@ -1,0 +1,677 @@
+- key: ts-medium-01
+  type: single
+  category: typescript
+  tags: [modules, nodenext, imports]
+  prompt: |
+    A project compiles with `tsc` using `"module": "nodenext"` and `"type": "module"` in
+    `package.json`. Next to `main.ts` is `units.ts`, which exports `toGrams`. Which import
+    line in `main.ts` does the compiler accept with default options?
+  options:
+    - text: '`import { toGrams } from "./units.js";`'
+      correct: true
+    - text: '`import { toGrams } from "./units";`'
+    - text: '`import { toGrams } from "./units.ts";`'
+    - text: '`import { toGrams } from "units";`'
+  explanation: |
+    Under `nodenext`, TypeScript checks imports by Node's rules for ES modules, and Node
+    requires a relative import to name the file, extension included. The compiler never
+    rewrites import paths, so you write the name of the file that will exist at run time,
+    `units.js`, and the compiler maps it back to `units.ts` for types. Leaving the extension
+    out is error TS2835 ("Did you mean './units.js'?"). `./units.ts` is error TS5097 unless
+    `allowImportingTsExtensions` (or `rewriteRelativeImportExtensions`) is set, because the
+    emitted JavaScript would import a `.ts` file. A bare `"units"` names a package in
+    `node_modules`, not a file.
+
+- key: ts-medium-02
+  type: single
+  category: typescript
+  tags: [modules, import-type, type-stripping]
+  prompt: |
+    `recipe.ts` exports an interface `Recipe` and a function `describe`. This file is run
+    directly with `node main.ts` on Node.js 26:
+
+    ```ts
+    import { describe, Recipe } from "./recipe.ts";
+
+    const bread: Recipe = { name: "Rye loaf", grams: 900 };
+    console.log(describe(bread));
+    ```
+
+    What happens?
+  options:
+    - text: 'It fails with `SyntaxError: The requested module ''./recipe.ts'' does not provide an export named ''Recipe''`'
+      correct: true
+    - text: It prints the description, because Node removes unused type imports
+    - text: Node refuses to run it because the import path ends in `.ts`
+    - text: It prints the description, but only if a `tsconfig.json` sets `verbatimModuleSyntax`
+  explanation: |
+    Type stripping only deletes type syntax; it cannot know that `Recipe` is an interface, so
+    it keeps `Recipe` as a value import, and the module has no such runtime export. Mark it as
+    a type: `import { describe, type Recipe } from "./recipe.ts";`. The `.ts` extension is
+    exactly what Node expects when it runs TypeScript files directly. Node ignores
+    `tsconfig.json`; `verbatimModuleSyntax` only makes `tsc` demand the `type` marker.
+
+- key: ts-medium-03
+  type: single
+  category: typescript
+  tags: [classes, private, hash-private]
+  prompt: |
+    What does this program print?
+
+    ```ts
+    class Locker {
+      private code: string;
+      #pin: string;
+
+      constructor(code: string, pin: string) {
+        this.code = code;
+        this.#pin = pin;
+      }
+    }
+
+    console.log(JSON.stringify(new Locker("B-17", "4821")));
+    ```
+  options:
+    - text: '`{"code":"B-17"}`'
+      correct: true
+    - text: '`{}`'
+    - text: '`{"code":"B-17","pin":"4821"}`'
+    - text: Nothing; the compiler rejects reading private members through `JSON.stringify`
+  explanation: |
+    `private` is checked only by the compiler and erased: at run time `code` is an ordinary
+    property, so `JSON.stringify` includes it (and `locker["code"]` would read it). A `#` name
+    is a JavaScript private element, which is not a property at all, so it never appears in
+    `JSON.stringify` or `Object.keys`. Use `#` when something must stay hidden at run time.
+
+- key: ts-medium-04
+  type: multiple
+  category: typescript
+  tags: [classes, type-stripping, erasable-syntax]
+  prompt: |
+    Which of these TypeScript constructs make `node file.ts` (Node.js 26 type stripping) fail
+    with `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`? Choose all that apply.
+  options:
+    - text: 'A parameter property: `constructor(readonly id: string) {}`'
+      correct: true
+    - text: 'An enum: `enum Level { Low, High }`'
+      correct: true
+    - text: 'A field with a type and `readonly`: `readonly id: string;`'
+    - text: 'A private element: `#reading = 0;`'
+  explanation: |
+    Type stripping deletes types and runs what is left; it never generates code. A parameter
+    property needs generated field assignments and an enum needs a generated object, so both
+    are refused, and Node.js 26 removed the old `--experimental-transform-types` flag. A
+    `readonly` field declaration is just a JavaScript field once `readonly` and the type are
+    erased, and `#reading` is plain JavaScript. `erasableSyntaxOnly` makes `tsc` report the
+    first two as error TS1294.
+
+- key: ts-medium-05
+  type: single
+  category: typescript
+  tags: [generics, inference]
+  prompt: |
+    ```ts
+    function first<T>(items: readonly T[]): T | undefined {
+      return items[0];
+    }
+
+    const result = first([3, 1, 2]);
+    ```
+
+    Which type does the compiler infer for `result`?
+  options:
+    - text: '`number | undefined`'
+      correct: true
+    - text: '`number`'
+    - text: '`any`'
+    - text: '`T | undefined`'
+  explanation: |
+    The argument is a `number[]`, so the compiler infers `T` as `number` for this call, and
+    the declared return type `T | undefined` becomes `number | undefined`. The `undefined` is
+    there because an empty array has no first element, so code using `result` must handle it.
+    `T` itself never appears in a caller's types: each call fills it in.
+
+- key: ts-medium-06
+  type: single
+  category: typescript
+  tags: [generics, type-arguments]
+  prompt: |
+    ```ts
+    function combine<T>(left: T[], right: T[]): T[] {
+      return [...left, ...right];
+    }
+
+    console.log(combine([1, 2], ["three"]));
+    ```
+
+    What happens, and what is the fix if mixing numbers and strings is intended?
+  options:
+    - text: 'Error TS2322 on `"three"` (string is not assignable to number); call `combine<string | number>(...)`'
+      correct: true
+    - text: 'It prints `[ 1, 2, ''three'' ]`, because `T` is inferred as `string | number`'
+    - text: It prints `[ 1, 2, 'three' ]`, because `T` becomes `any` when the arguments disagree
+    - text: Error TS2322; the only fix is to change the parameters to `any[]`
+  explanation: |
+    Inference fixes `T` as `number` from the first argument, and then `"three"` does not fit:
+    `main.ts(5,30): error TS2322: Type 'string' is not assignable to type 'number'.` When the
+    inferred type is not the one you mean, pass the type argument explicitly:
+    `combine<string | number>([1, 2], ["three"])` prints `[ 1, 2, 'three' ]`. Switching to
+    `any[]` would throw away the checking that generics exist to keep.
+
+- key: ts-medium-07
+  type: single
+  category: typescript
+  tags: [type-guards, narrowing]
+  prompt: |
+    ```ts
+    interface Photo { url: string; width: number }
+    interface Video { url: string; seconds: number }
+    type Media = Photo | Video;
+
+    function check(item: Media) /* return type here */ {
+      return "seconds" in item;
+    }
+
+    function length(item: Media): number {
+      return check(item) ? item.seconds : 0;
+    }
+    ```
+
+    Which return type for `check` makes `length` compile?
+  options:
+    - text: '`item is Video`'
+      correct: true
+    - text: '`boolean`'
+    - text: '`Video`'
+    - text: '`asserts item is Video`'
+  explanation: |
+    A type predicate `item is Video` tells the compiler that a `true` result means the
+    argument is a `Video`, so `item.seconds` is allowed in the true branch. With `boolean`,
+    the compiler learns nothing and reports `Property 'seconds' does not exist on type
+    'Media'`. `Video` would claim the function returns a video object. An assertion function
+    returns nothing and throws on failure, so it cannot be used as a condition.
+
+- key: ts-medium-08
+  type: single
+  category: typescript
+  tags: [discriminated-unions, exhaustiveness, never]
+  prompt: |
+    ```ts
+    type Ticket =
+      | { kind: "single"; zones: number }
+      | { kind: "day-pass" }
+      | { kind: "concession"; zones: number; percentOff: number };
+
+    function assertNever(value: never): never {
+      throw new Error(`Unexpected value: ${JSON.stringify(value)}`);
+    }
+
+    function price(ticket: Ticket): number {
+      switch (ticket.kind) {
+        case "single":
+          return 1.5 * ticket.zones;
+        case "concession":
+          return 1.5 * ticket.zones * (1 - ticket.percentOff / 100);
+        default:
+          return assertNever(ticket);
+      }
+    }
+    ```
+
+    What does the compiler report?
+  options:
+    - text: 'Error TS2345 at `assertNever(ticket)`: `{ kind: "day-pass"; }` is not assignable to `never`'
+      correct: true
+    - text: Nothing; the program compiles and throws only if a day pass reaches `price`
+    - text: 'Error TS2339: `zones` does not exist on `Ticket`'
+    - text: 'Error TS2366: the function lacks an ending return statement'
+  explanation: |
+    After the two cases, the only member left in `default` is the day pass, so `ticket` has
+    the type `{ kind: "day-pass"; }`, which cannot be passed to a `never` parameter. That is
+    the point of the pattern: a missing case becomes a compile error that names the case.
+    Inside each `case`, `ticket` is narrowed to one member, so `ticket.zones` is fine.
+    Because every path returns, there is no TS2366.
+
+- key: ts-medium-09
+  type: single
+  category: typescript
+  tags: [enums, runtime]
+  prompt: |
+    What does this print?
+
+    ```ts
+    enum Priority {
+      Low,
+      Normal,
+      Urgent,
+    }
+
+    console.log(Object.keys(Priority));
+    ```
+  options:
+    - text: "`[ '0', '1', '2', 'Low', 'Normal', 'Urgent' ]`"
+      correct: true
+    - text: "`[ 'Low', 'Normal', 'Urgent' ]`"
+    - text: "`[ '0', '1', '2' ]`"
+    - text: Nothing; enums are types and do not exist at run time
+  explanation: |
+    An enum compiles to a real object built by generated code. Numeric enums also get a
+    reverse mapping from value to name (`Priority[2]` is `"Urgent"`), so the object has six
+    keys: the three numbers (as strings) and the three names. This generated code is why
+    Node's type stripping and `erasableSyntaxOnly` reject enums, and why many projects use an
+    `as const` object instead.
+
+- key: ts-medium-10
+  type: multiple
+  category: typescript
+  tags: [as-const, literal-unions, typeof]
+  prompt: |
+    ```ts
+    const SIZES = ["small", "medium", "large"] as const;
+    type Size = (typeof SIZES)[number];
+
+    const a: Size = "medium";          // line 4
+    const b: Size = "huge";            // line 5
+    const c: number = SIZES.length;    // line 6
+    SIZES.push("huge");                // line 7
+    ```
+
+    Which lines does the compiler reject? Choose all that apply.
+  options:
+    - text: Line 5
+      correct: true
+    - text: Line 7
+      correct: true
+    - text: Line 4
+    - text: Line 6
+  explanation: |
+    `as const` gives the array the type `readonly ["small", "medium", "large"]`, and indexing
+    that type with `number` gives the union `"large" | "medium" | "small"`. Line 5 is error
+    TS2322 because `"huge"` is not in the union. Line 7 is error TS2339, "Property 'push'
+    does not exist on type 'readonly [...]'", because `as const` made the array read-only.
+    Reading `length` is fine.
+
+- key: ts-medium-11
+  type: single
+  category: typescript
+  tags: [utility-types, pick, omit]
+  prompt: |
+    ```ts
+    interface Booking {
+      id: string;
+      room: string;
+      nights: number;
+    }
+
+    type A = Pick<Booking, "price">;
+    type B = Omit<Booking, "price">;
+    ```
+
+    `Booking` has no `price`. What does the compiler report?
+  options:
+    - text: 'An error for `A` only (TS2344: `"price"` does not satisfy the constraint `keyof Booking`)'
+      correct: true
+    - text: Errors for both `A` and `B`
+    - text: An error for `B` only
+    - text: No errors; both resolve to `never`
+  explanation: |
+    `Pick<T, K>` constrains `K` to `keyof T`, so a key that does not exist is rejected.
+    `Omit<T, K>` accepts any key, so `B` silently removes nothing and is the same as
+    `Booking`. That is why a typo in an `Omit` key goes unnoticed: check the key, or use
+    `Pick` for the fields you keep.
+
+- key: ts-medium-12
+  type: multiple
+  category: typescript
+  tags: [utility-types, readonly]
+  prompt: |
+    ```ts
+    interface Room {
+      name: string;
+      amenities: string[];
+      floor?: number;
+    }
+
+    const fern: Readonly<Room> = { name: "Fern", amenities: ["kettle"] };
+    fern.amenities.push("desk");                 // line 8
+    fern.name = "Moss";                          // line 9
+    fern.amenities = [];                         // line 10
+    const copy: Room = { ...fern, floor: 2 };    // line 11
+    ```
+
+    Which lines does the compiler reject? Choose all that apply.
+  options:
+    - text: Line 9
+      correct: true
+    - text: Line 10
+      correct: true
+    - text: Line 8
+    - text: Line 11
+  explanation: |
+    `Readonly<Room>` marks the properties of `fern` itself as `readonly`, so assigning
+    `fern.name` or `fern.amenities` is error TS2540. It is shallow: the array inside is still
+    an ordinary `string[]`, so `push` compiles and changes it. Spreading a read-only object
+    into a new object is fine; the copy is a new, mutable `Room`.
+
+- key: ts-medium-13
+  type: single
+  category: typescript
+  tags: [keyof, indexed-access, generics]
+  prompt: |
+    ```ts
+    interface Bike {
+      frame: string;
+      gears: number;
+      electric: boolean;
+    }
+
+    function getField<T, K extends keyof T>(item: T, key: K): T[K] {
+      return item[key];
+    }
+
+    const commuter: Bike = { frame: "steel", gears: 8, electric: false };
+    const value = getField(commuter, "gears");
+    ```
+
+    What is the type of `value`?
+  options:
+    - text: '`number`'
+      correct: true
+    - text: '`string | number | boolean`'
+    - text: '`"gears"`'
+    - text: '`any`'
+  explanation: |
+    `K` is inferred as the literal type `"gears"`, and the return type `T[K]` becomes
+    `Bike["gears"]`, which is `number`. The answer `string | number | boolean` would be
+    `Bike[keyof Bike]`, what you get if the return type were written that way instead of
+    linked to the key. Passing a key that is not in `Bike`, such as `"colour"`, is error
+    TS2345.
+
+- key: ts-medium-14
+  type: single
+  category: typescript
+  tags: [keyof, runtime-checks, hasown]
+  prompt: |
+    ```ts
+    const stock = { bolts: 40, nuts: 25 };
+
+    function hasPartIn(name: string): boolean {
+      return name in stock;
+    }
+
+    function hasPartOwn(name: string): boolean {
+      return Object.hasOwn(stock, name);
+    }
+
+    console.log(hasPartIn("nuts"), hasPartIn("constructor"), hasPartOwn("nuts"), hasPartOwn("constructor"));
+    ```
+
+    What does it print?
+  options:
+    - text: '`true true true false`'
+      correct: true
+    - text: '`true false true false`'
+    - text: '`true true true true`'
+    - text: '`true false true true`'
+  explanation: |
+    `in` also looks at properties inherited from `Object.prototype`, such as `constructor`
+    and `toString`, so `"constructor" in stock` is `true`. `Object.hasOwn` checks only the
+    object's own properties. That is why a type guard that turns a `string` into
+    `keyof typeof stock` should use `Object.hasOwn`, not `in`.
+
+- key: ts-medium-15
+  type: single
+  category: typescript
+  tags: [map, undefined]
+  prompt: |
+    ```ts
+    const passes = new Map<string, number>([["R12", 3]]);
+    const leader: number = passes.get("R12");
+    ```
+
+    Why does the compiler reject the second line, even though `"R12"` is in the map?
+  options:
+    - text: '`get` returns `number | undefined`, because the compiler cannot know which keys a map holds'
+      correct: true
+    - text: Maps must be read with brackets, `passes["R12"]`
+    - text: The key type must be given as a literal type, `Map<"R12", number>`
+    - text: '`get` returns `unknown` until the map is narrowed with `instanceof Map`'
+  explanation: |
+    A map's contents change at run time, so `Map<K, V>.get` is typed `V | undefined`, and
+    `undefined` is not assignable to `number` (error TS2322). Handle the missing case with
+    `?? 0`, a check, or `has` before `get`. Brackets on a `Map` are error TS7052 and would set
+    a plain property in JavaScript, not a map entry.
+
+- key: ts-medium-16
+  type: single
+  category: typescript
+  tags: [generators, iterator-helpers, laziness]
+  prompt: |
+    How many `yield` lines does this print before the result?
+
+    ```ts
+    function* numbers(): Generator<number> {
+      let n = 1;
+      while (true) {
+        console.log(`yield ${n}`);
+        yield n;
+        n += 1;
+      }
+    }
+
+    const result = numbers()
+      .filter((n) => n % 3 === 0)
+      .take(2)
+      .toArray();
+    console.log(result);
+    ```
+  options:
+    - text: Six, then `[ 3, 6 ]`
+      correct: true
+    - text: Two, then `[ 3, 6 ]`
+    - text: None; the generator never ends, so the program runs forever
+    - text: Three, then `[ 3 ]`
+  explanation: |
+    Iterator helpers are lazy: values flow through the chain one at a time, only when
+    `toArray` asks for them. `filter` pulls 1, 2, 3 (keeps 3), then 4, 5, 6 (keeps 6), and
+    `take(2)` then stops asking, so the endless generator runs only until its sixth `yield`.
+    `[...numbers()]` without a `take` would indeed never finish.
+
+- key: ts-medium-17
+  type: single
+  category: typescript
+  tags: [promises, async, event-loop]
+  prompt: |
+    In what order are the letters printed?
+
+    ```ts
+    async function load(): Promise<string> {
+      console.log("B");
+      return "D";
+    }
+
+    console.log("A");
+    load().then((value) => console.log(value));
+    console.log("C");
+    ```
+  options:
+    - text: A, B, C, D
+      correct: true
+    - text: A, C, B, D
+    - text: A, B, D, C
+    - text: A, C, D, B
+  explanation: |
+    Calling an `async` function runs its body at once, up to its first `await`, so `B`
+    prints straight after `A`. The returned promise is already fulfilled, but a `then`
+    callback always runs later, after the current code finishes, so `C` comes before `D`.
+
+- key: ts-medium-18
+  type: single
+  category: typescript
+  tags: [promises, combinators]
+  prompt: |
+    A dashboard reads twelve weather stations concurrently. It must show every reading that
+    succeeds and an error message for each station that fails. Which call fits?
+  options:
+    - text: '`Promise.allSettled(ids.map(readStation))`'
+      correct: true
+    - text: '`Promise.all(ids.map(readStation))`'
+    - text: '`Promise.any(ids.map(readStation))`'
+    - text: '`Promise.race(ids.map(readStation))`'
+  explanation: |
+    `allSettled` waits for every promise and never rejects; it gives one object per station,
+    a discriminated union on `status` with `value` or `reason`. `all` rejects as soon as one
+    station fails, losing the other results. `any` gives only the first success, and `race`
+    only the first promise to settle.
+
+- key: ts-medium-19
+  type: single
+  category: typescript
+  tags: [json, runtime-validation, any]
+  prompt: |
+    ```ts
+    interface Pickup {
+      id: string;
+      boxes: number;
+    }
+
+    const pickup: Pickup = JSON.parse('{"id":"P-17","boxes":"3"}');
+    console.log(pickup.boxes + 1);
+    ```
+
+    What happens?
+  options:
+    - text: It compiles and prints `31`
+      correct: true
+    - text: It compiles and prints `4`
+    - text: Error TS2322, because `"3"` is not a `number`
+    - text: It compiles, then throws a `TypeError` because `boxes` has the wrong type
+  explanation: |
+    `JSON.parse` returns `any`, which the compiler accepts as a `Pickup` without checking.
+    At run time `boxes` is the string `"3"`, so `+ 1` joins strings and prints `31`. Types
+    are erased and cannot check data that arrives while the program runs: store the result
+    as `unknown` and validate it with code before giving it a type.
+
+- key: ts-medium-20
+  type: single
+  category: typescript
+  tags: [dates, runtime-validation]
+  prompt: |
+    A validator accepts any string for which `new Date(text)` is not an Invalid Date. What
+    does `new Date("2026-02-30").toISOString()` return on Node.js 26?
+  options:
+    - text: '`2026-03-02T00:00:00.000Z`'
+      correct: true
+    - text: 'It throws `RangeError: Invalid time value`'
+    - text: '`2026-02-28T00:00:00.000Z`'
+    - text: '`2026-02-30T00:00:00.000Z`'
+  explanation: |
+    An out-of-range day rolls over: 30 February 2026 becomes 2 March, and a date-only ISO
+    string means midnight UTC. So the "not Invalid Date" test accepts an impossible date.
+    Compare `toISOString()` with the input as well. A date that cannot be parsed at all, such
+    as `2026-13-45`, is an Invalid Date, and calling `toISOString()` on that one throws.
+
+- key: ts-medium-21
+  type: single
+  category: typescript
+  tags: [node-fs, async, errors]
+  prompt: |
+    ```ts
+    import { readFile } from "node:fs/promises";
+
+    async function readOptional(file: string): Promise<string | undefined> {
+      try {
+        return readFile(file, "utf8");
+      } catch {
+        return undefined;
+      }
+    }
+    ```
+
+    What does `await readOptional("missing.json")` do when the file does not exist?
+  options:
+    - text: It rejects with the `ENOENT` error, because the `catch` never sees it
+      correct: true
+    - text: It returns `undefined`
+    - text: It returns an empty string
+    - text: The compiler rejects `return readFile(...)` inside `try`
+  explanation: |
+    `readFile` returns a promise, and `return` hands that promise out of the `try` block
+    before it rejects; the rejection happens later, outside the `try`. Write
+    `return await readFile(file, "utf8");` so the rejection is thrown inside the `try`.
+    Better still, check `error.code === "ENOENT"` and rethrow other errors.
+
+- key: ts-medium-22
+  type: multiple
+  category: typescript
+  tags: [node-process, paths, exit-codes]
+  prompt: |
+    Which statements about Node.js programs are true? Choose all that apply.
+  options:
+    - text: A relative path given to `readFile` is resolved against `process.cwd()`, the folder the program was started from
+      correct: true
+    - text: Every value in `process.env` has the type `string | undefined`
+      correct: true
+    - text: '`process.exit(1)` is the safest way to fail, because it waits for pending output first'
+    - text: '`process.argv[0]` is the first argument typed after the script name'
+  explanation: |
+    Relative paths start from the working directory, not the script's folder; use
+    `import.meta.dirname` for files that ship with the code. Environment variables are
+    strings or missing, and the compiler makes you handle both. `process.exit` stops at once,
+    possibly before output is written; set `process.exitCode` instead. `process.argv` starts
+    with the path of `node` and of the script, so arguments begin at index 2.
+
+- key: ts-medium-23
+  type: single
+  category: typescript
+  tags: [declare, ambient, declaration-files]
+  prompt: |
+    ```ts
+    // globals.d.ts
+    declare const KILN_ID: string;
+    ```
+
+    ```ts
+    // main.ts
+    console.log(`kiln ${KILN_ID.toUpperCase()}`);
+    ```
+
+    Nothing else in the program defines `KILN_ID`. What happens?
+  options:
+    - text: 'It compiles, then fails with `ReferenceError: KILN_ID is not defined`'
+      correct: true
+    - text: It compiles and prints `kiln ` followed by an empty string
+    - text: The compiler reports that `KILN_ID` is never assigned
+    - text: It compiles and prints `kiln undefined`
+  explanation: |
+    `declare` describes a value that exists elsewhere and emits no JavaScript at all. The
+    compiler trusts the declaration, so `main.ts` type-checks, but nothing ever created
+    `KILN_ID`, and reading it throws a `ReferenceError`. Only declare what really exists at
+    run time.
+
+- key: ts-medium-24
+  type: single
+  category: typescript
+  tags: [declaration-files, ambient-modules, any]
+  prompt: |
+    The JavaScript package `kiln-colours` exports `colourFor(celsius)`, which returns a
+    string. A project adds this file to silence error TS7016:
+
+    ```ts
+    // kiln-colours.d.ts
+    declare module "kiln-colours";
+    ```
+
+    Then it compiles `const colour: number = colourFor("hot");`. What happens?
+  options:
+    - text: It compiles, because every import from a shorthand ambient module is `any`
+      correct: true
+    - text: Error TS2345, because `"hot"` is not a number
+    - text: Error TS2322, because `colourFor` returns a string
+    - text: Error TS7016 again, because the declaration has no body
+  explanation: |
+    A `declare module "name";` with no body is a shorthand ambient module: it tells the
+    compiler the module exists and makes everything imported from it `any`. Both mistakes
+    in the line pass unchecked. Write a full declaration instead, such as
+    `declare module "kiln-colours" { export function colourFor(celsius: number): string; }`,
+    and the compiler checks every call.

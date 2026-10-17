@@ -1,0 +1,18 @@
+title: Idiomatic TypeScript
+summary: >-
+  Write TypeScript the way TypeScript is written. Organize code in ES modules, model data with
+  classes, generics and discriminated unions, choose between enums and literal unions, use the
+  utility types and keyof and typeof, work with Maps, Sets and iterators, write async code with
+  promises, validate JSON at runtime, use the Node.js APIs, and type JavaScript libraries.
+outcomes:
+  - Organize a program into ES modules and use npm packages and their type definitions
+  - Model data with classes, generics, type guards and discriminated unions with exhaustive checks
+  - Derive types with the utility types, keyof, typeof and indexed access
+  - Write async code with promises and async/await, and use the Node.js file and process APIs
+  - Validate untrusted JSON at runtime instead of trusting a type assertion
+exam:
+  title: Idiomatic TypeScript Mock Exam
+  description: Ten questions drawn from the level's bank, from modules and classes to generics, unions, utility types, async code and validation.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

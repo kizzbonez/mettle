@@ -1,0 +1,19 @@
+title: Laundry Status Board
+summary: Type route keys with a template literal type, match paths with parameters, answer from a route table with 404, 405 and a generic 500 that leaks nothing, and serve it with node:http on 127.0.0.1.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Types route keys and matches paths with parameters
+    file: 02-match-path.ts
+    hidden: true
+  - name: Routes in table order with 404, 405 and a safe 500
+    file: 03-handler.ts
+    hidden: true
+  - name: Serves JSON over HTTP on 127.0.0.1 and closes
+    file: 04-server.ts
+    hidden: true

@@ -1,0 +1,19 @@
+title: Lost Property Office
+summary: Give an interface a readonly and an optional property, label objects with destructuring, count them in an index signature dictionary, and claim an item with a spread copy.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Shapes FoundItem with a readonly tag and an optional claimedBy
+    file: 02-item-shape.ts
+    hidden: true
+  - name: Labels claimed and unclaimed items, extra properties allowed
+    file: 03-labels.ts
+    hidden: true
+  - name: Counts items per station and claims a copy without changing the original
+    file: 04-count-and-claim.ts
+    hidden: true

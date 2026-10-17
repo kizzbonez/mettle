@@ -1,0 +1,19 @@
+title: Community Fridge Donations
+summary: Treat parsed JSON as unknown, write a generic Parsed result union, a string-array type guard and a strict date parser, and validate donation messages field by field, reporting every problem.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Accepts only real dates written YYYY-MM-DD
+    file: 02-days.ts
+    hidden: true
+  - name: Checks every field and reports every problem in order
+    file: 03-donations.ts
+    hidden: true
+  - name: Narrows with isStringArray and makes Parsed a discriminated union
+    file: 04-types-and-guards.ts
+    hidden: true

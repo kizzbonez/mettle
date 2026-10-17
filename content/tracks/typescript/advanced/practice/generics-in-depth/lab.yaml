@@ -1,0 +1,19 @@
+title: Bike Rental Helpers
+summary: Tie a key parameter to its object with keyof, keep a fallback out of inference with NoInfer, and keep literal tuple types with a const type parameter.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Groups any items by a key they have, with exact map types
+    file: 02-group-by.ts
+    hidden: true
+  - name: Picks a choice or the fallback, and rejects a fallback that is not a choice
+    file: 03-pick-or.ts
+    hidden: true
+  - name: Keeps the literal tuple of stops and refuses repeated stops
+    file: 04-tour-stops.ts
+    hidden: true

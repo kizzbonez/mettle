@@ -1,0 +1,19 @@
+title: Cycling Club Ride Logs
+summary: Split stream chunks into lines with an async generator, stream a ride log through a pipeline, write to a slow stream that pushes back by waiting for drain, and move a CPU-heavy sum into a worker thread that loads the same file.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Splits lines across chunks and streams a season's log
+    file: 02-lines-and-pipeline.ts
+    hidden: true
+  - name: Waits for drain and keeps the buffer at its high water mark
+    file: 03-backpressure.ts
+    hidden: true
+  - name: Computes climbs in worker threads and reports their failures
+    file: 04-worker.ts
+    hidden: true

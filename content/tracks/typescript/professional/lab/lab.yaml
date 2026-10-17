@@ -1,0 +1,23 @@
+slug: kiln-booking-service
+title: Kiln Booking Service
+summary: Build a pottery studio's booking service in TypeScript, with typed configuration from the environment, field-by-field validation, structured errors, an HTTP server on 127.0.0.1 and a graceful shutdown, checked down to its types.
+language: typescript
+minutes: 60
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the walkthrough from the instructions
+    file: 01-walkthrough.ts
+    hidden: false
+  - name: Reads configuration from the environment and reports every problem
+    file: 02-configuration.ts
+    hidden: true
+  - name: Validates booking bodies field by field, with exact types
+    file: 03-validation.ts
+    hidden: true
+  - name: Routes every request and answers with structured errors
+    file: 04-routing.ts
+    hidden: true
+  - name: Serves JSON on 127.0.0.1 and shuts down gracefully
+    file: 05-http-and-shutdown.ts
+    hidden: true

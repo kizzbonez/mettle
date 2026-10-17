@@ -1,0 +1,19 @@
+title: Cinema Box Office
+summary: Write a custom error class with an extra field, throw it and a built-in RangeError from a parser, and catch each kind by narrowing the unknown catch variable with instanceof.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Finishes SeatError with its name and the code it was given
+    file: 02-seat-error.ts
+    hidden: true
+  - name: Reads seat codes and throws the right error for each mistake
+    file: 03-parse-seat.ts
+    hidden: true
+  - name: Books what it can and explains every refusal
+    file: 04-book-seats.ts
+    hidden: true

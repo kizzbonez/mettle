@@ -1,0 +1,23 @@
+slug: repair-cafe-intake
+title: Repair Café Intake Desk
+summary: Validate a messy JSON export of repair tickets, model their outcomes as a discriminated union, count and update them with generics and utility types, and price missing parts from a slow, failing async service.
+language: typescript
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Loads, describes, counts and prices the October intake file
+    file: 01-intake-example.ts
+    hidden: false
+  - name: Validates each ticket field by field and builds a clean ticket
+    file: 02-ticket-validation.ts
+    hidden: true
+  - name: Describes every outcome, and the union, countBy and TicketUpdate types are exact
+    file: 03-outcomes-and-types.ts
+    hidden: true
+  - name: Prices each part once, concurrently, in a stable order, despite failures
+    file: 04-parts-quote.ts
+    hidden: true
+  - name: Survives odd entries and refuses files that are not a list of tickets
+    file: 05-loading-edge-cases.ts
+    hidden: true

@@ -1,0 +1,19 @@
+title: Florist Build Plan
+summary: Predict what tsc emits for each source file, from JavaScript and source maps to declaration files and their maps, under rootDir, outDir, emitDeclarationOnly and noEmit, and rewrite relative .ts imports as rewriteRelativeImportExtensions does.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Rewrites only relative TypeScript imports
+    file: 02-rewrite-import.ts
+    hidden: true
+  - name: Lists the emitted files in order for every combination of options
+    file: 03-emitted-files.ts
+    hidden: true
+  - name: Applies rootDir and outDir, and emits nothing for declaration files
+    file: 04-roots-and-declarations.ts
+    hidden: true

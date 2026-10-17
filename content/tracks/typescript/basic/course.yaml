@@ -1,0 +1,19 @@
+title: TypeScript Foundations
+summary: >-
+  TypeScript from zero. Learn what JavaScript and TypeScript are, install Node.js and the
+  TypeScript compiler and run a first program, then values and types, strings, numbers and
+  equality, conditions and loops, functions, arrays and tuples, objects and interfaces, null
+  safety, unions and narrowing, and errors, and finish with a complete program that reads and
+  checks real input.
+outcomes:
+  - Install Node.js and TypeScript, configure a strict project, and read the compiler's errors
+  - Write programs with variables, the primitive types, strings, numbers, conditions and loops
+  - Type functions, arrays, tuples and objects with annotations, interfaces and type aliases
+  - Handle null and undefined safely and narrow union types with type checks
+  - Throw and catch errors, read input and build a small command-line program
+exam:
+  title: TypeScript Foundations Mock Exam
+  description: Ten questions drawn from the level's bank, from how TypeScript runs and its types to functions, objects, unions and errors.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

@@ -1,0 +1,636 @@
+- key: ts-advanced-01
+  type: single
+  category: typescript
+  tags: [generics, keyof, indexed-access]
+  prompt: |
+    ```ts
+    interface Room {
+      name: string;
+      seats: number;
+    }
+    function field<T, K extends keyof T>(item: T, key: K): T[K] {
+      return item[key];
+    }
+    const room: Room = { name: "Hall", seats: 120 };
+    const seats = field(room, "seats");
+    ```
+
+    Which type does TypeScript infer for `seats`?
+  options:
+    - text: "`number`"
+      correct: true
+    - text: "`string | number`"
+    - text: "`Room[keyof Room]`"
+    - text: "`unknown`, because `T` could be anything inside `field`"
+  explanation: |
+    `T` is inferred as `Room` from the first argument, and `K` as the literal type `"seats"`
+    from the second, so the return type `T[K]` is `Room["seats"]`, which is `number`.
+    `string | number` would be the result of `Room[keyof Room]`, which is what you get if the
+    key parameter is typed `keyof T` instead of its own type parameter `K`: then the specific
+    key is forgotten. Inside the function `T` is unknown, but at the call it is known.
+
+- key: ts-advanced-02
+  type: single
+  category: typescript
+  tags: [generics, variance, in-out]
+  prompt: |
+    ```ts
+    interface Sink<in T> {
+      write: (value: T) => void;
+    }
+    declare const textSink: Sink<string>;
+    declare const mixedSink: Sink<string | number>;
+    ```
+
+    Which assignment compiles?
+  options:
+    - text: "`const a: Sink<string> = mixedSink;`"
+      correct: true
+    - text: "`const b: Sink<string | number> = textSink;`"
+    - text: Both, because variance annotations are only documentation
+    - text: Neither, because `in` makes `Sink` invariant
+  explanation: |
+    A sink only takes values in, so it is **contravariant**: something that can write any
+    `string | number` can certainly write a `string`, so a `Sink<string | number>` may be used
+    as a `Sink<string>`. The reverse fails with error TS2322, "Type 'Sink<string>' is not
+    assignable to type 'Sink<string | number>'", because a text-only sink cannot accept a number.
+    `in` states contravariance and the compiler checks it; `in out` would mean invariant.
+
+- key: ts-advanced-03
+  type: multiple
+  category: typescript
+  tags: [generics, const-type-parameters]
+  prompt: |
+    ```ts
+    function tags<const T extends readonly string[]>(list: T): T {
+      return list;
+    }
+    const inline = tags(["jazz", "soul"]);
+    const stored = ["jazz", "soul"];
+    const fromVariable = tags(stored);
+    ```
+
+    Which statements are true? Choose two.
+  options:
+    - text: "`inline` has the type `readonly [\"jazz\", \"soul\"]`"
+      correct: true
+    - text: "`fromVariable` has the type `string[]`"
+      correct: true
+    - text: "`fromVariable` has the type `readonly [\"jazz\", \"soul\"]`, because `const` applies to every argument"
+    - text: "`inline` has the type `string[]`, because `const` on a type parameter only forbids reassignment"
+  explanation: |
+    A `const` type parameter makes inference treat literals **written in the call** as if they
+    had `as const`, so `inline` is the readonly tuple `readonly ["jazz", "soul"]`. It has no
+    effect on a value that already has a type: `stored` was inferred as `string[]` when it was
+    declared, so `fromVariable` is `string[]`. The `readonly string[]` constraint matters too:
+    it lets the readonly tuple satisfy the constraint.
+
+- key: ts-advanced-04
+  type: single
+  category: typescript
+  tags: [conditional-types, distributive]
+  prompt: |
+    ```ts
+    type Wrap<T> = T extends unknown ? { value: T } : never;
+    type W = Wrap<"a" | 1>;
+    ```
+
+    What is `W`?
+  options:
+    - text: "`{ value: \"a\" } | { value: 1 }`"
+      correct: true
+    - text: "`{ value: \"a\" | 1 }`"
+    - text: "`never`, because a union does not extend `unknown`"
+    - text: "`{ value: unknown }`"
+  explanation: |
+    The checked type is a bare type parameter, so the conditional type is **distributive**: it
+    is applied to `"a"` and to `1` separately and the results are joined into a union. To check
+    the union as a whole and get `{ value: "a" | 1 }`, wrap both sides in brackets:
+    `[T] extends [unknown] ? { value: T } : never`. Every type extends `unknown`, so `never` is
+    never chosen here.
+
+- key: ts-advanced-05
+  type: single
+  category: typescript
+  tags: [conditional-types, infer]
+  prompt: |
+    ```ts
+    type ElementType<T> = T extends readonly (infer E)[] ? E : never;
+    type A = ElementType<number[]>;
+    type B = ElementType<string>;
+    ```
+
+    What are `A` and `B`?
+  options:
+    - text: "`A` is `number`, `B` is `never`"
+      correct: true
+    - text: "`A` is `number`, `B` is `string`, because a string is a sequence of characters"
+    - text: "`A` is `number[]`, `B` is `never`"
+    - text: "`A` is `unknown`, because `infer` cannot see inside arrays"
+  explanation: |
+    `infer E` captures whatever stands in the element position when `T` matches the pattern
+    `readonly E[]`. `number[]` matches, so `A` is `number`. `string` is not an array type (being
+    iterable is not enough), so the false branch gives `never`, and assigning `"x"` to a `B` is
+    error TS2322, "Type '"x"' is not assignable to type 'never'."
+
+- key: ts-advanced-06
+  type: single
+  category: typescript
+  tags: [conditional-types, never, distributive]
+  prompt: |
+    ```ts
+    type IsString<T> = T extends string ? true : false;
+    type R = IsString<never>;
+    ```
+
+    What is `R`?
+  options:
+    - text: "`never`"
+      correct: true
+    - text: "`true`, because `never` is assignable to every type"
+    - text: "`false`, because `never` is not a string"
+    - text: "`boolean`"
+  explanation: |
+    `IsString` is distributive, and `never` is the empty union: distributing over no members
+    gives no results, which is `never`. Even `const r: R = true` is rejected with "Type 'true' is
+    not assignable to type 'never'." `true` would be right for the non-distributive form
+    `[T] extends [string] ? true : false`, since `never` is assignable to `string`. That
+    bracketed form is how an `IsNever` check must be written.
+
+- key: ts-advanced-07
+  type: single
+  category: typescript
+  tags: [mapped-types, key-remapping]
+  prompt: |
+    ```ts
+    type Methods<T> = { [K in keyof T as T[K] extends (...args: never[]) => unknown ? K : never]: T[K] };
+    interface Player {
+      name: string;
+      volume: number;
+      play(): void;
+      stop(): void;
+    }
+    type M = keyof Methods<Player>;
+    ```
+
+    What is `M`?
+  options:
+    - text: "`\"play\" | \"stop\"`"
+      correct: true
+    - text: "`\"name\" | \"volume\" | \"play\" | \"stop\"`, because `as` only renames keys"
+    - text: "`\"name\" | \"volume\"`"
+    - text: "`never`, because a mapped type cannot inspect property types"
+  explanation: |
+    The `as` clause computes each new key. For a property whose type is a function the
+    conditional type gives back the key `K`; for the others it gives `never`, and a key remapped
+    to `never` is dropped. So only the methods remain. The pattern
+    `(...args: never[]) => unknown` matches every function, whatever its parameters.
+
+- key: ts-advanced-08
+  type: multiple
+  category: typescript
+  tags: [template-literal-types]
+  prompt: |
+    ```ts
+    type Axis = "x" | "y";
+    type Edge = "start" | "end";
+    type Inset = `${Axis}-${Edge}`;
+    ```
+
+    Which assignments compile? Choose two.
+  options:
+    - text: "`const a: Inset = \"x-start\";`"
+      correct: true
+    - text: "`const b: Inset = \"y-end\";`"
+      correct: true
+    - text: "`const c: Inset = \"x-middle\";`"
+    - text: "`const d: Inset = \"xy-start\";`"
+  explanation: |
+    A template literal type with unions in its placeholders is every combination: here the four
+    strings `"x-start"`, `"x-end"`, `"y-start"` and `"y-end"`. `"x-middle"` and `"xy-start"`
+    are rejected, and TypeScript 7 lists the members in its stable order:
+    `'"x-end" | "x-start" | "y-end" | "y-start"'`, adding "Did you mean '"x-start"'?" for the
+    near miss.
+
+- key: ts-advanced-09
+  type: multiple
+  category: typescript
+  tags: [branded-types]
+  prompt: |
+    ```ts
+    declare const brand: unique symbol;
+    type Meters = number & { readonly [brand]: "Meters" };
+    function meters(value: number): Meters {
+      return value as Meters;
+    }
+    function climb(height: Meters): string {
+      return `${height} m`;
+    }
+    const peak = meters(8848);
+    climb(peak);              // A
+    climb(8848);              // B
+    const plain: number = peak; // C
+    climb(peak + 1);          // D
+    ```
+
+    Which lines does the compiler reject? Choose two.
+  options:
+    - text: B
+      correct: true
+    - text: D
+      correct: true
+    - text: A
+    - text: C
+  explanation: |
+    A plain `number` lacks the brand property, so `climb(8848)` is rejected with "Argument of
+    type 'number' is not assignable to parameter of type 'Meters'." Arithmetic returns a plain
+    `number`, so `peak + 1` has lost the brand too (D). A branded value is still a `number`, so
+    it can be assigned to one (C). Code that computes a new branded value must pass it through
+    the validating function again.
+
+- key: ts-advanced-10
+  type: single
+  category: typescript
+  tags: [satisfies, keyof-typeof]
+  prompt: |
+    ```ts
+    const sizes = { small: 8, large: 16 } satisfies Record<string, number>;
+    type SizeName = keyof typeof sizes;
+
+    const annotated: Record<string, number> = { small: 8, large: 16 };
+    type AnnotatedName = keyof typeof annotated;
+    ```
+
+    What are `SizeName` and `AnnotatedName`?
+  options:
+    - text: "`SizeName` is `\"small\" | \"large\"`; `AnnotatedName` is `string`"
+      correct: true
+    - text: Both are `string`, because `satisfies` and an annotation give the same type
+    - text: "Both are `\"small\" | \"large\"`"
+    - text: "`SizeName` is `string`; `AnnotatedName` is `\"small\" | \"large\"`"
+  explanation: |
+    `satisfies` checks the object against `Record<string, number>` but leaves its type as
+    inferred, `{ small: number; large: number }`, so its keys are `"small" | "large"`. An
+    annotation replaces the inferred type with `Record<string, number>`, whose keys are any
+    `string`; `annotated.medium` then compiles and is `undefined` at run time.
+
+- key: ts-advanced-11
+  type: single
+  category: typescript
+  tags: [overloads]
+  prompt: |
+    ```ts
+    function toList(value: string): string[];
+    function toList(value: string[]): string[];
+    function toList(value: string | string[]): string[] {
+      return typeof value === "string" ? [value] : value;
+    }
+    function normalize(input: string | string[]): string[] {
+      return toList(input);
+    }
+    ```
+
+    What happens when this is compiled?
+  options:
+    - text: "Error TS2769, \"No overload matches this call\", on `toList(input)`"
+      correct: true
+    - text: It compiles, because the implementation signature accepts `string | string[]`
+    - text: It compiles, and TypeScript picks the first overload because `string` comes first
+    - text: "An error on the implementation, because it is not compatible with the overloads"
+  explanation: |
+    Callers see only the overload signatures, never the implementation's, and each call must
+    match one overload on its own. A `string | string[]` argument fits neither `string` nor
+    `string[]`. Since both overloads return `string[]`, the overloads add nothing: one signature
+    with a union parameter is simpler and accepts every call. Otherwise, add a third overload
+    taking the union.
+
+- key: ts-advanced-12
+  type: single
+  category: typescript
+  tags: [this-parameter, functions]
+  prompt: |
+    ```ts
+    const timer = {
+      ticks: 0,
+      tick(this: { ticks: number }): number {
+        this.ticks++;
+        return this.ticks;
+      },
+    };
+    const tick = timer.tick;
+    console.log(tick());
+    ```
+
+    What happens?
+  options:
+    - text: "A compile error: the `this` context of type `void` is not assignable to the method's `this`"
+      correct: true
+    - text: It prints `1`
+    - text: "It prints `NaN`, because `this` is the global object"
+    - text: "It compiles and then throws a `TypeError` at run time"
+  explanation: |
+    The `this` parameter says the method must be called on an object with `ticks`. `tick()`
+    calls it with no object, so the compiler reports error TS2684. Without the `this` parameter
+    it would compile, and in an ES module `this` would be `undefined`, so `this.ticks++` would
+    throw a `TypeError` at run time. Call `timer.tick()` or use `timer.tick.bind(timer)`.
+
+- key: ts-advanced-13
+  type: single
+  category: typescript
+  tags: [declaration-merging, interfaces]
+  prompt: |
+    ```ts
+    interface Config {
+      port: number;
+    }
+    interface Config {
+      host: string;
+    }
+    const config: Config = { port: 8080 };
+    ```
+
+    What does the compiler say?
+  options:
+    - text: "Property `host` is missing: the two declarations merged into one interface with both properties"
+      correct: true
+    - text: "Duplicate identifier `Config`"
+    - text: "Nothing: the second declaration replaces the first, so `{ port: 8080 }` is an excess property error at most"
+    - text: "Nothing: merged properties are optional"
+  explanation: |
+    Interfaces with the same name in the same scope **merge**: `Config` has both `port` and
+    `host`, so the object is rejected with error TS2741, "Property 'host' is missing in type
+    '{ port: number; }' but required in type 'Config'." Type aliases do not merge: two
+    `type Config` declarations are error TS2300, "Duplicate identifier 'Config'." Merging is
+    what lets module augmentation add properties to a library's interfaces.
+
+- key: ts-advanced-14
+  type: single
+  category: typescript
+  tags: [decorators]
+  prompt: |
+    ```ts
+    function announce(_method: unknown, context: ClassMethodDecoratorContext): void {
+      console.log(`decorating ${String(context.name)}`);
+    }
+    console.log("before class");
+    class Box {
+      @announce
+      open(): void {
+        console.log("open");
+      }
+    }
+    console.log("after class");
+    new Box().open();
+    new Box().open();
+    ```
+
+    Compiled with `tsc` and run with Node.js, what does it print?
+  options:
+    - text: "`before class`, `decorating open`, `after class`, `open`, `open`"
+      correct: true
+    - text: "`before class`, `after class`, `decorating open`, `open`, `decorating open`, `open`"
+    - text: "`decorating open`, `before class`, `after class`, `open`, `open`"
+    - text: "`before class`, `after class`, `open`, `open`, because a decorator that returns nothing is skipped"
+  explanation: |
+    A decorator runs **once, when the class is defined**, which happens when execution reaches
+    the class declaration, between the two `console.log` calls around it. Creating instances
+    does not run it again. Returning nothing (`void`) keeps the original method, so `open` runs
+    normally. Per-instance work belongs in `context.addInitializer` or in a replacement function.
+
+- key: ts-advanced-15
+  type: multiple
+  category: typescript
+  tags: [decorators, node, symbol-metadata]
+  prompt: |
+    Which statements about standard (ECMAScript) decorators in TypeScript 7 and Node.js 26 are
+    true? Choose two.
+  options:
+    - text: They need no compiler option; `experimentalDecorators` selects the older, different design
+      correct: true
+    - text: "With `target: es2025`, `tsc` rewrites decorated classes into plain JavaScript with helper functions, which Node.js runs"
+      correct: true
+    - text: Node.js 26 runs them directly from a `.ts` file by stripping them like types
+    - text: They can decorate parameters and support `emitDecoratorMetadata`
+  explanation: |
+    Standard decorators have been supported without a flag since TypeScript 5.0. JavaScript
+    engines do not run decorators yet, so Node.js stops at the `@` with a syntax error when it
+    strips types from a `.ts` file; compiling with `tsc` first emits helpers such as
+    `__esDecorate`. Parameter decorators and `emitDecoratorMetadata` belong to the old
+    `experimentalDecorators` design. For `context.metadata` on Node.js 26, `Symbol.metadata`
+    must also be polyfilled before the class is defined.
+
+- key: ts-advanced-16
+  type: single
+  category: typescript
+  tags: [event-loop, microtasks]
+  prompt: |
+    ```ts
+    console.log("1");
+    setImmediate(() => console.log("2"));
+    queueMicrotask(() => console.log("3"));
+    Promise.resolve().then(() => console.log("4"));
+    (async () => {
+      console.log("5");
+      await null;
+      console.log("6");
+    })();
+    console.log("7");
+    ```
+
+    In what order are the numbers printed?
+  options:
+    - text: 1 5 7 3 4 6 2
+      correct: true
+    - text: 1 7 3 4 5 6 2
+    - text: 1 5 7 2 3 4 6
+    - text: 1 5 6 7 3 4 2
+  explanation: |
+    Synchronous code runs first: `1`, then the async function's body up to its first `await`
+    (`5`), then `7`. The microtask queue is then drained in order: `3` and `4` were queued
+    first, and the rest of the async function (`6`) was queued when it reached `await null`.
+    `setImmediate` is a macrotask, so `2` comes last. An async function does not start later;
+    it runs synchronously until its first `await`.
+
+- key: ts-advanced-17
+  type: single
+  category: typescript
+  tags: [abortcontroller, abortsignal]
+  prompt: |
+    ```ts
+    const first = new AbortController();
+    const second = new AbortController();
+    const either = AbortSignal.any([first.signal, second.signal]);
+    second.abort("second stopped");
+    first.abort("first stopped");
+    console.log(either.aborted, either.reason);
+    ```
+
+    What does it print?
+  options:
+    - text: "`true second stopped`"
+      correct: true
+    - text: "`true first stopped`, because the first signal in the list wins"
+    - text: "`false undefined`, because the combined signal aborts only when all inputs abort"
+    - text: "`true [ 'second stopped', 'first stopped' ]`"
+  explanation: |
+    `AbortSignal.any` returns a signal that aborts as soon as **any** input aborts, and its
+    reason is the reason of the input that aborted first, whatever its position in the list.
+    Aborting `first` later changes nothing: a signal aborts once. This is how a user's cancel
+    button and a time limit (`AbortSignal.timeout`) are combined into one signal.
+
+- key: ts-advanced-18
+  type: single
+  category: typescript
+  tags: [async-iterators, generators]
+  prompt: |
+    ```ts
+    async function* count(): AsyncGenerator<number> {
+      try {
+        yield 1;
+        yield 2;
+        yield 3;
+      } finally {
+        console.log("cleanup");
+      }
+    }
+    for await (const n of count()) {
+      console.log(n);
+      if (n === 2) break;
+    }
+    console.log("done");
+    ```
+
+    What does it print?
+  options:
+    - text: "`1`, `2`, `cleanup`, `done`"
+      correct: true
+    - text: "`1`, `2`, `done`, because `break` leaves the generator suspended"
+    - text: "`1`, `2`, `3`, `cleanup`, `done`"
+    - text: "`1`, `2`, `done`, `cleanup`"
+  explanation: |
+    Leaving a `for await` loop early calls the iterator's `return` method and waits for it. The
+    generator resumes as if a `return` happened at its paused `yield`, so its `finally` block runs
+    before the loop statement completes, and `3` is never produced. This is why an async
+    generator can safely hold a resource (a file, a connection) and release it in `finally`.
+
+- key: ts-advanced-19
+  type: single
+  category: typescript
+  tags: [error-handling, exhaustive, never]
+  prompt: |
+    ```ts
+    type FetchError =
+      | { kind: "offline" }
+      | { kind: "not-found"; url: string }
+      | { kind: "timeout"; seconds: number };
+
+    function message(error: FetchError): string {
+      switch (error.kind) {
+        case "offline":
+          return "no connection";
+        case "not-found":
+          return `missing: ${error.url}`;
+        default: {
+          const unhandled: never = error;
+          return unhandled;
+        }
+      }
+    }
+    ```
+
+    What does the compiler report?
+  options:
+    - text: "An error on `const unhandled: never = error`: the `timeout` kind is not assignable to `never`"
+      correct: true
+    - text: Nothing, because the `default` branch handles every remaining kind
+    - text: "An error on the function: not all code paths return a value"
+    - text: Nothing at compile time; the program throws when a timeout occurs
+  explanation: |
+    After the two `case`s, `error` has been narrowed to the members not yet handled. Here that is
+    `{ kind: "timeout"; seconds: number }`, which cannot be assigned to `never`, so the compiler
+    reports error TS2322 and names the forgotten kind. When every kind has a `case`, `error` is
+    `never` in the `default` branch and the line compiles. A `default` that returns a fallback
+    message would hide the missing case instead.
+
+- key: ts-advanced-20
+  type: single
+  category: typescript
+  tags: [aggregateerror, promises]
+  prompt: |
+    ```ts
+    const outcomes = await Promise.allSettled([Promise.resolve(1), Promise.reject(new Error("b")), Promise.resolve(3)]);
+    console.log(outcomes.map((o) => o.status).join(" "));
+    try {
+      await Promise.any([Promise.reject(new Error("a")), Promise.reject(new Error("b"))]);
+    } catch (error) {
+      console.log(error instanceof AggregateError, (error as AggregateError).errors.length);
+    }
+    ```
+
+    What does it print?
+  options:
+    - text: "`fulfilled rejected fulfilled`, then `true 2`"
+      correct: true
+    - text: "Only an unhandled rejection, because `allSettled` rejects with the first error"
+    - text: "`fulfilled rejected fulfilled`, then `false 2`, because `Promise.any` rejects with the last error"
+    - text: "`fulfilled fulfilled`, then `true 1`"
+  explanation: |
+    `Promise.allSettled` never rejects: it reports every outcome in order, with a `status` of
+    `"fulfilled"` or `"rejected"`. `Promise.any` resolves with the first success; when every
+    promise rejects it rejects with an `AggregateError` whose `errors` hold all the reasons, in
+    the order of the input. Node.js 26 gives it the message "All promises were rejected".
+
+- key: ts-advanced-21
+  type: single
+  category: typescript
+  tags: [testing, ts-expect-error, type-tests]
+  prompt: |
+    ```ts
+    function double(value: number): number {
+      return value * 2;
+    }
+    // @ts-expect-error double must reject a string
+    double("4");
+    // @ts-expect-error double must reject a number
+    double(4);
+    ```
+
+    What does `tsc` report?
+  options:
+    - text: "Error TS2578, \"Unused '@ts-expect-error' directive\", for the second directive only"
+      correct: true
+    - text: Nothing; `@ts-expect-error` only silences errors
+    - text: "Error TS2345 for `double(\"4\")`, because the directive only covers the next statement if it is a declaration"
+    - text: "Errors for both directives, because the reasons after them are not valid syntax"
+  explanation: |
+    `@ts-expect-error` suppresses an error on the next line and **requires** that there be one.
+    `double("4")` has an error, so the first directive is satisfied. `double(4)` is valid, so
+    the second directive is unused, and `tsc` reports that. This is what makes it a type-level
+    test: if a type becomes too loose, the directive above a misuse turns into an error. The
+    text after the directive is a free comment.
+
+- key: ts-advanced-22
+  type: single
+  category: typescript
+  tags: [testing, node-test, mocks]
+  prompt: |
+    ```ts
+    import { mock } from "node:test";
+    const save = mock.fn((text: string) => text.length);
+    save("a");
+    save("bc");
+    console.log(save.mock.callCount(), save.mock.calls[1].arguments, save.mock.calls[1].result);
+    ```
+
+    What does it print?
+  options:
+    - text: "`2 [ 'bc' ] 2`"
+      correct: true
+    - text: "`2 [ 'bc' ] undefined`, because a mock does not call its implementation"
+    - text: "`1 [ 'a' ] 1`, because `calls` is numbered from 1"
+    - text: "Nothing: `mock.fn` can only be used inside a `test` callback"
+  explanation: |
+    `mock.fn(impl)` returns a function that calls `impl` and records each call: `callCount()`
+    is 2, and `calls` is an ordinary array numbered from 0, so `calls[1]` is the second call,
+    with its `arguments` and the `result` it returned. `mock` works outside a test too; inside
+    one, `t.mock` is preferred because it restores everything when the test ends.

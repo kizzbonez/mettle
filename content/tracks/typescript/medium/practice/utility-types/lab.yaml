@@ -1,0 +1,19 @@
+title: Climbing Gym Members
+summary: Derive the sign-up, profile edit and membership card versions of a member record with Omit, Partial, Pick and Record, filter unions with Exclude and Extract, read a function's result type with Awaited and ReturnType, and write the functions that use them.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Registers a new member from a draft without id or date joined
+    file: 02-new-members.ts
+    hidden: true
+  - name: Applies only allowed changes and builds a card with two fields
+    file: 03-changes-and-cards.ts
+    hidden: true
+  - name: Filters plan and event unions and reads fetchMember's result type
+    file: 04-unions-and-functions.ts
+    hidden: true

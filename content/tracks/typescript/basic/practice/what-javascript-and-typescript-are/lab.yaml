@@ -1,0 +1,19 @@
+title: The Pool Sign
+summary: Run a finished program for the first time, read what the test says about its output, change the one value that is out of date, and submit.
+language: typescript
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the summer sign
+    file: 01-summer-sign.ts
+    hidden: false
+  - name: Shows the new closing time
+    file: 02-closing-time.ts
+    hidden: true
+  - name: Works out the hours open from the two times
+    file: 03-hours-open.ts
+    hidden: true
+  - name: Keeps the rest of the sign and runs without an error
+    file: 04-rest-of-sign.ts
+    hidden: true

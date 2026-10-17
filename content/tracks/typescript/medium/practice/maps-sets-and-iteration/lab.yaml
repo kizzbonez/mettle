@@ -1,0 +1,19 @@
+title: Bird Count
+summary: Count sightings with a Map, combine walks with the ES2025 set methods difference and intersection, write an endless generator of ring numbers, and chain lazy iterator helpers over a map's entries.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Tallies species in a Map, in first-seen order
+    file: 02-tally.ts
+    hidden: true
+  - name: Finds new and shared species with set methods
+    file: 03-sets.ts
+    hidden: true
+  - name: Generates ring numbers lazily and picks rare species with iterator helpers
+    file: 04-iteration.ts
+    hidden: true

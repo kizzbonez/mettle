@@ -1,0 +1,19 @@
+title: Library Loans
+summary: Create loans of one shape that V8 gives a single hidden class, replace a quadratic count with one pass over a Map, and fix an unbounded cache with a least-recently-used limit, judged by results, shapes, counted entries and input sizes rather than a clock.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Gives every loan the same fields and the same hidden class
+    file: 02-loan-shape.ts
+    hidden: true
+  - name: Finds the most borrowed title in a year of loans
+    file: 03-most-borrowed.ts
+    hidden: true
+  - name: Keeps the cache at its limit and saves repeated loads
+    file: 04-lru-cache.ts
+    hidden: true

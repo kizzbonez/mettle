@@ -1,0 +1,19 @@
+title: Parcel Courier Prices
+summary: Brand weights and prices so they cannot be mixed, create them only through a checking function, and keep a price table literal and readonly with as const satisfies.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Keeps weights and prices apart and checks every weight
+    file: 02-brands.ts
+    hidden: true
+  - name: Keeps the service table literal, readonly and checked
+    file: 03-services.ts
+    hidden: true
+  - name: Charges every started kilogram at the service's price
+    file: 04-quote.ts
+    hidden: true

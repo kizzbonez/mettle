@@ -1,0 +1,19 @@
+title: Recycling Centre Gate
+summary: Turn a string type into a union of literal types, narrow typed text into it with ===, switch over it with no default, and narrow a discriminated union by its kind.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Reads materials from text and types them exactly
+    file: 02-materials.ts
+    hidden: true
+  - name: Picks the bin for each material and rejects any other
+    file: 03-bin-colours.ts
+    hidden: true
+  - name: Works out credit points for bags and loose material
+    file: 04-credit-points.ts
+    hidden: true

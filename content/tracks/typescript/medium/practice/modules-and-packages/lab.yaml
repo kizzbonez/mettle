@@ -1,0 +1,19 @@
+title: Photo Archive Module
+summary: Turn a file into a module with named exports, a default export and private helpers, import functions and a type from node:path with import type, and name, file and read back photo scans.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Exports exactly the listed names, with describePhoto as the default
+    file: 02-exports.ts
+    hidden: true
+  - name: Reads back only archive photo names
+    file: 03-reading-paths.ts
+    hidden: true
+  - name: Imports from node:path by name, marks ParsedPath as a type, and lets join tidy paths
+    file: 04-imports.ts
+    hidden: true

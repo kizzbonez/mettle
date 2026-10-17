@@ -1,0 +1,19 @@
+title: Advanced Types and Async
+summary: >-
+  The type system as a tool, and async code you can trust. Write generics that infer well,
+  conditional types with infer, mapped and template literal types, branded types, satisfies and
+  const type parameters, overloads and module augmentation, standard decorators, then the event
+  loop, cancellation with AbortController, async iterators, typed error handling, and tests for
+  both code and types.
+outcomes:
+  - Build reusable types with generics, conditional types, infer, mapped and template literal types
+  - Make illegal states unrepresentable with branded types, satisfies and const assertions
+  - Type overloaded functions and augment existing modules, and write standard decorators
+  - Reason about the event loop and write cancellable, concurrent async code
+  - Handle errors with typed results and test both runtime behavior and types
+exam:
+  title: Advanced Types and Async Mock Exam
+  description: Ten questions drawn from the level's bank, from conditional and mapped types to decorators, the event loop and testing.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

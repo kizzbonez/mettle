@@ -1,0 +1,19 @@
+title: Meter Reading Import
+summary: Return parse failures as a Result union, explain each kind with an exhaustive switch, and report every bad line at once as an AggregateError of errors that keep their cause.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Makes Result a union that never mixes a value and an error
+    file: 02-result-type.ts
+    hidden: true
+  - name: Parses readings into results and explains every kind of failure
+    file: 03-parse-and-explain.ts
+    hidden: true
+  - name: Collects every bad line into one AggregateError with causes
+    file: 04-aggregate-failures.ts
+    hidden: true

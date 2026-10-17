@@ -1,0 +1,19 @@
+title: Homework Planner Lint
+summary: Write three lint rules over source text, a floating-promise check that knows which functions are async, a ban on @ts-ignore and a reason required for every eslint-disable, then the exit code of a CI run with --max-warnings.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Reports calls of async functions whose promise floats
+    file: 02-floating-promises.ts
+    hidden: true
+  - name: Reports @ts-ignore and disable comments without a reason
+    file: 03-comments.ts
+    hidden: true
+  - name: Applies the configured severities and the warning limit
+    file: 04-config-and-exit.ts
+    hidden: true

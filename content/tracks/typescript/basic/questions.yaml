@@ -1,0 +1,665 @@
+- key: ts-basic-01
+  type: single
+  category: typescript
+  tags: [compiler, type-erasure]
+  prompt: |
+    A file `area.ts` is compiled with `tsc` and the result is run with `node`. What happens to
+    the type annotations, such as `width: number`?
+  options:
+    - text: The compiler checks them and then removes them, so the JavaScript that runs has no types
+      correct: true
+    - text: The compiler turns them into checks that run whenever the function is called
+    - text: They stay in the JavaScript, and Node.js checks them while the program runs
+    - text: They are kept as comments so that Node.js can print better error messages
+  explanation: |
+    TypeScript's types exist only for the compiler. `tsc` checks every use of every value against
+    its type, then **erases** the types and writes plain JavaScript. Nothing is checked while the
+    program runs, which is why data that arrives from outside (input, files, `JSON.parse`) must be
+    checked by your own code. Types never change what a program does; they only decide whether the
+    compiler accepts it.
+
+- key: ts-basic-02
+  type: single
+  category: typescript
+  tags: [javascript, compiler, errors]
+  prompt: |
+    ```ts
+    const room = { width: 4, length: 5 };
+    const area = room.width * room.lenght;
+    console.log("Area:", area);
+    ```
+
+    Saved as `area.js` and run with `node`, and then saved as `area.ts` and given to `tsc`, what
+    happens?
+  options:
+    - text: "Node.js prints `Area: NaN`; `tsc` reports error TS2551, that `lenght` does not exist on the object's type, and suggests `length`"
+      correct: true
+    - text: "Node.js stops with a ReferenceError; `tsc` reports the same error"
+    - text: "Node.js prints `Area: 20`, because JavaScript corrects the misspelling"
+    - text: "Both accept it, because nobody wrote a type annotation for `room`"
+  explanation: |
+    JavaScript gives `undefined` for a property that does not exist, and `4 * undefined` is `NaN`,
+    so the program prints a wrong answer without any error. The compiler **infers** the type
+    `{ width: number; length: number; }` from the object literal, so no annotation is needed for it
+    to see that `lenght` is not a property: `error TS2551: Property 'lenght' does not exist on type
+    '{ width: number; length: number; }'. Did you mean 'length'?`
+
+- key: ts-basic-03
+  type: single
+  category: typescript
+  tags: [tsconfig, setup, types-node]
+  prompt: |
+    A new TypeScript 7 project has `"lib": ["es2025"]` and `"types": []` in its `tsconfig.json`.
+    Compiling `console.log("hi");` fails:
+
+    ```text
+    src/hello.ts(1,1): error TS2584: Cannot find name 'console'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+    ```
+
+    What is the right fix for a Node.js program?
+  options:
+    - text: "Install `@types/node` with `npm install -D @types/node` and set `\"types\": [\"node\"]`"
+      correct: true
+    - text: "Add `\"dom\"` to `lib`, as the message suggests"
+    - text: "Set `\"strict\": false`, which brings back the global names"
+    - text: "Run the file with `node hello.ts` instead, which needs no types"
+  explanation: |
+    Since TypeScript 6.0, `types` defaults to `[]`, so no `@types` package is loaded unless it is
+    listed. Node's globals such as `console` and `process` are described by `@types/node`, which
+    must be installed and named in `types`. Adding `dom` would describe a *browser*, with names that
+    do not exist in Node.js. `strict` has nothing to do with it, and running with type stripping
+    only hides the problem, because Node.js does not check types at all.
+
+- key: ts-basic-04
+  type: multiple
+  category: typescript
+  tags: [node, type-stripping]
+  prompt: |
+    Which statements about running `node app.ts` with Node.js 26 are true?
+  options:
+    - text: It works without any flag, by replacing the type annotations with whitespace
+      correct: true
+    - text: "A file that declares an `enum` fails with `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`"
+      correct: true
+    - text: It type-checks the file first and refuses to run it if there are type errors
+    - text: "It reads `tsconfig.json` and applies settings such as `target` and `paths`"
+  explanation: |
+    Type stripping is stable and on by default in Node.js 26. It only *erases* types, so it
+    performs no type checking: a file with a type error runs until the bad line fails. Syntax that
+    would need new JavaScript, such as `enum`, namespaces with values and parameter properties, is
+    refused with `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`. Node.js ignores `tsconfig.json`. Check with
+    `npx tsc --noEmit`, then run.
+
+- key: ts-basic-05
+  type: single
+  category: typescript
+  tags: [variables, const, let, inference]
+  prompt: |
+    ```ts
+    let visitors = 120;
+    visitors = "many";
+    const city = "Lima";
+    city = "Quito";
+    ```
+
+    What does the compiler report?
+  options:
+    - text: "Two errors: line 2 (TS2322, a string is not assignable to `number`) and line 4 (TS2588, `city` is a constant)"
+      correct: true
+    - text: "Only line 4: a `let` variable may hold any value"
+    - text: "Only line 2: a `const` string may be replaced by another string"
+    - text: Nothing, because neither variable has a type annotation
+  explanation: |
+    `visitors` has no annotation, but the compiler infers `number` from its first value and holds
+    it to that type forever, so line 2 is `error TS2322: Type 'string' is not assignable to type
+    'number'.` A `const` can never be assigned again: line 4 is `error TS2588: Cannot assign to
+    'city' because it is a constant.` Inference gives every variable a type even without an
+    annotation.
+
+- key: ts-basic-06
+  type: single
+  category: typescript
+  tags: [any, unknown]
+  prompt: |
+    ```ts
+    const a: any = "seven";
+    const b: unknown = "seven";
+    console.log(a.toFixed(1));
+    console.log(b.toFixed(1));
+    ```
+
+    Which statement is true?
+  options:
+    - text: "The compiler rejects only line 4 (`'b' is of type 'unknown'`); without line 4, line 3 compiles and fails at run time with a TypeError"
+      correct: true
+    - text: The compiler rejects both lines, because a string has no `toFixed` method
+    - text: The compiler rejects only line 3, because `any` is the stricter of the two types
+    - text: Both lines compile, and both print `NaN`
+  explanation: |
+    `any` switches checking off, so `a.toFixed(1)` compiles and then crashes with
+    `TypeError: a.toFixed is not a function`. `unknown` also accepts any value but allows nothing
+    until the value is narrowed, so line 4 is `error TS18046: 'b' is of type 'unknown'.` Prefer
+    `unknown`, and check with `typeof` before use.
+
+- key: ts-basic-07
+  type: single
+  category: typescript
+  tags: [strings, methods]
+  prompt: |
+    ```ts
+    const raw = "  Pine Walk,Lake Path ";
+    const parts = raw.trim().split(",");
+    console.log(parts.length, parts[1].toUpperCase(), raw.length);
+    ```
+
+    What does this print?
+  options:
+    - text: "`2 LAKE PATH 22`"
+      correct: true
+    - text: "`2 LAKE PATH 19`"
+    - text: "`2 PINE WALK 22`"
+    - text: "`1 LAKE PATH 22`"
+  explanation: |
+    `trim()` returns a **new** string without the outer spaces, and `split(",")` cuts it into two
+    pieces. Indexes start at 0, so `parts[1]` is `"Lake Path"`. Strings are immutable: `raw` itself
+    is unchanged and still has its three spaces, so its length is 22, not 19.
+
+- key: ts-basic-08
+  type: single
+  category: typescript
+  tags: [strings, template-literals, immutability]
+  prompt: |
+    ```ts
+    const trail = "ridge";
+    trail.toUpperCase();
+    console.log("Walking ${trail}", `${trail}!`);
+    ```
+
+    What does this print?
+  options:
+    - text: "`Walking ${trail} ridge!`"
+      correct: true
+    - text: "`Walking ridge ridge!`"
+    - text: "`Walking RIDGE RIDGE!`"
+    - text: "`Walking ${trail} RIDGE!`"
+  explanation: |
+    Only backticks make a template literal; in double quotes, `${trail}` is ordinary text. And
+    `toUpperCase()` returns a new string that line 2 throws away: strings never change, so `trail`
+    is still `"ridge"`. Keep the result (`const shouted = trail.toUpperCase();`) to use it.
+
+- key: ts-basic-09
+  type: single
+  category: typescript
+  tags: [numbers, parsing]
+  prompt: |
+    ```ts
+    console.log(Number(" 7 "), Number(""), Number("12px"), parseInt("12px", 10));
+    ```
+
+    What does this print?
+  options:
+    - text: "`7 0 NaN 12`"
+      correct: true
+    - text: "`7 NaN NaN 12`"
+    - text: "`NaN 0 12 12`"
+    - text: "`7 0 12 NaN`"
+  explanation: |
+    `Number` converts the whole string, ignoring spaces at the ends, and gives `NaN` when any part
+    is not a number, so `"12px"` is `NaN`. The trap is the empty string, which `Number` turns into
+    `0`. `parseInt` reads digits from the start and stops at the first non-digit, so it gives 12.
+    Check for empty text and for `NaN` before using a converted number.
+
+- key: ts-basic-10
+  type: multiple
+  category: typescript
+  tags: [truthiness, falsy]
+  prompt: |
+    Which of these values are **falsy**?
+  options:
+    - text: "`0n`"
+      correct: true
+    - text: "`NaN`"
+      correct: true
+    - text: "`\"0\"`"
+    - text: "`\" \"`"
+  explanation: |
+    The falsy values are `false`, `0`, `-0`, `0n`, `""`, `null`, `undefined` and `NaN`. Every other
+    value is truthy, including the non-empty strings `"0"` and `" "`. This is why `a || b` replaces
+    `0` and `""` as if they were missing, and why lesson 10's `??` exists.
+
+- key: ts-basic-11
+  type: single
+  category: typescript
+  tags: [switch, control-flow]
+  prompt: |
+    ```ts
+    const size = "m".toUpperCase();
+    switch (size) {
+      case "S":
+        console.log("small");
+      case "M":
+        console.log("medium");
+      case "L":
+        console.log("large");
+        break;
+      default:
+        console.log("unknown");
+    }
+    ```
+
+    What does this print?
+  options:
+    - text: "`medium` then `large`"
+      correct: true
+    - text: "Only `medium`"
+    - text: "`medium`, `large` then `unknown`"
+    - text: "`small`, `medium` then `large`"
+  explanation: |
+    `switch` jumps to the first `case` that is `===` to the value, here `"M"`, and runs from there
+    **until a `break`**. With no `break` after `medium`, execution falls through into the `"L"` case,
+    whose `break` stops it before `default`. End every case with `break` unless sharing code is
+    deliberate.
+
+- key: ts-basic-12
+  type: single
+  category: typescript
+  tags: [loops, break, continue]
+  prompt: |
+    ```ts
+    let total = 0;
+    for (const piece of "4,x,,6,9".split(",")) {
+      if (piece === "") {
+        continue;
+      }
+      const value = Number(piece);
+      if (Number.isNaN(value)) {
+        break;
+      }
+      total += value;
+    }
+    console.log(total);
+    ```
+
+    What does this print?
+  options:
+    - text: "`4`"
+      correct: true
+    - text: "`19`"
+    - text: "`10`"
+    - text: "`NaN`"
+  explanation: |
+    The pieces are `"4"`, `"x"`, `""`, `"6"` and `"9"`. `"4"` is added. `"x"` converts to `NaN`, and
+    `break` leaves the loop at once, so the remaining pieces are never read. `continue` would only
+    skip the empty piece and go on; `19` would be the answer if the `NaN` check used `continue`.
+
+- key: ts-basic-13
+  type: single
+  category: typescript
+  tags: [functions, default-parameters, optional-parameters]
+  prompt: |
+    ```ts
+    function label(name: string, grams = 800, note?: string): string {
+      return `${name} ${grams}${note === undefined ? "" : " " + note}`;
+    }
+
+    console.log(label("Rye", undefined, "seeded"));
+    ```
+
+    What happens?
+  options:
+    - text: "It prints `Rye 800 seeded`"
+      correct: true
+    - text: "It prints `Rye undefined seeded`"
+    - text: "It prints `Rye seeded`"
+    - text: "The compiler rejects the call, because `undefined` is not a `number`"
+  explanation: |
+    A default value is used when the argument is left out **or is `undefined`**, so passing
+    `undefined` explicitly is how to skip `grams` and still give `note`. The parameter `grams = 800`
+    accepts `undefined` from callers, so the call compiles. Inside the function `grams` is a
+    `number`, and the optional `note` is `string | undefined` until it is checked.
+
+- key: ts-basic-14
+  type: single
+  category: typescript
+  tags: [functions, closures]
+  prompt: |
+    ```ts
+    function makeCounter(): () => number {
+      let count = 0;
+      return () => {
+        count++;
+        return count;
+      };
+    }
+
+    const a = makeCounter();
+    const b = makeCounter();
+    console.log(a(), a(), b(), a());
+    ```
+
+    What does this print?
+  options:
+    - text: "`1 2 1 3`"
+      correct: true
+    - text: "`1 2 3 4`"
+    - text: "`1 1 1 1`"
+    - text: "`0 1 0 2`"
+  explanation: |
+    Each call of `makeCounter` creates its own `count`, and the arrow function it returns keeps
+    that variable alive: a **closure**. `a` and `b` therefore count separately. The arrow function
+    increments before returning, so the first call returns 1.
+
+- key: ts-basic-15
+  type: single
+  category: typescript
+  tags: [arrays, sort, toSorted]
+  prompt: |
+    ```ts
+    const counts = [10, 9, 1, 100];
+    const sorted = counts.toSorted();
+    counts.sort((a, b) => b - a);
+    console.log(sorted, counts);
+    ```
+
+    What does this print?
+  options:
+    - text: "`[ 1, 10, 100, 9 ] [ 100, 10, 9, 1 ]`"
+      correct: true
+    - text: "`[ 1, 9, 10, 100 ] [ 100, 10, 9, 1 ]`"
+    - text: "`[ 100, 10, 9, 1 ] [ 100, 10, 9, 1 ]`"
+    - text: "`[ 1, 10, 100, 9 ] [ 10, 9, 1, 100 ]`"
+  explanation: |
+    Without a comparator, sorting compares the elements as strings, so `"100"` comes before `"9"`.
+    `toSorted` returns a sorted **copy** and leaves `counts` alone; `sort` then sorts `counts` in
+    place, here downward with the comparator `b - a`. Always pass `(a, b) => a - b` (or `b - a`) to
+    sort numbers.
+
+- key: ts-basic-16
+  type: single
+  category: typescript
+  tags: [arrays, find, strict-null-checks]
+  prompt: |
+    ```ts
+    const harvest = [1.2, 3.5, 0.8];
+    const big = harvest.filter((kg) => kg > 1);
+    const first = harvest.find((kg) => kg > 1);
+    console.log(big.length, first.toFixed(1));
+    ```
+
+    What does the compiler say?
+  options:
+    - text: "Error TS18048 on line 4: `'first' is possibly 'undefined'`"
+      correct: true
+    - text: "Nothing; the program prints `2 1.2`"
+    - text: "An error on line 4 that `big` is possibly `undefined`"
+    - text: "An error on line 3 that `find` needs a starting value"
+  explanation: |
+    `find` returns the first matching element **or `undefined`** when none matches, so its type is
+    `number | undefined`, and strict null checks refuse `first.toFixed(1)` until it is checked.
+    `filter` always returns an array, possibly empty, so `big.length` is fine. Fix it with
+    `if (first !== undefined)` or with `first?.toFixed(1)`.
+
+- key: ts-basic-17
+  type: single
+  category: typescript
+  tags: [objects, structural-typing, excess-property-checks]
+  prompt: |
+    ```ts
+    interface Named {
+      name: string;
+    }
+
+    function greet(thing: Named): string {
+      return `Hello, ${thing.name}`;
+    }
+
+    const cat = { name: "Tom", lives: 9 };
+    console.log(greet(cat));
+    console.log(greet({ name: "Tom", lives: 9 }));
+    ```
+
+    Which call does the compiler reject?
+  options:
+    - text: "Only the last one, with error TS2353: an object literal may only specify known properties"
+      correct: true
+    - text: "Only `greet(cat)`, because `cat` was never declared as `Named`"
+    - text: "Both, because `lives` is not part of `Named`"
+    - text: "Neither, because extra properties are always allowed"
+  explanation: |
+    TypeScript compares types by **structure**: `cat` has a `name` of type `string`, so it fits
+    `Named`, extra properties and all. The exception is an object **literal** written directly
+    where the type is expected: nothing could ever read its extra property, so the compiler treats
+    it as a mistake (`'lives' does not exist in type 'Named'`). This excess property check catches
+    misspelled property names.
+
+- key: ts-basic-18
+  type: single
+  category: typescript
+  tags: [objects, spread]
+  prompt: |
+    ```ts
+    const original = { name: "Fig", care: { water: "weekly" } };
+    const copy = { ...original };
+    copy.name = "Olive";
+    copy.care.water = "daily";
+    console.log(original.name, original.care.water);
+    ```
+
+    What does this print?
+  options:
+    - text: "`Fig daily`"
+      correct: true
+    - text: "`Fig weekly`"
+    - text: "`Olive daily`"
+    - text: "`Olive weekly`"
+  explanation: |
+    Spread copies one level. `copy` gets its own `name`, so changing it leaves `original.name`
+    alone, but `copy.care` is the **same** inner object as `original.care`, so changing its `water`
+    shows through both. Copy the inner object too: `{ ...original, care: { ...original.care } }`.
+
+- key: ts-basic-19
+  type: single
+  category: typescript
+  tags: [nullish-coalescing, defaults]
+  prompt: |
+    ```ts
+    interface Settings {
+      volume?: number;
+      nickname?: string;
+    }
+
+    const settings: Settings = { volume: 0, nickname: "" };
+    console.log(settings.volume ?? 50, settings.volume || 50, `[${settings.nickname ?? "anon"}]`);
+    ```
+
+    What does this print?
+  options:
+    - text: "`0 50 []`"
+      correct: true
+    - text: "`50 50 [anon]`"
+    - text: "`0 0 []`"
+    - text: "`0 50 [anon]`"
+  explanation: |
+    `??` replaces only `null` and `undefined`, so the volume 0 and the empty nickname are kept.
+    `||` replaces every falsy value, so it turns the deliberate 0 into 50. Use `??` for "missing"
+    and keep `||` for "falsy".
+
+- key: ts-basic-20
+  type: single
+  category: typescript
+  tags: [non-null-assertion, strict-null-checks]
+  prompt: |
+    ```ts
+    interface Member {
+      name: string;
+    }
+
+    const members: Member[] = [{ name: "Ines" }];
+    const zoe = members.find((member) => member.name === "Zoe")!;
+    console.log(zoe.name.toUpperCase());
+    ```
+
+    What happens?
+  options:
+    - text: "It compiles, then fails at run time with `TypeError: Cannot read properties of undefined (reading 'name')`"
+      correct: true
+    - text: "The compiler reports that `zoe` is possibly `undefined`"
+    - text: "It prints `undefined`, because `!` turns a missing value into `undefined` safely"
+    - text: "The `!` throws a clear error saying that no member was found"
+  explanation: |
+    The non-null assertion `!` tells the compiler to remove `undefined` from the type and checks
+    nothing while the program runs. `find` returns `undefined`, so reading `.name` crashes. Check
+    for `undefined` and handle the missing member, supply a default with `??`, or throw an error
+    with a clear message instead.
+
+- key: ts-basic-21
+  type: single
+  category: typescript
+  tags: [literal-types, widening, unions]
+  prompt: |
+    ```ts
+    type Size = "S" | "M" | "L";
+
+    function priceOf(size: Size): number {
+      return size === "S" ? 3 : size === "M" ? 4 : 5;
+    }
+
+    let a = "M";
+    const b = "M";
+    let c: Size = "M";
+    console.log(priceOf(a));
+    console.log(priceOf(b));
+    console.log(priceOf(c));
+    ```
+
+    Which calls does the compiler reject?
+  options:
+    - text: "Only `priceOf(a)`"
+      correct: true
+    - text: "`priceOf(a)` and `priceOf(b)`, because both hold a plain string"
+    - text: "All three, because `\"M\"` is a `string`"
+    - text: "None, because all three variables hold `\"M\"`"
+  explanation: |
+    A `let` may later hold any string, so `let a = "M"` is **widened** to `string`, and a `string`
+    is not assignable to `Size` (TS2345). A `const` can never change, so `b` keeps the literal type
+    `"M"`. `c` is annotated as `Size`. Use `const` or an annotation when a literal type is needed.
+
+- key: ts-basic-22
+  type: multiple
+  category: typescript
+  tags: [narrowing, typeof, array-isarray]
+  prompt: |
+    Inside a function with the parameter `value: string | string[] | null`, which `if` conditions
+    let the compiler accept `value.join(",")` inside the `if` block?
+  options:
+    - text: "`Array.isArray(value)`"
+      correct: true
+    - text: "`value !== null && typeof value !== \"string\"`"
+      correct: true
+    - text: "`typeof value === \"object\"`"
+    - text: "`value` (a truthiness check)"
+  explanation: |
+    `Array.isArray` narrows straight to `string[]`. Ruling out `null` and then `string` also leaves
+    only `string[]`. `typeof value === "object"` is true for `null` as well, so the compiler reports
+    `'value' is possibly 'null'` (TS18047). A truthiness check removes `null` but leaves
+    `string | string[]`, and strings have no `join` (TS2339).
+
+- key: ts-basic-23
+  type: single
+  category: typescript
+  tags: [errors, catch, unknown]
+  prompt: |
+    ```ts
+    try {
+      JSON.parse("{oops");
+    } catch (error) {
+      console.log(error.message);
+    }
+    ```
+
+    The compiler reports `error TS18046: 'error' is of type 'unknown'.` What is the right fix?
+  options:
+    - text: "Check `if (error instanceof Error)` before reading `error.message`"
+      correct: true
+    - text: "Annotate the catch variable as `catch (error: Error)`"
+    - text: "Write `error!.message`, because a caught error is never `null`"
+    - text: "Nothing can be done: catch blocks cannot read the error under `strict`"
+  explanation: |
+    JavaScript can throw any value, not only `Error` objects (`throw "oops"` is legal), so with
+    `strict` the catch variable is `unknown`. Narrow it with `instanceof Error`, which proves it has
+    a `message`. An annotation other than `unknown` or `any` is not allowed on a catch variable,
+    and `!` only removes `null` and `undefined`, not `unknown`.
+
+- key: ts-basic-24
+  type: single
+  category: typescript
+  tags: [errors, try-catch-finally]
+  prompt: |
+    ```ts
+    function check(text: string): string {
+      try {
+        if (text === "") {
+          throw new Error("empty");
+        }
+        return "ok";
+      } catch {
+        return "caught";
+      } finally {
+        console.log(`checked "${text}"`);
+      }
+    }
+
+    console.log(check(""), check("a"));
+    ```
+
+    What does this print?
+  options:
+    - text: "`checked \"\"`, then `checked \"a\"`, then `caught ok`"
+      correct: true
+    - text: "`caught ok` only, because `return` skips the `finally` block"
+    - text: "`checked \"\"`, `caught`, `checked \"a\"`, `ok` on four lines"
+    - text: "The program stops with `Error: empty`"
+  explanation: |
+    `finally` runs every time, even after a `return` in `try` or `catch`. Both calls are worked out
+    before the outer `console.log` prints anything, so both `checked` lines appear first, then the
+    two return values on one line. The thrown error is caught, so the program does not stop.
+
+- key: ts-basic-25
+  type: single
+  category: typescript
+  tags: [modules, import-meta-main, cli]
+  prompt: |
+    `trails.ts` exports `parseHike` and also has a `main` function that reads standard input and
+    prints a report. A second file does `import { parseHike } from "./trails.js";`. How should
+    `trails.ts` call `main` so that the import does not start reading input?
+  options:
+    - text: "`if (import.meta.main) { main(); }`"
+      correct: true
+    - text: "Call `main();` at the end of the file; imports skip top-level code"
+    - text: "Export `main` and let Node.js decide when to call it"
+    - text: "Wrap the call in `try { main(); } catch {}`"
+  explanation: |
+    Importing a module runs its top-level code, so a bare `main();` would run inside every file
+    that imports `trails.js`. `import.meta.main` is `true` only in the file Node.js was started
+    with, like Python's `__name__ == "__main__"`, so the program part runs when the file is the
+    program and not when it is imported.
+
+- key: ts-basic-26
+  type: single
+  category: typescript
+  tags: [cli, exit-codes, process]
+  prompt: |
+    A program prints its report with `console.log` and must then report failure to the shell.
+    Why does Node's documentation advise `process.exitCode = 1` rather than calling
+    `process.exit(1)` right after printing?
+  options:
+    - text: "`process.exit` ends the process at once, possibly before output still being written to stdout has been delivered"
+      correct: true
+    - text: "`process.exit(1)` always exits with code 0 on Windows"
+    - text: "`process.exitCode` also prints the report to standard error"
+    - text: "`process.exit` is not available in ES modules"
+  explanation: |
+    Writes to `process.stdout` can be asynchronous, and `process.exit()` forces the process to end
+    as quickly as possible, even with output pending. Setting `process.exitCode` lets the program
+    finish normally, flushing its output, and then exit with that code. Scripts read the code to
+    tell success (0) from failure.

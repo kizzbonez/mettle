@@ -1,0 +1,19 @@
+title: Station Config Audit
+summary: Read a tsconfig.json as unknown JSON, list the options TypeScript 7 refuses, and work out whether a check is really on from the TypeScript 6 defaults, the strict family and implied flags, with a Flag type derived from as const arrays.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Lists every refused option in the order of the file
+    file: 02-removed-options.ts
+    hidden: true
+  - name: Applies strict and its family, with an exact Flag type
+    file: 03-strict-family.ts
+    hidden: true
+  - name: Handles flags outside the family and refuses files that are not configs
+    file: 04-other-flags.ts
+    hidden: true

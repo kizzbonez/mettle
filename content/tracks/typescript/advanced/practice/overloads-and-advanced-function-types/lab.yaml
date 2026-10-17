@@ -1,0 +1,19 @@
+title: Car Park Ticket Machine
+summary: Give a function overloads whose return type follows the style asked for, protect methods with a this parameter, and wrap a function without losing its parameter types.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Formats every stay, with a return type for each style
+    file: 02-format-stay.ts
+    hidden: true
+  - name: Raises and lowers whichever barrier the methods are called on
+    file: 03-barrier.ts
+    hidden: true
+  - name: Limits the calls and keeps the wrapped function's types
+    file: 04-limit-calls.ts
+    hidden: true

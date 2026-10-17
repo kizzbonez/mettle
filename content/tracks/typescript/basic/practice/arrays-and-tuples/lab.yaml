@@ -1,0 +1,19 @@
+title: Rain Gauge Month
+summary: Total and count readonly arrays with reduce and filter, return the driest and wettest readings as a tuple, and list the wettest readings from a sorted copy.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Adds up the rain and counts the wet days
+    file: 02-total-and-wet-days.ts
+    hidden: true
+  - name: Returns the driest and wettest readings as a pair typed as a tuple
+    file: 03-driest-and-wettest.ts
+    hidden: true
+  - name: Lists the wettest readings from a sorted copy
+    file: 04-wettest-readings.ts
+    hidden: true

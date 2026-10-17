@@ -1,0 +1,19 @@
+title: Car Park Fee
+summary: Convert a stay given as text with Number, and work out a parking fee with subtraction, Math.max, Math.ceil and Math.min, letting NaN flag text that is not a number.
+language: typescript
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works out the fees from the example
+    file: 01-example.ts
+    hidden: false
+  - name: Lets the first 15 minutes go free
+    file: 02-free-minutes.ts
+    hidden: true
+  - name: Charges every started hour in full
+    file: 03-started-hours.ts
+    hidden: true
+  - name: Caps the fee and gives NaN for text that is not a number
+    file: 04-cap-and-bad-text.ts
+    hidden: true

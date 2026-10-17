@@ -1,0 +1,19 @@
+title: Smart Home Hub
+summary: Add a member to a discriminated union of sensor events, write a type guard for filter and if, an assertion function that narrows or throws, and an exhaustive switch that ends in assertNever.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Describes all five kinds of event and throws for an unknown kind
+    file: 02-describe.ts
+    hidden: true
+  - name: Narrows with isTemperature and finds the warmest room
+    file: 03-temperatures.ts
+    hidden: true
+  - name: Narrows to a door with assertDoor or throws a TypeError
+    file: 04-assert-door.ts
+    hidden: true

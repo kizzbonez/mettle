@@ -1,0 +1,19 @@
+title: Metronome Module
+summary: Read an untyped JavaScript module and its JSDoc, declare its exports as a .d.ts file would, with exact parameter, optional and read-only types, and use the declared module from TypeScript.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Declares the module's four exports with exact types
+    file: 02-module-declaration.ts
+    hidden: true
+  - name: Declares Pattern and RenderSymbols as the JSDoc describes them
+    file: 03-pattern-and-symbols.ts
+    hidden: true
+  - name: Describes a bar of each pattern and refuses unknown ones
+    file: 04-bar-display.ts
+    hidden: true

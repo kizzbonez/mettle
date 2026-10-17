@@ -1,0 +1,548 @@
+- key: ts-professional-01
+  type: single
+  category: typescript
+  tags: [tsconfig, defaults, types]
+  prompt: |
+    A project has `@types/node` installed and this `tsconfig.json`:
+
+    ```json
+    { "compilerOptions": { "module": "nodenext" } }
+    ```
+
+    `src/main.ts` contains `const port = process.env.PORT;`. What does TypeScript 7's `tsc` report?
+  options:
+    - text: "Error TS2591, cannot find name `process`: since TypeScript 6, `types` defaults to `[]`, so `@types/node` is not loaded until it is listed"
+      correct: true
+    - text: "Nothing: every installed `@types` package is loaded automatically"
+    - text: "An error because `strict` is off by default and `process.env` needs it"
+    - text: "An error because `module: nodenext` cannot be used without `moduleResolution: node`"
+  explanation: |
+    TypeScript 6 changed the default of `types` to `[]`, and TypeScript 7 keeps it, so no
+    `@types` package is included unless the config lists it. Add `"types": ["node"]`. The
+    automatic loading in the second option was the old behavior. `strict` is now on by default,
+    and `moduleResolution: node` (node10) has been removed; `nodenext` implies the matching
+    resolution.
+
+- key: ts-professional-02
+  type: single
+  category: typescript
+  tags: [tsconfig, noUncheckedIndexedAccess]
+  prompt: |
+    With `"noUncheckedIndexedAccess": true`, which numbered line does the compiler reject?
+
+    ```ts
+    const sizes = [10, 20, 30];
+    for (const size of sizes) console.log(size.toFixed(1)); // 2
+    const first = sizes[0];                                   // 3
+    console.log(first.toFixed(1));                            // 4
+    const counts: Record<string, number> = {};
+    counts["a"] = 1;                                          // 6
+    ```
+  options:
+    - text: "Line 4 only: `first` is `number | undefined`, because an index may not exist"
+      correct: true
+    - text: "Lines 2 and 4: every element read from an array becomes possibly `undefined`"
+    - text: "Lines 4 and 6: writing to an index signature is also unchecked access"
+    - text: "None: the flag only affects objects with index signatures, not arrays"
+  explanation: |
+    The flag adds `undefined` to values *read* by index, from arrays and from index signatures,
+    so line 4 is `error TS18048: 'first' is possibly 'undefined'.` Iterating with `for...of`
+    yields `number`, because iteration never visits a missing index. Writing `counts["a"] = 1`
+    is allowed. The fix is a check or a default, such as `first?.toFixed(1) ?? "none"`.
+
+- key: ts-professional-03
+  type: multiple
+  category: typescript
+  tags: [tsconfig, removed-options, typescript-7]
+  prompt: |
+    Which of these `compilerOptions` entries make TypeScript 7 stop with an error saying the
+    option has been removed? Select all that apply.
+  options:
+    - text: '`"baseUrl": "./src"`'
+      correct: true
+    - text: '`"target": "es5"`'
+      correct: true
+    - text: '`"moduleResolution": "bundler"`'
+    - text: '`"verbatimModuleSyntax": true`'
+  explanation: |
+    TypeScript 6 deprecated, and TypeScript 7 removed, `baseUrl` (error TS5102, "Option
+    'baseUrl' has been removed", with the hint to use `paths` relative to the config) and
+    `target: es5` (error TS5108). Also removed: `moduleResolution` `node`/`node10` and
+    `classic`, `outFile`, `downlevelIteration`, and the AMD, UMD and System module formats.
+    `bundler` resolution and `verbatimModuleSyntax` are current, recommended settings.
+
+- key: ts-professional-04
+  type: single
+  category: typescript
+  tags: [project-references, composite, tsc-build]
+  prompt: |
+    A monorepo's root `tsconfig.json` is:
+
+    ```json
+    {
+      "files": [],
+      "references": [{ "path": "./packages/core" }, { "path": "./packages/cli" }]
+    }
+    ```
+
+    Why is `"files": []` there?
+  options:
+    - text: "So the root compiles no files itself and only lists projects for `tsc -b`; without it the root would compile every file a second time"
+      correct: true
+    - text: "To mark the root as `composite`, which every referenced project requires"
+    - text: "To stop `tsc -b` from writing `.tsbuildinfo` files at the root"
+    - text: "Because an empty `files` array makes `tsc -b` build the references in parallel"
+  explanation: |
+    This is a solution-style config. With no `files` or `include`, a config includes every
+    `.ts` file under its folder, so the root would type-check and emit the packages' files
+    again. `"files": []` (allowed when there are references) makes it an entry point only:
+    `tsc -b` builds the referenced projects in dependency order. `composite` is set in the
+    referenced projects themselves, and parallelism comes from TypeScript 7's `--builders`.
+
+- key: ts-professional-05
+  type: single
+  category: typescript
+  tags: [project-references, tsc-build, declaration-files]
+  prompt: |
+    `packages/cli` references `packages/core`. Everything is built. You edit a comment inside
+    the body of an exported function in the core and run `tsc -b --verbose`. What happens?
+  options:
+    - text: "The core is rebuilt; its `.d.ts` is unchanged, so the CLI is reported up to date with the declaration files of its dependencies and is not rechecked"
+      correct: true
+    - text: "Both projects are rebuilt, because the CLI depends on a project whose source changed"
+    - text: "Nothing is rebuilt, because comments never change the output"
+    - text: "Only the CLI is rebuilt, because it is the project that imports the changed function"
+  explanation: |
+    Build mode compares each project's inputs with its `.tsbuildinfo`. The core's source changed,
+    so the core is rebuilt. A dependent project reads its dependency through the emitted
+    declaration files; since `index.d.ts` did not change, `tsc -b` prints that the CLI "is up to
+    date with .d.ts files from its dependencies" and only updates its timestamps. A change to
+    the core's public API would change the `.d.ts` and recheck the CLI.
+
+- key: ts-professional-06
+  type: single
+  category: typescript
+  tags: [type-stripping, node, building]
+  prompt: |
+    `src/oops.ts` contains:
+
+    ```ts
+    const minutes: number = "ten";
+    console.log(minutes);
+    ```
+
+    What does `node src/oops.ts` do on Node.js 26?
+  options:
+    - text: "It prints `ten`: Node strips the types and runs the rest without type-checking"
+      correct: true
+    - text: "It stops with error TS2322 before running anything"
+    - text: "It prints `NaN`, because the annotation converts the string to a number"
+    - text: "It refuses to run because `.ts` files need the `--experimental-transform-types` flag"
+  explanation: |
+    Node's type stripping replaces annotations with spaces and executes the JavaScript that is
+    left. It never checks types, so the wrong annotation is simply erased. Only `tsc` reports
+    `error TS2322: Type 'string' is not assignable to type 'number'.`, which is why projects that
+    run source directly still run `tsc --noEmit` in CI. Type stripping needs no flag, and
+    `--experimental-transform-types` was removed in Node.js 26.
+
+- key: ts-professional-07
+  type: multiple
+  category: typescript
+  tags: [bundling, esbuild, isolated-modules]
+  prompt: |
+    Which statements about bundling TypeScript with esbuild are true? Select all that apply.
+  options:
+    - text: "It does not type-check, so `tsc --noEmit` should run alongside it"
+      correct: true
+    - text: "It does not write `.d.ts` declaration files"
+      correct: true
+    - text: "It compiles each file on its own, so `isolatedModules` or `verbatimModuleSyntax` should be on"
+      correct: true
+    - text: "It calls TypeScript's programmatic API, so it must use TypeScript 6 until TypeScript 7.1"
+  explanation: |
+    esbuild has its own TypeScript parser: it strips types without checking them and does not
+    generate declarations, so a library still needs `tsc` (for example with
+    `emitDeclarationOnly`). Because it sees one file at a time, it cannot tell whether an
+    imported name is only a type; the two flags make `tsc` reject code it would mis-compile.
+    Since it does not use TypeScript's API, TypeScript 7 lacking one does not affect it.
+
+- key: ts-professional-08
+  type: single
+  category: typescript
+  tags: [publishing, semver, declaration-files]
+  prompt: |
+    Version 1.3.0 of a library exports `gradePercent(segment: Segment): number`. Which change
+    requires the next version to be 2.0.0?
+  options:
+    - text: "Changing the return type to `number | undefined` for zero-length segments"
+      correct: true
+    - text: "Adding a new exported function `climbEffort`"
+    - text: "Adding an optional second parameter `precision?: number`"
+    - text: "Fixing a rounding bug so that results match the documentation"
+  explanation: |
+    Types are part of a TypeScript package's API. Widening a return type breaks every consumer
+    that uses the result as a `number`: their code stops compiling, so it is a breaking change
+    and a new MAJOR version. A new export and an optional parameter are compatible additions
+    (MINOR); a bug fix that matches the documented behavior is a PATCH.
+
+- key: ts-professional-09
+  type: single
+  category: typescript
+  tags: [publishing, esm, commonjs, require-esm]
+  prompt: |
+    `trail-grade` is an ESM-only package (`"type": "module"`, no top-level `await`). A
+    consumer's CommonJS file `report.cts` contains `import { gradePercent } from "trail-grade";`.
+    Which statement is correct?
+  options:
+    - text: "Under `module: nodenext` it compiles to a `require` call that works on Node.js 26; under `module: node16` it is error TS1479"
+      correct: true
+    - text: "It never works: CommonJS code can only load ESM packages with `await import()`"
+    - text: "It compiles under any `module` setting, but Node.js 26 throws `ERR_REQUIRE_ESM` at run time"
+    - text: "It works only if the package also publishes a CommonJS build under a `require` condition"
+  explanation: |
+    Node.js can `require()` a synchronous ES module and returns its namespace object; the feature
+    is no longer experimental. TypeScript models it under `nodenext` and `node20`. The older
+    `node16` setting describes Node versions that could not, and reports error TS1479 ("the
+    referenced file is an ECMAScript module and cannot be imported with 'require'"). This is why
+    ESM-only packages can serve CommonJS consumers, as long as the package avoids top-level
+    `await`, which would make `require()` fail with `ERR_REQUIRE_ASYNC_MODULE`.
+
+- key: ts-professional-10
+  type: single
+  category: typescript
+  tags: [linting, typescript-eslint, floating-promises]
+  prompt: |
+    ```ts
+    async function saveReading(celsius: number): Promise<void> {
+      if (Number.isNaN(celsius)) throw new Error("reading is not a number");
+      console.log(`saved ${celsius}`);
+    }
+
+    function onReading(raw: string): void {
+      saveReading(Number(raw));
+      console.log(`queued ${raw}`);
+    }
+
+    onReading("n/a");
+    ```
+
+    `tsc` reports no errors. Which tool reports the bug before it runs?
+  options:
+    - text: "typescript-eslint's `no-floating-promises`, part of `recommendedTypeChecked`, which needs type information"
+      correct: true
+    - text: "typescript-eslint's `recommended` config, which needs only the syntax of the file"
+    - text: "`tsc` with `noUncheckedIndexedAccess` turned on"
+    - text: "Prettier with `--check`"
+  explanation: |
+    The promise returned by `saveReading` is dropped, so its rejection is unhandled: the program
+    prints `queued n/a` and then Node ends the process with the error. Knowing that the call
+    returns a promise requires the type checker, so the rule is in the type-checked configs and
+    needs `projectService: true`. Syntax-only rules cannot know it, no compiler flag forbids
+    it, and Prettier only formats.
+
+- key: ts-professional-11
+  type: single
+  category: typescript
+  tags: [linting, typescript-7, typescript-eslint]
+  prompt: |
+    A project builds with TypeScript 7 and wants typed linting with typescript-eslint. Why do
+    the TypeScript and Nx guides install `"typescript": "npm:@typescript/typescript6@^6.0.2"`
+    next to `"@typescript/native": "npm:typescript@^7.0.2"`?
+  options:
+    - text: "TypeScript 7.0 ships no programmatic API yet, so tools that import `typescript` get the 6.0 API under that name while `tsc` runs TypeScript 7"
+      correct: true
+    - text: "TypeScript 7 cannot read `tsconfig.json` files written for TypeScript 6"
+    - text: "ESLint only parses JavaScript, so TypeScript 6 converts the code to JavaScript first"
+    - text: "TypeScript 7 is slower at type-checking than TypeScript 6, so linting uses the faster version"
+  explanation: |
+    TypeScript 7.0 does not ship an API (a new one is planned for 7.1), and typescript-eslint
+    supports TypeScript below 6.1. The npm alias keeps the 6.0 API under the package name
+    `typescript` that the plugins import, and the `@typescript/native` alias provides
+    TypeScript 7's `tsc`. Both read the same `tsconfig.json`; TypeScript 7 is several times
+    faster, not slower.
+
+- key: ts-professional-12
+  type: single
+  category: typescript
+  tags: [node-services, graceful-shutdown, keep-alive]
+  prompt: |
+    A service calls `server.close()` on SIGTERM while one request is in flight. The request
+    finishes 100 ms later, yet the close callback runs only about three seconds after that.
+    The client is `fetch`. Why, and what is the fix?
+  options:
+    - text: "`fetch` keeps the connection alive after the response, and `close()` only closed the connections that were idle when it was called; send `connection: close` on responses written while shutting down"
+      correct: true
+    - text: "`close()` always waits for the server's `requestTimeout`; lower it to 100 ms"
+    - text: "The SIGTERM handler is missing `process.exit()`, which would close the connections"
+    - text: "The response was not flushed; call `response.flushHeaders()` before `end()`"
+  explanation: |
+    Since Node.js 19, `server.close()` stops accepting connections and closes idle ones, but a
+    keep-alive connection that becomes idle afterwards stays open until the client drops it.
+    Sending `connection: close` while draining (or calling `closeIdleConnections()` after those
+    responses) closes it at once. `process.exit()` would cut off in-flight requests instead of
+    finishing them.
+
+- key: ts-professional-13
+  type: single
+  category: typescript
+  tags: [node-services, configuration, environment]
+  prompt: |
+    ```ts
+    const port = Number(process.env["PORT"] ?? 8080);
+    server.listen(port, "127.0.0.1");
+    ```
+
+    The deployment sets `PORT=` (an empty value). What happens?
+  options:
+    - text: "`Number(\"\")` is `0`, so the server listens on a random free port and nobody can reach it where expected"
+      correct: true
+    - text: "`??` treats the empty string as missing, so the server listens on 8080"
+    - text: "`Number(\"\")` is `NaN`, so `listen` throws at startup"
+    - text: "TypeScript rejects the code because `process.env` values may be empty"
+  explanation: |
+    `??` only replaces `null` and `undefined`, and an empty string is neither, so `Number("")`
+    runs and returns `0`, which `listen` treats as "any free port". The program starts without
+    complaint and silently listens on the wrong port. Parse configuration once at startup,
+    reject empty and non-numeric values with a clear message, and refuse to start when anything
+    is wrong.
+
+- key: ts-professional-14
+  type: single
+  category: typescript
+  tags: [performance, hidden-classes, v8]
+  prompt: |
+    Both factories return objects that TypeScript types as `Order`. Which one gives V8 a
+    single hidden class for all orders, keeping property reads monomorphic?
+
+    ```ts
+    function makeA(id: number, vip: boolean): Order {
+      const order: Order = { id, total: 10 };
+      if (vip) order.discount = 5;
+      return order;
+    }
+
+    function makeB(id: number, vip: boolean): Order {
+      return { id, total: 10, discount: vip ? 5 : undefined };
+    }
+    ```
+  options:
+    - text: "`makeB`, because every object gets the same properties in the same order"
+      correct: true
+    - text: "`makeA`, because objects without a discount are smaller"
+    - text: "Both, because they return the same TypeScript type"
+    - text: "Neither, because object literals never share hidden classes"
+  explanation: |
+    V8 gives objects that received the same properties in the same order one hidden class.
+    `makeA` adds `discount` to some objects after creation, so orders come in two shapes, and
+    code reading them becomes polymorphic. `makeB` always assigns all three properties.
+    TypeScript's structural types say nothing about V8's shapes. (Checked with V8's
+    `%HaveSameMap`: false for `makeA`'s two kinds of order, true for `makeB`'s.)
+
+- key: ts-professional-15
+  type: single
+  category: typescript
+  tags: [memory, leaks, heap]
+  prompt: |
+    A service runs under steady load. `process.memoryUsage().heapUsed`, read right after a
+    forced garbage collection at the end of each hour, is 31 MB, 58 MB, 91 MB, 120 MB. What is
+    the most likely explanation?
+  options:
+    - text: "A leak: something keeps references to objects it no longer needs, such as a cache with no limit"
+      correct: true
+    - text: "Normal behavior: the heap grows until the garbage collector runs"
+    - text: "The JIT compiler is optimizing more functions each hour"
+    - text: "The heap limit is too low and must be raised with `--max-old-space-size`"
+  explanation: |
+    Memory that rises between collections and falls after them is normal. Here the readings are
+    taken after a collection, so they show live objects, and the floor keeps rising: a leak.
+    The usual cause in TypeScript services is an unintended reference: an unbounded cache, a
+    listener never removed, a timer never cleared. Compare two heap snapshots to find it;
+    raising the heap limit only delays the crash.
+
+- key: ts-professional-16
+  type: single
+  category: typescript
+  tags: [streams, backpressure]
+  prompt: |
+    ```ts
+    const slowSink = new Writable({
+      objectMode: true,
+      highWaterMark: 2,
+      write(reading: number, _encoding, done) {
+        sleep(5).then(() => done(), done);
+      },
+    });
+
+    let waits = 0;
+    for (let reading = 1; reading <= 6; reading++) {
+      if (!slowSink.write(reading)) {
+        waits += 1;
+        await once(slowSink, "drain");
+      }
+    }
+    console.log(waits);
+    ```
+
+    What is printed?
+  options:
+    - text: "`3`"
+      correct: true
+    - text: "`0`"
+    - text: "`2`"
+    - text: "`6`"
+  explanation: |
+    `write()` returns `false` when the buffered amount reaches the `highWaterMark`, here two
+    objects. Readings 1 and 2 fill the buffer, so the second `write` returns `false` and the
+    loop waits for `drain`, after which the buffer is empty again. The same happens at readings
+    4 and 6: three waits. Respecting `false` keeps memory bounded however many readings there
+    are.
+
+- key: ts-professional-17
+  type: single
+  category: typescript
+  tags: [worker-threads, event-loop]
+  prompt: |
+    A timer increments `ticks` every 10 ms. The program then counts primes below five million,
+    first by calling `countPrimes` directly, then by sending the work to a `Worker` and awaiting
+    its message. Each takes about 1.3 seconds. How many ticks happen during each?
+  options:
+    - text: "About 0 on the main thread and about 130 with the worker"
+      correct: true
+    - text: "About 130 in both cases, because timers have their own thread"
+    - text: "About 0 in both cases, because awaiting a worker also blocks the event loop"
+    - text: "About 130 on the main thread and 0 with the worker, because the worker takes the timer's thread"
+  explanation: |
+    JavaScript runs on one thread around the event loop. A synchronous calculation occupies it,
+    so no timer callback can run until it returns. A worker runs the calculation on another
+    thread with its own event loop; the main thread only awaits a message, so its timers keep
+    firing. In a real run: `main thread: 348513 primes, 0 ticks in 1309 ms` and
+    `worker: 348513 primes, 140 ticks in 1423 ms`.
+
+- key: ts-professional-18
+  type: single
+  category: typescript
+  tags: [security, validation, type-assertions]
+  prompt: |
+    ```ts
+    interface Order {
+      item: string;
+      totalCents: number;
+    }
+
+    const order = JSON.parse('{ "item": "lamp", "totalCents": "4000" }') as Order;
+    const withShipping = order.totalCents + 500;
+    console.log(withShipping, typeof withShipping);
+    ```
+
+    What does this print?
+  options:
+    - text: "`4000500 string`"
+      correct: true
+    - text: "`4500 number`"
+    - text: "Nothing: `tsc` rejects the assertion because `\"4000\"` is not a number"
+    - text: "Nothing: `as Order` throws a `TypeError` at run time"
+  explanation: |
+    Types are erased, and `as` checks nothing at run time; the compiler simply believes it. At
+    run time `totalCents` is the string `"4000"`, so `+` concatenates. Outside data must be
+    treated as `unknown` and validated at the boundary before it gets a type.
+
+- key: ts-professional-19
+  type: single
+  category: typescript
+  tags: [security, prototype-pollution]
+  prompt: |
+    A settings endpoint deep-merges user JSON into defaults with a recursive `merge` that copies
+    every key from `Object.entries(source)`. An attacker sends:
+
+    ```json
+    { "theme": "dark", "__proto__": { "isAdmin": true } }
+    ```
+
+    Afterwards, what does `({} as Record<string, unknown>)["isAdmin"]` evaluate to, in a
+    brand-new object anywhere in the process?
+  options:
+    - text: "`true`: `target[\"__proto__\"]` is `Object.prototype`, so `isAdmin` was copied onto the prototype every object inherits from"
+      correct: true
+    - text: "`undefined`: `JSON.parse` drops keys named `__proto__`"
+    - text: "`undefined`: the polluted property exists only on the merged settings object"
+    - text: "It throws, because `Object.prototype` is frozen"
+  explanation: |
+    `JSON.parse` creates an ordinary own key called `__proto__`, and `Object.entries` lists it.
+    Reading `target["__proto__"]` returns `Object.prototype`, and the merge writes `isAdmin` into
+    it, so every object now appears to have `isAdmin: true`. Defenses: validate with an allow
+    list, keep user keys in a `Map` or `Object.create(null)` objects, skip `__proto__`,
+    `constructor` and `prototype`, or run Node with `--disable-proto=delete`.
+
+- key: ts-professional-20
+  type: single
+  category: typescript
+  tags: [security, sql-injection, node-sqlite]
+  prompt: |
+    ```ts
+    function find(owner: string): unknown[] {
+      return db.prepare(`SELECT code FROM parcels WHERE owner = '${owner}'`).all();
+    }
+    ```
+
+    The table has three parcels, none owned by `nobody`. How many rows does
+    `find("nobody' OR '1'='1")` return, and what is the fix?
+  options:
+    - text: "3 rows; use a placeholder, `prepare(\"SELECT code FROM parcels WHERE owner = ?\").all(owner)`"
+      correct: true
+    - text: "0 rows; the code is safe because `owner` is typed `string`"
+    - text: "3 rows; escape single quotes with `owner.replaceAll(\"'\", \"\")` and keep the template literal"
+    - text: "An error; SQLite refuses statements that contain `OR`"
+  explanation: |
+    The template literal makes the input part of the SQL: `WHERE owner = 'nobody' OR '1'='1'`
+    is true for every row. A `?` placeholder sends the value separately from the statement, so
+    it is only ever data and matches nothing. The `string` type says nothing about the content.
+    Hand-made escaping is easy to get wrong; placeholders are the fix every driver offers.
+
+- key: ts-professional-21
+  type: single
+  category: typescript
+  tags: [migration, jsdoc, typescript-7]
+  prompt: |
+    A JavaScript file checked with `checkJs` contains:
+
+    ```js
+    export const Band = { STANDARD: "standard", REDUCED: "reduced" };
+
+    /** @param {Band} band */
+    export function describe(band) {
+      return String(band);
+    }
+    ```
+
+    What does TypeScript 7 report?
+  options:
+    - text: "Error TS2749: 'Band' refers to a value, but is being used as a type here. Did you mean 'typeof Band'?"
+      correct: true
+    - text: "Nothing: in JSDoc, naming a value uses its type"
+    - text: "Error TS7006 only: parameters in JavaScript files always need explicit types"
+    - text: "Nothing: TypeScript 7 no longer checks JSDoc comments"
+  explanation: |
+    TypeScript 7 analyzes JavaScript with the same rules as TypeScript, so a value cannot be
+    used as a type in JSDoc any more; older versions quietly accepted it. Write
+    `@param {typeof Band} band`, or define a `@typedef` such as
+    `(typeof Band)[keyof typeof Band]`. JSDoc is still fully checked; `@enum`, `@class` on
+    functions and Closure-style function types are among the other forms TypeScript 7 dropped.
+
+- key: ts-professional-22
+  type: single
+  category: typescript
+  tags: [migration, ts-expect-error, suppressions]
+  prompt: |
+    During a migration, a line carries `// @ts-expect-error legacy shape`. A later refactor fixes
+    the type error on that line but leaves the comment. What happens on the next `tsc` run?
+  options:
+    - text: "`tsc` reports error TS2578, an unused `@ts-expect-error` directive, so the stale suppression has to be removed"
+      correct: true
+    - text: "Nothing: the comment is ignored when there is no error to suppress"
+    - text: "`tsc` suppresses the next error that appears anywhere in the file"
+    - text: "The same as `// @ts-ignore`: both silently stay in the code"
+  explanation: |
+    `@ts-expect-error` expects an error on the next line, and reports `error TS2578: Unused
+    '@ts-expect-error' directive.` when there is none. That is why it is preferred over
+    `@ts-ignore`, which stays silent forever. Combined with a counted budget in CI, it lets the
+    number of suppressions only go down.

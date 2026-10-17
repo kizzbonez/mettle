@@ -1,0 +1,19 @@
+title: Board Game Café
+summary: Replace any with type parameters in a generic Page interface and paginate function, a playableWith function constrained with extends that returns the caller's own type, and a Waitlist class whose type parameter defaults to string.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Pages through any list and keeps the item type
+    file: 02-pages.ts
+    hidden: true
+  - name: Finds playable games and returns the caller's own type
+    file: 03-playable.ts
+    hidden: true
+  - name: Serves a typed waitlist first come, first served
+    file: 04-waitlist.ts
+    hidden: true

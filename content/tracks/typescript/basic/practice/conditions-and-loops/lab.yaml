@@ -1,0 +1,19 @@
+title: Guest Wi-Fi Password
+summary: Walk through a password with for...of, count digits and capitals, stop at a space with break, and rate it with an if, else if and else chain in the right order.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Rates the passwords from the example
+    file: 01-example.ts
+    hidden: false
+  - name: Calls passwords under 8 characters weak, counting exactly
+    file: 02-short-passwords.ts
+    hidden: true
+  - name: Needs the length, a digit and a capital for strong
+    file: 03-strong-passwords.ts
+    hidden: true
+  - name: Refuses any password with a space before the other rules
+    file: 04-spaces.ts
+    hidden: true

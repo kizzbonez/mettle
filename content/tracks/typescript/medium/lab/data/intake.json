@@ -1,0 +1,93 @@
+[
+  {
+    "id": "T-001",
+    "owner": "Priya Nair",
+    "item": "Toaster",
+    "category": "electrical",
+    "outcome": { "status": "fixed", "minutes": 25 }
+  },
+  {
+    "id": "T-002",
+    "owner": "  Tom Becker ",
+    "item": "Denim jacket",
+    "category": "textile",
+    "outcome": { "status": "needs-part", "part": "brass zip" }
+  },
+  {
+    "id": "T-003",
+    "owner": "Ana Lima",
+    "item": "Desk lamp",
+    "category": "electrical",
+    "outcome": { "status": "unrepairable", "reason": "cracked base" }
+  },
+  {
+    "id": "T-004",
+    "owner": "Ola Berg",
+    "item": "Rocking chair",
+    "category": "garden",
+    "outcome": { "status": "waiting" }
+  },
+  {
+    "id": "T-005",
+    "owner": "Sam Okafor",
+    "item": "Road bike",
+    "category": "bicycle",
+    "outcome": { "status": "needs-part", "part": "brake cable" }
+  },
+  {
+    "id": "T-006",
+    "owner": "",
+    "item": "Kettle",
+    "category": "electrical",
+    "outcome": { "status": "waiting" }
+  },
+  {
+    "id": "T-007",
+    "owner": "Mei Chen",
+    "item": "Kettle",
+    "category": "electrical",
+    "outcome": { "status": "fixed", "minutes": "20" }
+  },
+  {
+    "id": "T-008",
+    "owner": "Lena Vogel",
+    "item": "Wool scarf",
+    "category": "textile",
+    "outcome": { "status": "fixed", "minutes": 10, "note": "darned the elbow" }
+  },
+  {
+    "id": "T-005",
+    "owner": "Sam Okafor",
+    "item": "Road bike",
+    "category": "bicycle",
+    "outcome": { "status": "fixed", "minutes": 15 }
+  },
+  {
+    "id": "T-009",
+    "owner": "Jonas Weber",
+    "item": "City bike",
+    "category": "bicycle",
+    "outcome": { "status": "needs-part", "part": "brake cable" }
+  },
+  {
+    "id": "T-010",
+    "owner": "Rita Costa",
+    "item": "Radio",
+    "category": "electrical",
+    "outcome": { "status": "waiting" }
+  },
+  {
+    "id": "T-011",
+    "owner": "Kofi Mensah",
+    "item": "Bookshelf",
+    "category": "furniture",
+    "outcome": { "status": "fixed", "minutes": 40 }
+  },
+  {
+    "id": "T-012",
+    "owner": "Eva Novak",
+    "item": "Hair dryer",
+    "category": "electrical",
+    "outcome": { "status": "needs-part", "part": "thermal fuse" }
+  }
+]

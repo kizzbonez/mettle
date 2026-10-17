@@ -1,0 +1,19 @@
+title: Coffee Shop Till
+summary: Build a patch type with mapping modifiers, setter names with key remapping and Capitalize, the setters themselves, and a ticket parser made of a template literal pattern and infer.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Makes every property optional and writable with its own type
+    file: 02-patch.ts
+    hidden: true
+  - name: Names setters after their keys, skips functions, and writes to the target
+    file: 03-setters.ts
+    hidden: true
+  - name: Reads the size and drink of a ticket, and never for anything else
+    file: 04-ticket-parts.ts
+    hidden: true

@@ -1,0 +1,19 @@
+title: Pharmacy Pickup Text
+summary: Tidy a typed name with trim and slice, pad an order number with padStart, mask a phone number with replaceAll, slice and padStart, and build the message with a template literal.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Writes the message from the example
+    file: 01-example.ts
+    hidden: false
+  - name: Tidies the first name and capitalizes only its first letter
+    file: 02-names.ts
+    hidden: true
+  - name: Pads the order number to four digits
+    file: 03-order-numbers.ts
+    hidden: true
+  - name: Hides all but the last four digits of the phone number
+    file: 04-masked-phones.ts
+    hidden: true

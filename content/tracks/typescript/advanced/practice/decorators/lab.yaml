@@ -1,0 +1,19 @@
+title: Smart Oven Controls
+summary: Write a decorator factory that clamps a number accessor, a typed method decorator that logs calls, and a field decorator that records names in class metadata.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Clamps the initial value and every assignment of number accessors
+    file: 02-clamp.ts
+    hidden: true
+  - name: Logs each call, keeps this and results, and needs a log on the class
+    file: 03-recorded.ts
+    hidden: true
+  - name: Lists each class's shown fields from its metadata
+    file: 04-shown-fields.ts
+    hidden: true

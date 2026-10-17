@@ -1,0 +1,19 @@
+title: Intercom Directory
+summary: Return Resident or undefined from find, follow a missing resident and a missing phone with ?. and ??, keep a volume of 0 with ??, and check a null field before using it.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Finds a resident and makes callers handle undefined
+    file: 02-find-resident.ts
+    hidden: true
+  - name: Falls back to the front desk and keeps a muted volume
+    file: 03-calls-and-volumes.ts
+    hidden: true
+  - name: Names residents who are at home and away
+    file: 04-buzzer-names.ts
+    hidden: true

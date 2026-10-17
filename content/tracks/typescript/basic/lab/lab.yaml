@@ -1,0 +1,23 @@
+slug: boulder-league-scorecard
+title: Boulder League Scorecard
+summary: Read a night's bouldering sheet from standard input, validate every line into typed attempts by narrowing, count each climber's best result per problem, and print the league standings with the rejected lines on standard error.
+language: typescript
+minutes: 50
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Scores the sample round from the instructions
+    file: 01-sample-round.ts
+    hidden: false
+  - name: Turns text into results and points, and types the results exactly
+    file: 02-results-and-points.ts
+    hidden: true
+  - name: Reads problems and whole lines, and explains every rejected line
+    file: 03-parsing-lines.ts
+    hidden: true
+  - name: Keeps each climber's best result per problem and ranks the standings
+    file: 04-standings.ts
+    hidden: true
+  - name: Handles clean, empty, Windows and entirely wrong sheets as a program
+    file: 05-script-edge-cases.ts
+    hidden: true

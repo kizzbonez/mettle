@@ -1,0 +1,19 @@
+title: Yarn Package Check
+summary: Resolve which file a package.json exports map serves for a subpath and a set of conditions, as Node.js and TypeScript do, and check a package for a missing files list, a types condition out of place or not pointing at declarations, and exported paths the tarball will not contain.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Resolves subpaths through conditions in the package's order
+    file: 02-resolve.ts
+    hidden: true
+  - name: Checks the place and the path of every types condition
+    file: 03-types-condition.ts
+    hidden: true
+  - name: Checks files and every exported path against it
+    file: 04-files.ts
+    hidden: true

@@ -1,0 +1,53 @@
+[
+  null,
+  "T-001 Priya Nair toaster",
+  [{ "id": "T-002" }],
+  {
+    "id": "T-3",
+    "owner": "Ana Lima",
+    "item": "Desk lamp",
+    "category": "electrical",
+    "outcome": { "status": "waiting" }
+  },
+  {
+    "id": "T-004",
+    "owner": "Ola Berg",
+    "item": "   ",
+    "category": "furniture",
+    "outcome": { "status": "waiting" }
+  },
+  {
+    "id": "T-005",
+    "owner": "Sam Okafor",
+    "item": "Road bike",
+    "category": "Bicycle",
+    "outcome": { "status": "waiting" }
+  },
+  {
+    "id": "T-006",
+    "owner": "Mei Chen",
+    "item": "Kettle",
+    "category": "electrical"
+  },
+  {
+    "id": "T-007",
+    "owner": "Lena Vogel",
+    "item": "Wool scarf",
+    "category": "textile",
+    "outcome": { "status": "lost" }
+  },
+  {
+    "id": "T-008",
+    "owner": "Rita Costa",
+    "item": "Radio",
+    "category": "electrical",
+    "outcome": { "status": "needs-part", "part": "  tuning knob  " }
+  },
+  {
+    "id": "T-008",
+    "owner": "Rita Costa",
+    "item": "Radio",
+    "category": "electrical",
+    "outcome": { "status": "waiting" }
+  }
+]

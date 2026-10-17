@@ -1,0 +1,19 @@
+title: Grocery Delivery Types
+summary: Write conditional types that wrap values in lists, unwrap nested promises with infer, read a handler's final result, and test for never without distribution.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Wraps single values and keeps lists, with a type that distributes over unions
+    file: 02-as-list.ts
+    hidden: true
+  - name: Unwraps nested promises and accepts only functions as handlers
+    file: 03-resolved-and-handlers.ts
+    hidden: true
+  - name: Tells never apart from every other type, unions included
+    file: 04-is-never.ts
+    hidden: true

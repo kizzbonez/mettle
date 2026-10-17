@@ -1,0 +1,19 @@
+title: Taxi Booking Tests
+summary: Write node:assert checks with mock.fn for a fare calculator and a retrying booking call, so they pass on correct code and fail on each broken version, and write the lesson's type equality check.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Passes on the correct functions and catches the two mistakes from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Catches every broken fare and accepts a correct one written differently
+    file: 02-fare-mistakes.ts
+    hidden: true
+  - name: Catches every broken bookRide and accepts a correct one written differently
+    file: 03-booking-mistakes.ts
+    hidden: true
+  - name: Tells identical types apart from any, readonly and optional look-alikes
+    file: 04-equal-type.ts
+    hidden: true

@@ -1,0 +1,19 @@
+title: Library Holds
+summary: Ask every branch's catalogue at once and combine the answers with Promise.all, allSettled, any and race, typing each async function, while the tests release the answers in their own order.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Asks every branch at once and adds up the copies, or rejects
+    file: 02-total.ts
+    hidden: true
+  - name: Reports every branch in order, offline ones included, without rejecting
+    file: 03-report.ts
+    hidden: true
+  - name: Finds the first branch with a copy and enforces a deadline
+    file: 04-first-and-deadline.ts
+    hidden: true

@@ -1,0 +1,19 @@
+title: 3D Printer Materials
+summary: Derive the material, profile, setting and part types from a lookup table and an interface with keyof, typeof and indexed access, look names up safely with Object.hasOwn, and return each setting with its own type through K extends keyof.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Derives Material, Profile, Setting and Part exactly
+    file: 02-derived-types.ts
+    hidden: true
+  - name: Looks up only the table's own names
+    file: 03-lookups.ts
+    hidden: true
+  - name: Returns every setting with its own type, in table order
+    file: 04-settings.ts
+    hidden: true

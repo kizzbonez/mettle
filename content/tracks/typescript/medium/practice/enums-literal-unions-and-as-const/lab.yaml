@@ -1,0 +1,19 @@
+title: Ski-Pass Desk
+summary: Replace a string enum of lift passes with an as const object and derive its value and key types, turn a list of run grades into a literal union with as const, check plain strings with a type guard, and switch over the unions.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Replaces the enum with a read-only object and derives Pass and PassName
+    file: 02-passes.ts
+    hidden: true
+  - name: Derives Run from the as const array and checks strings with isRun
+    file: 03-runs.ts
+    hidden: true
+  - name: Gives the lessons required for every grade
+    file: 04-lessons.ts
+    hidden: true

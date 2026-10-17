@@ -1,0 +1,23 @@
+slug: playhouse-cue-bus
+title: Playhouse Cue Bus
+summary: Build a typed event bus for a theatre's show control, with payload and handler types derived from one event map, listeners that survive each other's failures, and a cancellable wait for the next cue.
+language: typescript
+minutes: 55
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Runs the start of opening night from the instructions
+    file: 01-opening-night.ts
+    hidden: false
+  - name: Keeps registrations apart, applies changes from the next emit, and collects listener errors
+    file: 02-emit-rules.ts
+    hidden: true
+  - name: Connects and disconnects a whole handler object
+    file: 03-connect-handlers.ts
+    hidden: true
+  - name: Waits for the next event and stops waiting when the signal is aborted
+    file: 04-next-and-abort.ts
+    hidden: true
+  - name: Derives exact types that reject misuse at compile time
+    file: 05-types-reject-misuse.ts
+    hidden: true

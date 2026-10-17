@@ -1,0 +1,15 @@
+title: TypeScript Development
+tagline: From your first typed program to production TypeScript on Node.js.
+description: >-
+  A full course in four levels on TypeScript 7 and Node.js 26, from zero. It teaches the
+  JavaScript every TypeScript program is made of together with the types that keep it correct:
+  values, functions, arrays and objects, unions and narrowing, then modules, classes, generics,
+  async code and the Node.js APIs, then conditional, mapped and template literal types, decorators
+  and async patterns, and finally tsconfig, monorepos, building, publishing, linting, services,
+  performance and security. Every level ends with a mock exam and a hands-on lab that the
+  TypeScript 7 compiler checks strictly and Node.js runs in a sandbox.
+icon: Braces
+category: typescript
+sortOrder: 8
+format: course
+revision: 1

@@ -1,0 +1,19 @@
+title: Fridge Temperature Log
+summary: Read a limit from the command line and a log from standard input, validate each line into a reading or a message, and report on standard output and standard error with an exit code, in a file that is both a module and a program.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Reports on the sample log from the instructions
+    file: 01-sample-log.ts
+    hidden: false
+  - name: Reads one line into a reading or a message
+    file: 02-parse-reading.ts
+    hidden: true
+  - name: Applies the limit from the first argument and refuses a bad one
+    file: 03-limit.ts
+    hidden: true
+  - name: Handles empty, Windows and unfinished logs as a program
+    file: 04-script-edge-cases.ts
+    hidden: true

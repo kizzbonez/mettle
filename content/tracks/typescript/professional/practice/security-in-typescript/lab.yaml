@@ -1,0 +1,19 @@
+title: Pantry Notes Hardening
+summary: Merge untrusted JSON settings without prototype pollution, keep requested files inside their folder behind a branded SafePath type, and rewrite a handle validator so that crafted input cannot make it backtrack for hours.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Merges settings without polluting any prototype
+    file: 02-merge.ts
+    hidden: true
+  - name: Keeps every path inside the folder, behind a branded type
+    file: 03-safe-join.ts
+    hidden: true
+  - name: Validates handles, crafted and huge ones included, at once
+    file: 04-handles.ts
+    hidden: true

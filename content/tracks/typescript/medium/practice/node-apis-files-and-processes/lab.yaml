@@ -1,0 +1,19 @@
+title: Houseplant Watering Journal
+summary: Read a journal with node:fs/promises and treat only ENOENT as empty, replace a schedule file atomically with a temporary file and rename, read an environment variable strictly, and write a command-line program with arguments, standard error and exit codes.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Reads the journal, treating only a missing file as empty
+    file: 02-read-journal.ts
+    hidden: true
+  - name: Replaces the schedule atomically with a rename
+    file: 03-save-schedule.ts
+    hidden: true
+  - name: Checks WATER_EVERY and the arguments, sets exit codes and creates folders
+    file: 04-program.ts
+    hidden: true

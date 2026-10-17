@@ -1,0 +1,19 @@
+title: Production TypeScript
+summary: >-
+  TypeScript that teams can build, ship and run. Configure tsconfig with the strictness that
+  pays, structure monorepos with project references, build and bundle, publish packages with
+  correct exports and declarations, lint with typed rules, write Node.js services, measure
+  performance and memory, use streams and workers, keep code secure, and migrate JavaScript to
+  TypeScript step by step.
+outcomes:
+  - Configure tsconfig for TypeScript 7, including the strict flags and module settings that matter
+  - Structure, build and publish TypeScript projects and packages that work in ESM and CommonJS
+  - Lint with typed rules and test, and write Node.js services with validation and graceful shutdown
+  - Profile performance and memory, and use streams and worker threads
+  - Defend against the security mistakes types cannot catch, and migrate JavaScript incrementally
+exam:
+  title: Production TypeScript Mock Exam
+  description: Ten questions drawn from the level's bank, from tsconfig and builds to publishing, services, performance and security.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

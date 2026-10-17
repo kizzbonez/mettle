@@ -1,0 +1,19 @@
+title: Laundromat Machines
+summary: Write an abstract Machine class with a static counter, a read-only id, a hard-private credit behind a getter and an abstract price, then extend it into washers and dryers with super and override, declaring every field explicitly.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Takes coins, starts cycles and keeps the change
+    file: 02-credit-and-cycles.ts
+    hidden: true
+  - name: Hides the credit, keeps fields read-only and counts machines on the class
+    file: 03-privacy-and-hierarchy.ts
+    hidden: true
+  - name: Prices dryers by started ten minutes and declares fields without parameter properties
+    file: 04-dryers-and-fields.ts
+    hidden: true

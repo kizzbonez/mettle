@@ -1,0 +1,19 @@
+title: Kiosk Start-up Banner
+summary: Switch three lines of a program back on, read each compiler error by file, position, code and message, and fix the program until it type-checks and prints the right banner.
+language: typescript
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Prints the whole start-up banner
+    file: 01-banner.ts
+    hidden: false
+  - name: Adds 1 to the kiosk number as a number, not as text
+    file: 02-kiosk-number.ts
+    hidden: true
+  - name: Reports the platform Node.js runs on
+    file: 03-platform.ts
+    hidden: true
+  - name: Keeps the other lines in order and runs without an error
+    file: 04-other-lines.ts
+    hidden: true

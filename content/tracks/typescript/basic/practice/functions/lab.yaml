@@ -1,0 +1,19 @@
+title: Ice-Cream Van Till
+summary: Write functions with default, optional and rest parameters, take a function as a parameter through a function type, and return a closure that keeps its own count.
+language: typescript
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.ts
+    hidden: false
+  - name: Writes order lines with the default scoop and the optional topping
+    file: 02-order-lines.ts
+    hidden: true
+  - name: Adds any number of prices and applies offers passed as functions
+    file: 03-totals-and-offers.ts
+    hidden: true
+  - name: Gives every loyalty card its own count
+    file: 04-loyalty-cards.ts
+    hidden: true

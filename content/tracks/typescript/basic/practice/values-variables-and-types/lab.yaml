@@ -1,0 +1,19 @@
+title: Parcel Locker Record
+summary: Replace any with real primitive types, turn a const into a let that changes through the day, and check an unknown value with typeof before using it.
+language: typescript
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 256
+tests:
+  - name: Keeps the locker's record from the example
+    file: 01-locker-record.ts
+    hidden: false
+  - name: Gives the locker's details real types instead of any
+    file: 02-real-types.ts
+    hidden: true
+  - name: Counts the parcels through the day
+    file: 03-parcels.ts
+    hidden: true
+  - name: Checks the unknown scan with typeof before using it
+    file: 04-unknown-scan.ts
+    hidden: true
