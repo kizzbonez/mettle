@@ -91,10 +91,11 @@ quick.
 | **Linux Command Line** | Shell Foundations | Text and Automation | Robust Shell Scripting | Systems Administration |
 | **Python Development** | Python Foundations | Idiomatic Python | The Data Model and Concurrency | Production Python |
 | **Data Analysis with NumPy and pandas** | NumPy Foundations | pandas Foundations | Analysing and Reshaping Data | Production Data Work |
+| **TypeScript Development** | TypeScript Foundations | Idiomatic TypeScript | Advanced Types and Async | Production TypeScript |
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** (Security+ SY0-801) | Security Foundations | Threats, Vulnerabilities and Attacks | Security Architecture and Controls | Security Operations and Program Management |
 
-284 lessons, 656 exam questions with explanations and 300 labs. Every lab is verified in the
+329 lessons, 750 exam questions with explanations and 349 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -145,6 +146,15 @@ questions are original and written in the exam's style, each tagged with its dom
 besides each level's mock exam a **90-question, 90-minute Security+ practice exam** draws a new
 paper in the official domain weights. Every lesson ends with a defensive practice lab on real
 logs, configs, certificates and code. Mettle is not affiliated with or endorsed by CompTIA.
+**TypeScript Development is the seventh**: 45 lessons on TypeScript 7 (the native compiler) and
+Node.js 26 that start from zero, teaching the JavaScript every program is made of together
+with its types, and go on to modules, classes, generics, discriminated unions, async code and
+runtime validation, then conditional, mapped and template literal types, decorators and the
+event loop, and finally tsconfig, monorepos, publishing, linting, Node services, performance
+and security. It was written from the TypeScript Handbook and release notes, the Node.js docs
+and MDN, with every example and compiler error run on TypeScript 7. Its question banks hold 94
+questions, and its labs are type-checked strictly before they run; many test the learner's
+**types** as well as their code: a call the types should reject must fail to compile.
 
 AI Development is still in the original short format (three lessons a level) and is next to be
 expanded.
