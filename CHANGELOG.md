@@ -4,6 +4,46 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-10-17
+
+TypeScript Development, a full course, and TypeScript as a lab language.
+
+### Added
+
+- **TypeScript Development**: 45 lessons in four levels on TypeScript 7 and Node.js 26, from
+  zero, in the same full-course format as the others. The JavaScript every TypeScript program is
+  made of is taught together with its types: values and types, strings, numbers, functions,
+  arrays, objects, null safety, unions and narrowing, errors; then ES modules, classes,
+  generics, discriminated unions, enums versus literal unions, utility types, iteration, async
+  code, runtime validation, the Node.js APIs and declaration files; then conditional, mapped
+  and template literal types, branded types and `satisfies`, overloads, module augmentation,
+  standard decorators, the event loop, cancellation and typed errors; and finally tsconfig,
+  project references, building, publishing, linting, Node services, performance, streams and
+  workers, security and migrating JavaScript. It follows TypeScript 7's defaults and never
+  teaches removed options as current, and every example and compiler error was run on
+  TypeScript 7.0.2.
+  - TypeScript Foundations (13 lessons), Idiomatic TypeScript (12), Advanced Types and Async
+    (10) and Production TypeScript (10).
+  - 94 exam questions; each attempt at a level's mock exam draws ten.
+  - An end-of-level lab for each level, from a bouldering league's scorecard to a pottery
+    studio's booking service with graceful shutdown, and a practice lab for every lesson.
+- **TypeScript as a lab language**: TypeScript 7.0 (the native compiler) on Node.js 26. The
+  learner's file and each test are type-checked strictly, so a test can check the learner's
+  types: a `@ts-expect-error` line their types no longer need fails that test alone. Tests are
+  modules that import the learner's exports and have `check`, `printedBy`, `printedByAsync` and
+  `runScript`; stack traces point at `solution.ts`; a "Not implemented" starter and compiler
+  errors in hidden tests are explained in plain words. The editor highlights TypeScript.
+
+### Changed
+
+- The admin lab editor allows the same 64 fixture files as the runner (it still said 16).
+
+### Fixed
+
+- The code editor now loads its files from an absolute address. Language workers start from a
+  `blob:` URL, where the old relative path could not be resolved, so TypeScript's editor support
+  failed to start and filled the browser console with errors.
+
 ## [1.10.0] - 2026-10-16
 
 Cyber Security, a full course aligned with CompTIA Security+ SY0-801.
