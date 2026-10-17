@@ -8,7 +8,7 @@ export const publishStatus = pgEnum('publish_status', ['draft', 'published', 'ar
 export const questionType = pgEnum('question_type', ['single', 'multiple', 'true_false']);
 export const examMode = pgEnum('exam_mode', ['fixed', 'dynamic']);
 export const attemptStatus = pgEnum('attempt_status', ['in_progress', 'submitted', 'expired']);
-export const labLanguage = pgEnum('lab_language', ['rust', 'python', 'bash', 'cpp', 'csharp', 'yaml']);
+export const labLanguage = pgEnum('lab_language', ['rust', 'python', 'bash', 'cpp', 'csharp', 'yaml', 'typescript']);
 export const submissionKind = pgEnum('submission_kind', ['run', 'submit']);
 export const submissionStatus = pgEnum('submission_status', [
   'queued',

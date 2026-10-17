@@ -25,6 +25,29 @@ function file(files: { path: string; content: string }[], path: string): string 
   return found.content;
 }
 
+describe('typescript harness', () => {
+  const harness = languages.typescript.build(request({ language: 'typescript' }), NONCE);
+
+  it('keeps the learner file as solution.ts and gives each test the helpers', () => {
+    expect(file(harness.files, 'solution.ts')).toBe('LEARNER_CODE');
+    const test = file(harness.files, 'case_1.ts');
+    expect(test.split('\n')[0]).toContain('from "./lab_helpers.js"');
+    expect(test).toContain('TEST_BODY_A');
+  });
+
+  it('type-checks the learner file, then each test, then deletes the test sources', () => {
+    const script = harness.compile?.[2] ?? '';
+    expect(script.split('\n')[0]).toBe('tsc -p tsconfig.json || exit $?');
+    expect(script).toContain('tsc -p tsconfig.case_2.json > out/case_2.check');
+    expect(script).toContain('rm -f case_*.ts tsconfig.case_*.json');
+  });
+
+  it('runs each compiled test through the runner that prints the nonce last', () => {
+    expect(harness.tests[1]?.cmd.at(-1)).toContain('lab_run.mjs out/case_2.js');
+    expect(file(harness.files, 'lab_run.mjs')).toContain(`"\\n${NONCE}\\n"`);
+  });
+});
+
 describe('rust harness', () => {
   const harness = languages.rust.build(request({ language: 'rust' }), NONCE);
 

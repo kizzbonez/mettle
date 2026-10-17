@@ -123,6 +123,60 @@ describe('c# sandbox', () => {
   });
 });
 
+describe('typescript sandbox', () => {
+  const shapes = [
+    'export type Shape = { kind: "circle"; radius: number } | { kind: "square"; side: number };',
+    'export function area(shape: Shape): number {',
+    '  return shape.kind === "circle" ? Math.PI * shape.radius ** 2 : shape.side ** 2;',
+    '}',
+    'export function greet(name: string): void {',
+    '  console.log(`Hello, ${name}!`);',
+    '}',
+    '',
+  ].join('\n');
+  const strict = 'import { area } from "./solution.js";\n// @ts-expect-error a triangle is not a Shape\narea({ kind: "triangle", base: 2 });';
+
+  it('passes a correct solution, with output capture and a type-level check', async () => {
+    const tests = [
+      'import { area, greet } from "./solution.js";\ncheck.equal(area({ kind: "square", side: 3 }), 9, "a 3 by 3 square");\ncheck.equal(printedBy(() => greet("Ada")), "Hello, Ada!\\n", "the greeting");',
+      strict,
+      'import { existsSync } from "node:fs";\ncheck.true(!existsSync("case_1.ts") && !existsSync("case_3.ts"), "test sources are gone before tests run");',
+    ];
+    const result = await execute(request('typescript', shapes, tests));
+    expect(result.status).toBe('passed');
+  });
+
+  it('reports a type error in the learner file as a compile error', async () => {
+    const result = await execute(request('typescript', 'export function area(side: number): number {\n  return side + "!";\n}\n', ['check.true(true, "x");']));
+    expect(result.status).toBe('compile_error');
+    expect(result.compile?.stdout + (result.compile?.stderr ?? '')).toMatch(/solution\.ts\(2,3\): error TS2322/);
+  });
+
+  it('fails only the test whose type-level check the learner types let through', async () => {
+    const loose = 'export function area(shape: { kind: string; side?: number; base?: number }): number {\n  return (shape.side ?? 0) ** 2;\n}\n';
+    const tests = ['import { area } from "./solution.js";\ncheck.equal(area({ kind: "square", side: 3 }), 9, "a 3 by 3 square");', strict];
+    const result = await execute(request('typescript', loose, tests));
+    expect(result.tests.map((t) => t.passed)).toEqual([true, false]);
+    expect(result.tests[1]?.stderr).toContain('error TS2578');
+  });
+
+  it('reports a failed check with both values, and a starter placeholder by its message', async () => {
+    const wrong = 'export function double(n: number): number {\n  return n + 1;\n}\nexport function later(): number {\n  throw new Error("Not implemented: later");\n}\n';
+    const tests = ['import { double } from "./solution.js";\ncheck.equal(double(4), 8, "double of 4");', 'import { later } from "./solution.js";\nlater();'];
+    const result = await execute(request('typescript', wrong, tests));
+    expect(result.tests[0]?.stderr).toContain('FAIL: double of 4');
+    expect(result.tests[0]?.stderr).toContain('actual:   5');
+    expect(result.tests[1]?.stderr).toContain('FAIL: unexpected Error: Not implemented: later');
+    expect(result.tests[1]?.stderr).toMatch(/solution\.ts:5/);
+  });
+
+  it('runs the learner file as a program with input', async () => {
+    const script = 'import { readFileSync } from "node:fs";\nconst name = readFileSync(0, "utf8").trim();\nconsole.log(`Hi, ${name}`);\n';
+    const result = await execute(request('typescript', script, ['const ran = runScript("Ada\\n");\ncheck.equal(ran.out, "Hi, Ada\\n", "the greeting");\ncheck.equal(ran.code, 0, "the exit status");']));
+    expect(result.status).toBe('passed');
+  });
+});
+
 describe('yaml sandbox', () => {
   const compose = ['services:', '  web:', '    image: nginx:1.27', '    ports:', '      - "8080:80"', ''].join('\n');
 

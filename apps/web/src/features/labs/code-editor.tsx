@@ -11,11 +11,14 @@ import { Spinner } from '@/design/primitives/spinner';
 loader.config({ paths: { vs: `/monaco/${monacoManifest.version}/vs` } });
 
 const MONACO_LANGUAGE: Record<LabLanguage, string> = {
-  rust: 'rust', python: 'python', bash: 'shell', cpp: 'cpp', csharp: 'csharp', yaml: 'yaml',
+  rust: 'rust', python: 'python', bash: 'shell', cpp: 'cpp', csharp: 'csharp', yaml: 'yaml', typescript: 'typescript',
 };
 const THEME = 'mettle-forge';
 
 const defineTheme: BeforeMount = (monaco) => {
+  // The editor sees one file without Node's types, so its own type checks would flag correct
+  // code; the sandbox type-checks strictly. Syntax errors are still underlined as you type.
+  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({ noSemanticValidation: true, noSyntaxValidation: false });
   monaco.editor.defineTheme(THEME, {
     base: 'vs-dark',
     inherit: true,
@@ -87,7 +90,7 @@ export function CodeEditor({ language, value, onChange, onRun, onSubmit, readOnl
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
         smoothScrolling: true,
-        tabSize: language === 'bash' || language === 'yaml' ? 2 : 4,
+        tabSize: language === 'bash' || language === 'yaml' || language === 'typescript' ? 2 : 4,
         insertSpaces: true,
         renderWhitespace: 'selection',
         padding: { top: 14, bottom: 14 },

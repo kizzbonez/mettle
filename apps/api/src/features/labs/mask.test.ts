@@ -93,6 +93,23 @@ describe('failureMessage', () => {
     );
     const csharp = 'FAIL: unexpected NotImplementedException: The method or operation is not implemented.';
     expect(failureMessage('csharp', result({ stderr: csharp }), 5000)).toMatch(/^This part is not written yet/);
+    const typescript = 'FAIL: unexpected Error: Not implemented: area\nError: Not implemented: area\n    at area (/work/solution.ts:3:9)';
+    expect(failureMessage('typescript', result({ stderr: typescript }), 5000)).toBe(
+      '`area` is not written yet: replace the starter\'s throw new Error("Not implemented") with your code.',
+    );
+  });
+
+  it('turns TypeScript compiler errors in a test into plain reasons', () => {
+    const loose = "case_2.ts(6,1): error TS2578: Unused '@ts-expect-error' directive.";
+    expect(failureMessage('typescript', result({ stderr: loose }), 5000)).toBe(
+      'A type check failed: your types accept code that the test expected them to reject.',
+    );
+    const mismatch = "case_1.ts(3,13): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.";
+    expect(failureMessage('typescript', result({ stderr: mismatch }), 5000)).toBe(
+      "Type error: Argument of type 'string' is not assignable to parameter of type 'number'.",
+    );
+    const check = 'FAIL: the area of a 3 by 3 square\n  expected: 9\n  actual:   6';
+    expect(failureMessage('typescript', result({ stderr: check }), 5000)).toBe('the area of a 3 by 3 square');
   });
 
   it('leaves an ordinary failure message as the author wrote it', () => {

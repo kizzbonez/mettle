@@ -167,7 +167,7 @@ retired item that is still shipped.
 slug: failed-login-triage
 title: Failed Login Triage
 summary: One sentence.
-language: bash               # rust | python | bash | cpp | csharp | yaml
+language: bash               # rust | python | bash | cpp | csharp | yaml | typescript
 minutes: 30
 timeLimitMs: 5000            # per test
 memoryMb: 128
@@ -221,6 +221,7 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
 | C++      | `solution.cpp` | the body of a function. The learner's file is included above it, so everything it declares is in scope. | `CHECK`, `CHECK_EQ`, `CHECK_THROWS`, `mettle::fail`, an escaping exception |
 | C#       | `solution.cs` | the body of an `async Task` method, so it may `await`. Declare the lab's types without a namespace so the test can name them. | `Check.True`, `Check.Equal`, `Check.SequenceEqual`, `Check.Throws<T>`, `Check.ThrowsAsync<T>`, an escaping exception |
 | YAML     | `solution.yaml` | a **Python** script. The file is already parsed: `doc` (first document), `docs` (all of them), `RAW` (the text), `at(doc, 'a.b.0')`, and the `yaml` module. | `assert`, raising |
+| TypeScript | `solution.ts` | a TypeScript **module**, type-checked strictly, that imports what it uses from `"./solution.js"` (so the learner `export`s it). `check`, `fail`, `printedBy`, `printedByAsync`, `runScript` and the type `Ran` are imported for it. It may `await` at the top level. | `check.equal`, `check.true`, `check.throws`, `check.rejects`, `fail`, an escaping exception, a type error |
 
 - Rust is compiled with `rustc --edition 2024`, standard library only. No crates.
   A Rust test can read what the code printed: `printed_by(|| greet("Ada"))` returns the text,
@@ -263,6 +264,19 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   parser's message. The parser is PyYAML, which follows YAML 1.1 (`no` is a boolean). Use the
   parsed values for what the file means and `RAW` or `yaml.compose(RAW)` for how it is written.
   The test files are Python (`tests/NN-<slug>.py`); the starter must be valid YAML.
+- TypeScript is TypeScript 7 (the native compiler) on Node.js 26 with `@types/node`, no other
+  packages, no network. Both the learner's file and every test are type-checked with
+  `strict: true` (target and lib ES2024, ES modules with `module: nodenext`), and the run stops
+  with the compiler's message if the learner's file does not type-check. Each test is then
+  checked on its own, so a test can check the learner's **types**: a `// @ts-expect-error`
+  line above a call the types must reject fails that test, and only that test, when the
+  learner's types accept it. A starter marks unwritten code with
+  `throw new Error("Not implemented")`, which the learner sees explained in plain words.
+  `check.equal(actual, expected, message)` compares deeply (arrays, objects, Maps, Sets) and
+  prints both values on failure; `printedBy(() => ...)` returns what a call printed;
+  `runScript(stdin, args)` runs the compiled learner file as a program (`.out`, `.err`,
+  `.code`). A script-style lab should test through `runScript`, not by importing the file, which
+  would run its top-level code inside the test. Stack traces point at `solution.ts` lines.
 - Where a helper takes both values, the order is actual, expected, message.
 - Each test is its own process with its own time limit.
 - Always give assertions a message: for hidden tests the message is all the learner sees.

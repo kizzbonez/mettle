@@ -6,17 +6,18 @@ export type Difficulty = (typeof DIFFICULTIES)[number];
 export const ROLES = ['learner', 'instructor', 'admin'] as const;
 export type Role = (typeof ROLES)[number];
 
-export const LAB_LANGUAGES = ['rust', 'python', 'bash', 'cpp', 'csharp', 'yaml'] as const;
+export const LAB_LANGUAGES = ['rust', 'python', 'bash', 'cpp', 'csharp', 'yaml', 'typescript'] as const;
 export type LabLanguage = (typeof LAB_LANGUAGES)[number];
 
 /** What each lab language is called on screen. */
 export const LAB_LANGUAGE_LABEL: Record<LabLanguage, string> = {
-  rust: 'Rust', python: 'Python', bash: 'Bash', cpp: 'C++', csharp: 'C#', yaml: 'YAML',
+  rust: 'Rust', python: 'Python', bash: 'Bash', cpp: 'C++', csharp: 'C#', yaml: 'YAML', typescript: 'TypeScript',
 };
 
 /** The name a learner's file has in the sandbox, and in the editor's title bar. */
 export const LAB_SOLUTION_FILE: Record<LabLanguage, string> = {
   rust: 'solution.rs', python: 'solution.py', bash: 'solution.sh', cpp: 'solution.cpp', csharp: 'solution.cs', yaml: 'solution.yaml',
+  typescript: 'solution.ts',
 };
 
 export const QUESTION_TYPES = ['single', 'multiple', 'true_false'] as const;

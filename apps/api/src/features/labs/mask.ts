@@ -72,6 +72,23 @@ function cppMessage(stderr: string): string | null {
   return lines.at(-1) ?? null;
 }
 
+/**
+ * TypeScript: a failed check or a crash prints "FAIL: message". A test that does not type-check
+ * prints the compiler's errors instead, and an unused `@ts-expect-error` means the learner's
+ * types accept code the test expected them to reject.
+ */
+function typescriptMessage(stderr: string): string | null {
+  const lines = nonEmptyLines(stderr);
+  const failed = lines.find((line) => line.startsWith('FAIL:'));
+  if (failed) return failed.replace(/^FAIL:\s*/, '');
+  if (lines.some((line) => line.includes('error TS2578:'))) {
+    return 'A type check failed: your types accept code that the test expected them to reject.';
+  }
+  const typeError = lines.find((line) => /error TS\d+:/.test(line));
+  if (typeError) return `Type error: ${typeError.replace(/^.*error TS\d+:\s*/, '')}`;
+  return lines.at(-1) ?? null;
+}
+
 const extractors: Record<LabLanguage, (stderr: string) => string | null> = {
   rust: rustMessage,
   python: pythonMessage,
@@ -81,6 +98,7 @@ const extractors: Record<LabLanguage, (stderr: string) => string | null> = {
   csharp: bashMessage,
   // YAML labs are checked by Python scripts.
   yaml: pythonMessage,
+  typescript: typescriptMessage,
 };
 
 /** Exit codes that mean the program crashed: 128 plus the signal that ended it. */

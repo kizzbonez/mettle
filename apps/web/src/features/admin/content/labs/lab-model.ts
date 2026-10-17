@@ -1,10 +1,10 @@
-import type { LabLanguage, PublishStatus } from '@mettle/shared';
+import { MAX_LAB_FIXTURES, type LabLanguage, type PublishStatus } from '@mettle/shared';
 import { ApiError, fieldErrors } from '@/lib/api';
 import type { AdminLabDetail } from '@/types/content-admin';
 import { toInt } from '../shared/labels';
 
 export const LABS = '/admin/content/labs';
-export const MAX_FIXTURES = 16;
+export const MAX_FIXTURES = MAX_LAB_FIXTURES;
 export const MAX_TESTS = 24;
 
 /** What a test case is in each language; the runner wraps it in a harness. */
@@ -15,6 +15,7 @@ export const TEST_HELP: Record<LabLanguage, string> = {
   cpp: 'Each test is the body of a function. solution.cpp is included above it, so everything it declares is in scope, along with the common standard headers. Use CHECK(condition, message), CHECK_EQ(actual, expected, message) and CHECK_THROWS(expression, Type, message). A memory error or a leak fails the test.',
   csharp: 'Each test is the body of an async method, so it may await. Declare types without a namespace so the test can name them. Use Check.True(condition, message), Check.Equal(actual, expected, message), Check.SequenceEqual, Check.Throws<T> and Check.ThrowsAsync<T>.',
   yaml: 'Each test is a Python script. solution.yaml is already parsed: doc is the first document, docs is all of them, RAW is the text, and at(doc, "a.b.0") follows a path. Write plain assert statements, each with a message that says what was checked.',
+  typescript: 'Each test is a TypeScript module, type-checked strictly. Import what it needs from "./solution.js" (the learner exports it). Use check.equal(actual, expected, message), check.true, check.throws, check.rejects, printedBy and runScript; a // @ts-expect-error line checks that the learner\'s types reject wrong code.',
 };
 
 export interface FixtureDraft {

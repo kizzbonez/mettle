@@ -176,10 +176,13 @@ in a harness, so authors write assertions and nothing else.
 | C++      | `solution.cpp` | a function in a generated `main.cpp` that includes the learner's file | `g++ -std=c++20` with the address and undefined-behaviour sanitizers | `./lab case_N` |
 | C#       | `solution.cs` | an async method in a generated `tests.cs` | the C# compiler, called directly (no MSBuild, no NuGet) | `dotnet lab.dll case_N` |
 | YAML     | `solution.yaml` | a Python script with the parsed file in scope | a strict parse: invalid YAML or a repeated key stops the run | `python case_N.py` |
+| TypeScript | `solution.ts` | a module that imports the learner's exports, with the helpers imported for it | `tsc` (TypeScript 7) strict on the learner's file, then on each test alone; the test sources are then deleted | `node lab_run.mjs out/case_N.js` |
 
 C++ labs are built with sanitizers on purpose: a use-after-free, an out-of-bounds access, a leak
 or a signed overflow ends the test with a report instead of passing by luck. A YAML lab has no
 program to run, so its tests are Python scripts that check what the learner's file means.
+TypeScript tests are type-checked one by one, so a test can check the learner's types: a
+`@ts-expect-error` line that the learner's types no longer need fails that test alone.
 
 When a compiled submission does not fit its tests (a missing function, a wrong parameter type),
 the compiler quotes the offending line of the test. Those excerpts are removed before the

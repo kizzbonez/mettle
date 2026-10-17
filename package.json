@@ -20,7 +20,7 @@
     "test": "vitest run",
     "check": "npm run lint && npm run typecheck && npm run test",
     "db:generate": "npm run db:generate -w @mettle/api",
-    "sandbox:build": "docker compose build sandbox-rust sandbox-python sandbox-bash sandbox-cpp sandbox-csharp sandbox-yaml",
+    "sandbox:build": "docker compose build sandbox-rust sandbox-python sandbox-bash sandbox-cpp sandbox-csharp sandbox-yaml sandbox-typescript",
     "up": "docker compose up -d --build",
     "down": "docker compose down",
     "test:sandbox": "vitest run -c vitest.sandbox.config.ts",
