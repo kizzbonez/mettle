@@ -126,8 +126,8 @@ export function labRunner(nonce: string): string {
 export const TS_CONFIG_BASE = JSON.stringify(
   {
     compilerOptions: {
-      target: 'es2024',
-      lib: ['es2024'],
+      target: 'es2025',
+      lib: ['es2025'],
       module: 'nodenext',
       moduleResolution: 'nodenext',
       strict: true,

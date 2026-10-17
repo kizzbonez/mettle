@@ -266,7 +266,7 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   The test files are Python (`tests/NN-<slug>.py`); the starter must be valid YAML.
 - TypeScript is TypeScript 7 (the native compiler) on Node.js 26 with `@types/node`, no other
   packages, no network. Both the learner's file and every test are type-checked with
-  `strict: true` (target and lib ES2024, ES modules with `module: nodenext`), and the run stops
+  `strict: true` (target and lib ES2025, ES modules with `module: nodenext`), and the run stops
   with the compiler's message if the learner's file does not type-check. Each test is then
   checked on its own, so a test can check the learner's **types**: a `// @ts-expect-error`
   line above a call the types must reject fails that test, and only that test, when the
