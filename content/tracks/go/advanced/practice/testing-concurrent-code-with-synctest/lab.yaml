@@ -1,0 +1,19 @@
+title: School Gate Timer Checks
+summary: Write synctest checks for a gate timer that prove, on the fake clock, that it returns the moment a grown-up arrives, at its limit and not a nanosecond before, and as soon as its context is cancelled, so that they accept correct timers and reject broken ones.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: The arrival check accepts correct waits and rejects broken ones
+    file: 02-arrival.go
+    hidden: true
+  - name: The limit check accepts correct waits and rejects broken ones
+    file: 03-limit.go
+    hidden: true
+  - name: The cancel check accepts correct waits and rejects broken ones
+    file: 04-cancel.go
+    hidden: true

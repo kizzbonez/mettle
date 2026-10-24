@@ -1,0 +1,19 @@
+title: Piano Tuner Bookings
+summary: Design a booking service around two small consumer-side interfaces, inject them through a constructor with functional options, adapt a plain function with a HandlerFunc-style type, and let the tests drive it with fakes.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Declares small interfaces and a function adapter that satisfies Notifier
+    file: 02-interfaces.go
+    hidden: true
+  - name: Applies defaults and functional options in order
+    file: 03-options.go
+    hidden: true
+  - name: Talks to the diary and the notifier in the right order and wraps their errors
+    file: 04-book-errors.go
+    hidden: true

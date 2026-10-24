@@ -1,0 +1,19 @@
+title: Kayak Hire Desk
+summary: Decide a kayak hire with switch and if, matching boat names in several spellings, reading the wind with a switch that has no condition, capping the price at a day rate, and refusing a hire when the harbour is closed.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Decides the hire from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Recognises every boat, whatever its spelling, and refuses unknown ones
+    file: 02-boats.go
+    hidden: true
+  - name: Reads the wind at the edges of each band
+    file: 03-wind.go
+    hidden: true
+  - name: Charges at most four hours
+    file: 04-hours.go
+    hidden: true

@@ -1,0 +1,19 @@
+title: Kayak Club Form Filler
+summary: Use reflection to list a struct's form tags and fill any struct from a map of text values, converting to each field's kind, enforcing required fields and rejecting anything that is not a pointer to a struct.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Converts text to strings, integers of every size, floats and booleans
+    file: 02-conversions.go
+    hidden: true
+  - name: Fills only tagged, exported fields and enforces required ones
+    file: 03-tags-and-required.go
+    hidden: true
+  - name: Lists keys and reports wrong targets and unsupported kinds
+    file: 04-keys-and-errors.go
+    hidden: true

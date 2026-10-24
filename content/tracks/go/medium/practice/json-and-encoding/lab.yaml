@@ -1,0 +1,19 @@
+title: Food Truck Menu Feed
+summary: Tag a menu's structs for JSON, give the heat level its own JSON form with MarshalJSON and UnmarshalJSON, read a menu strictly from a stream, and write the price list as CSV.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Marshals dishes and menus with the right names and omissions
+    file: 02-tags.go
+    hidden: true
+  - name: Writes and reads heat levels by name
+    file: 03-heat.go
+    hidden: true
+  - name: Reads menus strictly and writes the price list as CSV
+    file: 04-read-and-csv.go
+    hidden: true

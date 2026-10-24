@@ -1,0 +1,19 @@
+title: Archery Club Scoresheet
+summary: Write functions with several results, a variadic parameter, a function passed as a value and a closure that keeps a round's running total, to score an archery club's ends.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Scores every call a judge can make and rejects the rest
+    file: 02-arrows.go
+    hidden: true
+  - name: Totals ends of any length and counts arrows by a rule
+    file: 03-ends.go
+    hidden: true
+  - name: Keeps a separate running total for every round
+    file: 04-rounds.go
+    hidden: true

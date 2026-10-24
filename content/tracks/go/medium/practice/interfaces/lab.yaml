@@ -1,0 +1,19 @@
+title: Pet Hotel
+summary: Make dogs, cats and parrots satisfy one Guest interface, bill and describe any guest through it with a type switch, pick out the dogs with a comma-ok assertion, and return a nil error that really is nil.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Prices every kind of guest and bills a stay
+    file: 02-billing.go
+    hidden: true
+  - name: Describes every guest and lists the dogs to walk
+    file: 03-describe-and-walks.go
+    hidden: true
+  - name: Admits guests with a nil error and refuses large dogs
+    file: 04-admit.go
+    hidden: true

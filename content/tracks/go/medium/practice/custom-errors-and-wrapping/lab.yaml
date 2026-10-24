@@ -1,0 +1,19 @@
+title: Mill Lane Hall Bookings
+summary: Define error types that carry details, report every problem at once with errors.Join, wrap errors with context, and find them again with errors.Is and errors.AsType.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Reports every problem with a booking as a field error
+    file: 02-validate.go
+    hidden: true
+  - name: Wraps each refusal so that callers can still find its cause
+    file: 03-diary.go
+    hidden: true
+  - name: Answers from inside errors wrapped by other layers
+    file: 04-reply.go
+    hidden: true

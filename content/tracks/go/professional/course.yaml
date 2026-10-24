@@ -1,0 +1,19 @@
+title: Production Go
+summary: >-
+  Go that teams build, ship and run. Lay out projects and modules, write HTTP servers and
+  clients and test them with httptest, log with slog, configure programs and shut them down
+  gracefully, use database/sql safely, profile and speed up code with benchmarks and pprof,
+  defend against the common security mistakes, build and ship binaries and containers, and keep
+  code healthy with vet, go fix and static analysis.
+outcomes:
+  - Structure Go projects and modules, and manage versions, dependencies and toolchains
+  - Build, test and harden HTTP servers and clients with net/http and httptest
+  - Add structured logging, configuration and graceful shutdown to a service
+  - Use database/sql with contexts, transactions and parameters, and profile and optimize code
+  - Ship secure, reproducible binaries and keep a codebase healthy with vet, go fix and linters
+exam:
+  title: Production Go Mock Exam
+  description: Ten questions drawn from the level's bank, from project layout and HTTP to logging, shutdown, databases, performance, security and shipping.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

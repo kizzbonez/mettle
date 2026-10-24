@@ -1,0 +1,15 @@
+title: Go Development
+tagline: From your first Go program to concurrent services in production.
+description: >-
+  A full course in four levels on Go 1.27, from zero. It teaches the language the way Go is
+  written: values, types, functions, slices, maps, structs, pointers and errors as values, then
+  packages and modules, methods, interfaces, generics, iterators, testing, files and JSON, then
+  goroutines, channels, select, mutexes, context and the race detector, and finally HTTP
+  services, structured logging, databases, profiling, security and shipping. Every level ends
+  with a mock exam and a hands-on lab that Go builds with go test and runs under the race
+  detector in a sandbox.
+icon: Workflow
+category: go
+sortOrder: 9
+format: course
+revision: 1

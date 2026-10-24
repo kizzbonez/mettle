@@ -1,0 +1,23 @@
+slug: harbour-moorings-api
+title: Harbour Moorings API
+summary: Build the HTTP service that books visitor berths in a small harbour, with configuration from flags and the environment, ServeMux routes with methods and wildcards, size-limited and validated JSON, a constant-time admin token, slog request logging, panic recovery and server timeouts, all tested with httptest.
+language: go
+minutes: 60
+timeLimitMs: 10000
+memoryMb: 768
+tests:
+  - name: Books, reads and cancels a mooring as in the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Loads the configuration with flags over the environment over the defaults, and validates it
+    file: 02-config.go
+    hidden: true
+  - name: Validates bookings, limits the body size and refuses clashing berths
+    file: 03-bookings.go
+    hidden: true
+  - name: Lets only the admin token cancel bookings, and routes every request correctly
+    file: 04-auth-and-routes.go
+    hidden: true
+  - name: Logs every request, recovers from panics and sets server timeouts
+    file: 05-middleware.go
+    hidden: true

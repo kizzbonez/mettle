@@ -1,0 +1,23 @@
+slug: erg-test-leaderboard
+title: Erg Test Leaderboard
+summary: Build a small rowing-club library in one package that parses erg times, reads results from CSV with line-numbered custom errors joined together, ranks members with a generic best-per-key helper and an iterator, and writes the leaderboard as JSON through io.Writer.
+language: go
+minutes: 55
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Builds the leaderboard for the sample month
+    file: 01-sample-month.go
+    hidden: false
+  - name: Parses and writes erg times exactly
+    file: 02-erg-times.go
+    hidden: true
+  - name: Reads CSV results and reports every bad line with its number
+    file: 03-reading-results.go
+    hidden: true
+  - name: Keeps the best per key, ranks ties and yields attempts in order
+    file: 04-standings-and-attempts.go
+    hidden: true
+  - name: Writes the leaderboard as JSON and reports write errors
+    file: 05-json-output.go
+    hidden: true

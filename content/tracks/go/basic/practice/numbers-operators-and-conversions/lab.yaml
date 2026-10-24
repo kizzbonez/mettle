@@ -1,0 +1,19 @@
+title: Tile Shop Quote
+summary: Work out a tiling quote with integer and floating-point arithmetic, explicit conversions, rounding up with the math package, and numbers turned into text with strconv.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Prints the quote for the starter's room
+    file: 01-quote.go
+    hidden: false
+  - name: Works out the area and the tiles, rounding part tiles up
+    file: 02-area-and-tiles.go
+    hidden: true
+  - name: Rounds the boxes up and counts the spare tiles
+    file: 03-boxes.go
+    hidden: true
+  - name: Writes the reference and the price with two decimals
+    file: 04-reference-and-price.go
+    hidden: true

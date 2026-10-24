@@ -1,0 +1,19 @@
+title: Depot Build List
+summary: Parse go mod graph output, compare semantic versions as numbers, and compute the build list with minimal version selection, the way the go command does.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Compares versions part by part, as numbers
+    file: 02-compare-versions.go
+    hidden: true
+  - name: Reads graph lines, skips Go versions and reports bad lines by number
+    file: 03-parse-graph.go
+    hidden: true
+  - name: Selects the highest required version across the whole reachable graph
+    file: 04-build-list.go
+    hidden: true

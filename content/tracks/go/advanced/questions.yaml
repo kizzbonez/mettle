@@ -1,0 +1,570 @@
+- key: go-advanced-01
+  type: single
+  category: go
+  tags: [goroutines, main]
+  prompt: |
+    This program is built with `go build` (no race detector) and run several times:
+
+    ```go
+    package main
+
+    import "fmt"
+
+    func announce(stop string) {
+    	fmt.Println("next stop:", stop)
+    }
+
+    func main() {
+    	go announce("Harbour Street")
+    	fmt.Println("doors closing")
+    }
+    ```
+
+    What does it print?
+  options:
+    - text: "Usually only `doors closing`; now and then `next stop: Harbour Street` as well, because the program ends when `main` returns"
+      correct: true
+    - text: "Always both lines, `doors closing` first, because a program waits for its goroutines before it exits"
+    - text: "Always both lines, `next stop: Harbour Street` first, because the goroutine was started first"
+    - text: "Nothing: it does not compile, because the result of a `go` call cannot be ignored"
+  explanation: |
+    The `go` statement starts `announce` in a new goroutine and moves on at once, without
+    waiting. `main` then prints and returns, and **when `main` returns, the program ends**,
+    whatever its other goroutines are doing. Whether the announcement gets printed first is
+    down to scheduling: in three runs in the sandbox, it appeared once. Go never waits for
+    goroutines on its own; to wait, use a `sync.WaitGroup` (or a channel). The program compiles:
+    `announce` returns nothing, and a `go` call discards any results anyway.
+
+- key: go-advanced-02
+  type: multiple
+  category: go
+  tags: [waitgroup, sync]
+  prompt: |
+    Which statements about `sync.WaitGroup` are true? Choose all that apply.
+  options:
+    - text: "`wg.Go(f)` (Go 1.25) adds one to the counter, runs `f` in a new goroutine and calls `Done` when `f` returns"
+      correct: true
+    - text: "With `Add` and `Done`, call `wg.Add(1)` before the `go` statement, not as the first line inside the new goroutine"
+      correct: true
+    - text: "A worker can take the WaitGroup as a parameter of type `sync.WaitGroup` and call `Done` on it"
+    - text: "`Wait` returns as soon as any one of the goroutines has called `Done`"
+  explanation: |
+    `wg.Go(f)` packages the whole pattern into one call, and the documentation now tells callers
+    to prefer it. When you use `Add` and `Done` yourself, `Add` must happen before `Wait` can
+    run: called inside the new goroutine, `Wait` may find the counter still at zero and return
+    early, which `go vet` reports as `WaitGroup.Add called from inside new goroutine`.
+    A `sync.WaitGroup` parameter is a **copy**, so `Done` lowers the copy's counter and the
+    original `Wait` never returns; vet says `passes lock by value: sync.WaitGroup contains
+    sync.noCopy`. Pass `*sync.WaitGroup`, or keep it out of the signature with `wg.Go`. `Wait`
+    blocks until the counter is **zero**, that is until every task has finished.
+
+- key: go-advanced-03
+  type: single
+  category: go
+  tags: [channels, close, comma-ok]
+  prompt: |
+    What does this print?
+
+    ```go
+    ch := make(chan int, 2)
+    ch <- 1
+    ch <- 2
+    close(ch)
+    for range 3 {
+    	v, ok := <-ch
+    	fmt.Println(v, ok)
+    }
+    ```
+  options:
+    - text: "`1 true`, `2 true`, `0 false`"
+      correct: true
+    - text: "`1 true`, `2 true`, then `panic: receive from closed channel`"
+    - text: "`1 false`, `2 false`, `0 false`, because the channel was closed before anything was received"
+    - text: "`1 true`, `2 true`, then the program blocks forever on the third receive"
+  explanation: |
+    Closing a channel only records that **no more values will be sent**. Values already in the
+    buffer are still delivered, with `ok` true. Once the channel is closed **and** empty, every
+    receive returns at once with the element type's zero value and `ok` false, so the third
+    receive gives `0 false`. Receiving from a closed channel never panics and never blocks; it is
+    sending on (or closing) a closed channel that panics. This is what `for v := range ch` relies
+    on: it stops at the first receive whose `ok` would be false.
+
+- key: go-advanced-04
+  type: single
+  category: go
+  tags: [channels, close, ownership]
+  prompt: |
+    Four worker goroutines each send results on the same channel `results`, and `main` reads
+    them with `for r := range results`. Where should `close(results)` be called?
+  options:
+    - text: "Once, by a goroutine that waits for all four workers (for example with a `WaitGroup`) and then closes the channel"
+      correct: true
+    - text: "In each worker, with `defer close(results)`, so the channel is closed when the work is done"
+    - text: "In `main`, just before the `for range` loop, so that the loop knows when to stop"
+    - text: "Nowhere: `range` stops by itself when no goroutine is sending any more"
+  explanation: |
+    The rule is that **the sender closes**, because only the sender knows that no more values
+    are coming. With several senders, none of them knows that the others have finished: the
+    second worker to close would panic with `close of closed channel`, and a worker still
+    sending after the first close would panic with `send on closed channel`. Closing in `main`
+    before the loop makes every send panic. And `range` never stops by itself: without a close,
+    it waits forever once the values run out. So one goroutine waits for all the senders and
+    closes the channel exactly once, a pattern lesson 06 builds into fan-in.
+
+- key: go-advanced-05
+  type: single
+  category: go
+  tags: [select, timeouts, goroutine-leak]
+  prompt: |
+    ```go
+    func fetch() <-chan string {
+    	ch := make(chan string)
+    	go func() {
+    		time.Sleep(200 * time.Millisecond)
+    		ch <- "menu"
+    	}()
+    	return ch
+    }
+
+    func main() {
+    	select {
+    	case m := <-fetch():
+    		fmt.Println(m)
+    	case <-time.After(100 * time.Millisecond):
+    		fmt.Println("timed out")
+    	}
+    	// ... the program carries on for hours
+    }
+    ```
+
+    The program prints `timed out`. What becomes of the goroutine inside `fetch`?
+  options:
+    - text: "It blocks forever on `ch <- \"menu\"`, since nobody will ever receive: a goroutine leak. Making the channel `make(chan string, 1)` lets it finish"
+      correct: true
+    - text: "The `select` stops it when the timeout case is chosen"
+    - text: "Its send panics, because the channel was abandoned by the receiver"
+    - text: "The garbage collector frees it once nothing refers to the channel any more"
+  explanation: |
+    A `select` only chooses which communication proceeds; it does not stop goroutines. The
+    sender reaches `ch <- "menu"` after 200 ms, but the only receiver gave up at 100 ms, so on an
+    unbuffered channel the send waits forever. In the sandbox, `runtime.NumGoroutine()` still
+    counted it 300 ms later. Nothing panics: a send blocks, it never fails because nobody is
+    listening. The garbage collector does not free a blocked goroutine either (Go 1.27's
+    `goroutineleak` profile can **report** such goroutines, but they stay). With a buffer of one,
+    the late send succeeds into the buffer and the goroutine ends.
+
+- key: go-advanced-06
+  type: multiple
+  category: go
+  tags: [select, nil-channels, timers]
+  prompt: |
+    Which statements are true in Go 1.27? Choose all that apply.
+  options:
+    - text: "When several cases of a `select` are ready, one of them is chosen at random"
+      correct: true
+    - text: "A `select` case that receives from a nil channel is never chosen, so setting a closed channel's variable to `nil` switches its case off"
+      correct: true
+    - text: "After `t.Stop()` returns false, `<-t.C` must be called to drain a stale value before the timer can be reused"
+    - text: "A `select` with a `default` case blocks until one of its other cases is ready"
+  explanation: |
+    The spec says that when several communications can proceed, "a single one that can proceed
+    is chosen via a uniform pseudo-random selection", so case order means nothing. A nil
+    channel is never ready, so its case is never chosen: that is how a loop over two channels
+    stops looking at one once it is closed (a closed channel, by contrast, is always ready).
+    Since Go 1.23 timer channels are unbuffered and `Stop` and `Reset` guarantee that no stale
+    value is delivered afterwards; Go 1.27 removed the `asynctimerchan` setting that brought the
+    old behaviour back. When `Stop` returns false there is nothing to drain, and the old
+    `<-t.C` idiom can block forever. `default` does the opposite of blocking: it runs at once
+    when no other case is ready.
+
+- key: go-advanced-07
+  type: single
+  category: go
+  tags: [mutex, race-detector]
+  prompt: |
+    ```go
+    type counter struct {
+    	mu sync.Mutex
+    	n  int
+    }
+
+    func (c *counter) inc() {
+    	c.mu.Lock()
+    	defer c.mu.Unlock()
+    	c.n++
+    }
+
+    func (c *counter) value() int {
+    	return c.n
+    }
+    ```
+
+    Ten goroutines call `c.inc()` while another calls `c.value()`. What does the race detector
+    say?
+  options:
+    - text: "It reports a data race between the read in `value` and the write in `inc`; `value` must lock the mutex too"
+      correct: true
+    - text: "Nothing: reading an `int` is a single machine instruction, so it cannot race"
+    - text: "Nothing: the mutex locked in `inc` protects every access to `n`, wherever it is"
+    - text: "It reports a deadlock, because `value` never unlocks the mutex"
+  explanation: |
+    A mutex protects only the code that locks it. `value` reads `n` without the lock, so
+    nothing orders that read against the writes in `inc`: that is a **data race**, and
+    `go run -race` reports `Read at ... by goroutine 18: main.(*counter).value()` followed by
+    `Previous write at ... main.(*counter).inc()`. "It is only one instruction" is no defence:
+    the Go memory model defines any unsynchronized read that is concurrent with a write as a data
+    race, whatever its size. There is no deadlock, since `value` never locks at all. Lock in every method that touches the guarded fields, or make `n` an
+    `atomic.Int64`.
+
+- key: go-advanced-08
+  type: true_false
+  category: go
+  tags: [mutex, copylocks, vet]
+  prompt: |
+    The `counter` type has a `sync.Mutex` field `mu` and a method `inc` with a pointer receiver
+    that locks `mu` and adds one to `n`. It gets this method:
+
+    ```go
+    func (c counter) value() int {
+    	c.mu.Lock()
+    	defer c.mu.Unlock()
+    	return c.n
+    }
+    ```
+
+    True or false: `value` is safe to call while other goroutines call `inc`, because it locks
+    the mutex before it reads `n`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. Calling a method with a value receiver copies the whole struct, and a copied
+    `sync.Mutex` is a separate lock with no connection to the original. `inc` locks one mutex
+    and `value` locks another, so the read of `n` still races with the writes. The code
+    compiles, but `go vet` says `value passes lock by value: example.counter contains
+    sync.Mutex`. A `Mutex` is a plain struct value, not a reference to a shared lock. Give every
+    method of a type that holds a lock a pointer receiver; the same applies to `WaitGroup`,
+    `Once` and the atomic types.
+
+- key: go-advanced-09
+  type: single
+  category: go
+  tags: [context, cause]
+  prompt: |
+    What does this print?
+
+    ```go
+    var errBreakdown = errors.New("the van broke down")
+
+    func main() {
+    	ctx, cancel := context.WithCancelCause(context.Background())
+    	cancel(errBreakdown)
+    	fmt.Println(ctx.Err())
+    	fmt.Println(context.Cause(ctx))
+    }
+    ```
+  options:
+    - text: "`context canceled`, then `the van broke down`"
+      correct: true
+    - text: "`the van broke down` twice: the cause replaces the error"
+    - text: "`context canceled` twice: the cause is only kept for timeouts"
+    - text: "`<nil>`, then `the van broke down`: a context cancelled with a cause has no `Err`"
+  explanation: |
+    `Err` keeps its two standard values, `context.Canceled` ("context canceled") and
+    `context.DeadlineExceeded`, so existing checks like `errors.Is(err, context.Canceled)` go on
+    working. The error passed to the `CancelCauseFunc` is recorded separately, and
+    `context.Cause(ctx)` returns it. With no cause given, or `cancel(nil)`, `Cause` returns the
+    same value as `Err`. `WithTimeoutCause` and `WithDeadlineCause` set the cause used when the
+    time runs out.
+
+- key: go-advanced-10
+  type: multiple
+  category: go
+  tags: [context, conventions]
+  prompt: |
+    Which of these follow the `context` package's rules? Choose all that apply.
+  options:
+    - text: "`func (s *Store) Load(ctx context.Context, id string) (Item, error)`: the context is the first parameter, named `ctx`"
+      correct: true
+    - text: "`ctx, cancel := context.WithTimeout(ctx, time.Second)` followed at once by `defer cancel()`, even when the work usually finishes early"
+      correct: true
+    - text: "Storing the request's context in a field of `Store` when it is created, so that every method can use it"
+    - text: "`context.WithValue(ctx, \"userID\", id)`, with a plain string key that every package can use"
+  explanation: |
+    A context is passed **explicitly, as the first parameter**, to each call that needs it, so
+    every call can carry its own deadline and cancellation. Stored in a struct, one context
+    would govern every method, and callers could no longer cancel one operation on its own.
+    Every `With...` function except `WithValue` and `WithoutCancel` returns a `cancel` function
+    that must be called: it releases the context's resources, such as the timer, as soon as the
+    work is done, and `go vet` reports one that is discarded. Keys for `WithValue` should be of
+    an **unexported type of your own**, such as `type userIDKey struct{}`; with a string key,
+    two packages that both pick `"userID"` silently overwrite each other's values.
+
+- key: go-advanced-11
+  type: single
+  category: go
+  tags: [concurrency-patterns, pipelines, goroutine-leaks]
+  prompt: |
+    A pipeline stage sends with a plain send:
+
+    ```go
+    func square(in <-chan int) <-chan int {
+    	out := make(chan int)
+    	go func() {
+    		defer close(out)
+    		for n := range in {
+    			out <- n * n
+    		}
+    	}()
+    	return out
+    }
+    ```
+
+    The caller reads one value from `square(gen(1, 2, 3))` and returns, never reading again.
+    What happens to the stage's goroutine?
+  options:
+    - text: "It blocks forever on `out <- n * n`: a goroutine leak that stays in memory until the program exits"
+      correct: true
+    - text: "The garbage collector frees it once nothing refers to `out` any more"
+    - text: "It panics with `send on closed channel` when the caller returns"
+    - text: "The runtime stops the program with `fatal error: all goroutines are asleep - deadlock!`"
+  explanation: |
+    Goroutines are never garbage-collected: a goroutine blocked on a send that no one will
+    receive stays blocked, with everything it references, for the life of the program. Nothing
+    closes `out` early, so there is no panic, and the runtime reports a deadlock only when *every*
+    goroutine is blocked, which is not the case while `main` runs on. The fix is to put the send
+    in a `select` with `<-ctx.Done()` and have the caller cancel the context when it stops
+    reading. Go 1.27's `goroutineleak` profile reports such goroutines by file and line.
+
+- key: go-advanced-12
+  type: multiple
+  category: go
+  tags: [concurrency-patterns, worker-pools, semaphores]
+  prompt: |
+    You must process 1,000 files but never have more than 8 being processed at the same moment.
+    Which of these do that? Choose all that apply.
+  options:
+    - text: "Start 8 worker goroutines that `range` over a jobs channel, and send the 1,000 files on it"
+      correct: true
+    - text: "Make `sem := make(chan struct{}, 8)`; before starting each file's goroutine, send `sem <- struct{}{}`, and receive from `sem` when the goroutine finishes"
+      correct: true
+    - text: "Call `runtime.GOMAXPROCS(8)`, then start one goroutine per file"
+    - text: "Call `wg.Add(8)` on a `sync.WaitGroup` before starting one goroutine per file"
+  explanation: |
+    A fixed pool of 8 workers can only ever work on 8 files, and a buffered channel of capacity 8
+    used as a semaphore blocks the ninth send until a token is given back. `GOMAXPROCS` limits how
+    many OS threads run Go code at once, not how many goroutines exist or how many files are open:
+    1,000 goroutines would still start, and those blocked in I/O do not count against it.
+    `wg.Add(8)` only sets a counter for `Wait`; it limits nothing (and with 1,000 goroutines
+    calling `Done`, the counter would go negative and panic).
+
+- key: go-advanced-13
+  type: single
+  category: go
+  tags: [synctest, fake-clock, testing]
+  prompt: |
+    ```go
+    func TestClock(t *testing.T) {
+    	synctest.Test(t, func(t *testing.T) {
+    		start := time.Now()
+    		timer := time.NewTimer(90 * time.Minute)
+    		<-timer.C
+    		t.Log(start.Format(time.DateTime), time.Since(start))
+    	})
+    }
+    ```
+
+    What does `go test -v` log, and how long does the test take on the wall clock?
+  options:
+    - text: "`2000-01-01 00:00:00 1h30m0s`, and the test takes no noticeable real time"
+      correct: true
+    - text: "Today's date and `1h30m0s`, after waiting ninety real minutes"
+    - text: "`2000-01-01 00:00:00 0s`: the fake clock never moves inside a bubble"
+    - text: "Nothing: the test fails with `deadlock: all goroutines in bubble are blocked`"
+  explanation: |
+    Inside a synctest bubble the `time` package uses a fake clock that starts at midnight UTC on
+    1 January 2000. When every goroutine in the bubble is durably blocked (here the only one is
+    waiting on a timer created in the bubble) the clock jumps straight to the next timer, so the
+    receive completes at once and `time.Since(start)` is exactly 1h30m0s. It is not a deadlock,
+    because a pending timer can still wake the goroutine; the bubble deadlocks only when nothing,
+    not even a timer, could.
+
+- key: go-advanced-14
+  type: single
+  category: go
+  tags: [synctest, durably-blocked]
+  prompt: |
+    In a `synctest` bubble, the fake clock advances only when every goroutine in the bubble is
+    **durably blocked**. A goroutine blocked in which of these is **not** durably blocked, so that
+    it stops the clock from moving?
+  options:
+    - text: "`mu.Lock()` on a `sync.Mutex` that another goroutine holds"
+      correct: true
+    - text: "Receiving from a channel that was made inside the bubble"
+    - text: "`time.Sleep(time.Hour)`"
+    - text: "`wg.Wait()` on a `sync.WaitGroup` whose `Add` was called inside the bubble"
+  explanation: |
+    A goroutine is durably blocked when only another goroutine in the same bubble can wake it.
+    Channels made in the bubble, `time.Sleep`, `sync.Cond.Wait` and a `WaitGroup` tied to the
+    bubble all qualify. Mutex operations do not, because the package treats them as something
+    that could be released from outside the bubble; the same goes for I/O, system calls and
+    channels made outside the bubble. Mutex waits are normally short, so this rarely matters, but
+    a goroutine waiting on an outside channel stops the clock for good and the test times out.
+
+- key: go-advanced-15
+  type: single
+  category: go
+  tags: [reflection, kind, type]
+  prompt: |
+    ```go
+    type Celsius float64
+
+    func main() {
+    	t := reflect.TypeOf(Celsius(21.5))
+    	fmt.Println(t, t.Kind(), t.Kind() == reflect.Float64, t == reflect.TypeFor[float64]())
+    }
+    ```
+
+    What does it print?
+  options:
+    - text: "`main.Celsius float64 true false`"
+      correct: true
+    - text: "`main.Celsius main.Celsius false false`"
+    - text: "`float64 float64 true true`"
+    - text: "`main.Celsius float64 true true`"
+  explanation: |
+    A `reflect.Type` is the exact type, `main.Celsius`, which is a different type from `float64`,
+    so the last comparison is false. Its **Kind** is the kind of thing it is built from:
+    `Celsius` is defined on `float64`, so its kind is `reflect.Float64`. That is why reflective
+    code usually switches on `Kind()`: one `case reflect.Float64` handles `float64`, `Celsius` and
+    every other type defined on it.
+
+- key: go-advanced-16
+  type: single
+  category: go
+  tags: [reflection, settability]
+  prompt: |
+    ```go
+    type Hive struct {
+    	Name   string
+    	Frames int
+    }
+
+    h := Hive{Name: "Clover", Frames: 9}
+    reflect.ValueOf(h).Field(1).SetInt(10)
+    fmt.Println(h.Frames)
+    ```
+
+    What happens?
+  options:
+    - text: "It panics with `reflect: reflect.Value.SetInt using unaddressable value`; pass `&h` and call `Elem()` first"
+      correct: true
+    - text: "It prints `10`"
+    - text: "It prints `9`: the copy inside the `reflect.Value` changes, `h` does not"
+    - text: "It does not compile, because `SetInt` needs an `int64` and `10` is an `int`"
+  explanation: |
+    `reflect.ValueOf(h)` receives a copy of `h`. Changing that copy could never change `h`, so
+    reflection refuses: the field is not **settable** (`CanSet()` is false) and `SetInt` panics.
+    To change `h`, reflect on its address and step through the pointer:
+    `reflect.ValueOf(&h).Elem().Field(1).SetInt(10)`. The untyped constant `10` converts to
+    `int64` without complaint, so the code compiles.
+
+- key: go-advanced-17
+  type: single
+  category: go
+  tags: [generics, generic-methods, interfaces]
+  prompt: |
+    In Go 1.27:
+
+    ```go
+    type Box[T any] struct{ v T }
+
+    func (b Box[T]) Convert[U any](f func(T) U) Box[U] { return Box[U]{f(b.v)} }
+
+    type Converter interface {
+    	Convert(f func(int) string) Box[string]
+    }
+
+    var c Converter = Box[int]{42}
+    ```
+
+    What happens?
+  options:
+    - text: "Compile error: `Box[int]` does not implement `Converter` (wrong type for method `Convert`), because a generic method never satisfies an interface method"
+      correct: true
+    - text: "It compiles: the compiler instantiates `Convert` with `U = string` to match the interface"
+    - text: "Compile error: a method may not declare type parameters of its own"
+    - text: "It compiles, but calling `c.Convert` panics because `U` is unknown at run time"
+  explanation: |
+    Since Go 1.27 a method may declare its own type parameters, so `Convert[U any]` is legal and
+    can be called as `b.Convert(strconv.Itoa)` or `b.Convert[string](...)`. But a generic method
+    cannot implement an interface method, even one that looks like an instance of it: the
+    compiler reports `have Convert[U any](func(int) U) Box[U]`, `want Convert(func(int) string)
+    Box[string]`. Calls through an interface are resolved at run time, and the code for an
+    arbitrary `U` would have to be made then. Interface methods themselves cannot declare type
+    parameters either.
+
+- key: go-advanced-18
+  type: multiple
+  category: go
+  tags: [generics, constraints, inference]
+  prompt: |
+    Which of these compile with Go 1.27? Choose all that apply.
+  options:
+    - text: "`type Lesser[T Lesser[T]] interface { Less(T) bool }`"
+      correct: true
+    - text: "`func (s Set[T]) Map[U comparable](f func(T) U) Set[U]`, for `type Set[T comparable] struct{ items map[T]struct{} }`"
+      correct: true
+    - text: "`type Mapper interface { Map[U any](f func(string) U) []U }`"
+    - text: "`x := zero()`, for `func zero[T any]() T { var z T; return z }`"
+  explanation: |
+    Go 1.26 allowed a generic type to refer to itself in its own type parameter list, so a
+    self-referential constraint like `Lesser` compiles. Go 1.27 allows generic methods, so `Map`
+    with its own `U` compiles. Interface methods may still not have type parameters
+    (`interface method must have no type parameters`). And type arguments are inferred from the
+    arguments of a call: `T` appears only in the result of `zero`, so `zero()` fails with
+    `cannot infer T`; write `zero[int]()`.
+
+- key: go-advanced-19
+  type: single
+  category: go
+  tags: [interfaces, design, consumer-side]
+  prompt: |
+    Package `sms` has a concrete `*Gateway` with methods `Send`, `Credits` and `Close`. Package
+    `reminders` only ever calls `Send`, and its tests need a fake. Where does the idiomatic design
+    declare the interface that `reminders` depends on?
+  options:
+    - text: "In `reminders`, with only the `Send` method: `type Sender interface { Send(to, text string) error }`"
+      correct: true
+    - text: "In `sms`, next to `Gateway`, with all three methods, so that every user shares one interface"
+    - text: "In a shared package `interfaces` that both packages import"
+    - text: "Nowhere: `reminders` should take a `*sms.Gateway`, and the tests should use a real gateway"
+  explanation: |
+    Go interfaces are satisfied implicitly, so the package that *uses* a dependency can declare
+    exactly the methods it needs, and `*sms.Gateway` satisfies it without knowing it exists. A
+    one-method interface is trivial to fake. An interface defined by `sms` with all three methods
+    forces every fake to implement `Credits` and `Close` too (`does not implement ... (missing
+    method Close)`), and couples `reminders` to methods it never calls. Taking the concrete type
+    is fine until a test needs a fake, which is the moment to add the small consumer-side
+    interface.
+
+- key: go-advanced-20
+  type: true_false
+  category: go
+  tags: [interfaces, design, constructors]
+  prompt: |
+    A constructor such as `func NewService(sender Sender) *Service` should normally return an
+    interface type instead of `*Service`, so that callers can swap in another implementation.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False: "accept interfaces, return structs". Returning the concrete `*Service` gives callers
+    every method, documented in one place, and lets the package add methods later without
+    breaking anyone. A caller that wants to swap implementations declares its own small
+    interface, which `*Service` satisfies implicitly. Returning an interface hides methods behind
+    a view chosen in advance, and is a common sign of interface pollution. The exception is a
+    type that exists only to implement a well-known interface and has no behaviour of its own:
+    `crc32.NewIEEE()` returns a `hash.Hash32`, as Effective Go recommends for such types.

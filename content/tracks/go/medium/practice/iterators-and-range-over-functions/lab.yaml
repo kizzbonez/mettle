@@ -1,0 +1,19 @@
+title: Beach Clean Weigh-Up
+summary: Write iterators that read a log lazily and stop when the loop does, chain a filter and a take adapter that never over-reads, and walk two sequences side by side with iter.Pull.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Reads only the valid lines and stops when the loop breaks
+    file: 02-bags.go
+    hidden: true
+  - name: Filters and takes values lazily, even from an endless sequence
+    file: 03-adapters.go
+    hidden: true
+  - name: Pairs two sequences with iter.Pull and stops both
+    file: 04-differences.go
+    hidden: true

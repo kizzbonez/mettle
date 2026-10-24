@@ -1,0 +1,19 @@
+title: Park Tennis Courts
+summary: Build bookings with a constructor function, work out prices from their fields, mark bookings paid in place in a slice, and total what each person owes in a map of structs.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Builds bookings with their defaults and prices them
+    file: 02-new-and-cost.go
+    hidden: true
+  - name: Marks the bookings in the slice itself as paid
+    file: 03-pay-all.go
+    hidden: true
+  - name: Totals what each person still owes
+    file: 04-owed.go
+    hidden: true

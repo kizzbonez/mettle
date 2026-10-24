@@ -1,0 +1,19 @@
+title: Cider Press Co-op
+summary: Build a pipeline source that stops when its context is done, a fan-in merge that closes its output exactly once, and a bounded worker pool that keeps results in delivery order and cancels the other presses at the first error.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Sends the crates in order and stops when the context is done
+    file: 02-crates.go
+    hidden: true
+  - name: Merges every belt and closes the output once, after all of them
+    file: 03-merge.go
+    hidden: true
+  - name: Presses with a bounded pool, in order, and stops at the first error
+    file: 04-press-all.go
+    hidden: true

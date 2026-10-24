@@ -1,0 +1,19 @@
+title: Planetarium Show Banner
+summary: Add two lines to a nearly finished program, switch two broken lines back on, read what the compiler and go vet report by file, line and column, and fix the program until it prints the right banner.
+language: go
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Prints the whole show banner
+    file: 01-banner.go
+    hidden: false
+  - name: Names the planetarium and tonight's show between the borders
+    file: 02-title-lines.go
+    hidden: true
+  - name: Prints the door and show times with Println
+    file: 03-times.go
+    hidden: true
+  - name: Keeps the borders and the last line and runs without an error
+    file: 04-borders.go
+    hidden: true

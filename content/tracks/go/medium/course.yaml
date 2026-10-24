@@ -1,0 +1,19 @@
+title: Idiomatic Go
+summary: >-
+  Write Go the way Go is written. Organize code into packages and modules, give types methods,
+  design with small interfaces and embedding, wrap and inspect errors, use defer, panic and
+  recover, write generic functions and types, sort and search with the slices and maps
+  packages, write and use iterators, test with the testing package, work with files and
+  streams, encode JSON and handle time.
+outcomes:
+  - Organize a program into packages and modules and control what each package exports
+  - Model behaviour with methods, interfaces and embedding instead of inheritance
+  - Create, wrap and inspect errors, and use defer, panic and recover where each belongs
+  - Write generic functions and types, and use the slices, maps and iter packages
+  - Write table-driven tests, read and write files and JSON, and work with times and durations
+exam:
+  title: Idiomatic Go Mock Exam
+  description: Ten questions drawn from the level's bank, from packages and methods to interfaces, errors, generics, iterators, testing, I/O and JSON.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

@@ -1,0 +1,19 @@
+title: Pollen Forecast Feed
+summary: Call a JSON API with a context, check statuses and close every body, retry only what is safe with capped exponential backoff, and fake the network with a RoundTripper function type.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Computes capped backoff and adapts functions to RoundTripper
+    file: 02-backoff-and-transport.go
+    hidden: true
+  - name: Handles each status the way the instructions say
+    file: 03-statuses.go
+    hidden: true
+  - name: Retries network failures, closes every body and stops when waiting fails
+    file: 04-retries-and-bodies.go
+    hidden: true

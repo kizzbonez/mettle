@@ -1,0 +1,19 @@
+title: Canoe Club Boat Shed
+summary: Query a database through database/sql with contexts and placeholders, scan rows with a nullable column, turn sql.ErrNoRows into your own error, close rows and check rows.Err, and lend a boat inside a transaction.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Finds one boat, with placeholders, NULL notes and not-found errors
+    file: 02-find-boat.go
+    hidden: true
+  - name: Lists the boats of a kind, closing the rows and checking their error
+    file: 03-boats-of-kind.go
+    hidden: true
+  - name: Lends a boat in one transaction that commits or rolls back
+    file: 04-check-out.go
+    hidden: true

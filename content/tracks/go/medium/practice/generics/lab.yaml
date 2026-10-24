@@ -1,0 +1,19 @@
+title: Car Wash Queue
+summary: Write a generic queue with a Go 1.27 generic method, and generic functions constrained by a type set, comparable and cmp.Ordered.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Queues any type first in, first out, with zero values when empty
+    file: 02-queue.go
+    hidden: true
+  - name: Adds up and counts values of several types
+    file: 03-total-and-tally.go
+    hidden: true
+  - name: Finds the largest by a key, keeping the first on a tie
+    file: 04-max-by.go
+    hidden: true

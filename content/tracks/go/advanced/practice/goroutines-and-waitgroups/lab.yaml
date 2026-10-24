@@ -1,0 +1,19 @@
+title: Marina Depth Soundings
+summary: Read every berth's depth sensor in its own goroutine, wait for them all with a WaitGroup, keep the results in berth order by writing each one to its own index, and read in rounds when the radio can only talk to a few sensors at once.
+language: go
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Reads every sensor at the same time and keeps berth order
+    file: 02-all-at-once.go
+    hidden: true
+  - name: Reads in rounds of at most perRound sensors
+    file: 03-rounds.go
+    hidden: true
+  - name: Waits for the slowest sensor of every round before returning
+    file: 04-slow-sensors.go
+    hidden: true

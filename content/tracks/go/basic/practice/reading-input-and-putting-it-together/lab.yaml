@@ -1,0 +1,19 @@
+title: Bridge Cycle Counter
+summary: Write a small command-line program that reads a counter's file from standard input with bufio.Scanner, takes a flag, reports bad lines with their numbers on standard error, and sets the exit code.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Summarises the sample day from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Reads one line into a reading, or explains why not
+    file: 02-parse-reading.go
+    hidden: true
+  - name: Handles the -busy flag and its wrong values
+    file: 03-busy-flag.go
+    hidden: true
+  - name: Handles empty, Windows and garbled files as a program
+    file: 04-script-edge-cases.go
+    hidden: true

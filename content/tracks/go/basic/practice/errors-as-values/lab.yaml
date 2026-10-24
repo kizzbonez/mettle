@@ -1,0 +1,19 @@
+title: Bib Pickup Tent
+summary: Return errors next to results, wrap strconv's errors and your own sentinel errors with %w and context, and recognise them with errors.Is to decide which ones are real problems.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Reads bib numbers and explains the bad ones
+    file: 02-parse-bib.go
+    hidden: true
+  - name: Hands out bibs and wraps the sentinel errors
+    file: 03-collect.go
+    hidden: true
+  - name: Works through the queue and reports only the real problems
+    file: 04-queue.go
+    hidden: true

@@ -1,0 +1,19 @@
+title: Darkroom Booking Review
+summary: Work through the findings of go vet, a linter and a reviewer on a small booking package, by fixing copied locks, ignored errors and results, lost error wrapping, error strings, an IPv6-unsafe address and missing doc comments, and by deprecating an old method with //go:fix inline.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Keeps simultaneous bookings safe and names tidy
+    file: 02-concurrent-bookings.go
+    hidden: true
+  - name: Reports bad and taken slots with wrapped, well-formed errors, and builds IPv6 addresses
+    file: 03-errors-and-addresses.go
+    hidden: true
+  - name: Documents every exported name and deprecates Taken for go fix
+    file: 04-docs-and-deprecation.go
+    hidden: true

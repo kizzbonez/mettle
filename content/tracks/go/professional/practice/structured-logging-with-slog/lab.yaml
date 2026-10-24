@@ -1,0 +1,19 @@
+title: Lakeside Sauna Log
+summary: Log check-ins as JSON with slog, mask personal data with LogValue, redact secrets and drop the time with ReplaceAttr, change the level at run time with a LevelVar, and add a context value through a wrapping handler.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Logs a guest as a group with a masked phone
+    file: 02-log-value.go
+    hidden: true
+  - name: Drops the time, redacts secrets at any depth and follows the LevelVar
+    file: 03-handler-options.go
+    hidden: true
+  - name: Adds the kiosk from the context, also after With and WithGroup
+    file: 04-kiosk-context.go
+    hidden: true

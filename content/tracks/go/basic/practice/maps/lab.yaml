@@ -1,0 +1,19 @@
+title: Plant Swap Stall
+summary: Count cuttings in a map, hand them out with the comma-ok idiom and delete, print the stall board in a stable order, and group wishes in a map of slices.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Counts cuttings and hands them out without inventing plants
+    file: 02-tally-and-take.go
+    hidden: true
+  - name: Lists the board in alphabetical order every time
+    file: 03-board.go
+    hidden: true
+  - name: Groups wishes by plant, once per person, in the order asked
+    file: 04-wishlists.go
+    hidden: true

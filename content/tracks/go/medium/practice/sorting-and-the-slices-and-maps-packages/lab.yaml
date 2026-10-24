@@ -1,0 +1,19 @@
+title: Canal Wharf Trip Board
+summary: Sort boat trips by two keys with slices.SortFunc and cmp.Or, find the next trip with a binary search, insert into a sorted slice, and list distinct boats without changing the caller's data.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Sorts by time and then by boat
+    file: 02-sort.go
+    hidden: true
+  - name: Finds the next trip at or after a time and inserts in order
+    file: 03-search-and-insert.go
+    hidden: true
+  - name: Lists each boat once without changing the board
+    file: 04-boats.go
+    hidden: true

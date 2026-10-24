@@ -1,0 +1,19 @@
+title: Concurrency and Advanced Go
+summary: >-
+  Concurrency done right, and the language's sharper tools. Start goroutines and wait for them,
+  communicate over channels, combine them with select and timers, protect shared state with
+  mutexes and atomics and prove it with the race detector, cancel work with context, build
+  pipelines and worker pools without leaks, test concurrent code with synctest, then use
+  reflection and struct tags, advanced generics, and interfaces as the seams of a design.
+outcomes:
+  - Start goroutines, wait for them and pass work and results over channels
+  - Combine channels, timers and timeouts with select, and cancel work with context
+  - Find data races with the race detector and fix them with mutexes, atomics or channels
+  - Build pipelines, fan-out, fan-in and worker pools that shut down cleanly, and test them with synctest
+  - Use reflection, struct tags, generic methods and interface-based designs where they pay
+exam:
+  title: Concurrency and Advanced Go Mock Exam
+  description: Ten questions drawn from the level's bank, from goroutines and channels to select, mutexes, context, patterns, synctest, reflection and generics.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

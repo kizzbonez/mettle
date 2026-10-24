@@ -1,0 +1,19 @@
+title: Brass Band Members' Portal
+summary: Close four security holes in a small members' site, with crypto/rand tokens, an HMAC signature checked in constant time, file reads that cannot leave their folder through os.Root, a size limit, and html/template escaping.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Makes unguessable tokens and checks webhook signatures strictly
+    file: 02-tokens-and-signatures.go
+    hidden: true
+  - name: Reads scores without ever leaving the folder, within the size limit
+    file: 03-scores.go
+    hidden: true
+  - name: Escapes the member's data on the welcome page
+    file: 04-welcome-page.go
+    hidden: true

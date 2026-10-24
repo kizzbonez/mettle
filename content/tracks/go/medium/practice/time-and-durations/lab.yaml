@@ -1,0 +1,19 @@
+title: Velodrome Session Board
+summary: Parse session times in the velodrome's time zone, work out when each session ends, say whether it is upcoming, on now or finished at a moment passed in, and print board lines in any zone.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Parses session lines in the velodrome's time zone and rejects bad ones
+    file: 02-parse.go
+    hidden: true
+  - name: Says whether a session is upcoming, on now or finished, at the exact boundaries
+    file: 03-status.go
+    hidden: true
+  - name: Prints board lines in any time zone, across a clock change
+    file: 04-board-lines.go
+    hidden: true

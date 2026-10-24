@@ -1,0 +1,19 @@
+title: Lifeboat Station Radio Watch
+summary: Wait on two radio channels at once with select, give up after a time limit, log both channels until each is closed by switching closed ones off with nil, and read out bulletins at the pace of a ticker until told to stop.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Returns the first call from either channel, or ErrQuiet after the limit
+    file: 02-first-call.go
+    hidden: true
+  - name: Logs both channels in arrival order until both are closed
+    file: 03-watch-log.go
+    hidden: true
+  - name: Reads one bulletin line per tick and stops when told to
+    file: 04-broadcast.go
+    hidden: true

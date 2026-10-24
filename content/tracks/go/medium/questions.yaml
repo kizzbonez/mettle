@@ -1,0 +1,799 @@
+- key: go-medium-01
+  type: multiple
+  category: go
+  tags: [packages, visibility, exported-names]
+  prompt: |
+    The package `example.com/harbour/fares` declares:
+
+    ```go
+    package fares
+
+    const Adult = 450
+
+    func free(n int) int { return n / 10 }
+
+    type Ticket struct {
+    	Name string
+    	code int
+    }
+    ```
+
+    Which of these can the program's `main` package, which imports `fares`, use?
+  options:
+    - text: "`fares.Adult`"
+      correct: true
+    - text: "`fares.Ticket{Name: \"Ada\"}`"
+      correct: true
+    - text: "`fares.free(12)`, because `main` and `fares` are in the same module"
+    - text: "`t.code` on a `fares.Ticket` value `t`, because the type `Ticket` itself is exported"
+  explanation: |
+    A name is **exported**, and usable from another package, when its first letter is upper case:
+    that holds for package-level names and equally for struct fields. `Adult`, `Ticket` and the
+    field `Name` are exported. `free` is not, whatever module the importer lives in: the build
+    stops with `name free not exported by package fares`. An exported type does not export its
+    fields: `code` stays private to `fares`, and `t.code` gives `t.code undefined (cannot refer to
+    unexported field code)`. That is how a package keeps a field under its own control.
+
+- key: go-medium-02
+  type: single
+  category: go
+  tags: [modules, go-sum, dependencies]
+  prompt: |
+    After `go mod tidy` adds a dependency, the module has a new file, `go.sum`, with lines such as:
+
+    ```text
+    github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
+    github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
+    ```
+
+    What is this file for?
+  options:
+    - text: It records a cryptographic hash of each dependency version, so that the go command can detect a download whose content differs from what was first recorded and checked against sum.golang.org
+      correct: true
+    - text: It is a lock file that chooses the exact versions to build; without it, the go command picks the newest version of every dependency
+    - text: It caches the source code of the dependencies, so that the module builds without a network
+    - text: It lists the modules that are imported only indirectly, which go.mod leaves out
+  explanation: |
+    Each line holds a SHA-256 hash (`h1:`) of one module version's files, or of its `go.mod` alone.
+    When the go command downloads a module, it compares the content with these hashes, and a new
+    hash is first checked against the public checksum database, sum.golang.org. If someone serves
+    different code under the same version later, the build stops. `go.sum` does not choose
+    versions: the `require` lines in `go.mod` do that, and the go command never silently moves to
+    a newer version. The downloaded code lives in the module cache, not in `go.sum`, and indirect
+    dependencies appear in `go.mod` with an `// indirect` comment. Commit both files.
+
+- key: go-medium-03
+  type: single
+  category: go
+  tags: [methods, receivers, value-receiver]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    type Counter struct{ n int }
+
+    func (c Counter) Inc() { c.n++ }
+
+    func main() {
+    	c := Counter{}
+    	c.Inc()
+    	c.Inc()
+    	p := &c
+    	p.Inc()
+    	fmt.Println(c.n)
+    }
+    ```
+  options:
+    - text: "`0`"
+      correct: true
+    - text: "`2`"
+    - text: "`3`"
+    - text: "Nothing: it does not compile, because a value method cannot be called through the pointer `p`"
+  explanation: |
+    `Inc` has a **value receiver**, so every call gets a copy of the counter and increments the
+    copy, which is thrown away when the method returns. `c.n` stays `0`, and `go vet` does not
+    warn about it. Calling it through `p` compiles: Go turns `p.Inc()` into `(*p).Inc()`, which
+    copies `*p` just the same. A method that changes its receiver needs a pointer receiver,
+    `func (c *Counter) Inc()`; then the program prints `3`.
+
+- key: go-medium-04
+  type: single
+  category: go
+  tags: [methods, pointer-receiver, addressability]
+  prompt: |
+    `Add` has a pointer receiver:
+
+    ```go
+    type Stock struct{ count int }
+
+    func (s *Stock) Add(n int) { s.count += n }
+    ```
+
+    Which of these statements does **not** compile?
+  options:
+    - text: "`shelves[\"tea\"].Add(5)`, where `shelves` is a `map[string]Stock`"
+      correct: true
+    - text: "`s.Add(5)`, where `s` was declared with `var s Stock`"
+    - text: "`list[0].Add(5)`, where `list` is a `[]Stock`"
+    - text: "`p.Add(5)`, where `p := &Stock{}`"
+  explanation: |
+    When a value is **addressable**, Go calls a pointer method on it by taking its address for you:
+    `s.Add(5)` becomes `(&s).Add(5)`. Variables and slice elements are addressable, and `p` is
+    already a pointer. A map element is not addressable, since the map may move its elements as it
+    grows, so the compiler reports `cannot call pointer method Add on Stock`. Store pointers in the
+    map (`map[string]*Stock`), or copy the element out, change it and store it back.
+
+- key: go-medium-05
+  type: single
+  category: go
+  tags: [interfaces, nil, errors]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    type QuotaError struct {
+    	Limit int
+    }
+
+    func (e *QuotaError) Error() string {
+    	return fmt.Sprintf("more than %d seats", e.Limit)
+    }
+
+    func reserve(seats int) error {
+    	var err *QuotaError
+    	if seats > 10 {
+    		err = &QuotaError{Limit: 10}
+    	}
+    	return err
+    }
+
+    func main() {
+    	err := reserve(3)
+    	fmt.Println(err == nil)
+    }
+    ```
+  options:
+    - text: "`false`"
+      correct: true
+    - text: "`true`, because `err` was never given a value in `reserve`"
+    - text: "Nothing: it panics with a nil pointer dereference when `err` is returned"
+    - text: "Nothing: it does not compile, because a `*QuotaError` cannot be returned as an `error`"
+  explanation: |
+    An interface value is a pair of a dynamic type and a dynamic value, and it is `nil` only when
+    both are unset. `return err` stores the nil `*QuotaError` in the `error` result, giving the pair
+    (`*QuotaError`, nil), which is not equal to `nil`, so the program prints `false` and a caller's
+    `if err != nil` treats the reservation as failed. Returning the pointer compiles because
+    `*QuotaError` has an `Error() string` method, and nothing is dereferenced. The fix is to
+    return a literal `nil` on success and `&QuotaError{...}` only on failure.
+
+- key: go-medium-06
+  type: multiple
+  category: go
+  tags: [interfaces, method-sets, receivers]
+  prompt: |
+    ```go
+    type Payment interface {
+    	Pence() int
+    }
+
+    type Cash int
+
+    func (c Cash) Pence() int { return int(c) }
+
+    type Card struct{ Amount int }
+
+    func (c *Card) Pence() int { return c.Amount }
+    ```
+
+    Which of these types satisfy `Payment`?
+  options:
+    - text: "`Cash`"
+      correct: true
+    - text: "`*Cash`"
+      correct: true
+    - text: "`*Card`"
+      correct: true
+    - text: "`Card`"
+  explanation: |
+    A type satisfies an interface when its **method set** holds all the interface's methods. The
+    method set of `Cash` has the value-receiver method `Pence`, and the method set of a pointer
+    `*Cash` includes its base type's value methods too, so both satisfy `Payment`. `Card`'s
+    `Pence` has a pointer receiver: it is in the method set of `*Card` only. Using a `Card` value
+    gives `Card does not implement Payment (method Pence has pointer receiver)`; pass `&Card{...}`
+    instead.
+
+- key: go-medium-07
+  type: single
+  category: go
+  tags: [embedding, promoted-methods, composition]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    type Animal struct {
+    	Name string
+    }
+
+    func (a Animal) Sound() string {
+    	return "..."
+    }
+
+    func (a Animal) Speak() string {
+    	return a.Name + " says " + a.Sound()
+    }
+
+    type Dog struct {
+    	Animal
+    }
+
+    func (d Dog) Sound() string {
+    	return "woof"
+    }
+
+    func main() {
+    	d := Dog{Animal{Name: "Rex"}}
+    	fmt.Println(d.Sound(), "|", d.Speak())
+    }
+    ```
+  options:
+    - text: "`woof | Rex says ...`"
+      correct: true
+    - text: "`woof | Rex says woof`"
+    - text: "`... | Rex says ...`"
+    - text: "Nothing: it does not compile, because `Sound` is ambiguous"
+  explanation: |
+    `d.Sound()` finds `Dog.Sound` at depth 0, which hides the promoted `Animal.Sound`, so it gives
+    `woof`. `d.Speak()` is the promoted `Animal.Speak`, short for `d.Animal.Speak()`, and inside it
+    the receiver `a` is an `Animal`, so `a.Sound()` is `Animal.Sound`. Embedding forwards calls; it
+    is not inheritance, and an embedded type never calls the outer type's methods. The two
+    `Sound` methods are at different depths, so there is no ambiguity. To make `Speak` use the
+    dog's sound, give `Dog` its own `Speak`, or pass the sound in through an interface.
+
+- key: go-medium-08
+  type: single
+  category: go
+  tags: [embedding, struct-literals, go1.27]
+  prompt: |
+    In a module whose go.mod says `go 1.27.3`:
+
+    ```go
+    type Address struct {
+    	Street, City string
+    }
+
+    type Supplier struct {
+    	Name string
+    	Address
+    }
+
+    type Branch struct {
+    	Name string
+    	*Address
+    }
+    ```
+
+    Which of these struct literals compiles?
+  options:
+    - text: "`Supplier{Name: \"Fenwick\", City: \"Leeds\"}`"
+      correct: true
+    - text: "`Supplier{Address: Address{Street: \"4 Mill Lane\"}, City: \"Leeds\"}`"
+    - text: "`Branch{Name: \"North\", City: \"Leeds\"}`"
+    - text: "`Supplier{Address.City: \"Leeds\"}`"
+  explanation: |
+    Since Go 1.27, a key in a struct literal may be any field selector of the struct, so the
+    promoted field `City` can be set directly. The other three are still errors. A key may not set
+    a field inside an embedded struct that another key also sets: `cannot specify promoted field
+    City and enclosing embedded field Address`. A literal cannot reach a promoted field through an
+    embedded pointer, which could be nil: `invalid implicit pointer indirection to reach City`.
+    And a key is a plain name, never a dotted path: `invalid field name Address.City in struct
+    literal`. In a module whose `go` line is older than 1.27, even the first one is rejected.
+
+- key: go-medium-09
+  type: single
+  category: go
+  tags: [errors, custom-errors, errors-astype, wrapping]
+  prompt: |
+    What does this program print?
+
+    ```go
+    type LimitError struct{ Max int }
+
+    func (e LimitError) Error() string {
+    	return fmt.Sprintf("at most %d seats", e.Max)
+    }
+
+    func main() {
+    	err := fmt.Errorf("order: %w", LimitError{Max: 6})
+    	_, ok1 := err.(LimitError)
+    	le, ok2 := errors.AsType[LimitError](err)
+    	fmt.Println(ok1, ok2, le.Max)
+    }
+    ```
+  options:
+    - text: "`false true 6`"
+      correct: true
+    - text: "`true true 6`"
+    - text: "`false false 0`"
+    - text: "`true false 0`"
+  explanation: |
+    `fmt.Errorf` with `%w` returns a new wrapper error, so `err` itself is not a `LimitError` and
+    the type assertion fails. `errors.AsType[LimitError]` (Go 1.26) walks the whole chain, finds the
+    wrapped `LimitError` and returns it already converted, so `ok2` is true and `le.Max` is 6.
+    Thinking that wrapping keeps the outer type is the usual mistake; thinking that `AsType` fails
+    too would be right only if the error had been formatted with `%v`, which keeps the text but not
+    the error.
+
+- key: go-medium-10
+  type: multiple
+  category: go
+  tags: [errors, errors-join, wrapping]
+  prompt: |
+    `err := errors.Join(errA, nil, errB)`, where `errA` and `errB` are sentinel errors. Which
+    statements are true?
+  options:
+    - text: "`errors.Is(err, errA)` and `errors.Is(err, errB)` are both true"
+      correct: true
+    - text: "`errors.Join(nil, nil)` returns nil, so a validation function can return its result directly"
+      correct: true
+    - text: "`errors.Unwrap(err)` returns `errA`, the first joined error"
+    - text: "`err.Error()` joins the two messages with a comma and a space"
+  explanation: |
+    `errors.Join` drops nil arguments and returns nil when every argument is nil, which is why
+    `return errors.Join(errs...)` is a tidy end for a function that collects problems. The joined
+    error has an `Unwrap() []error` method, so the chain becomes a tree, and `errors.Is` and
+    `errors.AsType` search every branch. `errors.Unwrap` only calls the single-error
+    `Unwrap() error` method, so it returns nil for a joined error. The message puts each error on
+    its own line, separated by newlines, not by commas.
+
+- key: go-medium-11
+  type: single
+  category: go
+  tags: [defer, named-results]
+  prompt: |
+    What does this program print?
+
+    ```go
+    func f() (n int) {
+    	defer func() { n *= 10 }()
+    	n = 1
+    	defer fmt.Println("deferred n:", n)
+    	n = 2
+    	return n + 1
+    }
+
+    func main() {
+    	fmt.Println("result:", f())
+    }
+    ```
+  options:
+    - text: "`deferred n: 1` then `result: 30`"
+      correct: true
+    - text: "`deferred n: 2` then `result: 3`"
+    - text: "`deferred n: 3` then `result: 30`"
+    - text: "`result: 3` then `deferred n: 1`"
+  explanation: |
+    Arguments of a deferred call are evaluated when the `defer` statement runs, so the `Println`
+    saves `n` as 1. `return n + 1` sets the named result to 3; then the deferred calls run in
+    reverse order: first the `Println` (printing the saved 1), then the closure, which captured the
+    variable `n` itself and multiplies it to 30. Only after that does `f` hand 30 to `main`. The
+    tempting answers assume that deferred arguments are read late, or that `return` copies the
+    value before deferred calls can change a named result.
+
+- key: go-medium-12
+  type: true_false
+  category: go
+  tags: [panic, recover, defer]
+  prompt: |
+    `logPanic` calls `recover()` and prints the value when it is not nil. A function starts with
+    `defer func() { logPanic() }()` and then panics. True or false: the panic is stopped and the
+    function returns normally.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    `recover` only stops a panic when it is called **directly** by a deferred function. Here the
+    deferred function is the closure, and `recover` runs one call deeper, inside `logPanic`, so it
+    returns nil and the program still dies with the panic. Writing `defer logPanic()` makes
+    `logPanic` itself the deferred function, and then its `recover` works. Many people expect any
+    `recover` reached while a deferred call runs to work; the spec rules that out.
+
+- key: go-medium-13
+  type: single
+  category: go
+  tags: [generics, constraints, type-sets]
+  prompt: |
+    ```go
+    type Grams int
+
+    func Sum[N Number](nums []N) N {
+    	var total N
+    	for _, n := range nums {
+    		total += n
+    	}
+    	return total
+    }
+    ```
+
+    Which definition of `Number` lets `Sum([]Grams{250, 500})` compile and still allows `+=`?
+  options:
+    - text: "`type Number interface { ~int | ~float64 }`"
+      correct: true
+    - text: "`type Number interface { int | float64 }`"
+    - text: "`type Number interface { any }`"
+    - text: "`type Number interface { comparable }`"
+  explanation: |
+    `~int` means every type whose underlying type is `int`, so it includes `Grams`, and every type
+    in the set supports `+`, so `+=` is allowed. Without the tilde, the set holds exactly `int` and
+    `float64`, and the compiler says `Grams does not satisfy Number (possibly missing ~ for int in
+    Number)`. With `any` or `comparable` the call would be accepted, but the body would not
+    compile: not every type in those sets supports `+`.
+
+- key: go-medium-14
+  type: multiple
+  category: go
+  tags: [generics, generic-methods, go1.27, interfaces]
+  prompt: |
+    Go 1.27 added generic methods. Given
+
+    ```go
+    func (s *Stack[T]) Map[U any](f func(T) U) []U { /* ... */ }
+    ```
+
+    which statements are true?
+  options:
+    - text: "`trays.Map(strconv.Itoa)` on a `*Stack[int]` infers `U` as `string` and returns a `[]string`"
+      correct: true
+    - text: "`labels := trays.Map` does not compile, but `labels := trays.Map[string]` does"
+      correct: true
+    - text: "An interface can require the method with `Map[U any](f func(int) U) []U`"
+    - text: "`*Stack[int]` satisfies an interface whose method is `Map(f func(int) string) []string`, because that instantiation matches"
+  explanation: |
+    A generic method declares its own type parameter, here `U`, and like a generic function it is
+    inferred from the arguments or must be instantiated before it becomes a value
+    (`cannot use generic function trays.Map without instantiation`). Interface methods may not have
+    type parameters (`interface method must have no type parameters`), and a generic method never
+    implements an interface method, even when one instantiation would match: the compiler reports
+    `have Map[U any](func(int) U) []U` and `want Map(func(int) string) []string`.
+
+- key: go-medium-15
+  type: single
+  category: go
+  tags: [slices, compact]
+  prompt: |
+    What does `fmt.Println(slices.Compact([]int{3, 3, 1, 3, 1, 1}))` print?
+  options:
+    - text: "`[3 1 3 1]`"
+      correct: true
+    - text: "`[3 1]`"
+    - text: "`[1 3]`"
+    - text: "`[3 1 3 1 1]`"
+  explanation: |
+    `slices.Compact` replaces each run of **neighbouring** equal elements with one element, like
+    the Unix `uniq` command: `3 3` becomes `3`, `1` stays, `3` stays, `1 1` becomes `1`. It does
+    not remove duplicates that are apart, and it never sorts. To keep one of each value, sort first
+    (`slices.Sort`) and then compact, which gives `[1 3]`.
+
+- key: go-medium-16
+  type: single
+  category: go
+  tags: [sorting, cmp, slices-sortfunc]
+  prompt: |
+    Players have a `Name string` and a `Score int`. Which comparison function, passed to
+    `slices.SortFunc`, sorts by score from highest to lowest, and players with the same score by
+    name from A to Z?
+  options:
+    - text: "`func(a, b Player) int { return cmp.Or(cmp.Compare(b.Score, a.Score), cmp.Compare(a.Name, b.Name)) }`"
+      correct: true
+    - text: "`func(a, b Player) int { return cmp.Or(cmp.Compare(a.Score, b.Score), cmp.Compare(a.Name, b.Name)) }`"
+    - text: "`func(a, b Player) int { return cmp.Or(cmp.Compare(a.Name, b.Name), cmp.Compare(b.Score, a.Score)) }`"
+    - text: "`func(a, b Player) int { return cmp.Compare(b.Score, a.Score) + cmp.Compare(a.Name, b.Name) }`"
+  explanation: |
+    `cmp.Or` returns its first non-zero argument, so the name is compared only when the scores are
+    equal, and swapping the arguments, `cmp.Compare(b.Score, a.Score)`, makes the order
+    descending. The second option sorts the lowest score first, and the third sorts by name first.
+    Adding the two results looks clever but breaks: a higher score (-1) and a later name (+1) add up
+    to 0, so the pair counts as equal. Sorting `{Cy 7} {Al 9} {Bo 8} {Di 9}` that way gives
+    `[{Al 9} {Bo 8} {Cy 7} {Di 9}]`, with Di's 9 last.
+
+- key: go-medium-17
+  type: single
+  category: go
+  tags: [iterators, range-over-func, yield]
+  prompt: |
+    What happens when this program runs?
+
+    ```go
+    func Careless(n int) iter.Seq[int] {
+    	return func(yield func(int) bool) {
+    		for i := range n {
+    			yield(i)
+    		}
+    	}
+    }
+
+    func main() {
+    	for v := range Careless(5) {
+    		fmt.Println(v)
+    		if v == 1 {
+    			break
+    		}
+    	}
+    }
+    ```
+  options:
+    - text: "It prints 0 and 1, then panics: `range function continued iteration after function for loop body returned false`"
+      correct: true
+    - text: "It prints 0 and 1 and ends normally, because `break` stops the iterator"
+    - text: "It prints 0 to 4, because the iterator ignores the `break`"
+    - text: "It does not compile: `go vet` rejects a call of `yield` whose result is unused"
+  explanation: |
+    After the `break`, `yield` returns false, and the iterator must stop calling it. `Careless`
+    ignores the result and calls `yield(2)`, so the runtime panics with `range function continued
+    iteration after function for loop body returned false`. `break` cannot stop the iterator by
+    itself: the iterator is ordinary code that has to check `if !yield(i) { return }`. Neither the
+    compiler nor `go vet` reports the missing check, which is why every iterator deserves a test
+    with a loop that breaks.
+
+- key: go-medium-18
+  type: multiple
+  category: go
+  tags: [iterators, iter-pull]
+  prompt: |
+    `next, stop := iter.Pull(seq)` turns a push iterator into a pull iterator. Which statements
+    are true?
+  options:
+    - text: "Calling `stop` twice, or after `next` has reported the end, is allowed"
+      correct: true
+    - text: "After `stop`, `next` returns the zero value and false"
+      correct: true
+    - text: "If you stop pulling early and never call `stop`, the iterator never finishes, so its own cleanup never runs"
+      correct: true
+    - text: "`iter.Pull` accepts an `iter.Seq2`, so the same call also pulls key-value pairs"
+  explanation: |
+    The `iter` documentation allows calling `stop` more than once and calling `next` after `stop`
+    or after the end; `next` then keeps returning the zero value and false. `stop` exists because a
+    pull loop cannot make `yield` return false on its own: until `stop` is called, an unfinished
+    iterator stays paused and its deferred cleanup never runs, so write `defer stop()` straight after
+    `iter.Pull`. Key-value sequences need `iter.Pull2`, whose `next` returns a key, a value and a
+    bool.
+
+- key: go-medium-19
+  type: single
+  category: go
+  tags: [testing, fatalf, table-driven-tests]
+  prompt: |
+    `LateFee` has a bug: it returns 0 for one day and 40 for three days. What does
+    `go test -v` report for this test?
+
+    ```go
+    func TestLateFee(t *testing.T) {
+    	tests := []struct{ days, want int }{
+    		{1, 20},
+    		{0, 0},
+    		{3, 60},
+    	}
+    	for _, tt := range tests {
+    		if got := LateFee(tt.days); got != tt.want {
+    			t.Fatalf("LateFee(%d) = %d, want %d", tt.days, got, tt.want)
+    		}
+    	}
+    }
+    ```
+  options:
+    - text: "Only `LateFee(1) = 0, want 20`: `t.Fatalf` stops the whole test at the first failure, so the third case never runs"
+      correct: true
+    - text: "Both `LateFee(1) = 0, want 20` and `LateFee(3) = 40, want 60`, because `t.Fatalf` only ends the current loop iteration"
+    - text: "Both failures, because `go test` collects every `Fatalf` and prints them together at the end"
+    - text: "Nothing: `t.Fatalf` stops the test before it can print anything, so only `--- FAIL: TestLateFee` appears"
+  explanation: |
+    `t.Fatalf` is `t.Logf` followed by `t.FailNow`, which marks the test as failed and stops the
+    test function at once (with `runtime.Goexit`), so the loop never reaches `{3, 60}`. The
+    message is still printed: `fee_test.go:13: LateFee(1) = 0, want 20`. In a table of
+    independent cases, use `t.Errorf`, which marks the failure and keeps going, so one run shows
+    every wrong case; or run each case in its own `t.Run` subtest, where a `Fatalf` stops only
+    that subtest.
+
+- key: go-medium-20
+  type: multiple
+  category: go
+  tags: [testing, go-test, naming]
+  prompt: |
+    A file `fee_test.go` declares these four functions. Which of them does `go test` run as
+    tests?
+  options:
+    - text: "`func TestLateFee(t *testing.T)`"
+      correct: true
+    - text: "`func Test_lateFee(t *testing.T)`"
+      correct: true
+    - text: "`func testLateFee(t *testing.T)`"
+    - text: "`func Testlatefee(t *testing.T)`"
+  explanation: |
+    A test is `func TestXxx(t *testing.T)` in a `_test.go` file, where `Xxx` does not start with
+    a lower-case letter. `TestLateFee` qualifies, and so does `Test_lateFee`: an underscore is not
+    a lower-case letter. `testLateFee` does not start with `Test`, so it is an ordinary function
+    that `go test` silently skips. `Testlatefee` is worse than skipped: the `tests` check of
+    `go vet`, which `go test` runs first, stops the build with `Testlatefee has malformed name:
+    first letter after 'Test' must not be lowercase`.
+
+- key: go-medium-21
+  type: single
+  category: go
+  tags: [files, bufio, flush]
+  prompt: |
+    ```go
+    func saveReport(path string, orders []string) (err error) {
+    	f, err := os.Create(path)
+    	if err != nil {
+    		return err
+    	}
+    	defer func() {
+    		if closeErr := f.Close(); err == nil {
+    			err = closeErr
+    		}
+    	}()
+    	w := bufio.NewWriter(f)
+    	if err := writeReport(w, orders); err != nil {
+    		return err
+    	}
+    	return nil
+    }
+    ```
+
+    `writeReport` writes `1. tea` and `2. coffee`, each on its own line, to `w`. After
+    `saveReport("report.txt", []string{"tea", "coffee"})` returns `nil`, what does
+    `fmt.Printf("%q\n", data)` print for `data, _ := os.ReadFile("report.txt")`?
+  options:
+    - text: "`\"\"`: the lines were still in the `bufio.Writer`'s buffer when the file was closed"
+      correct: true
+    - text: "`\"1. tea\\n2. coffee\\n\"`, because `f.Close()` flushes the `bufio.Writer` first"
+    - text: "`\"1. tea\\n\"`, because a `bufio.Writer` passes each line on when it sees a newline"
+    - text: "Nothing: `saveReport` returns an error, because the buffer was not flushed"
+  explanation: |
+    A `bufio.Writer` collects writes in memory (4 KiB by default) and passes them to the file
+    only when the buffer fills or when you call `Flush`. Closing the `*os.File` knows nothing
+    about the buffer wrapped around it, so the two short lines are lost, and no error says so.
+    The fix is `return w.Flush()` in place of `return nil`: then the file holds
+    `"1. tea\n2. coffee\n"`, and a failed flush is reported. A `bufio.Writer` does not flush at
+    line ends; that is not its job.
+
+- key: go-medium-22
+  type: single
+  category: go
+  tags: [io, io-copy, limitreader]
+  prompt: |
+    ```go
+    var buf bytes.Buffer
+    n, err := io.Copy(&buf, io.LimitReader(strings.NewReader("hello, files"), 5))
+    fmt.Println(n, err, buf.String())
+    ```
+
+    What does this print?
+  options:
+    - text: "`5 <nil> hello`"
+      correct: true
+    - text: "`5 EOF hello`"
+    - text: "`12 <nil> hello, files`"
+    - text: "`0 <nil>` followed by an empty string, because `&buf` must be `buf`"
+  explanation: |
+    `io.LimitReader(r, 5)` reads from `r` but reports the end of input after 5 bytes, so
+    `io.Copy` copies `hello` and returns `n == 5`. Reaching the end of the input is how a copy
+    succeeds, so `io.Copy` returns `nil`, not `io.EOF`: the documentation says "A successful Copy
+    returns err == nil, not err == EOF." `&buf` is right: `bytes.Buffer`'s `Write` method has a
+    pointer receiver, so only a `*bytes.Buffer` is an `io.Writer`.
+
+- key: go-medium-23
+  type: single
+  category: go
+  tags: [json, unmarshal, struct-tags]
+  prompt: |
+    ```go
+    type Book struct {
+    	Title string `json:"title"`
+    }
+
+    var b Book
+    err := json.Unmarshal([]byte(`{"TITLE":"Emma","rating":5}`), &b)
+    fmt.Printf("%q %v\n", b.Title, err)
+    ```
+
+    With `import "encoding/json"` in Go 1.27, what does this print?
+  options:
+    - text: "`\"Emma\" <nil>`"
+      correct: true
+    - text: "`\"\" <nil>`, because `TITLE` does not match the tag `title`"
+    - text: "`\"Emma\"` and an error about the unknown member `rating`"
+    - text: "`\"\"` and an error, because Go 1.27's `encoding/json` now uses v2's strict rules"
+  explanation: |
+    `encoding/json` (v1) matches JSON names to fields **case-insensitively**, so `TITLE` fills
+    `Title`, and it **ignores** members that match no field, such as `rating`. Go 1.27 runs v1 on
+    the new v2 implementation, but with options that keep v1's behaviour, so results are the
+    same; only some error texts may differ. Strict behaviour is opt-in: `dec.DisallowUnknownFields()`
+    on a `json.Decoder` rejects `rating`, and `encoding/json/v2` matches names case-sensitively by
+    default, leaving `Title` empty.
+
+- key: go-medium-24
+  type: multiple
+  category: go
+  tags: [json, json-v2, go1.27]
+  prompt: |
+    Which of these are default behaviours of `encoding/json/v2` in Go 1.27 that differ from
+    `encoding/json`?
+  options:
+    - text: "An object with the same member name twice, such as `{\"title\":\"Emma\",\"title\":\"Dune\"}`, is rejected with an error"
+      correct: true
+    - text: "A nil slice field marshals as `[]` instead of `null`"
+      correct: true
+    - text: "An `int` field tagged `omitempty` is left out when it is 0"
+    - text: "JSON names match struct fields case-insensitively"
+  explanation: |
+    v2 chooses stricter, more interoperable defaults. Duplicate names are an error
+    (`jsontext: duplicate object member name "title"`), where v1 lets the last one win; invalid
+    UTF-8 is an error too. A nil slice or map marshals as `[]` or `{}`, where v1 writes `null`.
+    Names match **case-sensitively** in v2; case-insensitive matching is v1's behaviour. And v2
+    redefines `omitempty` to mean "would be an empty JSON value" (`null`, `""`, `{}`, `[]`), so an
+    `int` 0 is still written as `"count":0`: use `omitzero` to leave out zero numbers in both
+    versions.
+
+- key: go-medium-25
+  type: single
+  category: go
+  tags: [time, comparison, time-zones]
+  prompt: |
+    ```go
+    noon := time.Date(2026, time.October, 24, 12, 0, 0, 0, time.UTC)
+    there := noon.In(time.FixedZone("UTC+9", 9*60*60))
+    fmt.Println(noon == there, noon.Equal(there), there.Sub(noon))
+    ```
+
+    What does this print?
+  options:
+    - text: "`false true 0s`"
+      correct: true
+    - text: "`true true 0s`"
+    - text: "`false false 9h0m0s`"
+    - text: "`false true 9h0m0s`"
+  explanation: |
+    `In` shows the same instant in another zone; it does not change the instant, so
+    `noon.Equal(there)` is `true` and the duration between them is `0s`. But `==` compares the
+    whole `time.Time` value, including its location (and any monotonic clock reading), and the
+    locations differ, so `noon == there` is `false`. The package documentation says to prefer
+    `t.Equal(u)` to `t == u`. The 9 hours are only in how `there` is displayed (`21:00:00 +0900`).
+
+- key: go-medium-26
+  type: single
+  category: go
+  tags: [time, formatting, layouts]
+  prompt: |
+    ```go
+    t := time.Date(2026, time.March, 7, 18, 5, 0, 0, time.UTC)
+    fmt.Println(t.Format("2006-02-01 03:04"))
+    ```
+
+    What does this print?
+  options:
+    - text: "`2026-07-03 06:05`"
+      correct: true
+    - text: "`2026-03-07 18:05`"
+    - text: "`2026-03-07 06:05`"
+    - text: "`2006-02-01 03:04`, because the layout is printed as it is"
+  explanation: |
+    A layout is the reference time, Monday 2 January 2006 at 15:04:05, written the way you want
+    the output to look. Each number has a fixed meaning: `01` is the month, `02` the day, `15`
+    the hour on a 24-hour clock and `03` the hour on a 12-hour clock. This layout puts the
+    **day** (`02`, so 07) where the month should be and the **month** (`01`, so 03) last, and
+    `03` gives 6 instead of 18. For `2026-03-07 18:05`, write `"2006-01-02 15:04"`, or use
+    `time.DateTime` for seconds too. `go vet` warns about the swap: `2006-02-01 should be
+    2006-01-02`.

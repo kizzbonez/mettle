@@ -1,0 +1,19 @@
+title: Theatre Cloakroom
+summary: Give a ticket type and a slice type value-receiver String methods, choose pointer receivers for a cloakroom that changes, and return it ready to use from a constructor.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Prints tickets and lists of tickets
+    file: 02-printing.go
+    hidden: true
+  - name: Checks and returns coats, and never reuses a ticket
+    file: 03-cloakroom.go
+    hidden: true
+  - name: Gives every type the right receivers
+    file: 04-receivers.go
+    hidden: true

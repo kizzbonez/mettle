@@ -1,0 +1,19 @@
+title: Vet Clinic Waiting List
+summary: Build a generic priority queue on container/heap that keeps arrival order among equals, add a generic method that counts waiting items by any key, and order a list through a self-referential constraint.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Orders by priority and keeps arrival order among equals
+    file: 02-order.go
+    hidden: true
+  - name: Counts waiting items by any key without changing the list
+    file: 03-count.go
+    hidden: true
+  - name: Orders any Urgent type with byUrgency
+    file: 04-by-urgency.go
+    hidden: true

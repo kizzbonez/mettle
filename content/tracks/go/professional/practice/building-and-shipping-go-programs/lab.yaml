@@ -1,0 +1,19 @@
+title: Tide Gauge Release Build
+summary: Make a tide gauge reporter ready to ship as one binary, by describing its version from build information and -X, and by embedding its default settings and web files with go:embed.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Describes the version for tagged, dirty, development and unknown builds
+    file: 02-version-line.go
+    hidden: true
+  - name: Reads the default settings from the binary, not from the disk
+    file: 03-defaults.go
+    hidden: true
+  - name: Serves only the embedded web files, from the root of the site
+    file: 04-static-files.go
+    hidden: true

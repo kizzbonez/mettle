@@ -1,0 +1,23 @@
+slug: night-market-takings
+title: Night Market Takings
+summary: Read a night market's sales sheet from standard input, validate every line into a struct with wrapped sentinel errors, total each stall in a map of structs, and print a sorted fee report, with a flag, messages on standard error and exit codes.
+language: go
+minutes: 55
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Reports the sample night from the instructions
+    file: 01-sample-night.go
+    hidden: false
+  - name: Reads and writes amounts of money exactly
+    file: 02-amounts.go
+    hidden: true
+  - name: Reads sale lines and explains every rejected one
+    file: 03-parsing-sales.go
+    hidden: true
+  - name: Totals each stall and lays out the fee report
+    file: 04-tally-and-report.go
+    hidden: true
+  - name: Handles flags, arguments, empty, Windows and wrong sheets as a program
+    file: 05-script-edge-cases.go
+    hidden: true

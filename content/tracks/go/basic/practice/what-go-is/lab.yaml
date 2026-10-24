@@ -1,0 +1,19 @@
+title: The Ice Rink Board
+summary: Run a finished Go program for the first time, read what the test says about its output line by line, change the one value that is out of date, and submit.
+language: go
+minutes: 10
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Prints the winter board
+    file: 01-winter-board.go
+    hidden: false
+  - name: Shows the new skate hire price
+    file: 02-skate-hire.go
+    hidden: true
+  - name: Keeps the opening hours and the hours on the ice
+    file: 03-opening-hours.go
+    hidden: true
+  - name: Keeps the rest of the board and runs without an error
+    file: 04-rest-of-board.go
+    hidden: true

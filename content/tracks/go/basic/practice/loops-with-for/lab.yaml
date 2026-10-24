@@ -1,0 +1,19 @@
+title: Village Bus Timetable
+summary: Generate a day's departures with a three-part for loop, skip the driver's lunch hour with continue, count the buses, and search for the next bus at or after a given time.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Prints the timetable from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Lists every departure up to the last one, with two-digit times
+    file: 02-departures.go
+    hidden: true
+  - name: Leaves out the buses of the lunch hour
+    file: 03-lunch.go
+    hidden: true
+  - name: Finds the next bus at or after the passenger's time
+    file: 04-next-bus.go
+    hidden: true

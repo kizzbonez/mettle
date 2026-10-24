@@ -1,0 +1,19 @@
+title: Village Minibus Seats
+summary: Serve a small JSON API on a ServeMux with method and wildcard patterns, limit and validate request bodies, guard shared state with a mutex, and recover from panics in middleware.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Routes by method and path and always answers in JSON
+    file: 02-routes-and-json.go
+    hidden: true
+  - name: Limits, decodes and validates booking bodies
+    file: 03-booking-bodies.go
+    hidden: true
+  - name: Never overbooks, even under concurrent requests, and recovers from panics
+    file: 04-seats-and-recovery.go
+    hidden: true

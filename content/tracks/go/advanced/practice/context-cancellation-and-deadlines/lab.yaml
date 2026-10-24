@@ -1,0 +1,19 @@
+title: Wood-Fired Pizza Counter
+summary: Wait for the oven or for a context to end, give a bake its own deadline with a cause and always cancel it, and carry the order ticket through the context with an unexported key type.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Waits for the pizza until the context is cancelled or times out
+    file: 02-wait-for-pizza.go
+    hidden: true
+  - name: Gives the bake its own deadline, reports the cause and cancels it
+    file: 03-bake-within.go
+    hidden: true
+  - name: Carries the ticket number in the context without key clashes
+    file: 04-ticket.go
+    hidden: true

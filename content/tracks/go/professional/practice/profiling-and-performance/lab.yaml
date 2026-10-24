@@ -1,0 +1,19 @@
+title: Street Food Festival Report
+summary: Speed up a working report without changing its output, by sizing a strings.Builder, preallocating a slice, reading a sequence once and appending numbers in place, with allocation budgets checked by testing.AllocsPerRun.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Builds the stall list and the codes in one allocation each
+    file: 02-list-and-codes.go
+    hidden: true
+  - name: Summarises the takings in a single pass, refunds included
+    file: 03-summary.go
+    hidden: true
+  - name: Appends amounts in place without allocating
+    file: 04-cents.go
+    hidden: true

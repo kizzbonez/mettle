@@ -1,0 +1,19 @@
+title: Cheese Counter Labels
+summary: Print a weighed cut of cheese as a sticky label with Printf verbs, zero padding, widths, alignment, two decimals and a percent sign, and write the scale's log line to standard error.
+language: go
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Prints the label and the log line from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Pads the label number and lines up the weight
+    file: 02-numbers.go
+    hidden: true
+  - name: Pads cheese names of every length by their characters
+    file: 03-names.go
+    hidden: true
+  - name: Prints prices with two decimals and the fat as a percentage
+    file: 04-money.go
+    hidden: true

@@ -1,0 +1,19 @@
+title: Escape Room Reset
+summary: Lock every door again with deferred calls in the right order, turn a panic into an error with recover, and write a Must function for lists fixed in the program.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Logs begin and end around a deferred section
+    file: 02-section.go
+    hidden: true
+  - name: Locks every door in reverse order and wraps a failed check
+    file: 03-inspect.go
+    hidden: true
+  - name: Turns any panic into an error and splits fixed door lists
+    file: 04-panics.go
+    hidden: true

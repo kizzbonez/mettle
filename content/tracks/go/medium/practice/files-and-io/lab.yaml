@@ -1,0 +1,19 @@
+title: Lighthouse Visitor Book
+summary: Count the countries in a visitor book read from any io.Reader, write a sorted summary to any io.Writer, and save it to a file through a buffer, creating folders and reporting every error.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Reads countries from any reader and reports read errors
+    file: 02-reading.go
+    hidden: true
+  - name: Writes the summary in order and stops at a write error
+    file: 03-writing.go
+    hidden: true
+  - name: Saves the summary to a file, creating folders and reporting errors
+    file: 04-files.go
+    hidden: true

@@ -1,0 +1,19 @@
+title: Bingo Hall Caller
+summary: Load the drum into a buffered channel, run the caller as a goroutine that owns and closes its channel, and mark a card by ranging over the calls until the caller is done.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Loads the drum into a buffered channel and closes it
+    file: 02-drum.go
+    hidden: true
+  - name: Announces every ball from a goroutine and closes the calls
+    file: 03-announce.go
+    hidden: true
+  - name: Marks the card and reads every call to the end
+    file: 04-mark-card.go
+    hidden: true

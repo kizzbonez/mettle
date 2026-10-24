@@ -1,0 +1,23 @@
+slug: library-branch-stock-check
+title: Library Branch Stock Check
+summary: Build a concurrent stock check that asks every branch's catalogue through a bounded worker pool, gives each call its own timeout, retries busy and silent branches with exponential backoff, keeps a race-free running tally, returns results in branch order, and stops at once without leaking a goroutine when its context is cancelled.
+language: go
+minutes: 60
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Checks the five branches from the instructions
+    file: 01-sample-check.go
+    hidden: false
+  - name: Times out, retries with backoff and classifies the answers of one branch
+    file: 02-one-branch.go
+    hidden: true
+  - name: Bounds the calls in flight, keeps branch order and tallies safely while running
+    file: 03-pool-and-tally.go
+    hidden: true
+  - name: Stops at once on cancellation, without leaks or late calls
+    file: 04-cancel.go
+    hidden: true
+  - name: Rejects bad configs and writes the report
+    file: 05-config-and-report.go
+    hidden: true

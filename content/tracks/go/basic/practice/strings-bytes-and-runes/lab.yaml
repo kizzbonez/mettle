@@ -1,0 +1,19 @@
+title: Crêperie Chalkboard
+summary: Cut a typed menu entry into its parts with strings.Cut and strings.CutLast, trim it, underline the name by counting runes instead of bytes, and compare names without regard to case.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Writes the starter's entry on the board
+    file: 01-board.go
+    hidden: false
+  - name: Cuts the name, the fillings and the price out of other entries
+    file: 02-cutting.go
+    hidden: true
+  - name: Underlines the name with one = per character
+    file: 03-underline.go
+    hidden: true
+  - name: Recognises the dish of the day whatever its case
+    file: 04-dish-of-the-day.go
+    hidden: true

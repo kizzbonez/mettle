@@ -1,0 +1,19 @@
+title: Thursday Bowling League
+summary: Change a bowler's record through a pointer, return a pointer into a slice or nil, store an optional handicap as a *int with new, and read it back safely when pointers may be nil.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Adds valid games to the bowler passed in
+    file: 02-add-game.go
+    hidden: true
+  - name: Finds the bowler in the team itself, or returns nil
+    file: 03-find-bowler.go
+    hidden: true
+  - name: Sets and reads handicaps, including missing ones
+    file: 04-handicaps.go
+    hidden: true

@@ -1,0 +1,19 @@
+title: Climbing Wall Shoe Hire
+summary: Keep a climbing wall's rack of hire shoes in a slice, removing and appending pairs, list the sizes in stock from a sorted copy that leaves the rack alone, and find the busiest day in a week's array of hires.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Hires out and takes back pairs of shoes
+    file: 02-hire-and-return.go
+    hidden: true
+  - name: Lists each size once, in order, without touching the rack
+    file: 03-stock-list.go
+    hidden: true
+  - name: Finds the busiest day of the week
+    file: 04-busiest-day.go
+    hidden: true

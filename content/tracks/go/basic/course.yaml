@@ -1,0 +1,18 @@
+title: Go Foundations
+summary: >-
+  Go from zero. Learn what Go is and where it is used, install it and run a first program, then
+  variables, constants and types, numbers, strings and runes, formatted output, if and switch,
+  for loops, functions with several results, arrays and slices, maps, structs, pointers and
+  errors as values, and finish with a complete program that reads and checks real input.
+outcomes:
+  - Install Go, start a module, and build, run, format and vet a program
+  - Write programs with variables, constants, the basic types, strings, if, switch and for
+  - Write functions with several results, and use slices, maps and structs
+  - Use pointers to share and change values, and handle errors as values with if err != nil
+  - Read input from standard input and the command line, and build a small command-line program
+exam:
+  title: Go Foundations Mock Exam
+  description: Ten questions drawn from the level's bank, from how Go builds and runs to types, slices, maps, structs, pointers and errors.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

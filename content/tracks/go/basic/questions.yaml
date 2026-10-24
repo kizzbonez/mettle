@@ -1,0 +1,830 @@
+- key: go-basic-01
+  type: single
+  category: go
+  tags: [compiler, build, binary]
+  prompt: |
+    You run `go build` on a small Go program on a Linux laptop and copy the file it writes to a
+    Linux server with the same kind of processor. What does the server need in order to run it?
+  options:
+    - text: Nothing else; the executable contains the compiled program and the Go runtime
+      correct: true
+    - text: An installed Go toolchain, because the file is Go source code that `go` interprets
+    - text: A Go virtual machine, because `go build` writes bytecode rather than machine code
+    - text: The `.go` source files next to it, because the executable loads them when it starts
+  explanation: |
+    Go is **compiled ahead of time**: `go build` translates the whole program into machine code
+    and links it, together with the Go runtime (the garbage collector and the scheduler), into one
+    static executable. That is one of Go's design goals: copy the binary and run it. There is no
+    virtual machine and no interpreter, and the source files are not needed at run time. The one
+    limit is that a binary runs only on the operating system and processor it was built for.
+
+- key: go-basic-02
+  type: single
+  category: go
+  tags: [println, first-program]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    func main() {
+    	fmt.Println("Seats:", 3*12, "left")
+    }
+    ```
+  options:
+    - text: "`Seats: 36 left`"
+      correct: true
+    - text: "`Seats:36left`"
+    - text: "`Seats: 3*12 left`"
+    - text: "`\"Seats:\" 36 \"left\"`"
+  explanation: |
+    `fmt.Println` prints the values between its parentheses with **one space between each pair**
+    and then ends the line. `3*12` is an expression, worked out before `Println` receives it, so
+    the second value is the number 36. The quotes only mark where a string starts and ends in the
+    source code; they are not part of the text that is printed. To print values with no spaces
+    between them, you would build one string yourself, or use `fmt.Print` (lesson 6).
+
+- key: go-basic-03
+  type: single
+  category: go
+  tags: [modules, go-mod]
+  prompt: |
+    After `go mod init example.com/tidal` with Go 1.27.3, the new `go.mod` contains:
+
+    ```text
+    module example.com/tidal
+
+    go 1.27.3
+    ```
+
+    What does the line `go 1.27.3` mean?
+  options:
+    - text: The module needs at least Go 1.27.3; an older Go toolchain will not build it itself
+      correct: true
+    - text: The module may only be built with exactly Go 1.27.3, and newer versions refuse it
+    - text: It is a note about where the module was created, which every Go version ignores
+    - text: It tells `go` to download the standard library of version 1.27.3 for this module
+  explanation: |
+    The `go` line sets the **minimum** Go version the module needs. Since Go 1.21 it is a real
+    requirement, not advice: a Go toolchain older than that version refuses to load the module
+    (by default the older `go` command downloads and runs the newer toolchain instead). Newer
+    versions build it without complaint, thanks to the Go 1 compatibility promise. The standard
+    library comes with the toolchain and is never downloaded per module. `go mod init` writes the
+    version of the Go that ran it.
+
+- key: go-basic-04
+  type: single
+  category: go
+  tags: [syntax, gofmt, compile-errors]
+  prompt: |
+    What happens when you run `go run .` on this file?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    func main()
+    {
+    	fmt.Println("Hello")
+    }
+    ```
+  options:
+    - text: "The build fails with `./main.go:6:1: syntax error: unexpected semicolon or newline before {`"
+      correct: true
+    - text: "It prints `Hello`; brace placement is only a matter of style"
+    - text: "It prints `Hello`, and `gofmt` would later move the brace up to the line above"
+    - text: "It compiles, but `go vet` reports that the brace is in the wrong place"
+  explanation: |
+    Go ends a statement automatically at the end of a line that could end one, such as a line
+    ending in `)`. So `func main()` is taken as complete, and the `{` on the next line has nothing
+    to belong to: a **syntax error**, at line 6, column 1. The brace must stay on the line of
+    `func main()`. `gofmt` cannot repair this either: it refuses to format a file that does not
+    parse. The error message reads file:line:column, then the problem.
+
+- key: go-basic-05
+  type: single
+  category: go
+  tags: [scope, shadowing, short-declaration]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    func main() {
+    	docks := 10
+    	{
+    		docks := 20
+    		fmt.Println(docks)
+    	}
+    	docks = docks + 1
+    	fmt.Println(docks)
+    }
+    ```
+  options:
+    - text: "`20`, then `11`"
+      correct: true
+    - text: "`20`, then `21`"
+    - text: "`10`, then `11`"
+    - text: "Nothing: the second `:=` gives `no new variables on left side of :=`"
+  explanation: |
+    The inner `docks := 20` is in a new **block**, so it declares a second, separate variable
+    that **shadows** the outer one until the closing brace. Inside the block `docks` is 20; after
+    it, the name means the outer variable again, which still holds 10, and `docks = docks + 1`
+    makes it 11. The error `no new variables on left side of :=` appears only when `:=` repeats a
+    name in the *same* block. Shadowing is silent, which is why it causes bugs: use `=` when you
+    mean to change the outer variable.
+
+- key: go-basic-06
+  type: true_false
+  category: go
+  tags: [zero-values, variables]
+  prompt: |
+    True or false: in this program `count` holds whatever value happened to be left in memory
+    until something is assigned to it, so the line may print any number.
+
+    ```go
+    package main
+
+    import "fmt"
+
+    func main() {
+    	var count int
+    	var name string
+    	fmt.Println(count, name == "")
+    }
+    ```
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. Go never leaves a variable uninitialised: a variable declared without a value holds
+    the **zero value** of its type, which is `0` for numbers, `""` for strings and `false` for
+    booleans. The program always prints `0 true`. This is a deliberate design choice, unlike C,
+    where a local variable without a value can hold leftover memory; Go code relies on it, so a
+    counter declared with `var count int` is ready to use.
+
+- key: go-basic-07
+  type: single
+  category: go
+  tags: [integer-division, remainder, operators]
+  prompt: |
+    What does this line print?
+
+    ```go
+    fmt.Println(7/2, -7/2, 7%3, -7%3)
+    ```
+  options:
+    - text: "`3 -3 1 -1`"
+      correct: true
+    - text: "`3.5 -3.5 1 -1`"
+    - text: "`3 -4 1 2`"
+    - text: "`4 -4 1 -1`"
+  explanation: |
+    All four values are integers, so `/` is **integer division**: the fraction is dropped,
+    truncating towards zero, so 7/2 is 3 and -7/2 is -3 (not -4, which is what languages that
+    round down, such as Python, give). The remainder `%` takes the sign of the left operand, so
+    -7%3 is -1, keeping `x == (x/y)*y + x%y` true. Only with a floating-point operand, as in
+    `7.0/2`, does `/` give 3.5.
+
+- key: go-basic-08
+  type: multiple
+  category: go
+  tags: [overflow, conversions, strconv]
+  prompt: |
+    Which of these statements about Go 1.27 are true? Choose all that apply.
+  options:
+    - text: "After `var level int8 = 127` and `level++`, `level` holds -128, and no error is reported"
+      correct: true
+    - text: "With `litres := 7.5` and `bottles := 3`, `litres / bottles` does not compile"
+      correct: true
+    - text: "With `debt := -2.7`, `int(debt)` is -3, because conversion rounds to the nearest integer"
+    - text: "`strconv.Atoi(\"4 2\")` returns 0 and an error that says `invalid syntax`"
+      correct: true
+  explanation: |
+    Integer **overflow** wraps around silently: 127 + 1 in an `int8` becomes -128, with no panic.
+    Go never converts between number types by itself, so a `float64` divided by an `int` is the
+    compile error `mismatched types float64 and int`; write `litres / float64(bottles)`.
+    Converting a float to an integer **truncates towards zero**, so `int(debt)` is -2, not -3;
+    use `math.Round` first if you want rounding. `strconv.Atoi` returns two values, and for text
+    that is not a number they are 0 and the error
+    `strconv.Atoi: parsing "4 2": invalid syntax`.
+
+- key: go-basic-09
+  type: single
+  category: go
+  tags: [strings, utf8, bytes, runes]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import (
+    	"fmt"
+    	"unicode/utf8"
+    )
+
+    func main() {
+    	city := "Málaga"
+    	fmt.Println(len(city), utf8.RuneCountInString(city), city[1])
+    }
+    ```
+  options:
+    - text: "`7 6 195`"
+      correct: true
+    - text: "`6 6 á`"
+    - text: "`7 6 á`"
+    - text: "`6 6 225`"
+  explanation: |
+    A Go string is a sequence of **bytes** in UTF-8. `á` takes two bytes (195 and 161), so
+    `len` counts 7 bytes for 6 characters, and `utf8.RuneCountInString` counts the 6 **runes**
+    (code points). Indexing a string gives one byte, a number, so `city[1]` prints 195, the first
+    byte of `á`, not the letter. 225 is the rune `'á'`, which you get from `[]rune(city)[1]`.
+
+- key: go-basic-10
+  type: single
+  category: go
+  tags: [strings, cut, cutlast]
+  prompt: |
+    What does this program print with Go 1.27?
+
+    ```go
+    package main
+
+    import (
+    	"fmt"
+    	"strings"
+    )
+
+    func main() {
+    	before, after, found := strings.CutLast("backup.2026.tar.gz", ".")
+    	fmt.Println(before, after, found)
+    }
+    ```
+  options:
+    - text: "`backup.2026.tar gz true`"
+      correct: true
+    - text: "`backup 2026.tar.gz true`"
+    - text: "`gz backup.2026.tar true`"
+    - text: "`backup.2026.tar.gz  false`"
+  explanation: |
+    `strings.CutLast`, new in Go 1.27, slices the string around the **last** occurrence of the
+    separator and returns the text before it, the text after it, and whether it was found, which
+    is what a file extension needs. `strings.Cut` does the same around the **first** occurrence,
+    which would give `backup 2026.tar.gz true`. Only when the separator is missing does either
+    return the whole string, an empty string and `false`.
+
+- key: go-basic-11
+  type: single
+  category: go
+  tags: [fmt, printf, width, precision]
+  prompt: |
+    What does this line print?
+
+    ```go
+    fmt.Printf("[%-6s|%6.2f|%03d]\n", "Iona", 3.14159, 7)
+    ```
+  options:
+    - text: "`[Iona  |  3.14|007]`"
+      correct: true
+    - text: "`[  Iona|3.14  |007]`"
+    - text: "`[Iona  |  3.14|7  ]`"
+    - text: "`[Iona|3.14|007]`"
+  explanation: |
+    A number after `%` is a **minimum width**, and values are padded with spaces on the left, so
+    they line up on the right. The `-` flag pads on the right instead: `%-6s` gives `Iona` and two
+    spaces. `%6.2f` rounds to two decimals and right-aligns the four characters `3.14` in six.
+    The `0` flag pads a number with zeros, so `%03d` gives `007`. The second option swaps the
+    meaning of `-`; the last one ignores the widths, which are never ignored, only exceeded when a
+    value is longer than its field.
+
+- key: go-basic-12
+  type: multiple
+  category: go
+  tags: [fmt, go-vet, printf]
+  prompt: |
+    With `n := 3`, which of these lines does `go vet` report?
+  options:
+    - text: "`fmt.Printf(\"%d items\\n\", \"3\")`"
+      correct: true
+    - text: "`fmt.Println(\"total: %d\", n)`"
+      correct: true
+    - text: "`fmt.Printf(\"%v items\\n\", \"3\")`"
+    - text: "`fmt.Printf(\"%.1f%% off\\n\", 7.5)`"
+  explanation: |
+    vet's printf check compares each verb with its argument. `%d` needs an integer, and `"3"` is a
+    string: `fmt.Printf format %d has arg "3" of wrong type string`. Println has no verbs at all,
+    so a `%d` in its text is almost certainly a mistake: `fmt.Println call has possible Printf
+    formatting directive %d`. `%v` accepts a value of any type, so the third line is fine, and in
+    the fourth `%.1f` matches the float while `%%` prints a percent sign without using an
+    argument. Without vet, the first line would print `%!d(string=3) items` at run time.
+
+- key: go-basic-13
+  type: single
+  category: go
+  tags: [switch, fallthrough]
+  prompt: |
+    What does this program print?
+
+    ```go
+    n := 2
+    switch {
+    case n > 1:
+    	fmt.Println("big")
+    	fallthrough
+    case n > 5:
+    	fmt.Println("huge")
+    default:
+    	fmt.Println("small")
+    }
+    ```
+  options:
+    - text: "`big`, then `huge`"
+      correct: true
+    - text: "`big` only, because `n > 5` is false"
+    - text: "`big`, `huge` and `small`"
+    - text: "`big`, then `small`"
+  explanation: |
+    The first true case, `n > 1`, runs. `fallthrough` then runs the **body** of the next case
+    without testing its condition, so `huge` is printed even though `n > 5` is false. It moves
+    only one case on: the `huge` case has no `fallthrough`, so the switch ends there and
+    `default` does not run. This surprise is why `fallthrough` is rare in Go; without it, a case
+    never runs on into the next.
+
+- key: go-basic-14
+  type: true_false
+  category: go
+  tags: [if, scope, short-statement]
+  prompt: |
+    A variable declared in an if's short statement, as `n` is in
+    `if n := len(name); n > 16 { ... } else { ... }`, can be used in the `else` block too, but
+    not after the whole if statement.
+  options:
+    - text: "True"
+      correct: true
+    - text: "False"
+  explanation: |
+    The scope of a variable declared in the short statement is the whole if statement: its
+    condition, its block and every `else if` and `else` block. After the statement ends, the name
+    is gone, and using it is `undefined: n`. That is why the form is used for values needed only
+    for one decision, such as `if err := save(); err != nil`.
+
+- key: go-basic-15
+  type: single
+  category: go
+  tags: [for, range, strings, runes]
+  prompt: |
+    What does this loop print?
+
+    ```go
+    for i, r := range "añb" {
+    	fmt.Printf("%d:%c ", i, r)
+    }
+    ```
+  options:
+    - text: "`0:a 1:ñ 3:b`"
+      correct: true
+    - text: "`0:a 1:ñ 2:b`"
+    - text: "`0:a 1:Ã 2:± 3:b`"
+    - text: "`1:a 2:ñ 3:b`"
+  explanation: |
+    `range` over a string decodes UTF-8: each iteration gives one rune and the **byte index**
+    where it starts. `ñ` takes two bytes, so `b` starts at byte 3, not 2. Counting runes (the
+    second option) is what `utf8.RuneCountInString` does, not what the index means. The third
+    option is what printing each byte with `s[i]` gives, which splits `ñ` into two meaningless
+    characters; `range` avoids that. Indexes always start at 0.
+
+- key: go-basic-16
+  type: single
+  category: go
+  tags: [for, break, switch]
+  prompt: |
+    What does this program print?
+
+    ```go
+    for i := 1; i <= 5; i++ {
+    	switch i {
+    	case 3:
+    		break
+    	}
+    	fmt.Print(i, " ")
+    }
+    ```
+  options:
+    - text: "`1 2 3 4 5`"
+      correct: true
+    - text: "`1 2`"
+    - text: "`1 2 4 5`"
+    - text: "Nothing: `break` is not allowed inside a switch"
+  explanation: |
+    An unlabelled `break` ends the innermost `for`, `switch` or `select`, and here that is the
+    switch. The loop carries on, so every number is printed. To leave the loop from inside the
+    switch, label the loop (`loop:` before `for`) and write `break loop`. The third option
+    describes `continue`, which would skip the rest of the body for 3.
+
+- key: go-basic-17
+  type: single
+  category: go
+  tags: [functions, closures]
+  prompt: |
+    What does this program print?
+
+    ```go
+    func counter() func() int {
+    	n := 0
+    	return func() int {
+    		n++
+    		return n
+    	}
+    }
+
+    func main() {
+    	a := counter()
+    	b := counter()
+    	fmt.Println(a(), a(), b(), a())
+    }
+    ```
+  options:
+    - text: "`1 2 1 3`"
+      correct: true
+    - text: "`1 2 3 4`"
+    - text: "`1 1 1 1`"
+    - text: "`0 1 0 2`"
+  explanation: |
+    The function that `counter` returns is a **closure**: it keeps the variable `n` it uses alive
+    after `counter` has returned. Each call of `counter` creates a new `n`, so `a` and `b` count
+    separately: `a` gives 1 and 2, `b` starts at 1, and `a` goes on to 3. `n` is not reset by
+    calling `a` (that would be `1 1 1 1`), and it is incremented before it is returned, so the
+    first call gives 1.
+
+- key: go-basic-18
+  type: multiple
+  category: go
+  tags: [functions, results, function-values]
+  prompt: |
+    Which of these statements about Go functions are true?
+  options:
+    - text: A function can return several values, such as a result and an error
+      correct: true
+    - text: A function can be passed as an argument to another function
+      correct: true
+    - text: Two functions in one package may share a name if their parameter lists differ
+    - text: "A parameter can have a default value, as in `func fare(adults int = 1) int`"
+  explanation: |
+    Multiple results are ordinary in Go: `strconv.Atoi` returns a number and an error, and many
+    functions return a value and an `ok` flag. Functions are values with types such as
+    `func(int) int`, so they can be stored and passed. Go has **no overloading**: a second
+    function with the same name is `fare redeclared in this block`, whatever its parameters. And
+    it has **no default arguments**: `func fare(adults int = 1)` is a syntax error. Both keep
+    every call explicit about what it runs and with which values.
+
+- key: go-basic-19
+  type: single
+  category: go
+  tags: [slices, append, aliasing]
+  prompt: |
+    What does this program print?
+
+    ```go
+    a := []int{1, 2, 3, 4}
+    b := a[:2]
+    b = append(b, 99)
+    fmt.Println(a, b)
+    ```
+  options:
+    - text: "`[1 2 99 4] [1 2 99]`"
+      correct: true
+    - text: "`[1 2 3 4] [1 2 99]`"
+    - text: "`[1 2 3 4 99] [1 2 99]`"
+    - text: "`[1 2 99 3 4] [1 2 99]`"
+  explanation: |
+    Slicing copies nothing: `b` is a view of the first two elements of `a`'s backing array, with
+    length 2 but capacity 4. Because there is spare capacity, `append` writes 99 into that same
+    array, at index 2, which is `a[2]`. So `a` changes too. Only when the capacity runs out does
+    `append` allocate a new array. To keep `a` safe, copy first or limit the capacity with
+    `a[:2:2]`, which makes the append copy.
+
+- key: go-basic-20
+  type: single
+  category: go
+  tags: [slices, make, append]
+  prompt: |
+    What does this program print?
+
+    ```go
+    names := make([]string, 3)
+    names = append(names, "Ada", "Bo")
+    fmt.Println(len(names), names[0] == "")
+    ```
+  options:
+    - text: "`5 true`"
+      correct: true
+    - text: "`2 false`"
+    - text: "`3 false`"
+    - text: "`5 false`"
+  explanation: |
+    `make([]string, 3)` makes a slice of **length** 3: three empty strings, not room for three.
+    `append` always adds after the last element, so `"Ada"` and `"Bo"` become elements 3 and 4,
+    the length is 5, and `names[0]` is still `""`. To start empty with room for three, write
+    `make([]string, 0, 3)`: length 0, capacity 3. Then the appends would give a length of 2.
+
+- key: go-basic-21
+  type: single
+  category: go
+  tags: [maps, zero-value, comma-ok]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    func main() {
+    	stock := map[string]int{"leeks": 2}
+    	stock["kale"]--
+    	n, ok := stock["kale"]
+    	fmt.Println(n, ok, len(stock))
+    }
+    ```
+  options:
+    - text: "`-1 true 2`"
+      correct: true
+    - text: "`0 false 1`"
+    - text: "`-1 false 1`"
+    - text: It stops with a panic, because there is no key `"kale"` to decrease
+  explanation: |
+    Reading a missing key is not an error in Go: it gives the zero value of the value type, here
+    0. So `stock["kale"]--` reads 0, subtracts one and **stores** -1 under the new key `"kale"`.
+    After that the key exists, so the comma-ok form gives `-1 true`, and the map has two entries.
+    The tempting answer `0 false 1` assumes that changing a missing key does nothing; in fact it
+    creates the key. To change only keys that exist, check with `n, ok := stock[name]` first.
+
+- key: go-basic-22
+  type: multiple
+  category: go
+  tags: [maps, nil-map, panic]
+  prompt: |
+    A function declares `var m map[string]int` and never assigns anything else to `m`. Which of
+    these statements are true?
+  options:
+    - text: "`len(m)` is 0"
+      correct: true
+    - text: "`m[\"a\"]` gives 0"
+      correct: true
+    - text: "`m[\"a\"] = 1` panics with `assignment to entry in nil map`"
+      correct: true
+    - text: "`delete(m, \"a\")` panics, because there is no map to delete from"
+  explanation: |
+    `var m map[string]int` declares a map variable whose value is `nil`: no map has been
+    created. A nil map behaves like an empty map for everything that only reads it: `len` is 0,
+    any key reads as the zero value, `range` runs zero times, and `delete` on it does nothing.
+    Only adding an entry needs storage, so `m["a"] = 1` panics with `assignment to entry in nil
+    map`. Create the map with `map[string]int{}` or `make(map[string]int)` before writing to it.
+
+- key: go-basic-23
+  type: single
+  category: go
+  tags: [structs, slices, range, value-semantics]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    type Seat struct {
+    	Row    int
+    	Booked bool
+    }
+
+    func main() {
+    	seats := []Seat{{Row: 1}, {Row: 2}}
+    	for _, s := range seats {
+    		s.Booked = true
+    	}
+    	fmt.Println(seats[0].Booked, seats[1].Booked)
+    }
+    ```
+  options:
+    - text: "`false false`"
+      correct: true
+    - text: "`true true`"
+    - text: "`false true`"
+    - text: "Nothing: it fails to compile with `declared and not used: s`"
+  explanation: |
+    Structs are values. In `for _, s := range seats`, `s` is a **copy** of each element, so
+    `s.Booked = true` changes the copy, which is thrown away at the end of each iteration; the
+    slice is never touched. The program compiles, because setting a field of `s` uses it. To
+    change the elements themselves, index the slice: `for i := range seats { seats[i].Booked =
+    true }`, or take a pointer to the element with `&seats[i]` (lesson 13).
+
+- key: go-basic-24
+  type: single
+  category: go
+  tags: [structs, maps, addressability]
+  prompt: |
+    ```go
+    type Member struct {
+    	Name string
+    	Town string
+    }
+
+    members := map[string]Member{"ada": {Name: "Ada"}}
+    members["ada"].Town = "Frome"
+    ```
+
+    What happens?
+  options:
+    - text: "It does not compile: `cannot assign to struct field members[\"ada\"].Town in map`"
+      correct: true
+    - text: It compiles, and Ada's town in the map becomes Frome
+    - text: It compiles, but changes a temporary copy, so the map still has an empty town
+    - text: It compiles, and panics when it runs because the key is missing
+  explanation: |
+    An element of a map is not a variable you can take the address of: the map may move its
+    entries as it grows. So Go refuses to assign to a field of a struct stored in a map, at
+    compile time, rather than silently changing a copy. The usual fix is to read the struct out,
+    change the copy and store it back: `m := members["ada"]; m.Town = "Frome"; members["ada"] =
+    m`. A map of pointers, `map[string]*Member`, is the other way round it.
+
+- key: go-basic-25
+  type: single
+  category: go
+  tags: [pointers, functions, dereference]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import "fmt"
+
+    func bump(n int) {
+    	n++
+    }
+
+    func bumpPointer(n *int) {
+    	*n++
+    }
+
+    func main() {
+    	x := 1
+    	bump(x)
+    	bumpPointer(&x)
+    	bumpPointer(&x)
+    	fmt.Println(x)
+    }
+    ```
+  options:
+    - text: "`3`"
+      correct: true
+    - text: "`4`"
+    - text: "`1`"
+    - text: "Nothing: `*n++` does not compile, because it moves the pointer"
+  explanation: |
+    `bump` receives a copy of `x`, so its `n++` changes only the copy: `x` stays 1. Each call of
+    `bumpPointer(&x)` receives the address of `x`, and `*n++` increases the variable that `n`
+    points to (it means `(*n)++`), so `x` becomes 2 and then 3. Go has no pointer arithmetic, so
+    `*n++` can never mean "move the pointer"; `n++` on a pointer would not compile at all.
+
+- key: go-basic-26
+  type: single
+  category: go
+  tags: [pointers, new, go1.26, optional-values]
+  prompt: |
+    `type Entry struct { Name string; Handicap *int }` uses a nil `Handicap` to mean "no handicap
+    yet". In Go 1.27, which literal sets Ada's handicap to 12 in one expression?
+  options:
+    - text: "`Entry{Name: \"Ada\", Handicap: new(12)}`"
+      correct: true
+    - text: "`Entry{Name: \"Ada\", Handicap: &12}`"
+    - text: "`Entry{Name: \"Ada\", Handicap: new(int, 12)}`"
+    - text: "`Entry{Name: \"Ada\", Handicap: 12}`"
+  explanation: |
+    Since Go 1.26, `new` accepts an expression as well as a type: `new(12)` creates a new `int`
+    variable holding 12 and returns a `*int` to it (an untyped constant gets its default type).
+    `&12` does not compile, because a constant has no address (`cannot take address of 12
+    (untyped int constant)`); before Go 1.26 you needed a temporary variable, `h := 12` and then
+    `&h`. `new` takes one argument only, and a plain `12` is an `int`, not a `*int`.
+
+- key: go-basic-27
+  type: single
+  category: go
+  tags: [errors, wrapping, errors-is, sentinel]
+  prompt: |
+    What does this program print?
+
+    ```go
+    package main
+
+    import (
+    	"errors"
+    	"fmt"
+    )
+
+    var ErrFull = errors.New("minibus full")
+
+    func main() {
+    	a := fmt.Errorf("trip 3: %w", ErrFull)
+    	b := fmt.Errorf("trip 3: %v", ErrFull)
+    	fmt.Println(a.Error() == b.Error(), errors.Is(a, ErrFull), errors.Is(b, ErrFull), a == ErrFull)
+    }
+    ```
+  options:
+    - text: "`true true false false`"
+      correct: true
+    - text: "`true true true false`"
+    - text: "`false true false false`"
+    - text: "`true true false true`"
+  explanation: |
+    Both errors have the same text, `trip 3: minibus full`, so the first value is `true`. The
+    difference is inside: `%w` **wraps** `ErrFull`, keeping it in the new error, so `errors.Is(a,
+    ErrFull)` finds it. `%v` only copies the text, so `errors.Is(b, ErrFull)` is `false`. And `a`
+    is a new error value, not `ErrFull` itself, so `a == ErrFull` is `false`: once an error may
+    be wrapped, compare with `errors.Is`, never with `==`.
+
+- key: go-basic-28
+  type: multiple
+  category: go
+  tags: [errors, style, error-strings]
+  prompt: |
+    Which of these error messages follow Go's conventions for error strings?
+  options:
+    - text: "`booking \"x\": strconv.Atoi: parsing \"x\": invalid syntax`"
+      correct: true
+    - text: "`bib 88: no runner has this bib`"
+      correct: true
+    - text: "`Error: Could not book the seats.`"
+    - text: "`Failed to parse seats!`"
+  explanation: |
+    Go error strings are usually printed inside a longer message, as a chain of contexts joined
+    by colons, so they start in lower case (unless they begin with a name), have no full stop or
+    exclamation mark at the end, put the context first and include the values involved. The first
+    two do exactly that. `Error: Could not book the seats.` repeats "Error", is capitalised, ends
+    with a full stop and says neither which booking nor why. `Failed to parse seats!` is
+    capitalised, shouts, and does not say which text failed.
+
+- key: go-basic-29
+  type: true_false
+  category: go
+  tags: [bufio, scanner, input, errors]
+  prompt: |
+    A program reads standard input with a `bufio.Scanner`:
+
+    ```go
+    scanner := bufio.NewScanner(os.Stdin)
+    for scanner.Scan() {
+    	fmt.Println(scanner.Text())
+    }
+    err := scanner.Err()
+    ```
+
+    When the loop ends because all the input has been read normally, `err` is `io.EOF`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False: at a normal end of input, `Err()` returns `nil`. `Scan` returns a plain `bool`, which
+    is `false` both when the input ends and when reading fails, for example on a line longer
+    than the scanner's 64 KiB limit. `Err()` tells the two apart: `nil` means the input simply
+    ended (the scanner does not report io.EOF as an error), and anything else is the real
+    problem, such as `bufio.Scanner: token too long`. That is why a scanner loop is followed by
+    `if err := scanner.Err(); err != nil { ... }`, and why a check for `io.EOF` there would never
+    match.
+
+- key: go-basic-30
+  type: single
+  category: go
+  tags: [flag, os-args, command-line]
+  prompt: |
+    ```go
+    minimum := flag.Int("min", 0, "smallest number to count")
+    verbose := flag.Bool("v", false, "print every line")
+    flag.Parse()
+    fmt.Println(*minimum, *verbose, flag.Args())
+    ```
+
+    The program is built as `tally` and run as `./tally -min 5 a.txt -v`. What does it print?
+  options:
+    - text: "`5 false [a.txt -v]`"
+      correct: true
+    - text: "`5 true [a.txt]`"
+    - text: "`0 false [-min 5 a.txt -v]`"
+    - text: It prints an error about an unknown flag and exits with code 2
+  explanation: |
+    The `flag` package parses flags only up to the first argument that is not a flag. `-min 5`
+    sets `minimum` to 5; `a.txt` is not a flag, so parsing stops there, and `-v` is left in
+    `flag.Args()` as an ordinary argument, with `verbose` still `false`. Put flags before the
+    other arguments: `./tally -min 5 -v a.txt` prints `5 true [a.txt]`. `os.Args[1:]` would hold
+    all four words whatever the flags are.

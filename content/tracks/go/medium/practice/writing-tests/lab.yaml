@@ -1,0 +1,19 @@
+title: Wetsuit Return Checks
+summary: Write the late-return charge, a table of test cases on its boundaries, and a got-want checker that reports through the part of testing.T it needs, then let hidden tests run your table against broken versions.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Charges late returns by the rules
+    file: 02-late-charge.go
+    hidden: true
+  - name: Reports every failing case with a got-want message
+    file: 03-checker.go
+    hidden: true
+  - name: Has a table of cases that catches broken charge rules
+    file: 04-table.go
+    hidden: true

@@ -1,0 +1,543 @@
+- key: go-professional-01
+  type: single
+  category: go
+  tags: [modules, minimal-version-selection]
+  prompt: |
+    Module `example.com/rota` requires `example.com/maps v1.1.0` and `example.com/clock v1.0.0`.
+    `maps v1.1.0` requires `tz v1.2.0`. `clock v1.0.0` requires `maps v1.3.0` and `tz v1.5.0`.
+    Newer versions of all three modules have been published, up to `v1.9.0`.
+
+    After `go mod tidy`, which versions does `go list -m all` show for the build?
+  options:
+    - text: "`clock v1.0.0`, `maps v1.3.0`, `tz v1.5.0`"
+      correct: true
+    - text: "`clock v1.0.0`, `maps v1.1.0`, `tz v1.2.0`, because the main module's own requirements always win"
+    - text: "`clock v1.9.0`, `maps v1.9.0`, `tz v1.9.0`, because the go command picks the latest published versions"
+    - text: "None: the build fails, because two different versions of `maps` and of `tz` are required"
+  explanation: |
+    **Minimal version selection** walks the requirement graph and keeps, for each module path, the
+    highest version that anything requires: `maps` is required at v1.1.0 and v1.3.0, so v1.3.0;
+    `tz` at v1.2.0 and v1.5.0, so v1.5.0. A `require` line is a minimum, not an exact pin, so the
+    main module's `maps v1.1.0` does not hold the build back, and `go mod tidy` rewrites it to
+    v1.3.0. Nothing newer than what is required is ever chosen on its own: v1.9.0 is used only
+    after someone runs `go get` to ask for it. Different required versions are not a conflict;
+    they are exactly what MVS resolves, deterministically and without a lock file.
+
+- key: go-professional-02
+  type: multiple
+  category: go
+  tags: [modules, internal, replace, workspaces, versioning]
+  prompt: |
+    Which of these statements about Go modules are true? Choose every true one.
+  options:
+    - text: A package in `tramstop/internal/timetable` can be imported only by code inside the tree rooted at `tramstop/`
+      correct: true
+    - text: "`replace` directives in the `go.mod` of a module you depend on are ignored when you build your own module"
+      correct: true
+    - text: "`go.work` should be committed, so that CI builds against the same local modules as the developer"
+    - text: "A breaking v2 release can keep the module path `example.com/geo` as long as it is tagged `v2.0.0`"
+  explanation: |
+    The go command enforces `internal/`: another module that imports such a package gets
+    `use of internal package ... not allowed`. `replace` and `exclude` apply only in the main
+    module's `go.mod` (and in `go.work`), so a dependency cannot redirect your build. A `go.work`
+    file is for local work and should stay out of version control, or CI may build against folders
+    that only exist on someone's machine. A v2 module must change its path to end in `/v2`:
+    requiring `example.com/geo v2.0.0` fails with `version "v2.0.0" invalid: should be v0 or v1,
+    not v2`. This is the import compatibility rule: one import path, one compatible API.
+
+- key: go-professional-03
+  type: single
+  category: go
+  tags: [net-http, servemux, routing]
+  prompt: |
+    ```go
+    mux := http.NewServeMux()
+    mux.HandleFunc("GET /bikes/{id}", showBike)
+    mux.HandleFunc("GET /bikes/spare", showSpare)
+    ```
+
+    A client sends `DELETE /bikes/7` to this mux. What does it get?
+  options:
+    - text: "`405 Method Not Allowed` with the header `Allow: GET, HEAD`"
+      correct: true
+    - text: "`404 page not found`, because no pattern names the DELETE method"
+    - text: "`200 OK` from `showBike`, because `{id}` matches `7` whatever the method"
+    - text: Nothing; registering the two patterns panics, because both match `/bikes/spare`
+  explanation: |
+    Since Go 1.22 a pattern can start with a method. When a request's path matches a pattern but
+    its method does not, and no other pattern serves it, the mux answers **405** and lists the
+    allowed methods in `Allow`; a `GET` pattern also serves `HEAD`. A 404 is only for paths that
+    match nothing. The two patterns do not conflict: `/bikes/spare` matches a strict subset of what
+    `/bikes/{id}` matches, so it is **more specific** and wins for that path, in either
+    registration order. A conflict (and a panic) needs two patterns where neither is more specific,
+    such as `GET /bikes/{id}` and `GET /{kind}/7`.
+
+- key: go-professional-04
+  type: single
+  category: go
+  tags: [net-http, handlers, responses]
+  prompt: |
+    ```go
+    func create(w http.ResponseWriter, r *http.Request) {
+    	if r.URL.Query().Get("id") == "" {
+    		http.Error(w, "missing id", http.StatusBadRequest)
+    	}
+    	w.WriteHeader(http.StatusCreated)
+    	w.Header().Set("Content-Type", "application/json")
+    	fmt.Fprintln(w, `{"ok":true}`)
+    }
+    ```
+
+    A request arrives without `id`. What does the client receive?
+  options:
+    - text: "Status 400, `Content-Type: text/plain; charset=utf-8`, and the body `missing id` followed by `{\"ok\":true}`"
+      correct: true
+    - text: "Status 400 and only the body `missing id`, because `http.Error` ends the handler"
+    - text: "Status 201 with the JSON body, because the last `WriteHeader` call wins"
+    - text: "Status 500, because writing a second status makes the handler panic"
+  explanation: |
+    `http.Error` writes a status and a body but does not stop the function: only `return` does.
+    The status is sent once, by the first `WriteHeader`, and the server just logs
+    `http: superfluous response.WriteHeader call` for the second. The JSON is still written after
+    the error text. The `Content-Type` set after `WriteHeader` is ignored too, because headers are
+    sent with the status. The fix is to `return` straight after `http.Error`, and to set headers
+    before `WriteHeader`.
+
+- key: go-professional-05
+  type: multiple
+  category: go
+  tags: [http-client, retries, idempotency]
+  prompt: |
+    A client wraps its calls in automatic retries with exponential backoff. Which of these
+    failures should it retry? Choose every one.
+  options:
+    - text: A `GET /forecasts/whitby` that timed out before any response arrived
+      correct: true
+    - text: "A `GET /forecasts/whitby` answered with `503 Service Unavailable`"
+      correct: true
+    - text: "A `GET /forecasts/whitby` answered with `400 Bad Request`"
+    - text: A `POST /orders` that timed out, on an API with no idempotency key
+  explanation: |
+    Retry only when another attempt may succeed and is safe. A timeout and a 503 are often brief,
+    and a GET is **idempotent**: sending it twice has the same effect as once (429 Too Many
+    Requests is also worth retrying, after a wait). A 400 means the request itself is wrong, so it
+    will fail the same way every time. A POST that timed out may already have created the order on
+    the server; sending it again can create a second one, unless the API lets the client send an
+    idempotency key that makes repeats harmless.
+
+- key: go-professional-06
+  type: true_false
+  category: go
+  tags: [http-client, errors, status-codes]
+  prompt: |
+    `resp, err := client.Do(req)` returns a non-nil `err` when the server answers
+    `500 Internal Server Error`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    `Do` returns an error only when it could not get a response at all: a refused connection, a
+    timeout, a redirect policy that failed. A 404 or a 500 is a response, so `err` is `nil` and
+    `resp.StatusCode` is 500. Always check the status yourself, and close `resp.Body` whenever
+    `err` is `nil`, even for error statuses, so the connection can be reused.
+
+- key: go-professional-07
+  type: single
+  category: go
+  tags: [slog, logging, vet]
+  prompt: |
+    ```go
+    slog.Info("kiln fired", "kiln", "K2", 1260)
+    ```
+
+    What happens when this line is built with `go vet` and run?
+  options:
+    - text: "vet warns that `1260` should be a string or a `slog.Attr`; the program logs `kiln=K2 !BADKEY=1260`"
+      correct: true
+    - text: "It does not compile, because the arguments after the message must come in pairs"
+    - text: "It logs `kiln=K2 1260=` and vet reports nothing"
+    - text: "It panics at run time with `slog: odd number of arguments`"
+  explanation: |
+    After the message, slog reads alternating keys and values. Here `"kiln", "K2"` is a pair, then
+    `1260` sits where a key should be. slog does not panic: it logs the stray value under the key
+    `!BADKEY`, so the line prints `INFO kiln fired kiln=K2 !BADKEY=1260`. The compiler cannot catch
+    it (the parameters are `...any`), but `go vet` does: `slog.Info arg "1260" should be a string
+    or a slog.Attr (possible missing key or value)`. Typed attributes such as `slog.Int("temp_c",
+    1260)` make the mistake impossible.
+
+- key: go-professional-08
+  type: single
+  category: go
+  tags: [slog, handlers, context]
+  prompt: |
+    ```go
+    type requestIDHandler struct{ slog.Handler }
+
+    func (h requestIDHandler) Handle(ctx context.Context, r slog.Record) error {
+    	if id, ok := ctx.Value(requestIDKey{}).(string); ok {
+    		r.AddAttrs(slog.String("request_id", id))
+    	}
+    	return h.Handler.Handle(ctx, r)
+    }
+
+    // logger := slog.New(requestIDHandler{slog.NewTextHandler(os.Stdout, opts)})
+    logger.InfoContext(ctx, "direct")
+    logger.With("kiln", "K2").InfoContext(ctx, "after With")
+    ```
+
+    The first line logs `request_id=req-7f3`, the second does not. Why?
+  options:
+    - text: "`With` calls the handler's `WithAttrs`, which is the embedded handler's method, so it returns a plain text handler and the wrapper is gone"
+      correct: true
+    - text: "`With` makes a copy of the context without its values, so `ctx.Value` finds nothing"
+    - text: "`AddAttrs` cannot add attributes to a record that already has some from `With`"
+    - text: "A logger made with `With` ignores the context passed to `InfoContext`"
+  explanation: |
+    `logger.With` asks the handler for a new handler with the extra attributes by calling
+    `WithAttrs`. `requestIDHandler` does not define one, so the method **promoted** from the
+    embedded `slog.Handler` runs, and it returns the inner handler's result: a bare text handler
+    that knows nothing of request IDs. The context still holds the ID, and `InfoContext` still
+    passes it on; nobody reads it. A wrapping handler must override `WithAttrs` and `WithGroup` to
+    return itself around the inner handler's result.
+
+- key: go-professional-09
+  type: single
+  category: go
+  tags: [graceful-shutdown, context, net-http]
+  prompt: |
+    ```go
+    ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+    defer stop()
+    go srv.Serve(ln)
+    <-ctx.Done()
+    if err := srv.Shutdown(ctx); err != nil {
+    	log.Print(err)
+    }
+    ```
+
+    SIGTERM arrives while a slow request is being served. What does `Shutdown` do?
+  options:
+    - text: "It closes the listener, then returns `context canceled` at once without waiting for the request, which is cut off when the program exits"
+      correct: true
+    - text: "It waits for the request to finish, because the context is only checked before shutdown starts"
+    - text: "It panics, because `Shutdown` must not be given a context that is already done"
+    - text: "It ignores the context and waits until the server's `WriteTimeout` expires"
+  explanation: |
+    `Shutdown` closes the listeners and idle connections, then waits for active connections, but
+    gives up as soon as its context is done and returns the context's error. The signal context
+    is already cancelled, so it returns `context canceled` immediately (in the sandbox, in well
+    under 100 ms with a 500 ms request in flight). Give `Shutdown` a fresh context with its own
+    deadline instead: `context.WithTimeout(context.Background(), grace)`.
+
+- key: go-professional-10
+  type: single
+  category: go
+  tags: [configuration, flags, environment]
+  prompt: |
+    ```go
+    cfg := Config{Addr: "127.0.0.1:8080", Timeout: 5 * time.Second}
+    if v, ok := getenv("TIDES_ADDR"); ok {
+    	cfg.Addr = v
+    }
+    fs := flag.NewFlagSet("tides", flag.ContinueOnError)
+    fs.StringVar(&cfg.Addr, "addr", cfg.Addr, "listen address")
+    fs.DurationVar(&cfg.Timeout, "timeout", cfg.Timeout, "upstream timeout")
+    err := fs.Parse(args)
+    ```
+
+    `TIDES_ADDR` is `:9000` in the environment. What are `cfg.Addr` and `cfg.Timeout` after
+    parsing `args = []string{}`, and after parsing `args = []string{"-addr", ":7000", "-timeout", "2s"}`?
+  options:
+    - text: "`:9000` and 5s with no arguments; `:7000` and 2s with the flags"
+      correct: true
+    - text: "`127.0.0.1:8080` and 5s with no arguments, because `StringVar` resets the field to the code's default; `:7000` and 2s with the flags"
+    - text: "`:9000` and 5s in both cases, because the environment always overrides flags"
+    - text: "`:9000` and 0s with no arguments, because a flag that is not given sets its field to the zero value"
+  explanation: |
+    `StringVar(&cfg.Addr, "addr", cfg.Addr, ...)` stores its default in the field when the flag is
+    defined, and the default here is the value already read from the environment. `Parse` changes
+    a field only for the flags it sees. So with no arguments the environment's `:9000` and the
+    code's 5s remain, and given flags win over both: **flag > environment > default**. Running
+    exactly this setup printed `addr=:9000 timeout=5s` and `addr=:7000 timeout=2s`.
+
+- key: go-professional-11
+  type: single
+  category: go
+  tags: [database-sql, errors, err-no-rows]
+  prompt: |
+    The program imports the SQLite driver `modernc.org/sqlite`, and the table `boats` in
+    `club.db` has no row with id 9. What does it print?
+
+    ```go
+    func boatName(ctx context.Context, db *sql.DB, id int64) (string, error) {
+    	var name string
+    	err := db.QueryRowContext(ctx, "SELECT name FROM boats WHERE id = ?", id).Scan(&name)
+    	if err != nil {
+    		return "", fmt.Errorf("boat %d: %w", id, err)
+    	}
+    	return name, nil
+    }
+
+    func main() {
+    	db, _ := sql.Open("sqlite", "club.db")
+    	_, err := boatName(context.Background(), db, 9)
+    	fmt.Println(err)
+    	fmt.Println(err == sql.ErrNoRows, errors.Is(err, sql.ErrNoRows))
+    }
+    ```
+  options:
+    - text: "`boat 9: sql: no rows in result set`, then `false true`"
+      correct: true
+    - text: "`boat 9: sql: no rows in result set`, then `true true`"
+    - text: "`<nil>`, then `false false`, because a query that finds nothing is not an error"
+    - text: "Nothing: `QueryRowContext` panics when the query returns no row"
+  explanation: |
+    `QueryRowContext` keeps any error until `Scan`, and `Scan` returns `sql.ErrNoRows` when no
+    row matched. A query that finds nothing is an error for `QueryRow`, because there is nothing
+    to scan. `fmt.Errorf` with `%w` builds a new error that wraps it, so `err` is no longer equal
+    to `sql.ErrNoRows` (`==` is false), but `errors.Is` follows the chain and finds it (true).
+    That is why code that may receive wrapped errors uses `errors.Is`. (`Query`, for many rows,
+    is different: no rows there is simply a loop that runs zero times.)
+
+- key: go-professional-12
+  type: multiple
+  category: go
+  tags: [database-sql, rows, transactions, connection-pool]
+  prompt: |
+    Which of these statements about `database/sql` are true? Choose all that apply.
+  options:
+    - text: "`defer rows.Close()` straight after checking the error of `QueryContext` releases the connection on every way out of the function"
+      correct: true
+    - text: "`rows.Next()` returns false both at the end of the rows and when reading them fails, so `rows.Err()` must be checked after the loop"
+      correct: true
+    - text: "`sql.Open` connects to the database and returns an error if the server cannot be reached"
+    - text: "Inside a transaction, `db.ExecContext` takes part in the transaction, because it uses the same pool as `tx`"
+  explanation: |
+    Open rows hold a connection from the pool until they are closed; a deferred `Close` covers
+    the early returns, such as a failed `Scan`. `Next` reports false at the end and on a
+    failure alike, and only `rows.Err()` tells them apart, so without it a connection lost
+    halfway looks like a short, successful result.
+
+    `sql.Open` only checks its arguments and prepares the pool; it may not connect at all. Call
+    `PingContext` at start-up to find out. A transaction holds one connection, and only the
+    methods of `tx` run on it: `db.ExecContext` runs on another connection, outside the
+    transaction, and with a small pool it can even wait forever for the connection `tx` holds.
+
+- key: go-professional-13
+  type: single
+  category: go
+  tags: [benchmarks, benchmem, performance]
+  prompt: |
+    `go test -bench . -benchmem` prints this line:
+
+    ```text
+    BenchmarkJoinPlus-2   	     636	   2048343 ns/op	 2942730 B/op	     998 allocs/op
+    ```
+
+    What does it tell you?
+  options:
+    - text: One call of the benchmarked code took about 2 ms on average and allocated 998 times, about 2.9 MB in all; the benchmark ran it 636 times with GOMAXPROCS 2
+      correct: true
+    - text: The benchmark ran twice for 636 ms each, and allocated 998 objects in total over the whole run
+    - text: The 636 calls together took about 2 ms and allocated 2.9 MB
+    - text: The function took 2 arguments and returned after 636 nanoseconds
+  explanation: |
+    The columns after the name are the number of iterations the benchmark ran, then the time,
+    bytes and allocations **per operation**, that is per pass of the `for b.Loop()` body. The
+    `-2` after the name is the GOMAXPROCS value the benchmark ran with. So each call of the code
+    took about 2,048,343 ns (2 ms) and made 998 allocations totalling about 2.9 MB, a sign of
+    something quadratic such as building a string with `+=` in a loop. The totals for the whole
+    run would be 636 times larger, which is why per-operation numbers can be compared between
+    benchmarks that ran a different number of times.
+
+- key: go-professional-14
+  type: true_false
+  category: go
+  tags: [escape-analysis, gcflags, heap]
+  prompt: |
+    `go build -gcflags='-m -l' .` reports `moved to heap: r` for this function:
+
+    ```go
+    func newReading(stall string, cents int) *reading {
+    	r := reading{stall, cents}
+    	return &r
+    }
+    ```
+
+    True or false: the report means the function has a bug, because `r` is freed when
+    `newReading` returns and the caller gets a dangling pointer.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. Returning the address of a local variable is perfectly safe in Go. **Escape
+    analysis** sees that `r` is still reachable after the function returns, so the compiler
+    allocates it on the heap instead of the stack, and the garbage collector frees it once
+    nothing points to it. `-m` is not a warning: it explains where allocations come from, which
+    matters only in code that a profile shows to be hot. Writing `new(reading)` instead would
+    change nothing, since that value escapes in exactly the same way.
+
+- key: go-professional-15
+  type: single
+  category: go
+  tags: [security, constant-time, crypto-subtle]
+  prompt: |
+    An API checks the token in a request against the one it stored. Which comparison should it
+    use?
+  options:
+    - text: "`subtle.ConstantTimeCompare([]byte(got), []byte(want)) == 1`"
+      correct: true
+    - text: "`got == want`, because Go compares strings in constant time"
+    - text: "`bytes.Equal([]byte(got), []byte(want))`, because it compares bytes rather than characters"
+    - text: "`strings.EqualFold(got, want)`, so that the case of the token does not matter"
+  explanation: |
+    `==` and `bytes.Equal` stop at the first byte that differs, so a guess with a correct
+    beginning takes slightly longer to reject. Over many requests an attacker can measure that
+    and recover the secret one byte at a time: a **timing attack**. `crypto/subtle`'s
+    `ConstantTimeCompare` (and `hmac.Equal` for MACs) takes the same time whatever the
+    contents, leaking at most the length. `EqualFold` is worse still: it ignores case, which
+    makes a token easier to guess, and it is not constant time either.
+
+- key: go-professional-16
+  type: single
+  category: go
+  tags: [security, html-template, xss]
+  prompt: |
+    What does this program print?
+
+    ```go
+    t := template.Must(template.New("p").Parse("<p>Hello, {{.}}!</p>\n")) // html/template
+    t.Execute(os.Stdout, "<b>Bo</b>")
+    t.Execute(os.Stdout, template.HTML("<b>Bo</b>"))
+    ```
+  options:
+    - text: "`<p>Hello, &lt;b&gt;Bo&lt;/b&gt;!</p>`, then `<p>Hello, <b>Bo</b>!</p>`"
+      correct: true
+    - text: "`<p>Hello, <b>Bo</b>!</p>` twice: html/template only escapes `<script>` tags"
+    - text: "`<p>Hello, Bo!</p>` twice: html/template removes the tags from data"
+    - text: "`<p>Hello, &lt;b&gt;Bo&lt;/b&gt;!</p>` twice: every value is escaped, whatever its type"
+  explanation: |
+    `html/template` escapes every value for the place it lands, so a plain string with markup
+    is shown as text: `&lt;b&gt;Bo&lt;/b&gt;`. It does not strip tags, and it does not look for
+    dangerous ones only. The type `template.HTML` tells it "this is already safe HTML", and
+    switches the escaping off for that value, so the second call writes the tags as they are.
+    That is why user input must never be converted to `template.HTML`: it reopens the door to
+    cross-site scripting that the package closed.
+
+- key: go-professional-17
+  type: single
+  category: go
+  tags: [go-build, ldflags, versioning]
+  prompt: |
+    `main.go` declares `var version = "dev"` and prints it. The release script builds with:
+
+    ```sh
+    go build -ldflags="-X main.Version=v1.2.0" -o tally .
+    ```
+
+    What does `./tally` print?
+  options:
+    - text: "`dev`: there is no variable `main.Version`, and the linker ignores `-X` for a name that does not exist"
+      correct: true
+    - text: "`v1.2.0`: `-X` matches variable names without regard to case"
+    - text: "Nothing: the link fails with an error naming the missing variable"
+    - text: "Nothing: the compiler rejects the program because `version` is not a constant"
+  explanation: |
+    `-X importpath.name=value` sets a package-level **string variable** at link time, and the
+    name must match exactly: `main.version`, with a lower-case v. For a name that does not
+    exist the linker says nothing at all, so the binary keeps its default and prints `dev`,
+    a mistake that is easy to ship. Only a malformed argument such as `-X version=v1` stops the
+    link (`-X flag requires argument of the form importpath.name=value`). `-X` needs a
+    variable, not a constant, which is why the program declares `version` with `var`.
+
+- key: go-professional-18
+  type: multiple
+  category: go
+  tags: [cross-compiling, cgo, embed, build-flags]
+  prompt: |
+    Which of these statements about building and shipping Go programs are true? Choose all
+    that apply.
+  options:
+    - text: "A binary built with `CGO_ENABLED=0` does not need the system's C library, so it can run in a `scratch` or `distroless/static` image"
+      correct: true
+    - text: "`-ldflags=\"-s -w\"` leaves out the symbol table and debug information, but panics still print stack traces"
+      correct: true
+    - text: "`//go:embed ../shared/logo.png` embeds a file from a sibling directory of the package"
+    - text: "Building for `GOOS=windows` on a Linux machine needs a Windows machine or a Windows SDK"
+  explanation: |
+    With cgo off, packages such as `net` and `os/user` use their pure Go versions and the
+    binary is fully static; with cgo on they may link to libc, which an empty image does not
+    have. `-s -w` strips the symbol table and DWARF data, which makes the file smaller but
+    hurts debuggers; Go's stack traces use separate tables that stay in the binary.
+
+    `//go:embed` patterns are relative to the package directory and may not contain `..`:
+    the go command reports `invalid pattern syntax`. And cross-compiling needs nothing but the
+    Go toolchain: `GOOS=windows GOARCH=amd64 go build` works from any platform, as long as no
+    cgo is involved.
+
+- key: go-professional-19
+  type: single
+  category: go
+  tags: [go-vet, copylocks, mutex]
+  prompt: |
+    `go vet ./...` reports:
+
+    ```text
+    counter.go:14:9: Value passes lock by value: example.Counter contains sync.Mutex
+    ```
+
+    for this method:
+
+    ```go
+    func (c Counter) Value() int {
+    	c.mu.Lock()
+    	defer c.mu.Unlock()
+    	return c.n
+    }
+    ```
+
+    What is the right fix?
+  options:
+    - text: "Give the method a pointer receiver, `func (c *Counter) Value() int`, so it locks the counter's own mutex"
+      correct: true
+    - text: "Nothing: vet's copylocks check is a style warning, and the code is correct as written"
+    - text: "Replace `sync.Mutex` with `sync.RWMutex`, which may be copied"
+    - text: "Call `c.mu.Lock()` in the caller before calling `Value`"
+  explanation: |
+    A value receiver gets a **copy** of the `Counter`, mutex included. Locking the copy
+    protects nothing: other goroutines lock the original, so reads and writes of `n` race.
+    That is why vet's **copylocks** analyzer reports any copy of a value containing a lock, and
+    its reports are real bugs. A pointer receiver uses the one shared mutex; and if one method
+    needs a pointer receiver, all of them should have one. An `RWMutex` must not be copied
+    either, and locking in the caller only moves the problem.
+
+- key: go-professional-20
+  type: single
+  category: go
+  tags: [go-vet, stdversion, go-mod, go-1.27]
+  prompt: |
+    A module's `go.mod` says `go 1.24`. A developer with Go 1.27 adds a call to
+    `strings.CutLast`, which is new in Go 1.27. `go build ./...` succeeds, but `go test ./...`
+    fails:
+
+    ```text
+    ./berth.go:7:25: strings.CutLast requires go1.27 or later (module is go1.24)
+    ```
+
+    Why?
+  options:
+    - text: "Since Go 1.27, `go test` runs vet's stdversion check, which reports standard library symbols newer than the module's `go` version; users on Go 1.24 could not build this code, so raise the `go` line or avoid the function"
+      correct: true
+    - text: "`go test` uses the Go 1.24 toolchain named in `go.mod`, while `go build` uses Go 1.27"
+    - text: "`strings.CutLast` only works in test files, so the build check runs only in `go test`"
+    - text: "It is a bug in Go 1.27: the build and the test should behave the same"
+  explanation: |
+    The compiler lets a newer toolchain use its newer standard library even when `go.mod`
+    names an older version, so `go build` passes on the developer's machine. But the `go` line
+    promises that the module works with Go 1.24, where `strings.CutLast` does not exist.
+    `go test` runs a high-confidence subset of vet on every build, and Go 1.27 added
+    **stdversion** to that subset. The fix is a decision: require Go 1.27 by raising the `go`
+    line (users then need 1.27), or keep 1.24 and write the code with `strings.LastIndex`.
+    The toolchain is not switched down: a `go` line is a minimum, and Go 1.27 runs both commands.

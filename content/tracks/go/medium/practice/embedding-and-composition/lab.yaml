@@ -1,0 +1,19 @@
+title: Picture Framer's Counter
+summary: Combine two interfaces by embedding, build a framed print on top of an embedded print with its own price and label, fill it with a Go 1.27 promoted-field literal, and wrap any item in a sale that changes only its price.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Declares Item from the two small interfaces
+    file: 02-item-interface.go
+    hidden: true
+  - name: Prices and labels framed prints with their own methods
+    file: 03-framed.go
+    hidden: true
+  - name: Takes a sale off the price of any item and keeps its label
+    file: 04-sales.go
+    hidden: true

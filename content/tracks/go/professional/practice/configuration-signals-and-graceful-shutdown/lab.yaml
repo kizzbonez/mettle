@@ -1,0 +1,19 @@
+title: Bell Ringers' Rota
+summary: Load a validated Config from defaults, environment variables and a FlagSet with the right precedence, map errors to exit codes, and shut an HTTP server down gracefully with a deadline.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Applies defaults, environment and flags in the right order
+    file: 02-precedence.go
+    hidden: true
+  - name: Rejects bad configuration with every problem and the right exit code
+    file: 03-validation-and-exit-codes.go
+    hidden: true
+  - name: Shuts down gracefully, gives up after the grace period and reports a failed server
+    file: 04-graceful-shutdown.go
+    hidden: true

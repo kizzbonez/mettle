@@ -1,0 +1,19 @@
+title: Ferris Wheel Shift Board
+summary: Declare a constant and variables with var and :=, work out the day's numbers from package-level variables, swap two values in one assignment, and print a zero value.
+language: go
+minutes: 15
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Prints the shift board for the starter's numbers
+    file: 01-shift-board.go
+    hidden: false
+  - name: Works out the gondolas and seats from today's numbers
+    file: 02-gondolas-and-seats.go
+    hidden: true
+  - name: Swaps the operator and the attendant themselves for the afternoon
+    file: 03-noon-swap.go
+    hidden: true
+  - name: Starts the ride count at zero and runs without an error
+    file: 04-rides-and-exit.go
+    hidden: true

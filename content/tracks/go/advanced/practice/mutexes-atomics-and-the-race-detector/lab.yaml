@@ -1,0 +1,19 @@
+title: Festival Wristband Desk
+summary: Protect a register of wristbands with a mutex inside its struct, count gate scans with an atomic integer, and load the site map exactly once with sync.OnceValue, all under the race detector with many goroutines at once.
+language: go
+minutes: 20
+timeLimitMs: 5000
+memoryMb: 768
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.go
+    hidden: false
+  - name: Issues, looks up and cancels wristbands from many desks at once
+    file: 02-register.go
+    hidden: true
+  - name: Counts every scan from many gates at once
+    file: 03-gate.go
+    hidden: true
+  - name: Loads the site map once, on first use, for everyone
+    file: 04-site-map.go
+    hidden: true
