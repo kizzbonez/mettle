@@ -38,5 +38,6 @@ export const config = {
     csharp: process.env.SANDBOX_IMAGE_CSHARP ?? 'mettle-sandbox-csharp:1',
     yaml: process.env.SANDBOX_IMAGE_YAML ?? 'mettle-sandbox-yaml:1',
     typescript: process.env.SANDBOX_IMAGE_TYPESCRIPT ?? 'mettle-sandbox-typescript:1',
+    go: process.env.SANDBOX_IMAGE_GO ?? 'mettle-sandbox-go:1',
   },
 } as const;

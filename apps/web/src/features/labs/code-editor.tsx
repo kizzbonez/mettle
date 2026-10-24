@@ -14,7 +14,7 @@ const origin = typeof window === 'undefined' ? '' : window.location.origin;
 loader.config({ paths: { vs: `${origin}/monaco/${monacoManifest.version}/vs` } });
 
 const MONACO_LANGUAGE: Record<LabLanguage, string> = {
-  rust: 'rust', python: 'python', bash: 'shell', cpp: 'cpp', csharp: 'csharp', yaml: 'yaml', typescript: 'typescript',
+  rust: 'rust', python: 'python', bash: 'shell', cpp: 'cpp', csharp: 'csharp', yaml: 'yaml', typescript: 'typescript', go: 'go',
 };
 const THEME = 'mettle-forge';
 
@@ -94,7 +94,8 @@ export function CodeEditor({ language, value, onChange, onRun, onSubmit, readOnl
         scrollBeyondLastLine: false,
         smoothScrolling: true,
         tabSize: language === 'bash' || language === 'yaml' || language === 'typescript' ? 2 : 4,
-        insertSpaces: true,
+        // gofmt indents Go with tabs.
+        insertSpaces: language !== 'go',
         renderWhitespace: 'selection',
         padding: { top: 14, bottom: 14 },
         automaticLayout: true,

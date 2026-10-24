@@ -117,6 +117,7 @@ services:
       sandbox-csharp: { condition: service_completed_successfully }
       sandbox-yaml: { condition: service_completed_successfully }
       sandbox-typescript: { condition: service_completed_successfully }
+      sandbox-go: { condition: service_completed_successfully }
 
   # The sandbox images. These services exist so that `up --build` builds them;
   # each container exits at once. The runner starts sandboxes from the images.
@@ -153,6 +154,11 @@ services:
   sandbox-typescript:
     build: ./sandbox/typescript
     image: mettle-sandbox-typescript:1
+    network_mode: none
+    restart: 'no'
+  sandbox-go:
+    build: ./sandbox/go
+    image: mettle-sandbox-go:1
     network_mode: none
     restart: 'no'
 

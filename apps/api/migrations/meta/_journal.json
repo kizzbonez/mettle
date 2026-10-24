@@ -29,6 +29,13 @@
       "when": 1792234254346,
       "tag": "0003_lab_typescript",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792855935971,
+      "tag": "0004_lab_go",
+      "breakpoints": true
     }
   ]
 }

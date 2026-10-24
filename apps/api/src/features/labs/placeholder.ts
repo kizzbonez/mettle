@@ -1,8 +1,9 @@
 /**
  * Starter code marks what the learner has to write with a placeholder that
  * fails when it runs: `todo!()` in Rust, `raise NotImplementedError` in
- * Python, `throw new NotImplementedException()` in C#, and
- * `throw new Error("Not implemented")` in TypeScript. Running the starter
+ * Python, `throw new NotImplementedException()` in C#,
+ * `throw new Error("Not implemented")` in TypeScript and
+ * `panic("not implemented")` in Go. Running the starter
  * untouched is the first thing most people do, so the reason shown says in
  * plain words what happened instead of echoing the language's own message.
  */
@@ -21,6 +22,11 @@ export function explainPlaceholder(message: string): string {
   if (typescript) {
     const what = typescript[1] ? `\`${typescript[1]}\`` : 'This part';
     return `${what} is not written yet: replace the starter's throw new Error("Not implemented") with your code.`;
+  }
+  const go = /^unexpected panic(?: in (\S+))?: not implemented$/.exec(message);
+  if (go) {
+    const what = go[1] ? `\`${go[1]}\`` : 'This part';
+    return `${what} is not written yet: replace the starter's panic("not implemented") with your code.`;
   }
   if (message.startsWith('unexpected NotImplementedException')) {
     return 'This part is not written yet: replace the starter\'s "throw new NotImplementedException()" with your code.';

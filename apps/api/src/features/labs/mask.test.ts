@@ -112,6 +112,27 @@ describe('failureMessage', () => {
     expect(failureMessage('typescript', result({ stderr: check }), 5000)).toBe('the area of a 3 by 3 square');
   });
 
+  it('reads the reasons a Go test fails for', () => {
+    const go = (overrides: Partial<StoredResult>) => failureMessage('go', result(overrides), 5000);
+    expect(go({ stderr: 'FAIL: the area of a 3 by 3 square\n  expected: 10\n  actual:   9' })).toBe('the area of a 3 by 3 square');
+    expect(go({ stderr: 'FAIL: unexpected panic in Cart.Add: not implemented\ngoroutine 20 [running]:' })).toBe(
+      '`Cart.Add` is not written yet: replace the starter\'s panic("not implemented") with your code.',
+    );
+    const race = [
+      '==================',
+      'WARNING: DATA RACE',
+      'Read at 0x00c000094328 by goroutine 12:',
+      '  lab.count.func1()',
+      '      /work/solution.go:9 +0x2e',
+    ].join('\n');
+    expect(go({ stderr: race, stdout: '--- FAIL: TestCase1 (0.00s)\n    testing.go:1867: race detected during execution of test' })).toBe(
+      'Data race at solution.go line 9: two goroutines used the same memory at once, at least one of them writing.',
+    );
+    expect(go({ stderr: 'panic: test timed out after 4.25s\n\trunning tests:\n\t\tTestCase7 (4s)', exitCode: 2 })).toMatch(/^Timed out after 4.25s: /);
+    expect(go({ stderr: 'panic: send on closed channel\n\ngoroutine 9 [running]:', exitCode: 2 })).toBe('A goroutine panicked: send on closed channel');
+    expect(go({ stdout: '--- FAIL: TestCase6 (0.00s)\n    case_6_test.go:5: the total of three prices\nFAIL' })).toBe('the total of three prices');
+  });
+
   it('leaves an ordinary failure message as the author wrote it', () => {
     const stderr = ["thread 'main' (59) panicked at main.rs:11:1:", 'a blank line is skipped, not counted as an error'].join('\n');
     expect(failureMessage('rust', result({ stderr }), 5000)).toBe('a blank line is skipped, not counted as an error');

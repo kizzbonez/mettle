@@ -167,7 +167,7 @@ retired item that is still shipped.
 slug: failed-login-triage
 title: Failed Login Triage
 summary: One sentence.
-language: bash               # rust | python | bash | cpp | csharp | yaml | typescript
+language: bash               # rust | python | bash | cpp | csharp | yaml | typescript | go
 minutes: 30
 timeLimitMs: 5000            # per test
 memoryMb: 128
@@ -222,6 +222,7 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
 | C#       | `solution.cs` | the body of an `async Task` method, so it may `await`. Declare the lab's types without a namespace so the test can name them. | `Check.True`, `Check.Equal`, `Check.SequenceEqual`, `Check.Throws<T>`, `Check.ThrowsAsync<T>`, an escaping exception |
 | YAML     | `solution.yaml` | a **Python** script. The file is already parsed: `doc` (first document), `docs` (all of them), `RAW` (the text), `at(doc, 'a.b.0')`, and the `yaml` module. | `assert`, raising |
 | TypeScript | `solution.ts` | a TypeScript **module**, type-checked strictly, that imports what it uses from `"./solution.js"` (so the learner `export`s it). `check`, `fail`, `printedBy`, `printedByAsync`, `runScript` and the type `Ran` are imported for it. It may `await` at the top level. | `check.equal`, `check.true`, `check.throws`, `check.rejects`, `fail`, an escaping exception, a type error |
+| Go       | `solution.go` | a Go **test file without its package clause**: its own `import`s and declarations, and one `func Test(t *testing.T) {` at the start of a line. It is compiled into the learner's package, so it sees unexported names. `testing` and `lab/check` are imported for it. | `check.Equal`, `check.True`, `check.Fail`, the other `check` helpers, `t.Errorf` / `t.Fatalf`, a panic, a data race |
 
 - Rust is compiled with `rustc --edition 2024`, standard library only. No crates.
   A Rust test can read what the code printed: `printed_by(|| greet("Ada"))` returns the text,
@@ -277,6 +278,50 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   `runScript(stdin, args)` runs the compiled learner file as a program (`.out`, `.err`,
   `.code`). A script-style lab should test through `runScript`, not by importing the file, which
   would run its top-level code inside the test. Stack traces point at `solution.ts` lines.
+- Go is Go 1.27 (with `encoding/json/v2`, `uuid`, `testing/synctest` and the rest of the
+  standard library), no other modules, no network. The tests are built with `go test -race -c`,
+  so `go vet`'s test checks run on the learner's file (a `Printf` verb that does not match its
+  argument stops the build, as it would locally) and **every test runs under the race
+  detector**: a data race fails the test even when its checks pass, and the reason names the
+  line of `solution.go`. The race detector makes code slower and hungrier, so keep workloads
+  small and set `memoryMb: 768`; it also refuses more than 8,128 live goroutines.
+  - The learner's file usually starts `package main`. A test calls its functions and methods
+    directly, exported or not. If the file also has a `func main()`, it is built as a program
+    too, and `check.RunScript(stdin, args...)` runs it, typing the input into it, and returns
+    `.Out`, `.Err` and `.Code`. A lab about a library can use another package name instead
+    (`package inventory`); the tests are compiled into whatever package the file declares.
+  - A test file looks like a test in a real `_test.go` file, without its package line:
+
+    ```go
+    import "strings"
+
+    func Test(t *testing.T) {
+    	got := shout("hi")
+    	check.Equal(got, "HI!", "shout of a short word")
+    	check.True(strings.HasSuffix(got, "!"), "ends with an exclamation mark")
+    }
+    ```
+
+    Line numbers in messages are the test file's own. All of a lab's test files are compiled
+    into one package, so top-level names a test declares (a fake type, a helper) must differ
+    from one test file to the next and from the learner's. Never import `testing` or
+    `lab/check` yourself, and an unused import is a compile error, as always in Go.
+  - `check.Equal(got, want, message)` compares deeply (slices, maps, structs, pointers' targets)
+    and treats a nil slice or map as equal to an empty one; `got` and `want` must have the same
+    type. Also `check.True`, `check.Near(got, want, tolerance, message)` for floats,
+    `check.NoError(err, message)`, `check.Error`, `check.ErrorIs(err, target, message)`,
+    `check.ErrorAs[*MyError](err, message)` (returns the error), `check.Panics(func, message)`
+    (returns the panic value), `check.Fail(message, detail...)`, and
+    `check.PrintedBy(func() { ... })`, which returns what the call printed to `os.Stdout`.
+    `t.Errorf` and `t.Fatalf` work too, and `t` is a real `*testing.T` (`t.Run`, `t.TempDir`,
+    `t.Context`, `synctest.Test(t, ...)`).
+  - A starter marks unwritten code with `panic("not implemented")`; the learner sees which
+    function is still unwritten. A starter must compile: no unused variables or imports.
+  - A panic inside a test fails it with the panic's value and the function of `solution.go` it
+    came from. A test that is still blocked shortly before its time limit is stopped by
+    `testing`'s own deadline, which prints where every goroutine is waiting.
+  - Don't let the learner's file declare `check`, `TestMain` or `TestCaseN` at package level:
+    the tests use those names. The compile output says so if it happens.
 - Where a helper takes both values, the order is actual, expected, message.
 - Each test is its own process with its own time limit.
 - Always give assertions a message: for hidden tests the message is all the learner sees.

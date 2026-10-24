@@ -81,6 +81,22 @@ describe('presentCompileOutput', () => {
     expect(shown).toContain('    1 | int total(int a) { return a; }');
   });
 
+  it('replaces the tests\' positions in Go output and keeps the learner file\'s', () => {
+    const go = ['# lab [lab.test]', './case_2_test.go:7:3: undefined: secretRule', './solution.go:4:2: declared and not used: total', 'FAIL\tlab [build failed]'].join('\n');
+    const shown = presentCompileOutput('go', go);
+    expect(shown).toContain('in a test: undefined: secretRule');
+    expect(shown).not.toContain('case_2_test.go');
+    expect(shown).toContain('./solution.go:4:2: declared and not used: total');
+    expect(shown).not.toContain('Note:');
+  });
+
+  it('explains a Go declaration that takes a name the tests use', () => {
+    const go = ['./solution.go:3:6: check redeclared in this block', '\t./case_1_test.go:6:2: other declaration of check'].join('\n');
+    const shown = presentCompileOutput('go', go);
+    expect(shown).toContain('\tin a test: other declaration of check');
+    expect(shown).toContain('Note: the tests use the names check, TestMain');
+  });
+
   it('does not touch languages whose check step only reads the learner file', () => {
     const python = '  File "solution.py", line 1\n    def broken(:\n               ^\nSyntaxError: invalid syntax';
     expect(presentCompileOutput('python', python)).toBe(python);

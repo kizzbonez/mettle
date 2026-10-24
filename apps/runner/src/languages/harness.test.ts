@@ -48,6 +48,40 @@ describe('typescript harness', () => {
   });
 });
 
+describe('go harness', () => {
+  const tests = [
+    { id: 'a', name: 'first', code: 'import "strings"\n\nfunc Test(t *testing.T) {\n\tTEST_BODY_A\n}' },
+    { id: 'b', name: 'second', code: 'func helper() {}' },
+  ];
+  const harness = languages.go.build(request({ language: 'go', code: 'package shop\n\nfunc main() {}\n', tests }), NONCE);
+
+  it('compiles each test into the learner package with its line numbers kept', () => {
+    const first = file(harness.files, 'case_1_test.go');
+    expect(first.split('\n')[0]).toBe('package shop');
+    expect(first).toContain('//line case_1_test.go:1\nimport "strings"');
+    expect(first).toContain('func TestCase1(t *testing.T) { defer check.Recover();\n\tTEST_BODY_A');
+    expect(file(harness.files, 'check/check.go')).toContain('func Equal[T any](got, want T, message string)');
+  });
+
+  it('fails a test file that has no func Test instead of passing it', () => {
+    expect(file(harness.files, 'case_2_test.go')).toContain('func TestCase2(t *testing.T) {\n\tcheck.Fail(');
+  });
+
+  it('builds the program only for package main, then deletes the test sources', () => {
+    const script = harness.compile?.[2] ?? '';
+    expect(script).toContain('go test -race -c -o lab.test .');
+    expect(script).not.toContain('go build');
+    expect(script).toContain('rm -rf case_*_test.go lab_main_test.go check');
+    const program = languages.go.build(request({ language: 'go', code: 'package main\n\nfunc main() {\n}\n' }), NONCE);
+    expect(program.compile?.[2]).toContain('go build -race -o program .');
+  });
+
+  it('runs one test per process under a deadline shorter than the time limit', () => {
+    expect(harness.tests[1]?.cmd).toEqual(['./lab.test', '-test.run=^TestCase2$', '-test.timeout=1250ms', '-test.paniconexit0']);
+    expect(file(harness.files, 'lab_main_test.go')).toContain(`WriteString("\\n${NONCE}\\n")`);
+  });
+});
+
 describe('rust harness', () => {
   const harness = languages.rust.build(request({ language: 'rust' }), NONCE);
 

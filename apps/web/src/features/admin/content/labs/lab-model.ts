@@ -16,6 +16,7 @@ export const TEST_HELP: Record<LabLanguage, string> = {
   csharp: 'Each test is the body of an async method, so it may await. Declare types without a namespace so the test can name them. Use Check.True(condition, message), Check.Equal(actual, expected, message), Check.SequenceEqual, Check.Throws<T> and Check.ThrowsAsync<T>.',
   yaml: 'Each test is a Python script. solution.yaml is already parsed: doc is the first document, docs is all of them, RAW is the text, and at(doc, "a.b.0") follows a path. Write plain assert statements, each with a message that says what was checked.',
   typescript: 'Each test is a TypeScript module, type-checked strictly. Import what it needs from "./solution.js" (the learner exports it). Use check.equal(actual, expected, message), check.true, check.throws, check.rejects, printedBy and runScript; a // @ts-expect-error line checks that the learner\'s types reject wrong code.',
+  go: 'Each test is a Go file without a package clause: its own imports and declarations, and one func Test(t *testing.T). It is compiled into the learner\'s package, so it sees unexported names; testing and lab/check are imported for it. Use check.Equal(got, want, message), check.True, check.Near, check.NoError, check.ErrorIs, check.ErrorAs, check.Panics, check.PrintedBy and check.RunScript. Every test runs under the race detector.',
 };
 
 export interface FixtureDraft {

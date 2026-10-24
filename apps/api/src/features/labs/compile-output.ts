@@ -51,7 +51,23 @@ function redactGcc(lines: string[]): string[] {
   return kept;
 }
 
-const redactors: Partial<Record<LabLanguage, (lines: string[]) => string[]>> = { rust: redactRust, cpp: redactGcc };
+const GO_TEST_FILE = /^(\s*)(?:\.\/)?(?:case_\d+_test|lab_main_test)\.go:\d+(?::\d+)?:/;
+const GO_HELPERS = /^(\s*)(?:\.\/)?check\/\w+\.go:\d+(?::\d+)?:/;
+const GO_HARNESS_NAME = /\b(?:check|TestMain|TestCase\d+) (?:redeclared|already declared)/;
+
+/**
+ * go: the compiler and vet quote no source, so only the tests' positions are replaced. A
+ * learner's declaration that takes a name the tests use gets a note saying so.
+ */
+function redactGo(lines: string[]): string[] {
+  const kept = lines.map((line) => line.replace(GO_TEST_FILE, `$1${IN_A_TEST}:`).replace(GO_HELPERS, '$1in the test helpers:'));
+  if (lines.some((line) => GO_HARNESS_NAME.test(line))) {
+    kept.push('', 'Note: the tests use the names check, TestMain and TestCase1, TestCase2 and so on. Give your own declaration another name.');
+  }
+  return kept;
+}
+
+const redactors: Partial<Record<LabLanguage, (lines: string[]) => string[]>> = { rust: redactRust, cpp: redactGcc, go: redactGo };
 
 export function presentCompileOutput(language: LabLanguage, output: string): string {
   const redact = redactors[language];

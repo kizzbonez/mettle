@@ -89,7 +89,30 @@ function typescriptMessage(stderr: string): string | null {
   return lines.at(-1) ?? null;
 }
 
-const extractors: Record<LabLanguage, (stderr: string) => string | null> = {
+/**
+ * Go: a failed check, or a panic inside a test, prints "FAIL: message". The race detector, a
+ * deadlock, testing's own deadline and a goroutine's panic have reports of their own, and
+ * t.Errorf goes to standard output as `case_N_test.go:LINE: message`.
+ */
+function goMessage(stderr: string, stdout: string): string | null {
+  const lines = nonEmptyLines(stderr);
+  const failed = lines.find((line) => line.startsWith('FAIL:'));
+  if (failed) return failed.replace(/^FAIL:\s*/, '');
+  if (stderr.includes('WARNING: DATA RACE')) {
+    const line = /\/solution\.go:(\d+)/.exec(stderr)?.[1];
+    return `Data race${line ? ` at solution.go line ${line}` : ''}: two goroutines used the same memory at once, at least one of them writing.`;
+  }
+  if (stderr.includes('all goroutines are asleep - deadlock!')) return 'Deadlock: every goroutine is blocked, waiting for something no other goroutine will do.';
+  const deadline = /^panic: test timed out after (\S+)/m.exec(stderr)?.[1];
+  if (deadline) return `Timed out after ${deadline}: the code is still running, or is blocked on a channel or a lock.`;
+  const panicked = lines.find((line) => line.startsWith('panic: '));
+  if (panicked) return `A goroutine panicked: ${panicked.replace(/^panic:\s*/, '').replace(/\s*\[recovered.*\]$/, '')}`;
+  const reported = nonEmptyLines(stdout).find((line) => /^\S+_test\.go:\d+: /.test(line));
+  if (reported) return reported.replace(/^\S+_test\.go:\d+:\s*/, '');
+  return lines.at(-1) ?? null;
+}
+
+const extractors: Record<LabLanguage, (stderr: string, stdout: string) => string | null> = {
   rust: rustMessage,
   python: pythonMessage,
   bash: bashMessage,
@@ -99,6 +122,7 @@ const extractors: Record<LabLanguage, (stderr: string) => string | null> = {
   // YAML labs are checked by Python scripts.
   yaml: pythonMessage,
   typescript: typescriptMessage,
+  go: goMessage,
 };
 
 /** Exit codes that mean the program crashed: 128 plus the signal that ended it. */
@@ -114,7 +138,7 @@ export function failureMessage(language: LabLanguage, result: StoredResult, time
   if (result.exitCode === KILLED) return 'The process was killed, most likely for using too much memory.';
   const crash = CRASHES[result.exitCode ?? 0];
   if (crash && !result.stderr.trim()) return crash;
-  const extracted = extractors[language](result.stderr);
+  const extracted = extractors[language](result.stderr, result.stdout);
   if (extracted) return explainPlaceholder(extracted).slice(0, MAX_MESSAGE);
   if (result.exitCode === 0) return 'The code exited before the test finished checking it.';
   return `The test failed (exit code ${result.exitCode ?? 'unknown'}).`;

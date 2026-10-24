@@ -1,0 +1,1 @@
+ALTER TYPE "public"."lab_language" ADD VALUE 'go';
