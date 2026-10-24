@@ -92,10 +92,11 @@ quick.
 | **Python Development** | Python Foundations | Idiomatic Python | The Data Model and Concurrency | Production Python |
 | **Data Analysis with NumPy and pandas** | NumPy Foundations | pandas Foundations | Analysing and Reshaping Data | Production Data Work |
 | **TypeScript Development** | TypeScript Foundations | Idiomatic TypeScript | Advanced Types and Async | Production TypeScript |
+| **Go Development** | Go Foundations | Idiomatic Go | Concurrency and Advanced Go | Production Go |
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** (Security+ SY0-801) | Security Foundations | Threats, Vulnerabilities and Attacks | Security Architecture and Controls | Security Operations and Program Management |
 
-329 lessons, 750 exam questions with explanations and 349 labs. Every lab is verified in the
+377 lessons, 846 exam questions with explanations and 401 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -155,6 +156,17 @@ and security. It was written from the TypeScript Handbook and release notes, the
 and MDN, with every example and compiler error run on TypeScript 7. Its question banks hold 94
 questions, and its labs are type-checked strictly before they run; many test the learner's
 **types** as well as their code: a call the types should reject must fail to compile.
+**Go Development is the eighth**: 48 lessons on Go 1.27 that start from what Go is, installing it
+and a first program, and go on to slices, maps, structs, pointers and errors as values, then
+packages and modules, methods, interfaces, embedding, generics (including Go 1.27's generic
+methods), iterators, testing, files, JSON (with `encoding/json/v2`) and time, then goroutines,
+channels, select, mutexes, context, concurrency patterns, `testing/synctest`, reflection and
+interface design, and finally HTTP servers and clients, slog, graceful shutdown, `database/sql`,
+profiling, security, shipping and static analysis. It was written from the Go specification,
+the package documentation, Effective Go, the Go blog and the release notes up to Go 1.27, with
+every example, compiler error and vet report run on Go 1.27.3. Its question banks hold 96
+questions, and every lab is built with `go test` and runs **under the race detector**, so a
+data race fails a test even when its checks pass.
 
 AI Development is still in the original short format (three lessons a level) and is next to be
 expanded.

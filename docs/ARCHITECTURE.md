@@ -87,7 +87,7 @@ cookies are first-party and there is no CORS surface.
 ## Secure code execution
 
 This is the part of the system that is attacked by design: any signed-in learner can submit
-arbitrary Rust, C++, C#, Python or shell code and the platform must run it.
+arbitrary Rust, C++, C#, Python, TypeScript, Go or shell code and the platform must run it.
 
 ### Lifecycle of a submission
 
