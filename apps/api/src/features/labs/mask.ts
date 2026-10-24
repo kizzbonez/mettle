@@ -1,4 +1,5 @@
 import type { LabLanguage } from '@mettle/shared';
+import { goMessage } from './mask-go';
 import { explainPlaceholder } from './placeholder';
 
 /**
@@ -86,29 +87,6 @@ function typescriptMessage(stderr: string): string | null {
   }
   const typeError = lines.find((line) => /error TS\d+:/.test(line));
   if (typeError) return `Type error: ${typeError.replace(/^.*error TS\d+:\s*/, '')}`;
-  return lines.at(-1) ?? null;
-}
-
-/**
- * Go: a failed check, or a panic inside a test, prints "FAIL: message". The race detector, a
- * deadlock, testing's own deadline and a goroutine's panic have reports of their own, and
- * t.Errorf goes to standard output as `case_N_test.go:LINE: message`.
- */
-function goMessage(stderr: string, stdout: string): string | null {
-  const lines = nonEmptyLines(stderr);
-  const failed = lines.find((line) => line.startsWith('FAIL:'));
-  if (failed) return failed.replace(/^FAIL:\s*/, '');
-  if (stderr.includes('WARNING: DATA RACE')) {
-    const line = /\/solution\.go:(\d+)/.exec(stderr)?.[1];
-    return `Data race${line ? ` at solution.go line ${line}` : ''}: two goroutines used the same memory at once, at least one of them writing.`;
-  }
-  if (stderr.includes('all goroutines are asleep - deadlock!')) return 'Deadlock: every goroutine is blocked, waiting for something no other goroutine will do.';
-  const deadline = /^panic: test timed out after (\S+)/m.exec(stderr)?.[1];
-  if (deadline) return `Timed out after ${deadline}: the code is still running, or is blocked on a channel or a lock.`;
-  const panicked = lines.find((line) => line.startsWith('panic: '));
-  if (panicked) return `A goroutine panicked: ${panicked.replace(/^panic:\s*/, '').replace(/\s*\[recovered.*\]$/, '')}`;
-  const reported = nonEmptyLines(stdout).find((line) => /^\S+_test\.go:\d+: /.test(line));
-  if (reported) return reported.replace(/^\S+_test\.go:\d+:\s*/, '');
   return lines.at(-1) ?? null;
 }
 

@@ -130,6 +130,20 @@ describe('failureMessage', () => {
     );
     expect(go({ stderr: 'panic: test timed out after 4.25s\n\trunning tests:\n\t\tTestCase7 (4s)', exitCode: 2 })).toMatch(/^Timed out after 4.25s: /);
     expect(go({ stderr: 'panic: send on closed channel\n\ngoroutine 9 [running]:', exitCode: 2 })).toBe('A goroutine panicked: send on closed channel');
+    const bubble = [
+      'panic: not implemented [recovered, repanicked]',
+      '',
+      'goroutine 22 [running, synctest bubble 1]:',
+      'panic({0x7ced80?, 0x644f30?})',
+      '\t/usr/local/go/src/runtime/panic.go:859 +0x125',
+      'lab.(*desk).serve(...)',
+      '\t/work/solution.go:5',
+      'lab.TestCase1.func1(0xc0000ea488?)',
+      '\t/work/case_1_test.go:6 +0x2c',
+    ].join('\n');
+    expect(go({ stderr: bubble, exitCode: 2 })).toBe('`desk.serve` is not written yet: replace the starter\'s panic("not implemented") with your code.');
+    const spawned = 'panic: boom\n\ngoroutine 23 [running]:\nlab.later.func2(...)\n\t/work/solution.go:7\ncreated by lab.TestCase2 in goroutine 22';
+    expect(go({ stderr: spawned, exitCode: 2 })).toBe('A goroutine panicked in later: boom');
     expect(go({ stdout: '--- FAIL: TestCase6 (0.00s)\n    case_6_test.go:5: the total of three prices\nFAIL' })).toBe('the total of three prices');
   });
 

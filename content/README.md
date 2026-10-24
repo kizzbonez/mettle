@@ -283,8 +283,10 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
   so `go vet`'s test checks run on the learner's file (a `Printf` verb that does not match its
   argument stops the build, as it would locally) and **every test runs under the race
   detector**: a data race fails the test even when its checks pass, and the reason names the
-  line of `solution.go`. The race detector makes code slower and hungrier, so keep workloads
-  small and set `memoryMb: 768`; it also refuses more than 8,128 live goroutines.
+  line of `solution.go`. The race detector makes code several times slower and hungrier for
+  memory, so keep workloads small (hundreds of goroutines, not millions) and set
+  `memoryMb: 768`. It also turns off Go's "all goroutines are asleep - deadlock!" check, so a
+  deadlocked test runs into its deadline instead.
   - The learner's file usually starts `package main`. A test calls its functions and methods
     directly, exported or not. If the file also has a `func main()`, it is built as a program
     too, and `check.RunScript(stdin, args...)` runs it, typing the input into it, and returns
@@ -302,10 +304,14 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
     }
     ```
 
-    Line numbers in messages are the test file's own. All of a lab's test files are compiled
+    Line numbers in messages are the test file's own. The tests that run together are compiled
     into one package, so top-level names a test declares (a fake type, a helper) must differ
-    from one test file to the next and from the learner's. Never import `testing` or
-    `lab/check` yourself, and an unused import is a compile error, as always in Go.
+    from one test file to the next and from the learner's. A hidden test may use a helper the
+    visible test declares, such as a fake database driver: *Run* builds the visible tests alone
+    and *Submit* builds them all, so the visible ones are always there. Never the other way
+    round. Never import `testing` or `lab/check` yourself, and an unused import is a compile
+    error, as always in Go. `solution.go` stays in the working directory while tests run, so a
+    test may parse it with `go/parser` to check how the code is written.
   - `check.Equal(got, want, message)` compares deeply (slices, maps, structs, pointers' targets)
     and treats a nil slice or map as equal to an empty one; `got` and `want` must have the same
     type. Also `check.True`, `check.Near(got, want, tolerance, message)` for floats,
