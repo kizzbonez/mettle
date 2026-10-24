@@ -2,6 +2,7 @@ import type { RunnerRequest } from '@mettle/shared';
 import { config } from '../config';
 import { GO_CHECK } from './go-check';
 import { GO_CHECK_RUN } from './go-check-run';
+import { GO_CHECK_TEXT } from './go-check-text';
 import type { Harness, LanguageSpec } from './types';
 
 const GO_MOD = 'module lab\n\ngo 1.27\n';
@@ -95,6 +96,7 @@ function build(request: RunnerRequest, nonce: string): Harness {
       { path: 'solution.go', content: request.code },
       { path: 'check/check.go', content: GO_CHECK },
       { path: 'check/run.go', content: GO_CHECK_RUN },
+      { path: 'check/text.go', content: GO_CHECK_TEXT },
       { path: 'lab_main_test.go', content: mainSource(pkg, nonce) },
       ...request.tests.map((test, i) => ({ path: `case_${i + 1}_test.go`, content: caseSource(pkg, test.code, i + 1) })),
       ...request.fixtures,

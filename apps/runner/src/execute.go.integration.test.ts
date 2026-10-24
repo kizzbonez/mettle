@@ -75,6 +75,14 @@ describe('go sandbox', () => {
     expect(result.tests[1]?.stderr).toContain('FAIL: unexpected panic in later: not implemented');
   });
 
+  it('shows texts of several lines one numbered line at a time', async () => {
+    const board = 'package main\n\nfunc board() string { return "Open\\nTea 2.50\\n" }\n';
+    const result = await execute(request(board, [test('\tcheck.Equal(board(), "Open\\nTea 2.40\\n", "the board")')]));
+    expect(result.tests[0]?.stderr).toBe(
+      ['FAIL: the board', '  expected:', '    1 "Open"', '    2 "Tea 2.40"', '    3 ""', '  actual:', '    1 "Open"', '    2 "Tea 2.50"', '    3 ""', '  first difference: line 2', ''].join('\n'),
+    );
+  });
+
   it('fails a test with a data race, even when its checks pass', async () => {
     const racy = 'package main\n\nimport "sync"\n\nfunc count() int {\n\tn := 0\n\tvar wg sync.WaitGroup\n\tfor range 20 {\n\t\twg.Go(func() { n++ })\n\t}\n\twg.Wait()\n\treturn n\n}\n';
     const result = await execute(request(racy, [test('\tcheck.True(count() > 0, "counts something")')]));

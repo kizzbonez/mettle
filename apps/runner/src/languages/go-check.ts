@@ -33,9 +33,13 @@ func True(condition bool, message string) {
 
 // Equal compares deeply, as reflect.DeepEqual does, except that a nil slice or map equals an empty one.
 func Equal[T any](got, want T, message string) {
-	if !same(reflect.ValueOf(&got).Elem(), reflect.ValueOf(&want).Elem(), 0) {
-		Fail(message, "  expected: "+show(want), "  actual:   "+show(got))
+	if same(reflect.ValueOf(&got).Elem(), reflect.ValueOf(&want).Elem(), 0) {
+		return
 	}
+	if g, w, ok := multiline(any(got), any(want)); ok {
+		Fail(message, textDetail(g, w)...)
+	}
+	Fail(message, "  expected: "+show(want), "  actual:   "+show(got))
 }
 
 // Near compares two floating-point numbers, which may differ by up to TOLERANCE.
