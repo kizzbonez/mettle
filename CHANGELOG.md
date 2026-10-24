@@ -4,6 +4,40 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-10-25
+
+Go Development, a full course, and Go as a lab language.
+
+### Added
+
+- **Go Development**: 48 lessons in four levels on Go 1.27, from zero, in the same full-course
+  format as the others. It starts from what Go is, installing it and a first program, and
+  teaches types, strings and runes, fmt, control flow, functions, slices, maps, structs,
+  pointers and errors as values; then packages and modules, methods, interfaces, embedding,
+  wrapped errors, defer and recover, generics (with Go 1.27's generic methods), the slices and
+  maps packages, iterators, testing, files, JSON (with `encoding/json/v2`) and time; then
+  goroutines, channels, select, mutexes and the race detector, context, concurrency patterns,
+  `testing/synctest`, reflection, advanced generics and interface design; and finally project
+  layout, HTTP servers and clients, slog, configuration and graceful shutdown, `database/sql`,
+  profiling, security, shipping and static analysis. Every example, compiler error, vet report
+  and panic was run on Go 1.27.3.
+  - Go Foundations (15 lessons), Idiomatic Go (13), Concurrency and Advanced Go (10) and
+    Production Go (10).
+  - 96 exam questions; each attempt at a level's mock exam draws ten.
+  - An end-of-level lab for each level, from a night market's takings report to a harbour's
+    moorings API, and a practice lab for every lesson.
+- **Go as a lab language**: Go 1.27 with the whole standard library. Each test is a Go test file
+  compiled into the learner's package with `go test -race -c`, so tests see unexported names,
+  `go vet`'s test checks run on the learner's file, and **every test runs under the race
+  detector**: a data race fails it even when its checks pass. Tests have `check.Equal` and the
+  other `check` helpers, `check.PrintedBy` and `check.RunScript` (a file with `func main` is also
+  built as a program), and a real `*testing.T`. A failed check on output of several lines shows
+  it one numbered line at a time and names the first line that differs. The image holds the standard library already
+  compiled for the race detector, so a lab builds in about two seconds. Hidden tests get plain
+  reasons for failed checks, unwritten starter functions (by name, even inside a synctest
+  bubble), data races (by line), timeouts and `t.Errorf`; compiler output hides the tests'
+  positions. The editor highlights Go and indents with tabs.
+
 ## [1.11.0] - 2026-10-17
 
 TypeScript Development, a full course, and TypeScript as a lab language.
