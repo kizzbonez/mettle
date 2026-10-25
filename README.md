@@ -93,10 +93,11 @@ quick.
 | **Data Analysis with NumPy and pandas** | NumPy Foundations | pandas Foundations | Analysing and Reshaping Data | Production Data Work |
 | **TypeScript Development** | TypeScript Foundations | Idiomatic TypeScript | Advanced Types and Async | Production TypeScript |
 | **Go Development** | Go Foundations | Idiomatic Go | Concurrency and Advanced Go | Production Go |
+| **Solidity Smart Contracts** | Solidity Foundations | Building Contracts | Smart Contract Security | Production Solidity |
 | **AI Development** | AI Foundations | Building with LLMs | Models Under the Hood | Production AI Systems |
 | **Cyber Security** (Security+ SY0-801) | Security Foundations | Threats, Vulnerabilities and Attacks | Security Architecture and Controls | Security Operations and Program Management |
 
-377 lessons, 846 exam questions with explanations and 401 labs. Every lab is verified in the
+421 lessons, 934 exam questions with explanations and 449 labs. Every lab is verified in the
 sandbox: its reference solution passes, its starter code does not. The whole curriculum is
 plain files under [`content/`](content/README.md) and is documented in
 [docs/CURRICULUM.md](docs/CURRICULUM.md).
@@ -167,6 +168,18 @@ the package documentation, Effective Go, the Go blog and the release notes up to
 every example, compiler error and vet report run on Go 1.27.3. Its question banks hold 96
 questions, and every lab is built with `go test` and runs **under the race detector**, so a
 data race fails a test even when its checks pass.
+**Solidity Smart Contracts is the ninth**: 44 lessons on Solidity 0.8.38 and Foundry for people who
+already program. It starts from zero on blockchains (accounts, transactions, gas and the EVM) and
+goes on to types, functions, custom errors, mappings, data locations, events, access control and
+payments; then interfaces, inheritance, libraries, ERC-20 and ERC-721 tokens, the ABI, gas, testing
+and deployment; then a security level built around real attacks (reentrancy, access control,
+rounding, front-running, oracle manipulation and flash loans, signature replay, proxy storage
+collisions, denial of service) and invariant testing; and finally gas optimisation, Yul, UUPS
+upgrades with ERC-7201 storage, ERC-4626 vaults, an AMM, ERC-4337 and EIP-7702, governance, audits,
+operations and the EVM roadmap. It was written from the Solidity documentation and changelog, the
+EIPs, the Foundry book and OpenZeppelin Contracts 5.7, with every example run in the sandbox. Its
+question banks hold 88 questions, and its labs run on Foundry's local EVM, with no blockchain and
+no money involved; in the security labs the hidden tests are attacker contracts that must fail.
 
 AI Development is still in the original short format (three lessons a level) and is next to be
 expanded.
