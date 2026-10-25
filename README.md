@@ -8,9 +8,9 @@ a sandbox.
 
 - **Exams that cannot be memorized.** A blueprint of rules draws a new paper from the question
   bank for every attempt, and freezes it so it can be reviewed exactly as it was sat.
-- **Labs that really run.** Rust, C++, C#, TypeScript and Go are compiled, Python is executed, shell
-  scripts are run against files and YAML is parsed, each in a single-use container with no
-  network, a read-only filesystem and hard limits.
+- **Labs that really run.** Rust, C++, C#, TypeScript, Go and Solidity are compiled, Python is
+  executed, shell scripts are run against files and YAML is parsed, each in a single-use
+  container with no network, a read-only filesystem and hard limits.
 - **A full platform around them.** Accounts with two-factor authentication, a learner portal with
   progress and a skill tree, and an admin panel for users, email and all of the content.
 
@@ -264,7 +264,7 @@ apps/api       Fastify API, Drizzle schema and migrations, content seeder
 apps/runner    sandbox orchestrator
 packages/shared types shared by all three
 content/       the curriculum as Markdown, YAML and real source files
-sandbox/       Dockerfiles for the sandbox images: Rust, Python, Bash, C++, C#, YAML, TypeScript, Go
+sandbox/       Dockerfiles for the sandbox images: Rust, Python, Bash, C++, C#, YAML, TypeScript, Go, Solidity
 e2e/           the browser tour
 docs/          architecture, schema, curriculum, user guide
 ```

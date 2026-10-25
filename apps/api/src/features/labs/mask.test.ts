@@ -147,6 +147,19 @@ describe('failureMessage', () => {
     expect(go({ stdout: '--- FAIL: TestCase6 (0.00s)\n    case_6_test.go:5: the total of three prices\nFAIL' })).toBe('the total of three prices');
   });
 
+  it('reads a Solidity failure without the values an assertion compared', () => {
+    const sol = (stderr: string) => failureMessage('solidity', result({ stderr }), 5000);
+    expect(sol("FAIL: other depositors' ether stays in the vault: 0 != 5000000000000000000\n  in test_vault()")).toBe(
+      "other depositors' ether stays in the vault",
+    );
+    expect(sol('FAIL: line 3: the total: 5 != 6\n  in test_total()')).toBe('line 3: the total');
+    expect(sol('FAIL: the fee stays under the cap: 30 > 25\n  in test_cap()')).toBe('the fee stays under the cap');
+    expect(sol('FAIL: assertion failed: 1 != 2\n  in test_x()')).toBe('An assertion failed (the test gave it no message).');
+    expect(sol('FAIL: panic: arithmetic underflow or overflow (0x11)\n  in testFuzz_half(uint8)')).toBe('panic: arithmetic underflow or overflow (0x11)');
+    expect(sol('FAIL: NotOwner()\n  in test_owner()')).toBe('NotOwner()');
+    expect(sol('FAIL: not implemented: fee\n  in test_fee()')).toBe('`fee` is not written yet: replace the starter\'s revert("not implemented") with your code.');
+  });
+
   it('leaves an ordinary failure message as the author wrote it', () => {
     const stderr = ["thread 'main' (59) panicked at main.rs:11:1:", 'a blank line is skipped, not counted as an error'].join('\n');
     expect(failureMessage('rust', result({ stderr }), 5000)).toBe('a blank line is skipped, not counted as an error');

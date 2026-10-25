@@ -36,6 +36,13 @@
       "when": 1792855935971,
       "tag": "0004_lab_go",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792905834408,
+      "tag": "0005_lab_solidity",
+      "breakpoints": true
     }
   ]
 }

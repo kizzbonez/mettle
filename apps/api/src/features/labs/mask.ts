@@ -1,5 +1,6 @@
 import type { LabLanguage } from '@mettle/shared';
 import { goMessage } from './mask-go';
+import { solidityMessage } from './mask-solidity';
 import { explainPlaceholder } from './placeholder';
 
 /**
@@ -101,6 +102,7 @@ const extractors: Record<LabLanguage, (stderr: string, stdout: string) => string
   yaml: pythonMessage,
   typescript: typescriptMessage,
   go: goMessage,
+  solidity: solidityMessage,
 };
 
 /** Exit codes that mean the program crashed: 128 plus the signal that ended it. */
@@ -117,7 +119,7 @@ export function failureMessage(language: LabLanguage, result: StoredResult, time
   const crash = CRASHES[result.exitCode ?? 0];
   if (crash && !result.stderr.trim()) return crash;
   const extracted = extractors[language](result.stderr, result.stdout);
-  if (extracted) return explainPlaceholder(extracted).slice(0, MAX_MESSAGE);
+  if (extracted) return explainPlaceholder(extracted, language).slice(0, MAX_MESSAGE);
   if (result.exitCode === 0) return 'The code exited before the test finished checking it.';
   return `The test failed (exit code ${result.exitCode ?? 'unknown'}).`;
 }

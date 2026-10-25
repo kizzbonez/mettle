@@ -58,7 +58,7 @@ function questionSection(question: ContentQuestion, index: number): string {
 }
 
 /** The language a lab's tests are written in. A YAML lab is checked by Python. */
-const TEST_FENCE: Record<LabLanguage, string> = { rust: 'rust', python: 'python', bash: 'bash', cpp: 'cpp', csharp: 'csharp', yaml: 'python', typescript: 'typescript', go: 'go' };
+const TEST_FENCE: Record<LabLanguage, string> = { rust: 'rust', python: 'python', bash: 'bash', cpp: 'cpp', csharp: 'csharp', yaml: 'python', typescript: 'typescript', go: 'go', solidity: 'solidity' };
 
 function labSection(lab: ContentLab, where: string): string {
   const ext = LAB_SOLUTION_FILE[lab.language].split('.').pop();

@@ -118,6 +118,7 @@ services:
       sandbox-yaml: { condition: service_completed_successfully }
       sandbox-typescript: { condition: service_completed_successfully }
       sandbox-go: { condition: service_completed_successfully }
+      sandbox-solidity: { condition: service_completed_successfully }
 
   # The sandbox images. These services exist so that `up --build` builds them;
   # each container exits at once. The runner starts sandboxes from the images.
@@ -159,6 +160,11 @@ services:
   sandbox-go:
     build: ./sandbox/go
     image: mettle-sandbox-go:1
+    network_mode: none
+    restart: 'no'
+  sandbox-solidity:
+    build: ./sandbox/solidity
+    image: mettle-sandbox-solidity:1
     network_mode: none
     restart: 'no'
 

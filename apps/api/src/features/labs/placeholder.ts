@@ -1,13 +1,21 @@
+import type { LabLanguage } from '@mettle/shared';
+
 /**
  * Starter code marks what the learner has to write with a placeholder that
  * fails when it runs: `todo!()` in Rust, `raise NotImplementedError` in
  * Python, `throw new NotImplementedException()` in C#,
- * `throw new Error("Not implemented")` in TypeScript and
- * `panic("not implemented")` in Go. Running the starter
- * untouched is the first thing most people do, so the reason shown says in
- * plain words what happened instead of echoing the language's own message.
+ * `throw new Error("Not implemented")` in TypeScript,
+ * `panic("not implemented")` in Go and `revert("not implemented: name")` in
+ * Solidity. Running the starter untouched is the first thing most people do,
+ * so the reason shown says in plain words what happened instead of echoing
+ * the language's own message.
  */
-export function explainPlaceholder(message: string): string {
+export function explainPlaceholder(message: string, language: LabLanguage): string {
+  const solidity = language === 'solidity' ? /^not implemented(?::\s*(.+))?$/.exec(message) : null;
+  if (solidity) {
+    const what = solidity[1] ? `\`${solidity[1]}\`` : 'This part';
+    return `${what} is not written yet: replace the starter's revert("not implemented") with your code.`;
+  }
   const rust = /^not (?:yet )?implemented(?::\s*(.+))?$/.exec(message);
   if (rust) {
     const what = rust[1] ? `\`${rust[1]}\`` : 'This part';

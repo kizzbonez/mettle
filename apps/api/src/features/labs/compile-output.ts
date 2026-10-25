@@ -13,14 +13,17 @@ import type { LabLanguage } from '@mettle/shared';
 const EXCERPT = /^\s*\d*\s*\|/;
 const IN_A_TEST = 'in a test';
 
-/** rustc: `--> file:line:col` opens an excerpt; `= note:` and `= help:` lines belong to it. */
-function redactRust(lines: string[]): string[] {
+/**
+ * rustc and solc: `--> file:line:col` opens an excerpt; `= note:` and `= help:` lines belong to
+ * it. Excerpts of the files the harness generated are dropped.
+ */
+function redactExcerpts(lines: string[], isHarness: (file: string) => boolean): string[] {
   const kept: string[] = [];
   let inHarness = false;
   for (const line of lines) {
     const location = line.match(/^(\s*(?:-->|:::)\s+)(\S+?):\d+/);
     if (location) {
-      inHarness = location[2] === 'main.rs';
+      inHarness = isHarness(location[2] ?? '');
       kept.push(inHarness ? `${location[1]}${IN_A_TEST}` : line);
     } else if (line.trim() === '') {
       inHarness = false;
@@ -67,7 +70,20 @@ function redactGo(lines: string[]): string[] {
   return kept;
 }
 
-const redactors: Partial<Record<LabLanguage, (lines: string[]) => string[]>> = { rust: redactRust, cpp: redactGcc, go: redactGo };
+const redactRust = (lines: string[]) => redactExcerpts(lines, (file) => file === 'main.rs');
+
+/** forge prints solc's diagnostics; the tests live in test/. Its own notes about them are dropped too. */
+function redactSolidity(lines: string[]): string[] {
+  const kept = lines.filter((line) => !line.startsWith('Warning: dynamic test linking'));
+  return redactExcerpts(kept, (file) => file.startsWith('test/'));
+}
+
+const redactors: Partial<Record<LabLanguage, (lines: string[]) => string[]>> = {
+  rust: redactRust,
+  cpp: redactGcc,
+  go: redactGo,
+  solidity: redactSolidity,
+};
 
 export function presentCompileOutput(language: LabLanguage, output: string): string {
   const redact = redactors[language];

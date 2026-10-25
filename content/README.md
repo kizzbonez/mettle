@@ -167,7 +167,7 @@ retired item that is still shipped.
 slug: failed-login-triage
 title: Failed Login Triage
 summary: One sentence.
-language: bash               # rust | python | bash | cpp | csharp | yaml | typescript | go
+language: bash               # rust | python | bash | cpp | csharp | yaml | typescript | go | solidity
 minutes: 30
 timeLimitMs: 5000            # per test
 memoryMb: 128
@@ -223,6 +223,7 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
 | YAML     | `solution.yaml` | a **Python** script. The file is already parsed: `doc` (first document), `docs` (all of them), `RAW` (the text), `at(doc, 'a.b.0')`, and the `yaml` module. | `assert`, raising |
 | TypeScript | `solution.ts` | a TypeScript **module**, type-checked strictly, that imports what it uses from `"./solution.js"` (so the learner `export`s it). `check`, `fail`, `printedBy`, `printedByAsync`, `runScript` and the type `Ran` are imported for it. It may `await` at the top level. | `check.equal`, `check.true`, `check.throws`, `check.rejects`, `fail`, an escaping exception, a type error |
 | Go       | `solution.go` | a Go **test file without its package clause**: its own `import`s and declarations, and one `func Test(t *testing.T) {` at the start of a line. It is compiled into the learner's package, so it sees unexported names. `testing` and `lab/check` are imported for it. | `check.Equal`, `check.True`, `check.Fail`, the other `check` helpers, `t.Errorf` / `t.Fatalf`, a panic, a data race |
+| Solidity | `solution.sol` | a Solidity file **without its license line, pragma or imports**: contracts that inherit forge-std's `Test`, with `test...` functions (and helper contracts, such as an attacker). forge-std's `Test`, `Vm`, `console`, `stdError` and `StdInvariant` and the learner's file are imported for it. Every test function in the file must pass. | `assertEq` and the other forge-std assertions, `vm.expectRevert`, any revert or panic |
 
 - Rust is compiled with `rustc --edition 2024`, standard library only. No crates.
   A Rust test can read what the code printed: `printed_by(|| greet("Ada"))` returns the text,
@@ -328,6 +329,48 @@ Each test file is a *body*, not a whole program. The runner wraps it in a harnes
     `testing`'s own deadline, which prints where every goroutine is waiting.
   - Don't let the learner's file declare `check`, `TestMain` or `TestCaseN` at package level:
     the tests use those names. The compile output says so if it happens.
+- Solidity is solc 0.8.38 (EVM version `osaka`, optimizer off) with Foundry 1.8.6, forge-std
+  1.17 and OpenZeppelin Contracts 5.7 (`import {ERC20} from "@openzeppelin/contracts/..."`).
+  Contracts run on forge's own local EVM: no blockchain, no network, no wallets. The project is
+  built once with `forge build`, then each test file runs alone with
+  `forge test --match-path test/CaseN.t.sol -vv`, so `setUp` and every `test...` function in it
+  run, each call as its own transaction (`isolate = true`).
+  - The learner's file is `src/solution.sol` with its own license line and pragma (use
+    `pragma solidity ^0.8.24;` or later). A starter marks unwritten code with
+    `revert("not implemented: <function>");`, which the learner sees explained in plain words.
+    A starter must compile; unused-parameter warnings are fine.
+  - A test file looks like this; its line numbers in messages are the file's own:
+
+    ```solidity
+    contract DepositTest is Test {
+        Vault vault;
+
+        function setUp() public {
+            vault = new Vault();
+        }
+
+        function test_records_a_deposit() public {
+            vm.deal(address(this), 1 ether);
+            vault.deposit{value: 1 ether}();
+            assertEq(vault.balanceOf(address(this)), 1 ether, "the balance after a deposit");
+        }
+    }
+    ```
+
+  - Give every assertion a message. forge-std's reasons end with both values
+    (`the balance after a deposit: 0 != 1000000000000000000`); a hidden test shows only the
+    message before them. A revert's own reason, a custom error such as `NotOwner()` and a panic
+    (`panic: arithmetic underflow or overflow (0x11)`) are shown as they are. `console.log` and
+    a fuzz test's counterexample appear in a visible test's output.
+  - Top-level contract names in a test file must not clash with the learner's. All test files
+    are compiled together, but each runs alone, so a hidden test cannot use a contract that only
+    another test file declares; put shared helpers in each file that needs them.
+  - Fuzz tests (`function testFuzz_x(uint96 amount)`) use a fixed seed, so a run is
+    reproducible: 256 runs by default. Invariant tests run 64 times with a depth of 32; raise
+    either with an inline `/// forge-config: default.fuzz.runs = 500` comment when it matters.
+  - Contracts may read fixtures in `data/` (`vm.readFile("data/prices.json")`) and nothing
+    else; `ffi` is off. A learner's contract cannot skip its own test.
+  - Set `timeLimitMs: 8000` and `memoryMb: 512`. A test file usually takes 0.2 to 0.5 s.
 - Where a helper takes both values, the order is actual, expected, message.
 - Each test is its own process with its own time limit.
 - Always give assertions a message: for hidden tests the message is all the learner sees.

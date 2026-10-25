@@ -82,6 +82,26 @@ describe('go harness', () => {
   });
 });
 
+describe('solidity harness', () => {
+  const harness = languages.solidity.build(request({ language: 'solidity' }), NONCE);
+
+  it('puts the learner file in src/ and the imports on each test file\'s first line', () => {
+    expect(file(harness.files, 'src/solution.sol')).toBe('LEARNER_CODE');
+    const test = file(harness.files, 'test/Case2.t.sol');
+    expect(test.split('\n')).toHaveLength(2);
+    expect(test).toMatch(/^\/\* SPDX-License-Identifier: UNLICENSED \*\/ pragma solidity .*import "\.\.\/src\/solution\.sol"; TEST_BODY_B\n$/);
+    expect(file(harness.files, 'foundry.toml')).toContain('offline = true');
+  });
+
+  it('builds once, then runs each test file alone and prints the nonce only when every test passed', () => {
+    expect(harness.compile).toEqual(['forge', 'build']);
+    const script = harness.tests[1]?.cmd.at(-1) ?? '';
+    expect(script).toContain('forge test --match-path test/Case2.t.sol -vv --json');
+    expect(script).toContain(`jq -e -f .lab/passed.jq /tmp/case_2.json > /dev/null; then printf '\\n%s\\n' '${NONCE}'`);
+    expect(file(harness.files, '.lab/passed.jq')).toContain('all(.status == "Success")');
+  });
+});
+
 describe('rust harness', () => {
   const harness = languages.rust.build(request({ language: 'rust' }), NONCE);
 

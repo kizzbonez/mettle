@@ -39,5 +39,6 @@ export const config = {
     yaml: process.env.SANDBOX_IMAGE_YAML ?? 'mettle-sandbox-yaml:1',
     typescript: process.env.SANDBOX_IMAGE_TYPESCRIPT ?? 'mettle-sandbox-typescript:1',
     go: process.env.SANDBOX_IMAGE_GO ?? 'mettle-sandbox-go:1',
+    solidity: process.env.SANDBOX_IMAGE_SOLIDITY ?? 'mettle-sandbox-solidity:1',
   },
 } as const;

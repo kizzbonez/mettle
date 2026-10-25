@@ -14,7 +14,7 @@ const origin = typeof window === 'undefined' ? '' : window.location.origin;
 loader.config({ paths: { vs: `${origin}/monaco/${monacoManifest.version}/vs` } });
 
 const MONACO_LANGUAGE: Record<LabLanguage, string> = {
-  rust: 'rust', python: 'python', bash: 'shell', cpp: 'cpp', csharp: 'csharp', yaml: 'yaml', typescript: 'typescript', go: 'go',
+  rust: 'rust', python: 'python', bash: 'shell', cpp: 'cpp', csharp: 'csharp', yaml: 'yaml', typescript: 'typescript', go: 'go', solidity: 'sol',
 };
 const THEME = 'mettle-forge';
 

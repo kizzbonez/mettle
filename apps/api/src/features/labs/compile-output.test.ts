@@ -97,6 +97,29 @@ describe('presentCompileOutput', () => {
     expect(shown).toContain('Note: the tests use the names check, TestMain');
   });
 
+  it('removes the quoted test lines from forge output and keeps the learner file\'s', () => {
+    const forge = [
+      'Warning: dynamic test linking disabled for 1 files: error: unresolved symbol `secretRule`',
+      'Error: Compiler run failed:',
+      'Error (7576): Undeclared identifier.',
+      '  --> test/Case2.t.sol:34:53:',
+      '   |',
+      '34 | contract Case2 is Test { function test_x() public { secretRule(41); } }',
+      '   |                                                     ^^^^^^^^^^',
+      '',
+      'Warning (5667): Unused function parameter.',
+      '  --> src/solution.sol:19:18:',
+      '   |',
+      '19 |     function fee(uint256 amount) external pure returns (uint256) {',
+      '   |                  ^^^^^^^^^^^^^^',
+    ].join('\n');
+    const shown = presentCompileOutput('solidity', forge);
+    expect(shown).not.toContain('secretRule');
+    expect(shown).toContain('Error (7576): Undeclared identifier.');
+    expect(shown).toContain('  --> in a test');
+    expect(shown).toContain('19 |     function fee(uint256 amount) external pure returns (uint256) {');
+  });
+
   it('does not touch languages whose check step only reads the learner file', () => {
     const python = '  File "solution.py", line 1\n    def broken(:\n               ^\nSyntaxError: invalid syntax';
     expect(presentCompileOutput('python', python)).toBe(python);

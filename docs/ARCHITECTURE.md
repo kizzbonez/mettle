@@ -87,7 +87,7 @@ cookies are first-party and there is no CORS surface.
 ## Secure code execution
 
 This is the part of the system that is attacked by design: any signed-in learner can submit
-arbitrary Rust, C++, C#, Python, TypeScript, Go or shell code and the platform must run it.
+arbitrary Rust, C++, C#, Python, TypeScript, Go, Solidity or shell code and the platform must run it.
 
 ### Lifecycle of a submission
 
@@ -178,6 +178,7 @@ in a harness, so authors write assertions and nothing else.
 | YAML     | `solution.yaml` | a Python script with the parsed file in scope | a strict parse: invalid YAML or a repeated key stops the run | `python case_N.py` |
 | TypeScript | `solution.ts` | a module that imports the learner's exports, with the helpers imported for it | `tsc` (TypeScript 7) strict on the learner's file, then on each test alone; the test sources are then deleted | `node lab_run.mjs out/case_N.js` |
 | Go | `solution.go` | a `_test.go` file in the learner's package, its `func Test` renamed `TestCaseN` | `go test -race -c` (vet included) against a read-only cache of the compiled standard library, and `go build -race` when the file is a program; the test sources are then deleted | `./lab.test -test.run=^TestCaseN$` |
+| Solidity | `src/solution.sol` | a test file of contracts that inherit forge-std's `Test`, with the imports added on its first line | `forge build` (solc 0.8.38, offline, with forge-std and OpenZeppelin) | `forge test --match-path test/CaseN.t.sol --json`, judged by jq |
 
 C++ labs are built with sanitizers on purpose: a use-after-free, an out-of-bounds access, a leak
 or a signed overflow ends the test with a report instead of passing by luck. A YAML lab has no
@@ -185,7 +186,9 @@ program to run, so its tests are Python scripts that check what the learner's fi
 TypeScript tests are type-checked one by one, so a test can check the learner's types: a
 `@ts-expect-error` line that the learner's types no longer need fails that test alone.
 Go labs are built with the race detector on purpose, as C++ labs are built with sanitizers: a
-data race fails the test even when every check passed.
+data race fails the test even when every check passed. Solidity contracts run on forge's own
+local EVM; a test passes only when every test function in it succeeded, so a contract that
+tries to skip its own test fails it.
 
 When a compiled submission does not fit its tests (a missing function, a wrong parameter type),
 the compiler quotes the offending line of the test. Those excerpts are removed before the
