@@ -8,7 +8,9 @@
  * Offline, with the pinned compiler and the libraries in the image. A fixed fuzz seed makes fuzz
  * and invariant tests reproducible; the linter and dynamic test linking would only add noise to
  * a learner's build output. Contracts may read fixtures in data/ and nothing else. Foundry hides
- * solc's warning that `send` and `transfer` are deprecated; a learner should see it.
+ * solc's warning that `send` and `transfer` are deprecated; a learner should see it. Each call a
+ * test makes is its own transaction (isolate, Foundry's default since 1.0, pinned): transient
+ * storage is cleared between them and gas is charged as on a real chain.
  */
 export const FOUNDRY_TOML = `[profile.default]
 src = "src"
@@ -28,6 +30,7 @@ dynamic_test_linking = false
 ffi = false
 fs_permissions = [{ access = "read", path = "./data" }]
 ignored_error_codes = ["license", "code-size", "init-code-size", "transient-storage"]
+isolate = true
 
 [fuzz]
 seed = "0x1"
