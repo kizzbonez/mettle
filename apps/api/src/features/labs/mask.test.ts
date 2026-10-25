@@ -153,6 +153,7 @@ describe('failureMessage', () => {
       "other depositors' ether stays in the vault",
     );
     expect(sol('FAIL: line 3: the total: 5 != 6\n  in test_total()')).toBe('line 3: the total');
+    expect(sol('FAIL: the tokenURI of tree 2: https://orchard.example/trees2 != https://orchard.example/trees/2')).toBe('the tokenURI of tree 2');
     expect(sol('FAIL: the fee stays under the cap: 30 > 25\n  in test_cap()')).toBe('the fee stays under the cap');
     expect(sol('FAIL: assertion failed: 1 != 2\n  in test_x()')).toBe('An assertion failed (the test gave it no message).');
     expect(sol('FAIL: panic: arithmetic underflow or overflow (0x11)\n  in testFuzz_half(uint8)')).toBe('panic: arithmetic underflow or overflow (0x11)');

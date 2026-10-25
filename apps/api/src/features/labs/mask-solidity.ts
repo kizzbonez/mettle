@@ -7,16 +7,21 @@
 
 const nonEmptyLines = (text: string) => text.split('\n').map((line) => line.trim()).filter(Boolean);
 
-/** The values part of a forge-std assertion: "0 != 5", "3 <= 4", "1 !~= 2 (max delta: ...)". */
-const COMPARED = /^[^:]*? (?:!=|==|<=|>=|<|>|!~=) /;
+/** The operator in the values part of a forge-std assertion: "0 != 5", "3 <= 4", "1 !~= 2 (...)". */
+const COMPARED = / (?:!=|==|<=|>=|<|>|!~=) /;
 
-/** The message the test's author gave an assertion, without the values it compared. */
+/**
+ * The message the test's author gave an assertion, without the values it compared: everything
+ * before the last ": " that still has a comparison after it. Values may hold colons (a URL) and
+ * so may messages ("line 3: the total"), but a value rarely holds ": ".
+ */
 export function withoutValues(reason: string): string {
   if (/^assertion failed(?::|$)/.test(reason)) return 'An assertion failed (the test gave it no message).';
+  let cut = -1;
   for (let at = reason.indexOf(': '); at >= 0; at = reason.indexOf(': ', at + 2)) {
-    if (COMPARED.test(reason.slice(at + 2))) return reason.slice(0, at);
+    if (COMPARED.test(reason.slice(at + 2))) cut = at;
   }
-  return reason;
+  return cut >= 0 ? reason.slice(0, cut) : reason;
 }
 
 /**
