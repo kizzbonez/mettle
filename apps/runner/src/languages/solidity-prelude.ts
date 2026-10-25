@@ -52,18 +52,34 @@ export const TEST_HEADER =
   '/* SPDX-License-Identifier: UNLICENSED */ pragma solidity ^0.8.24; ' +
   'import {Test, Vm, console, stdError, StdInvariant} from "forge-std/Test.sol"; import "../src/solution.sol"; ';
 
-/** One line per test function, its logs and any fuzz counterexample: what a visible test shows. */
-export const REPORT_JQ = `to_entries[] | .value.test_results | to_entries[] |
-  (if .value.status == "Success" then "[PASS] " else "[FAIL] " end) + .key
-    + (if .value.reason then ": " + .value.reason else "" end),
-  (.value.decoded_logs[]? | "    " + .),
-  (.value.counterexample // empty | .. | objects | select(has("args")) | "    counterexample: args=[" + .args + "]")
+/**
+ * One line per test function, its logs and any fuzz counterexample: what a visible test shows.
+ * A contract's invariants run as one campaign, reported under one of their names with no reason
+ * of its own: each invariant's result is in invariant_predicate_results, and each broken one, with
+ * the calls that broke it, in invariant_failures.
+ */
+export const REPORT_JQ = `to_entries[] | .value.test_results | to_entries[] | .key as $name | .value as $t |
+  (if ($t.invariant_predicate_results // []) != [] then
+    ($t.invariant_predicate_results[] | (if .status == "Success" then "[PASS] " else "[FAIL] " end) + .name + "()"
+      + (if .reason then ": " + .reason else "" end))
+  else
+    (if $t.status == "Success" then "[PASS] " else "[FAIL] " end) + $name + (if $t.reason then ": " + $t.reason else "" end)
+  end),
+  ($t.invariant_failures[]? | "    " + .name + " broke after: "
+    + ([.counterexample | .. | objects | select(has("func_name")) | .func_name + "(" + (.args // "") + ")"] | join(", "))),
+  ($t.decoded_logs[]? | "    " + .),
+  ($t.counterexample // empty | .. | objects | select(has("args")) | "    counterexample: args=[" + .args + "]")
 `;
 
-/** "FAIL: reason" for each failed test function: the first line is a hidden test's reason. */
+/** "FAIL: reason" for each failed test function or broken invariant: the first is a hidden test's reason. */
 export const FAILURES_JQ = `to_entries[] | .value.test_results | to_entries[] | select(.value.status != "Success") |
-  "FAIL: " + (.value.reason // (if .value.status == "Skipped" then "the test was skipped" else "the test failed" end)),
-  "  in " + .key
+  .key as $name | .value as $t |
+  if ($t.invariant_failures // []) != [] then
+    ($t.invariant_failures[] | "FAIL: " + (.reason // "an invariant was broken"), "  in " + (.name // $name))
+  else
+    "FAIL: " + ($t.reason // (if $t.status == "Skipped" then "the test was skipped" else "the test failed" end)),
+    "  in " + $name
+  end
 `;
 
 /** Passed: at least one test function ran, and every one succeeded (a skipped one does not count). */

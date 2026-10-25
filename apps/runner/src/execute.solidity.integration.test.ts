@@ -100,6 +100,50 @@ describe('solidity sandbox', () => {
     expect(result.tests[1]?.stdout).toMatch(/counterexample: args=\[\d+\]/);
   });
 
+  it('reports which invariant broke, its reason and the calls that broke it', async () => {
+    const pot = 'pragma solidity ^0.8.24;\n\ncontract Pot {\n    uint256 public total;\n\n    function add(uint256 amount) external {\n        if (amount != 7) total += amount;\n    }\n}\n';
+    const invariants = [
+      'contract PotHandler is Test {',
+      '    Pot public pot;',
+      '    uint256 public ghost;',
+      '',
+      '    constructor(Pot p) {',
+      '        pot = p;',
+      '    }',
+      '',
+      '    function add(uint256 amount) external {',
+      '        amount = bound(amount, 1, 10);',
+      '        pot.add(amount);',
+      '        ghost += amount;',
+      '    }',
+      '}',
+      '',
+      'contract PotInvariants is StdInvariant, Test {',
+      '    Pot pot;',
+      '    PotHandler handler;',
+      '',
+      '    function setUp() public {',
+      '        pot = new Pot();',
+      '        handler = new PotHandler(pot);',
+      '        targetContract(address(handler));',
+      '    }',
+      '',
+      '    function invariant_a_never_negative() public view {',
+      '        assertGe(pot.total(), 0, "the total is never negative");',
+      '    }',
+      '',
+      '    function invariant_b_matches_ghost() public view {',
+      '        assertEq(pot.total(), handler.ghost(), "the total against the handler\'s ghost");',
+      '    }',
+      '}',
+    ].join('\n');
+    const result = await execute(request(pot, [invariants]));
+    expect(result.status).toBe('failed');
+    expect(result.tests[0]?.stderr).toMatch(/^FAIL: the total against the handler's ghost: \d+ != \d+\n {2}in invariant_b_matches_ghost/);
+    expect(result.tests[0]?.stdout).toContain('[PASS] invariant_a_never_negative()');
+    expect(result.tests[0]?.stdout).toMatch(/invariant_b_matches_ghost broke after: .*add\(7\)/);
+  });
+
   it('does not let the learner contract skip its test', async () => {
     const result = await execute(request(vault, ['contract SkipTest is Test {\n    function test_x() public {\n        new Vault().skipMyTest();\n        assertTrue(false, "never reached");\n    }\n}']));
     expect(result.status).toBe('failed');
