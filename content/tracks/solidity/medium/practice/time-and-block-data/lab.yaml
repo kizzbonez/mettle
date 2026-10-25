@@ -1,0 +1,19 @@
+title: Boatyard Apprentice Bonus
+summary: Vest an apprentice's bonus over time with a cliff, compute the vested amount at any timestamp without rounding or underflow errors, pay it out with a weekly cooldown, and test the schedule with vm.warp.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Computes the vested amount at every point of the schedule
+    file: 02-schedule.sol
+    hidden: true
+  - name: Pays out only what has vested, safely, to the apprentice alone
+    file: 03-release.sol
+    hidden: true
+  - name: Keeps a week between releases, but not before the first
+    file: 04-cooldown.sol
+    hidden: true

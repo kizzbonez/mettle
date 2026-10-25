@@ -1,0 +1,19 @@
+title: Smart Contract Security
+summary: >-
+  Think like an attacker so your contracts survive one. Threat-model a contract, then find and
+  fix the bugs that have drained real protocols: reentrancy, broken access control, rounding
+  and precision errors, front-running, oracle manipulation with flash loans, signature replay,
+  delegatecall and proxy storage collisions, denial of service and unsafe tokens, and prove the
+  fixes with attack tests, invariant tests and security tools.
+outcomes:
+  - Threat-model a contract and write attack tests that prove a vulnerability
+  - Prevent reentrancy, access control flaws and arithmetic and rounding bugs
+  - Defend against front-running, oracle manipulation, flash loans and signature replay
+  - Explain delegatecall and proxy storage layout, and avoid denial of service and unsafe token behaviour
+  - Use invariant testing and security tools to find bugs before attackers do
+exam:
+  title: Smart Contract Security Mock Exam
+  description: Ten questions drawn from the level's bank, from reentrancy and access control to oracles, signatures, proxies and invariant testing.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

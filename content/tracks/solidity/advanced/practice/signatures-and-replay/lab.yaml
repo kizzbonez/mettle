@@ -1,0 +1,19 @@
+title: Orchard Picking Vouchers
+summary: Harden a contract that pays signed vouchers so that each one works once, here, on this chain and before its deadline, using EIP-712 typed data, nonces and OpenZeppelin's ECDSA.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Refuses replays, malleable twins and vouchers from elsewhere
+    file: 02-replays.sol
+    hidden: true
+  - name: Enforces deadlines and the coordinator's signature
+    file: 03-deadlines-and-signers.sol
+    hidden: true
+  - name: Signs EIP-712 typed data with nonces in order
+    file: 04-typed-data-and-nonces.sol
+    hidden: true

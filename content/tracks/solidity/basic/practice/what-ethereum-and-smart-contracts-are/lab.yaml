@@ -1,0 +1,19 @@
+title: Lantern Cruise Places
+summary: Run a finished contract for the first time, read what the test says about the value it returned, change the one number that is out of date, and submit.
+language: solidity
+minutes: 10
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Sells places on the new boat
+    file: 01-new-boat.sol
+    hidden: false
+  - name: Has the new number of seats
+    file: 02-seats.sol
+    hidden: true
+  - name: Sells up to the last seat and refuses one more
+    file: 03-last-seat.sol
+    hidden: true
+  - name: Keeps the boat's name and refuses a booking that is too big
+    file: 04-rest-of-contract.sol
+    hidden: true

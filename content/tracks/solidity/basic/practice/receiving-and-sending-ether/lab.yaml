@@ -1,0 +1,19 @@
+title: Regatta Savings Jar
+summary: Accept ether through a payable function and receive(), refuse unknown calls in fallback(), and let members withdraw their own savings with a checked call.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Takes savings by function call and by plain transfer, and refuses unknown calls
+    file: 02-receiving.sol
+    hidden: true
+  - name: Pays out exactly what each member asks for and has saved
+    file: 03-withdrawing.sol
+    hidden: true
+  - name: Pays contract members whose receive needs gas, and reverts when a payment fails
+    file: 04-recipients.sol
+    hidden: true

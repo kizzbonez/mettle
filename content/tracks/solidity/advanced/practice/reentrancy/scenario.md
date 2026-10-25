@@ -1,0 +1,1 @@
+The Ridgeway Beekeepers' Co-op saves for a shared honey extractor in a contract that also mints each paying member a badge. Some members use smart-contract wallets, so every payment and every badge hands control to code the co-op did not write.

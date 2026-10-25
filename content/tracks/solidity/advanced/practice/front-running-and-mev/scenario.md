@@ -1,0 +1,1 @@
+The Riverford lantern festival hides a prize pot behind a secret phrase: the first finder to prove they know it wins. Searchers watch the mempool, so the claim must not be something they can copy and front-run.

@@ -1,0 +1,19 @@
+title: Observatory Equipment Fund
+summary: Close three access-control flaws in a community fund, so a stranger cannot seize its initializer, appoint themselves a keeper, or spend it through a phished warden, while the warden and keepers keep their powers.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example and stops an initializer grab
+    file: 01-example.sol
+    hidden: false
+  - name: Lets the warden be set once and only once
+    file: 02-initializer.sol
+    hidden: true
+  - name: Keeps keeper and spending powers to their owners
+    file: 03-keepers-and-spending.sol
+    hidden: true
+  - name: Still lets the warden and keepers do their jobs
+    file: 04-fund-works.sol
+    hidden: true

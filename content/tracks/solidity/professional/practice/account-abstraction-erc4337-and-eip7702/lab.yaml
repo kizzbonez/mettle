@@ -1,0 +1,19 @@
+title: Glassworks Delegated Wallet
+summary: Write the EIP-7702 delegate for an EOA that batches payments, validates ERC-4337 user operations for itself and still accepts ether, and lets no one else move its funds.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Lets only the account and the EntryPoint execute, all or nothing
+    file: 02-execute.sol
+    hidden: true
+  - name: Validates user operations without reverting on bad signatures
+    file: 03-validate.sol
+    hidden: true
+  - name: Accepts ether and works through the EntryPoint
+    file: 04-receive-and-entry-point.sol
+    hidden: true

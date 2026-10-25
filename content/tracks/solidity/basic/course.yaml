@@ -1,0 +1,19 @@
+title: Solidity Foundations
+summary: >-
+  Ethereum and Solidity from zero, for people who already program. Learn what blockchains,
+  accounts, transactions, gas and the EVM are, set up Foundry and write and test a first
+  contract, then types and units, functions and visibility, control flow and custom errors,
+  arrays and strings, mappings and structs, data locations, events, modifiers and access
+  control, and receiving and sending ether, and finish with a complete, tested contract.
+outcomes:
+  - Explain accounts, transactions, gas and the EVM, and why contract bugs are costly
+  - Build and test contracts with Foundry, reading compiler errors, reverts and test output
+  - Use Solidity's types, functions, visibility, mappings, structs, arrays and data locations
+  - Signal failure with custom errors and require, record history with events, and restrict access with modifiers
+  - Receive and send ether safely with call and the pull-payment pattern
+exam:
+  title: Solidity Foundations Mock Exam
+  description: Ten questions drawn from the level's bank, from accounts and gas to types, functions, errors, storage, events and payments.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

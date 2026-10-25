@@ -1,0 +1,19 @@
+title: Launch Hill Wind Relay
+summary: Install sensors with new, connect other makers' sensors through an interface, let one sensor's error bubble up, and read them all with try/catch so a frozen one cannot silence the rest.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Installs owned sensors and connects only real contracts
+    file: 02-install-and-connect.sol
+    hidden: true
+  - name: Lets one sensor's error reach the caller
+    file: 03-bubbling.sol
+    hidden: true
+  - name: Skips every kind of failing sensor in the gust reading
+    file: 04-strongest-gust.sol
+    hidden: true

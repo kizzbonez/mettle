@@ -1,0 +1,1 @@
+The Harrowfield grain co-op keeps a maintenance fund: members deposit ether for shares, and redeem shares for a slice of the pot. The accounting is almost right, but three arithmetic slips let a member take more than their share.

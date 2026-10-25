@@ -1,0 +1,19 @@
+title: Hill Climb Timing Words
+summary: Pack and unpack a hill-climb race's results with shifts and masks in Yul, find the highest passed gate with clz, revert with custom errors from assembly, and total times in a checked Yul loop over calldata, each fuzzed against a Solidity reference.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Packs and unpacks every field exactly
+    file: 02-packing.sol
+    hidden: true
+  - name: Finds the highest passed gate and refuses an empty mask
+    file: 03-highest-gate.sol
+    hidden: true
+  - name: Totals the times and stops before 64 bits overflow
+    file: 04-total-millis.sol
+    hidden: true

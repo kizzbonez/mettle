@@ -1,0 +1,19 @@
+title: Parish Council Grants
+summary: Give a parish council's grant fund on-chain governance with a votes token that counts seconds, a Governor with a quorum and a timelock, and a guardian who can pause the fund but never spend from it.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Uses the council's clock, durations, threshold and quorum
+    file: 02-settings.sol
+    hidden: true
+  - name: Sends passed proposals through the timelock and enforces the quorum
+    file: 03-timelock-and-quorum.sol
+    hidden: true
+  - name: Counts votes at the snapshot and keeps the guardian to pausing
+    file: 04-snapshot-and-guardian.sol
+    hidden: true

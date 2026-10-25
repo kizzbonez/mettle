@@ -1,0 +1,19 @@
+title: Solar Co-op Credit Desk
+summary: Stop a flash-loan attack on a lending desk by pricing its collateral from a checked price feed instead of a pool's spot price, rejecting stale and bad answers and scaling the feed's decimals.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Survives a flash-loan attack on the pool's price
+    file: 02-flash-loan-attack.sol
+    hidden: true
+  - name: Rejects stale, missing and non-positive answers
+    file: 03-stale-and-bad-answers.sol
+    hidden: true
+  - name: Scales feeds of different decimals
+    file: 04-decimals.sol
+    hidden: true

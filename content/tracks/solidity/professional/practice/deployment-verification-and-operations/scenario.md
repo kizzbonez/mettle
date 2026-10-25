@@ -1,0 +1,1 @@
+A marine institute's weather buoys report wave heights and water temperatures to a registry on Ethereum mainnet, OP Mainnet and Arbitrum One. The forecasting apps want one registry address for all three networks, and each network's registry must belong to that network's multisig from its very first block.

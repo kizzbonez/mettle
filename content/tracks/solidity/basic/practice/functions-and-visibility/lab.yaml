@@ -1,0 +1,19 @@
+title: Mountain Hut Bunks
+summary: Write a function with two named return values that records its caller and calls a view function internally, tested from several accounts with vm.prank.
+language: solidity
+minutes: 15
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Checks in the two parties from the instructions
+    file: 01-two-parties.sol
+    hidden: false
+  - name: Records the leader who called
+    file: 02-leader.sol
+    hidden: true
+  - name: Hands out bunks in order from bunk 1
+    file: 03-bunk-numbers.sol
+    hidden: true
+  - name: Returns the bunks left, in step with the getters
+    file: 04-bunks-left.sol
+    hidden: true

@@ -1,0 +1,19 @@
+title: Climbing Wall Locker Deposits, Modernised
+summary: Bring a 2021 contract up to date with today's EVM and compiler, with custom errors, room for smart accounts and EIP-7702 accounts, payments by call, a transient reentrancy lock and a close that does not rely on selfdestruct.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Uses custom errors and closes the box for good
+    file: 02-errors-and-closing.sol
+    hidden: true
+  - name: Serves smart contract wallets and EIP-7702 accounts
+    file: 03-smart-accounts.sol
+    hidden: true
+  - name: Refuses reentrant withdrawals with a transient lock
+    file: 04-lock-and-storage.sol
+    hidden: true

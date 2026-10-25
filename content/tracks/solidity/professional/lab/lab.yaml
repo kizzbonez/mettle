@@ -1,0 +1,23 @@
+slug: tea-estate-upgradeable-fee-vault
+title: Tea Estate Upgradeable Fee Vault
+summary: Build a production ERC-4626 vault behind a UUPS proxy, with state in ERC-7201 namespaces, virtual shares against donation attacks, rounding in the vault's favour, an exit fee for the treasury, an upgrade that adds a deposit cap, and gas budgets.
+language: solidity
+minutes: 60
+timeLimitMs: 12000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Initializes once behind the proxy, and lets only the owner upgrade and set the fee
+    file: 02-proxy-and-admin.sol
+    hidden: true
+  - name: Converts with virtual shares, rounds in the vault's favour and matches its previews
+    file: 03-share-math.sol
+    hidden: true
+  - name: Charges the exit fee exactly, rounded up, and honours allowances and limits
+    file: 04-exit-fee.sol
+    hidden: true
+  - name: Upgrades to a capped version without losing state, within the gas budgets
+    file: 05-upgrade-and-gas.sol
+    hidden: true

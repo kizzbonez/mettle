@@ -1,0 +1,19 @@
+title: Granary Shares
+summary: Fix three arithmetic flaws in a share fund, so a member cannot drain it by over-redeeming an unchecked balance, small holders keep their precision through multiply-before-divide, and an over-range deposit reverts with SafeCast instead of corrupting the ledger.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example and stops an over-redeem
+    file: 01-example.sol
+    hidden: false
+  - name: Refuses to pay out more shares than a member holds
+    file: 02-over-redeem.sol
+    hidden: true
+  - name: Keeps precision and rounds in the fund's favour
+    file: 03-precision.sol
+    hidden: true
+  - name: Casts safely and never pays out more than it took
+    file: 04-safe-cast-and-conservation.sol
+    hidden: true

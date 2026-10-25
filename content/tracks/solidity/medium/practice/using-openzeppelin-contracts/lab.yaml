@@ -1,0 +1,19 @@
+title: Rowing Club Dues Box
+summary: Assemble a dues contract from OpenZeppelin parts, with AccessControl roles and an admin role, Pausable, ReentrancyGuardTransient and SafeERC20, so that it refuses strangers, stops when paused and copes with tokens that return false or nothing.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Gives each role exactly its powers
+    file: 02-roles.sol
+    hidden: true
+  - name: Pauses payments but not withdrawals, and moves the right amounts
+    file: 03-pausing-and-paying.sol
+    hidden: true
+  - name: Copes with tokens that return false, return nothing or call back
+    file: 04-unusual-tokens.sol
+    hidden: true

@@ -1,0 +1,19 @@
+title: Production Solidity
+summary: >-
+  Solidity that teams ship and run. Optimise gas where it pays, use inline assembly and Yul with
+  care, build upgradeable contracts safely, implement ERC-4626 vaults and an automated market
+  maker, understand account abstraction with ERC-4337 and EIP-7702, govern protocols with
+  timelocks and votes, review and audit code, deploy and operate contracts, and keep up with the
+  EVM's roadmap.
+outcomes:
+  - Measure and reduce gas, and write and test inline assembly safely
+  - Build and test upgradeable contracts with UUPS proxies and namespaced storage
+  - Implement ERC-4626 vaults and a constant-product AMM with correct rounding
+  - Explain ERC-4337 and EIP-7702 and what they change for contract security
+  - Run governance, audits, deployments and incident response, and track EVM upgrades
+exam:
+  title: Production Solidity Mock Exam
+  description: Ten questions drawn from the level's bank, from gas and assembly to upgrades, vaults, AMMs, account abstraction, governance and operations.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

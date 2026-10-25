@@ -1,0 +1,19 @@
+title: Hillside Coffee Roastery Ledger
+summary: Keep weights in a user-defined value type with its own operators, put the roasting arithmetic in a library with the right rounding, and use both in a stock ledger.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Gives Grams working - and == operators
+    file: 02-grams-operators.sol
+    hidden: true
+  - name: Computes roasted and green weights with the right rounding
+    file: 03-roast-library.sol
+    hidden: true
+  - name: Keeps the green and roasted stock in the ledger
+    file: 04-roastery-ledger.sol
+    hidden: true

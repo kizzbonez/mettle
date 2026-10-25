@@ -1,0 +1,508 @@
+- key: sol-professional-01
+  type: single
+  category: solidity
+  tags: [gas, storage-layout, packing]
+  prompt: |
+    How many storage slots do this contract's state variables use, and what is the fewest that
+    reordering them could give?
+
+    ```solidity
+    contract Kiosk {
+        address owner;
+        uint256 sales;
+        uint64 openedAt;
+        bool open;
+    }
+    ```
+  options:
+    - text: "Three slots; declaring `sales` last packs `owner`, `openedAt` and `open` into one slot, so two"
+      correct: true
+    - text: "Two slots already, because the compiler reorders state variables to pack them"
+    - text: "Four slots, one per variable, and no order can change that"
+    - text: "One slot, because `address`, `uint64` and `bool` together are under 32 bytes and `uint256` is stored elsewhere"
+  explanation: |
+    The compiler places state variables in declaration order and never reorders them. `owner`
+    (20 bytes) takes slot 0; `sales` needs a whole 32-byte slot, so it starts slot 1; `openedAt`
+    (8 bytes) and `open` (1 byte) then share slot 2. `forge inspect Kiosk storageLayout` shows
+    exactly that: slots 0, 1 and 2, with `open` at offset 8 of slot 2. Declare `sales` last and
+    `owner`, `openedAt` and `open` (29 bytes) fit in slot 0, with `sales` in slot 1. A `uint256`
+    is not stored "elsewhere": only mappings and dynamic arrays keep their contents at hashed
+    locations.
+
+- key: sol-professional-02
+  type: multiple
+  category: solidity
+  tags: [gas, measurement, bitmaps, loops]
+  prompt: |
+    You compile with solc 0.8.38, optimizer off, and test with Foundry 1.8. Which statements are
+    true? Choose all that apply.
+  options:
+    - text: "`for (uint256 i = 0; i < n; ++i)` already skips the overflow check on `++i`, so wrapping it in `unchecked` by hand gains almost nothing"
+      correct: true
+    - text: "Setting a second flag in the same bitmap word costs much less than the first, because it changes a slot that is already non-zero"
+      correct: true
+    - text: "Declaring a lone counter as `uint8` instead of `uint256` makes every write to it cheaper"
+    - text: "For a state-changing call, `vm.lastFrameGas().gasTotalUsed` leaves out the 21,000 gas every transaction pays"
+  explanation: |
+    Since Solidity 0.8.22 the compiler drops the overflow check itself when a `for` loop compares
+    a local counter with `<` and increments it by one, even with the optimizer off: in the
+    lesson's measurement, the hand-written `unchecked` loop saved 44 gas over 100 iterations. A
+    bitmap's first flag in a word writes zero to non-zero (about 22,100 gas with the cold read);
+    its neighbours rewrite a non-zero slot (about 5,000): 43,837 against 26,737 gas per call in
+    the lesson. A storage slot is 32 bytes whatever the type, so a lone `uint8` costs the same
+    write and adds masking. Foundry 1.8 runs each state-changing call of a test as its own
+    transaction, so its `gasTotalUsed` includes the 21,000 base cost and the calldata.
+
+- key: sol-professional-03
+  type: true_false
+  category: solidity
+  tags: [gas, transient-storage, reentrancy]
+  prompt: |
+    A contract guards a function with `bool transient locked;`, setting it to `true` on entry
+    and `false` on exit. True or false: if a call reverts between the two assignments, `locked`
+    stays `true` and blocks the next transaction too.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    Transient storage (EIP-1153) is cleared at the end of every transaction, and a revert also
+    undoes every transient write made in the reverted call, just as it undoes storage writes. So
+    the next transaction always starts with `locked == false`. That is also why a transient lock
+    is cheap: each access costs 100 gas and nothing is left behind to clear. In the lesson's
+    measurement a transient lock cost 21,868 gas per call against 26,333 for a storage lock (2,800
+    of which was refunded). Within one transaction, though, the value does persist across calls,
+    so a lock must still be reset on the way out.
+
+- key: sol-professional-04
+  type: single
+  category: solidity
+  tags: [assembly, memory, free-memory-pointer]
+  prompt: |
+    What does `f()` return?
+
+    ```solidity
+    function f() external pure returns (uint256 a, uint256 b) {
+        assembly {
+            a := mload(0x40)
+        }
+        bytes memory s = new bytes(10);
+        s[0] = 0x01;
+        assembly {
+            b := mload(0x40)
+        }
+    }
+    ```
+  options:
+    - text: "`128` and `192`"
+      correct: true
+    - text: "`128` and `138`"
+    - text: "`64` and `74`"
+    - text: "`0` and `42`"
+  explanation: |
+    `0x40` holds the free memory pointer, the first unused byte. Solidity reserves `0x00` to
+    `0x7f` (scratch space, the pointer itself and the zero slot), so in a fresh call it starts at
+    `0x80`, 128. `new bytes(10)` takes a 32-byte length word plus the data rounded up to a whole
+    32-byte word: 64 bytes, so the pointer moves to `0xc0`, 192. It never moves by exactly 10
+    because memory is allocated in words. Running it in the sandbox prints `128 192`.
+
+- key: sol-professional-05
+  type: multiple
+  category: solidity
+  tags: [assembly, yul, safety]
+  prompt: |
+    Which statements about inline assembly in Solidity 0.8.38 are true? Choose all that apply.
+  options:
+    - text: "`add(a, b)` in Yul wraps around silently instead of reverting on overflow"
+      correct: true
+    - text: "`return(p, s)` inside an internal function's assembly ends the whole external call, so the caller's remaining code never runs"
+      correct: true
+    - text: "`assembly (\"memory-safe\") { ... }` makes the compiler check that the block only touches memory it is allowed to"
+    - text: "`clz(x)` compiles for any EVM version, because the compiler emulates it with a loop on older ones"
+  explanation: |
+    Yul has no checked arithmetic: `add(type(uint256).max, 1)` is 0, so every check is yours to
+    write. `return` and `revert` end the entire call, not the function; solc even warns
+    "Unreachable code" for the lines after an internal function that does it. The
+    `("memory-safe")` annotation is a promise, not a check: the compiler trusts it, and a false
+    promise is undefined behaviour that tests rarely catch. `clz` is the Osaka `CLZ` opcode
+    (EIP-7939); compiling for `prague` fails with `The "clz" instruction is only available for
+    Osaka-compatible VMs`.
+
+- key: sol-professional-06
+  type: single
+  category: solidity
+  tags: [upgrades, uups, initializable]
+  prompt: |
+    A UUPS implementation's constructor calls `_disableInitializers()`. What does that protect
+    against?
+  options:
+    - text: "Someone calling `initialize` on the implementation contract itself and becoming its owner; the proxy's own state is initialized separately, through the proxy"
+      correct: true
+    - text: "The proxy being initialized twice; without it a second `initialize` through the proxy would succeed"
+    - text: "Nothing at run time: it only silences the compiler, which rejects constructors in upgradeable contracts"
+    - text: "It sets the proxy's initialized version to 1, so that `reinitializer(2)` can run later"
+  explanation: |
+    The implementation is a deployed contract with its own storage. Without the lock, anyone can
+    call `initialize` on it directly and own it, which has led to real incidents. The constructor
+    runs only in the implementation's context, so `_disableInitializers()` sets the
+    implementation's own initialized version to the maximum, and every later initializer there
+    reverts with `InvalidInitialization()`. The proxy is protected from a second initialization
+    by the `initializer` modifier, which works on the proxy's storage. Constructors are allowed;
+    they just never run for the proxy, which is why setup moves into an initializer.
+
+- key: sol-professional-07
+  type: single
+  category: solidity
+  tags: [upgrades, erc1967, openzeppelin]
+  prompt: |
+    With OpenZeppelin Contracts 5.7, what happens here?
+
+    ```solidity
+    TipJarV1 implementation = new TipJarV1();
+    ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), "");
+    ```
+  options:
+    - text: "The deployment reverts with `ERC1967ProxyUninitialized()`"
+      correct: true
+    - text: "It deploys a proxy with no owner, which anyone can initialize later"
+    - text: "It reverts with `InvalidInitialization()`, because the implementation's initializers are disabled"
+    - text: "It reverts with `ERC1967InvalidImplementation(address)`, because the implementation has not been initialized"
+  explanation: |
+    In OpenZeppelin 5.7 the `ERC1967Proxy` constructor refuses empty initialization data unless
+    a subclass overrides `_unsafeAllowUninitialized()`: a proxy left uninitialized could be
+    initialized by an attacker first. The sandbox test fails with
+    `[FAIL: ERC1967ProxyUninitialized()]`. Pass the encoded initializer instead,
+    `abi.encodeCall(TipJarV1.initialize, (owner))`, so the proxy is set up in the same
+    transaction that creates it. `ERC1967InvalidImplementation` is for an address without code
+    or, during an upgrade, one that is not UUPS.
+
+- key: sol-professional-08
+  type: single
+  category: solidity
+  tags: [erc4626, rounding, vaults]
+  prompt: |
+    An OpenZeppelin `ERC4626` vault (decimals offset 0) holds 1,500 assets against 1,000 shares.
+    What do `previewDeposit(100)` and `previewMint(100)` return?
+  options:
+    - text: "`66` and `150`"
+      correct: true
+    - text: "`67` and `149`"
+    - text: "`66` and `149`"
+    - text: "`67` and `150`"
+  explanation: |
+    ERC-4626 rounds in the vault's favour. A deposit pays shares out, so it rounds down:
+    `100 * (1000 + 1) / (1500 + 1)` is 66.69, giving 66. A mint charges the user assets, so it
+    rounds up: `100 * (1500 + 1) / (1000 + 1)` is 149.95, giving 150. (The `+ 1`s are
+    OpenZeppelin's virtual share and asset.) Rounding the other way would let a user repeat a tiny
+    deposit or mint and take a wei from the other holders each time. The sandbox printed exactly
+    66 and 150.
+
+- key: sol-professional-09
+  type: multiple
+  category: solidity
+  tags: [erc4626, inflation-attack, security]
+  prompt: |
+    An attacker deposits 1 wei into an empty vault, donates 10,000 tokens straight to it, and
+    then a victim deposits 10,000 tokens. Which statements are true? Choose all that apply.
+  options:
+    - text: "Against a vault using the plain formula `assets * totalSupply / totalAssets`, the victim receives 0 shares and the attacker redeems everything"
+      correct: true
+    - text: "Against OpenZeppelin's `ERC4626` with the default offset of 0, the attack loses the attacker money, but the victim still loses a large part of the deposit"
+      correct: true
+    - text: "Virtual shares work by rounding the victim's shares up, so the victim always gets at least one share"
+    - text: "Using `asset.balanceOf(address(this))` as `totalAssets` is what stops a donation from changing the share price"
+  explanation: |
+    The donation raises `totalAssets` without minting shares, so in the plain formula
+    `10,000e18 * 1 / (10,000e18 + 1)` rounds down to 0 shares; the lesson's naive vault paid the
+    attacker 20,000 tokens. OpenZeppelin computes with virtual shares and assets, which own part
+    of every donation: with offset 0, attacker and victim each got back about 6,667 tokens, so the
+    attack no longer pays but still hurts the victim. With `_decimalsOffset()` of 6 the victim got
+    back 99.99997%. Rounding still goes down in the vault's favour, and a `balanceOf`-based
+    `totalAssets` is exactly what lets a donation move the price.
+
+- key: sol-professional-10
+  type: single
+  category: solidity
+  tags: [amm, constant-product, fees]
+  prompt: |
+    A constant-product pool charges 0.3% on the input:
+
+    ```solidity
+    function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut) public pure returns (uint256) {
+        uint256 amountInWithFee = amountIn * 997;
+        return amountInWithFee * reserveOut / (reserveIn * 1000 + amountInWithFee);
+    }
+    ```
+
+    What is `getAmountOut(1_000, 1_000_000, 1_000_000)`?
+  options:
+    - text: "996"
+      correct: true
+    - text: "999"
+    - text: "997"
+    - text: "1000"
+  explanation: |
+    `997000 * 1000000 / (1000000000 + 997000)` is 996.004, rounded down to 996. Without the fee
+    the trade would get `1000 * 1000000 / 1001000` = 999 (rounded down from 999.001): the curve
+    alone costs a little, because every token sold makes the next one buy less. 997 is the fee
+    applied without the curve, and 1000 is the spot price, which no trade of real size gets. The
+    lab's tests check 996 for exactly this case.
+
+- key: sol-professional-11
+  type: single
+  category: solidity
+  tags: [eip-7702, tx-origin, account-abstraction]
+  prompt: |
+    This contract was written before EIP-7702:
+
+    ```solidity
+    contract TicketBooth {
+        mapping(address => uint256) public tickets;
+
+        error NoContracts();
+
+        function buy() external {
+            if (msg.sender != tx.origin) revert NoContracts();
+            tickets[msg.sender] += 1;
+        }
+    }
+    ```
+
+    Alice's EOA delegates with EIP-7702 to a batching contract whose `execute` makes each call in
+    a list. In one transaction that Alice sends to her own address, `execute` calls `buy()` three
+    times. What is `tickets(alice)` afterwards?
+  options:
+    - text: "3: in every call `msg.sender` and `tx.origin` are both Alice, so the check passes each time"
+      correct: true
+    - text: "0: Alice's account now has code, so the first `buy()` reverts with `NoContracts()`"
+    - text: "1: `msg.sender == tx.origin` is only true for the first call of a transaction"
+    - text: "0: an EOA with a delegation cannot be `tx.origin`, so the transaction is invalid"
+  explanation: |
+    The batch runs Alice's delegate code in Alice's own context, so when it calls the booth,
+    `msg.sender` is Alice; Alice also signed the transaction, so `tx.origin` is Alice too. Run in
+    Foundry with `vm.signAndAttachDelegation` and `vm.prank(alice, alice)`, the test printed
+    `tickets bought in one transaction: 3`. Before EIP-7702, `msg.sender == tx.origin` meant "the
+    top-level call of a person's transaction"; now it no longer does, which EIP-7702's Security
+    Considerations point out. The check never looks at code, so the delegation indicator does not
+    make it fail. Write the rule you mean, such as `tickets[msg.sender] == 0`.
+
+- key: sol-professional-12
+  type: multiple
+  category: solidity
+  tags: [eip-7702, erc-4337, account-abstraction]
+  prompt: |
+    Which statements about EIP-7702 and ERC-4337 are true? Choose all that apply.
+  options:
+    - text: "After an EIP-7702 delegation, the EOA's code is 23 bytes: `0xef0100` followed by the delegate's address"
+      correct: true
+    - text: "A plain ether payment to a delegated EOA runs the delegate's code, so it fails if the delegate has no `receive` or `fallback` function"
+      correct: true
+    - text: "A smart account's `validateUserOp` should return 1 (`SIG_VALIDATION_FAILED`) for a wrong signature rather than revert"
+      correct: true
+    - text: "Once an EOA has delegated, its private key can no longer sign transactions, so a stolen key is harmless"
+  explanation: |
+    EIP-7702 writes the 23-byte **delegation indicator** `0xef0100 || address` into the EOA's
+    code (`alice.code.length` printed 23). Every call to the account then runs the delegate's code,
+    including plain payments: with a delegate that had no `receive`, a payment returned
+    `ok == false`. ERC-4337 asks `validateUserOp` to return `SIG_VALIDATION_FAILED` on a signature
+    mismatch and to revert only for other errors. The EOA's key keeps full power: it can still
+    sign any transaction, and can re-delegate or clear the delegation, so a stolen key is as bad
+    as ever.
+
+- key: sol-professional-13
+  type: single
+  category: solidity
+  tags: [governance, quorum, governor]
+  prompt: |
+    A Governor uses `GovernorCountingSimple` and `GovernorVotesQuorumFraction(4)`. The token's
+    total supply at the proposal's snapshot is 1,000 tokens. During the voting period Bob votes
+    for with 30 tokens and Carol votes against with 10; nobody else votes. What does
+    `governor.state(id)` return after the voting period ends?
+  options:
+    - text: "`Defeated`: for and abstain votes total 30, below the quorum of 40"
+      correct: true
+    - text: "`Succeeded`: there are more votes for than against"
+    - text: "`Active`: the proposal stays open until the quorum is reached"
+    - text: "`Succeeded`: for and against votes together total 40, which meets the quorum"
+  explanation: |
+    A proposal succeeds only if it reaches the quorum **and** has more for than against votes.
+    `GovernorCountingSimple` counts for and abstain votes towards the quorum, not against votes.
+    The quorum is 4% of 1,000 = 40 tokens (the test printed `quorum: 40000000000000000000`), and
+    only 30 count, so the state is Defeated (`state: 3`). The voting period has a fixed length; it
+    does not wait for a quorum.
+
+- key: sol-professional-14
+  type: single
+  category: solidity
+  tags: [governance, snapshots, flash-loans]
+  prompt: |
+    A proposal is Active. Mallory, who held no tokens when it was created, receives 900 tokens
+    (90% of the supply), delegates them to herself and calls `governor.castVote(id, 0)` in the
+    same block. The Governor uses `GovernorVotes` with an `ERC20Votes` token. What does `castVote`
+    return as her weight?
+  options:
+    - text: "0: her weight is `getPastVotes(mallory, snapshot)`, and she had no votes at the snapshot"
+      correct: true
+    - text: "900 tokens: she delegated before voting, so all her tokens count"
+    - text: "It reverts with `GovernorInsufficientProposerVotes`"
+    - text: "It reverts with `ERC5805FutureLookup`, because her checkpoint is in the current block"
+  explanation: |
+    Votes are counted at the proposal's **snapshot**, its creation time plus the voting delay,
+    which is in the past once voting opens. Tokens borrowed or bought later have no weight: the
+    test printed `mallory's vote weight: 0`. This is what stops flash-loaned votes, the attack that
+    drained Beanstalk in 2022, where voting power was counted at the current moment.
+    `GovernorInsufficientProposerVotes` applies to proposing, and `ERC5805FutureLookup` to asking
+    for votes at a timepoint that is not yet in the past, which the Governor never does here.
+
+- key: sol-professional-15
+  type: single
+  category: solidity
+  tags: [audits, forge-lint, access-control]
+  prompt: |
+    ```solidity
+    function tip(address to, uint256 amount) external {
+        token.transferFrom(msg.sender, address(this), amount);
+        uint256 fee = amount / 10_000 * feeBps;
+        owed[treasury] += fee;
+        owed[to] += amount - fee;
+    }
+
+    function claim() external {
+        uint256 amount = owed[msg.sender];
+        owed[msg.sender] = 0;
+        token.transfer(msg.sender, amount);
+    }
+
+    function setTreasury(address treasury_) external {
+        treasury = treasury_;
+    }
+    ```
+
+    `forge lint` on this contract reports `divide-before-multiply`, `erc20-unchecked-transfer`
+    and `missing-zero-check`. Which of these real problems does it **not** report?
+  options:
+    - text: "Anyone can call `setTreasury` and redirect every later fee to themselves"
+      correct: true
+    - text: "The fee is divided before it is multiplied, so it rounds down to multiples of 10,000"
+    - text: "The return values of `transfer` and `transferFrom` are ignored"
+    - text: "`setTreasury` accepts the zero address"
+  explanation: |
+    A linter matches patterns; whether a caller *should* be allowed is a question about intent,
+    so the missing access control, the most severe bug here, produced no warning. The run printed
+    `divide-before-multiply` on the fee line, `erc20-unchecked-transfer` on both token calls and
+    `missing-zero-check` on `setTreasury`'s parameter. A Foundry proof of concept showed the
+    impact: after `setTreasury(mallory)`, Mallory claimed the whole 2,500 fee of a 100,000 tip.
+    Tools support a review; they never replace one.
+
+- key: sol-professional-16
+  type: single
+  category: solidity
+  tags: [audits, severity]
+  prompt: |
+    Using the impact and likelihood matrix from CodeHawks' documentation, a reviewer finds that
+    every tip loses at most a few wei of fee to rounding (no user funds at risk, impact Low), and
+    that it happens on every tip anyone makes (likelihood High). What severity is the finding?
+  options:
+    - text: "Medium"
+      correct: true
+    - text: "Low, because no funds are at risk"
+    - text: "High, because it happens on every transaction"
+    - text: "Informational, because the amounts are tiny"
+  explanation: |
+    Severity combines both dimensions. In that matrix High likelihood with Low impact gives
+    Medium, as do High impact with Low likelihood and Medium with Medium; High needs both to be
+    high, and Low needs both to be low or one low and one medium. Rating by impact alone
+    ("no funds at risk, so Low") or by frequency alone ("every transaction, so High") is the
+    usual mistake. Informational is for style, gas and documentation notes.
+
+- key: sol-professional-17
+  type: single
+  category: solidity
+  tags: [deployment, create2]
+  prompt: |
+    A deploy script runs `new Registry{salt: SALT}(multisig)` through the same CREATE2 factory, with
+    the same `SALT` and the same compiled code, on OP Mainnet and on a local chain. Each network
+    passes its own multisig as `multisig`. The two registries end up at different addresses. Why?
+  options:
+    - text: "The constructor arguments are part of the init code, so its hash, and with it the address, differ"
+      correct: true
+    - text: "CREATE2 mixes the chain id into the address, so it is always different on each network"
+    - text: "The factory's nonce differs between the two networks"
+    - text: "The block number at deployment is part of the CREATE2 address"
+  explanation: |
+    A CREATE2 address is `keccak256(0xff ++ deployer ++ salt ++ keccak256(initCode))[12:]`, and the
+    init code is the creation code followed by the ABI-encoded constructor arguments. The script
+    printed different registry addresses for chain 10 and the local chain, each "as predicted:
+    true". Neither the chain id, the nonce nor the block number is part of the formula; that is
+    why CREATE2 is used for the same address on every chain. To keep one address with different
+    owners, deploy code without constructor arguments and initialize it in the same transaction,
+    or use the CREATE3 idea, whose address depends only on the factory and the salt.
+
+- key: sol-professional-18
+  type: true_false
+  category: solidity
+  tags: [evm-version, push0, deployment]
+  prompt: |
+    True or false: bytecode compiled for the default `evm_version` (`osaka`) runs correctly on any
+    EVM chain, because an EVM that does not know an opcode such as `PUSH0` skips it.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    An unknown opcode is invalid: execution stops, the call fails and all the gas given to it is
+    consumed. A Foundry test that runs the three bytes `5f 5f f3` (`PUSH0 PUSH0 RETURN`) printed
+    `call succeeded: true` on the default EVM and `call succeeded: false` with
+    `forge test --evm-version paris`, using over a billion gas. solc emits `PUSH0` for `shanghai`
+    and later, so set `evm_version` to the oldest fork among the chains you deploy to.
+
+- key: sol-professional-19
+  type: single
+  category: solidity
+  tags: [evm-roadmap, osaka, clz, evm-version]
+  prompt: |
+    ```solidity
+    function leadingZeros(uint256 x) external pure returns (uint256 n) {
+        assembly {
+            n := clz(x)
+        }
+    }
+    ```
+
+    What happens when you build this with `forge build --evm-version prague` (solc 0.8.38)?
+  options:
+    - text: "It does not compile: `The \"clz\" instruction is only available for Osaka-compatible VMs (you are currently compiling for \"prague\").`"
+      correct: true
+    - text: "It compiles, and calls revert at run time on a Prague chain"
+    - text: "It compiles with a warning that `clz` is experimental"
+    - text: "It compiles, and solc replaces `clz` with an equivalent loop for Prague"
+  explanation: |
+    `CLZ` (EIP-7939) arrived with the Fusaka upgrade, whose execution-layer name is Osaka, on
+    3 December 2025, and solc 0.8.31 added the Yul builtin for the `osaka` target. For an older
+    target the compiler refuses it: error 4948, quoted in the correct answer, followed by a second
+    error because the assignment then has no value. solc never emulates an opcode. Run-time
+    failures happen when code compiled for a newer target is deployed to an older chain, as with
+    `PUSH0`.
+
+- key: sol-professional-20
+  type: multiple
+  category: solidity
+  tags: [solidity-0.9, deprecations, evm-roadmap]
+  prompt: |
+    solc 0.8.38 compiles a legacy contract. Which of these features make it print a warning that
+    the feature is deprecated and scheduled for removal? Choose all that apply.
+  options:
+    - text: "`to.transfer(amount)` on an `address payable`"
+      correct: true
+    - text: "`pragma abicoder v1;`"
+      correct: true
+    - text: "A `virtual` modifier overridden in a derived contract"
+      correct: true
+    - text: "`require(ok, PaymentFailed());` with a custom error"
+  explanation: |
+    Since 0.8.31 solc warns about the features 0.9 will remove: `send` and `transfer`
+    (warning 9207, "Use 'call{value: <amount>}(\"\")' instead"), ABI coder v1 (9511), virtual
+    modifiers (8429), comparisons of contract-type variables (9170) and the
+    `/// @solidity memory-safe-assembly` comment. All four warnings appeared when the lesson's
+    legacy `Refunds` contract was compiled. `require` with a custom error is a newer feature, not
+    a deprecated one: since 0.8.27 it works in the default pipeline.

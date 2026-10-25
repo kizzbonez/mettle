@@ -1,0 +1,23 @@
+slug: orchestra-instrument-loans
+title: Orchestra Instrument Loans
+summary: Build a complete lending contract for an orchestra's instruments, with structs in a mapping, members and a librarian guarded by modifiers, deposits in ether, damage fees, events, custom errors and pull-pattern withdrawals that keep the books equal to the ether held.
+language: solidity
+minutes: 55
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Works through the rehearsal evening from the instructions
+    file: 01-rehearsal-evening.sol
+    hidden: false
+  - name: Keeps the catalogue and the member list, for the librarian only
+    file: 02-catalogue-and-members.sol
+    hidden: true
+  - name: Lends an instrument to one member at a time against its deposit
+    file: 03-borrowing.sol
+    hidden: true
+  - name: Checks instruments in, keeping fees and crediting the rest
+    file: 04-check-in-and-fees.sol
+    hidden: true
+  - name: Pays out by the pull pattern to every kind of account, exactly once
+    file: 05-withdrawals.sol
+    hidden: true

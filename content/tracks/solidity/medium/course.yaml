@@ -1,0 +1,18 @@
+title: Building Contracts
+summary: >-
+  Build contracts that work with other contracts. Call them through interfaces, reuse code with
+  inheritance and libraries, write ERC-20 and ERC-721 tokens by hand and with OpenZeppelin,
+  encode calls with the ABI, understand what gas pays for, use time and block data, test
+  thoroughly with Foundry, apply payment patterns and state machines, and deploy with scripts.
+outcomes:
+  - Call and create other contracts through interfaces, and handle their failures
+  - Structure code with inheritance, abstract contracts, libraries and user-defined value types
+  - Implement and use ERC-20 and ERC-721 tokens, by hand and with OpenZeppelin
+  - Encode calls with the ABI, measure gas, and use time and block data correctly
+  - Test with Foundry's cheatcodes and fuzzing, and deploy with scripts and CREATE2
+exam:
+  title: Building Contracts Mock Exam
+  description: Ten questions drawn from the level's bank, from interfaces and inheritance to tokens, the ABI, gas, testing and deployment.
+  timeLimitMinutes: 20
+  passPercent: 70
+  questionCount: 10

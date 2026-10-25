@@ -1,0 +1,1 @@
+Passengers on the island ferry tip the crew in tokens, and the tip pool shares every tip equally among them. The day the token's issuer froze one deckhand's address, the weekly payout reverted for the whole crew, and nobody has been paid since.

@@ -1,0 +1,1 @@
+The bike repair co-op keeps members' yearly dues in a vault behind a proxy, so that it can add features later without moving the money. The first deployment stopped working at once, and the review that followed found two more ways for a stranger to take the dues.

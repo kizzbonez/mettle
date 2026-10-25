@@ -1,0 +1,662 @@
+- key: sol-basic-01
+  type: single
+  category: solidity
+  tags: [gas, fees]
+  prompt: |
+    A plain ether transfer uses 21,000 gas. When it is included, the base fee is 10 gwei per gas
+    and the sender offered a priority fee of 2 gwei per gas. What does the sender pay in fees, and
+    where does the money go?
+  options:
+    - text: "252,000 gwei: the 210,000 gwei of base fee is burned and the 42,000 gwei of priority fee goes to the validator"
+      correct: true
+    - text: "252,000 gwei, all of it paid to the validator that included the transaction"
+    - text: "42,000 gwei: the sender pays only the priority fee, and the protocol covers the base fee"
+    - text: "210,000 gwei: the priority fee is refunded because a plain transfer needs no tip"
+  explanation: |
+    The fee is **gas used × (base fee + priority fee)**: 21,000 × (10 + 2) gwei = 252,000 gwei,
+    which is 0.000252 ether. The two parts go to different places. The **base fee** is set by the
+    protocol for each block and is **burned**, destroyed, so nobody receives it: 21,000 × 10 =
+    210,000 gwei. The **priority fee** is the tip that makes a validator want to include the
+    transaction, and the validator keeps it: 21,000 × 2 = 42,000 gwei. The sender always pays
+    the base fee; it is what makes the transaction valid at all. Nothing is refunded for being a
+    simple transfer: what can be refunded is the part of a `maxFeePerGas` above base fee plus tip.
+
+- key: sol-basic-02
+  type: multiple
+  category: solidity
+  tags: [accounts, eoa, contracts, privacy]
+  prompt: |
+    Which statements about Ethereum accounts are true? Choose all that apply.
+  options:
+    - text: "An externally owned account is controlled by whoever holds its private key; there is no way to reset a lost key"
+      correct: true
+    - text: "A contract account holds code and storage and has no private key; its code runs only when something calls it"
+      correct: true
+    - text: "A contract account can start a transaction by itself, for example every night at midnight, without anyone calling it"
+    - text: "A contract's state variable marked `private` cannot be read by anyone outside the contract"
+  explanation: |
+    An **externally owned account** (EOA) is a key pair: the address is derived from the public
+    key, and signing with the private key is the only proof of ownership, so a lost key means a
+    lost account and a leaked key means anyone can empty it. A **contract account** has code and
+    its own storage but no key, so it cannot sign: only an EOA starts a transaction, and a
+    contract acts when a transaction (or another contract) calls it. Scheduled jobs need someone
+    off chain to send the call. `private` only stops *other contracts* from reading a variable;
+    every storage slot can be read from outside the chain, and lesson 04 reads a private door code
+    with `vm.load`.
+
+- key: sol-basic-03
+  type: single
+  category: solidity
+  tags: [foundry, testing, assertEq]
+  prompt: |
+    `forge test` prints this line for a test of the swift tally from lesson 02:
+
+    ```text
+    [FAIL: count after recording 12 and 5: 5 != 17] test_adds_each_record() (gas: 94305)
+    ```
+
+    What does it tell you?
+  options:
+    - text: "An `assertEq` with the message `count after recording 12 and 5` failed: the contract returned 5 and the test expected 17"
+      correct: true
+    - text: "An `assertEq` failed: the contract returned 17 and the test expected 5"
+    - text: "The call to `record` reverted after 94,305 gas, so the count was never checked"
+    - text: "The test file did not compile, and forge shows the two line numbers where the error is"
+  explanation: |
+    forge-std's `assertEq(actual, expected, message)` fails with the message first, then the two
+    values with the **actual value first**: here `tally.count()` gave 5, while the test expected
+    12 + 5 = 17. That points at a `record` that overwrites the count (`count = seen;`) instead of
+    adding to it. A revert would show its own reason instead, such as `panic: arithmetic underflow
+    or overflow (0x11)`, and a compile error stops the run before any `[FAIL]` line. The gas is
+    simply what the test used. This is why every check gets a message: in a hidden lab test, the
+    message is all you see.
+
+- key: sol-basic-04
+  type: single
+  category: solidity
+  tags: [foundry, setUp, testing]
+  prompt: |
+    ```solidity
+    contract SwiftTallyTest is Test {
+        SwiftTally tally;
+
+        function setUp() public {
+            tally = new SwiftTally();
+        }
+
+        function test_a() public {
+            tally.record(5);
+            assertEq(tally.count(), 5, "count in test_a");
+        }
+
+        function test_b() public {
+            tally.record(2);
+            assertEq(tally.count(), EXPECTED, "count in test_b");
+        }
+    }
+    ```
+
+    `record` adds its argument to `count`, which starts at 0. Which value of `EXPECTED` makes
+    `test_b` pass every time `forge test` runs both tests?
+  options:
+    - text: "2"
+      correct: true
+    - text: "7, because `test_a` runs first and its 5 is still in the tally"
+    - text: "7 when `test_a` happens to run first and 2 otherwise, so no value works every time"
+    - text: "0, because the change made by `record` is only visible in the next transaction"
+  explanation: |
+    `setUp` runs before **each** test function, and each test starts from the state `setUp`
+    left, with a freshly deployed `SwiftTally`. Nothing one test changes is seen by another, so
+    the order in which forge runs them does not matter: `test_b` records 2 into a new tally and
+    reads 2. Run in the sandbox, both tests pass with `EXPECTED` set to 2. The change is visible at
+    once to the next call in the same test: there is no delay until a later transaction.
+
+- key: sol-basic-05
+  type: single
+  category: solidity
+  tags: [types, checked-arithmetic, overflow]
+  prompt: |
+    ```solidity
+    function total(uint8 morning, uint8 afternoon) public pure returns (uint16) {
+        uint16 sum = morning + afternoon;
+        return sum;
+    }
+    ```
+
+    What happens when a test calls `total(200, 100)`?
+  options:
+    - text: "The call reverts with `panic: arithmetic underflow or overflow (0x11)`"
+      correct: true
+    - text: "It returns 300, because the result is stored in a `uint16`"
+    - text: "It returns 44, because the sum wraps around at 256"
+    - text: "It does not compile, because a `uint8` cannot be assigned to a `uint16`"
+  explanation: |
+    The type of `morning + afternoon` is the type of its operands, `uint8`, whatever the variable
+    it is stored in. 200 + 100 = 300 does not fit in a `uint8` (at most 255), and arithmetic has
+    been **checked** since Solidity 0.8, so the addition reverts with panic code 0x11 before the
+    widening to `uint16` happens. Wrapping to 44 is what an `unchecked` block would do. The
+    assignment itself compiles: a `uint8` converts implicitly to the wider `uint16`. The fix is to
+    widen first: `return uint16(morning) + afternoon;` returns 300.
+
+- key: sol-basic-06
+  type: multiple
+  category: solidity
+  tags: [types, conversions, constant, immutable, units]
+  prompt: |
+    Which statements about Solidity 0.8 are true? Choose all that apply.
+  options:
+    - text: "For `uint256 x = 300`, `uint8(x)` is 44, and the conversion does not revert"
+      correct: true
+    - text: "An `immutable` state variable can be assigned in the constructor, and never again after deployment"
+      correct: true
+    - text: "`uint256 constant OPENED = block.timestamp;` compiles and records the deployment time"
+    - text: "For `uint256 d = 3`, the expression `d days` is 259200"
+  explanation: |
+    An explicit conversion to a smaller integer type **truncates silently**: it keeps the lowest
+    8 bits, and 300 − 256 = 44, with no error, so check the range yourself before narrowing a
+    value that came from a user. An `immutable` is set during construction and is then copied into
+    the deployed bytecode; assigning it in a function fails with `Cannot write to immutable here`.
+    A `constant` must be known when the code is compiled, so `block.timestamp` is rejected with
+    `Initial value for constant variable has to be compile-time constant.` (an `immutable` set in
+    the constructor is the right tool). Unit suffixes apply only to literals: `d days` fails with
+    `Expected ';' but got 'days'`, and the correct form is `d * 1 days`.
+
+- key: sol-basic-07
+  type: single
+  category: solidity
+  tags: [functions, msg.sender, external-calls]
+  prompt: |
+    ```solidity
+    contract Caller {
+        function whoCalls() public view returns (address) {
+            return msg.sender;
+        }
+
+        function throughThis() external view returns (address) {
+            return this.whoCalls();
+        }
+    }
+    ```
+
+    A test calls `throughThis()` after `vm.prank(address(0xADA))`. What does it return?
+  options:
+    - text: "The address of the `Caller` contract itself"
+      correct: true
+    - text: "`0xADA`, because `msg.sender` is the account that made the pranked call"
+    - text: "The test contract's address, because `vm.prank` only applies to `whoCalls`"
+    - text: "`address(0)`, because a view function called through `this` has no sender"
+  explanation: |
+    `this.whoCalls()` is an **external call**: the contract sends a new message to itself, so
+    inside `whoCalls` the immediate caller, `msg.sender`, is the `Caller` contract. Run in the
+    sandbox, `throughThis()` returned the contract's address, while an internal call,
+    `return whoCalls();` in another function, returned `0xADA`. `vm.prank` changes the sender of
+    the next call from the test, which here is `throughThis`; it does not reach the call the
+    contract makes itself. Use
+    internal calls for helpers: they are cheaper and keep `msg.sender`.
+
+- key: sol-basic-08
+  type: true_false
+  category: solidity
+  tags: [visibility, private, security]
+  prompt: |
+    Declaring `uint256 private doorCode;` in a deployed contract stops anyone outside the contract
+    from finding out the door code.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    `private` is a rule for Solidity code: other contracts cannot read or call the member. It does
+    not encrypt anything. Every storage slot of every contract can be read from outside the
+    chain (`cast storage <address> <slot>`, or `vm.load` in a test, which printed `door code: 4321`
+    in lesson 04), and the value was also visible in the transaction that set it. Never keep a
+    password, key or answer in a contract, whatever its visibility.
+
+- key: sol-basic-09
+  type: single
+  category: solidity
+  tags: [errors, expectRevert, custom-errors]
+  prompt: |
+    `Ferry` declares `error NoSeatsRequested();` and
+    `error NotEnoughSeats(uint256 available, uint256 requested);`, and starts with 40 seats left:
+
+    ```solidity
+    function book(uint256 seats) external {
+        if (seats == 0) revert NoSeatsRequested();
+        require(seats <= seatsLeft, NotEnoughSeats(seatsLeft, seats));
+        seatsLeft -= seats;
+    }
+    ```
+
+    A test runs:
+
+    ```solidity
+    vm.expectRevert(abi.encodeWithSelector(Ferry.NotEnoughSeats.selector, 40, 0));
+    ferry.book(0);
+    ```
+
+    What does `forge test` report?
+  options:
+    - text: "`[FAIL: Error != expected error: NoSeatsRequested() != NotEnoughSeats(40, 0)]`"
+      correct: true
+    - text: "`[PASS]`: `book(0)` reverted, and `vm.expectRevert` only checks that the next call reverts"
+    - text: "`[FAIL: next call did not revert as expected]`, because 0 seats are always available"
+    - text: "`[PASS]`: both checks fail for 0 seats, and the test matches either error"
+  explanation: |
+    `vm.expectRevert(bytes)` compares the **whole revert data**: the selector and every argument.
+    `book` checks for zero seats first, so `book(0)` stops at `revert NoSeatsRequested()` and never
+    reaches the `require`. The revert data is the selector of `NoSeatsRequested()`, not
+    `NotEnoughSeats(40, 0)`, and forge reports both, as in the lesson's run. The call does revert,
+    so "did not revert" is wrong, and a revert stops at the first failing check, so only one error
+    is ever returned. The order of your checks is part of what callers and tests see.
+
+- key: sol-basic-10
+  type: multiple
+  category: solidity
+  tags: [errors, panic, assert]
+  prompt: |
+    Which of these revert with a **panic**, the built-in `Panic(uint256)` error, rather than with
+    an error you chose? Choose all that apply.
+  options:
+    - text: "`assert(seatsSold <= capacity);` when the condition is false"
+      correct: true
+    - text: "`return seatsLeft / cars;` when `cars` is 0"
+      correct: true
+    - text: "`require(msg.sender == captain, \"only the captain\");` when a stranger calls"
+    - text: "`require(seats <= seatsLeft, NotEnoughSeats(seatsLeft, seats));` when too many seats are asked for"
+  explanation: |
+    A panic is raised when the code itself goes wrong: `assert` with a false condition gives
+    `panic: assertion failed (0x01)`, and dividing by zero gives
+    `panic: division or modulo by zero (0x12)`. Overflow (0x11), an index out of bounds (0x32) and
+    `pop()` on an empty array (0x31) are other panics. `require` with a string reverts with the
+    built-in `Error(string)`, and `require` with a custom error reverts with that error: both are
+    errors you chose, to reject bad input. Correct code should never panic, which is why input is
+    checked with `require` or `revert` and `assert` is kept for invariants.
+
+- key: sol-basic-11
+  type: single
+  category: solidity
+  tags: [strings, bytes, unicode]
+  prompt: |
+    What does this expression return?
+
+    ```solidity
+    bytes(unicode"Café Society").length
+    ```
+  options:
+    - text: "13"
+      correct: true
+    - text: "12"
+    - text: "24, because every character takes two bytes"
+    - text: "Nothing: it does not compile, because a string has no length"
+  explanation: |
+    `string` has no `length`, but converting it with `bytes(...)` gives its UTF-8 bytes, which do.
+    "Café Society" has 12 characters, but `é` takes two bytes in UTF-8, so the length is 13 (the
+    lesson's test logged exactly that). ASCII characters take one byte each, so the answer is not
+    24. This is why a limit such as "names up to 16 bytes" must be stated and checked in bytes.
+    Text outside ASCII also needs the `unicode"..."` prefix: `"Café"` alone fails with
+    `Invalid character in string`.
+
+- key: sol-basic-12
+  type: single
+  category: solidity
+  tags: [arrays, swap-and-pop, delete]
+  prompt: |
+    `titles` holds `["Moby-Dick", "Middlemarch", "Beloved", "Kindred"]`, and `remove(1)` runs:
+
+    ```solidity
+    function remove(uint256 index) external {
+        if (index >= titles.length) revert NoSuchTitle(index, titles.length);
+        titles[index] = titles[titles.length - 1];
+        titles.pop();
+    }
+    ```
+
+    What does `titles` hold afterwards?
+  options:
+    - text: "`[\"Moby-Dick\", \"Kindred\", \"Beloved\"]`"
+      correct: true
+    - text: "`[\"Moby-Dick\", \"Beloved\", \"Kindred\"]`"
+    - text: "`[\"Moby-Dick\", \"\", \"Beloved\", \"Kindred\"]`"
+    - text: "`[\"Kindred\", \"Moby-Dick\", \"Beloved\"]`"
+  explanation: |
+    This is **swap-and-pop**: the last element, Kindred, is copied over index 1 and `pop()` removes
+    the old last slot. It costs the same whatever the length, but it changes the order, so an index
+    someone saved earlier may now point at a different title. Keeping the order (Beloved before
+    Kindred) needs every later element shifted down, which costs gas per element. A gap with an
+    empty string is what `delete titles[1]` leaves: it resets one element and keeps the length.
+
+- key: sol-basic-13
+  type: single
+  category: solidity
+  tags: [mappings, enums, structs]
+  prompt: |
+    A tool shed declares its tools like this, and no tool has ever been listed:
+
+    ```solidity
+    enum Status {
+        Available,
+        OnLoan
+    }
+
+    struct Tool {
+        string name;
+        Status status;
+        address borrower;
+        uint256 loans;
+    }
+
+    mapping(uint256 => Tool) public tools;
+
+    function borrow(uint256 id) external {
+        Tool storage tool = tools[id];
+        if (tool.status != Status.Available) revert NotAvailable(id, tool.status);
+        tool.status = Status.OnLoan;
+        tool.borrower = msg.sender;
+        tool.loans += 1;
+    }
+    ```
+
+    What happens when someone calls `borrow(99)`?
+  options:
+    - text: "It succeeds: tool 99 is recorded as on loan to the caller, with 1 loan"
+      correct: true
+    - text: "It reverts with `NotAvailable(99, 0)`, because tool 99 was never listed"
+    - text: "It reverts with a panic, because key 99 does not exist in the mapping"
+    - text: "It does not compile: a storage reference must point at an existing element"
+  explanation: |
+    A mapping behaves as if every key exists, holding zero values. A tool never listed has
+    `status` 0, and an enum's zero value is its **first** member, here `Available`. So the check
+    passes and a tool that does not exist is lent out; the lesson's run logged exactly that. Put a
+    "does not exist" member first (`Unlisted`, `Unknown`, `None`), or keep a `bool exists`, and
+    check it. Nothing panics: reading a mapping never goes out of bounds.
+
+- key: sol-basic-14
+  type: multiple
+  category: solidity
+  tags: [mappings, delete]
+  prompt: |
+    Which statements about `mapping(address => uint256) public credits;` are true? Choose all that
+    apply.
+  options:
+    - text: "`credits(someone)` returns 0 for an address that was never written"
+      correct: true
+    - text: "`delete credits;` does not compile"
+      correct: true
+    - text: "`credits.length` returns how many addresses have a non-zero value"
+    - text: "Deleting a struct that contains a mapping also clears that mapping's entries"
+  explanation: |
+    Every key reads as the zero value until it is written, so a mapping cannot tell "never set" from
+    "set to 0". It stores no list of keys, which means no `length` (error 9582) and no loops, and
+    `delete` on a whole mapping is refused: `Built-in unary operator delete cannot be applied to
+    type mapping(address => uint256)`. You can `delete credits[someone]` to reset one entry.
+    Deleting a struct resets its other fields but leaves a mapping inside it untouched in storage,
+    as the documentation's security considerations warn. To list or clear a mapping, keep an array
+    of its keys.
+
+- key: sol-basic-15
+  type: single
+  category: solidity
+  tags: [data-locations, memory, references]
+  prompt: |
+    What does this function return?
+
+    ```solidity
+    function aliasDemo() external pure returns (uint256, uint256) {
+        uint256[] memory a = new uint256[](1);
+        uint256[] memory b = a;
+        b[0] = 7;
+        return (a[0], b[0]);
+    }
+    ```
+  options:
+    - text: "`(7, 7)`"
+      correct: true
+    - text: "`(0, 7)`, because assigning an array makes a copy"
+    - text: "`(0, 0)`, because a memory array cannot be changed after it is created"
+    - text: "Nothing: assigning one memory array to another does not compile"
+  explanation: |
+    Assignments between **memory** variables copy only the reference, so `a` and `b` are two names
+    for one array and writing through `b` changes what `a` sees. Copies happen between different
+    locations: storage to memory, memory or calldata to storage, and any assignment to a state
+    variable. A storage-to-local `storage` assignment is again a reference. A memory array has a
+    fixed length, but its elements can be written.
+
+- key: sol-basic-16
+  type: true_false
+  category: solidity
+  tags: [data-locations, transient-storage]
+  prompt: |
+    True or false: a `transient` state variable, such as `uint256 transient runsThisTx;`, keeps
+    its value from one transaction to the next as long as both are in the same block.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    Transient storage (EIP-1153, available since the Cancun upgrade and supported for value-type
+    state variables since Solidity 0.8.28) is cleared at the end of **every transaction**, not every
+    block. Within one transaction every call sees the same value, so it suits per-transaction
+    state such as a lock or a counter, and it is much cheaper than storage. Because it does not
+    survive, never use it for anything that must be remembered, and do not rely on its value
+    between separate calls that a user might make in different transactions.
+
+- key: sol-basic-17
+  type: single
+  category: solidity
+  tags: [events, indexed, topics]
+  prompt: |
+    A contract declares and emits this event:
+
+    ```solidity
+    event Tagged(string indexed tag);
+
+    function tag(string calldata t) external {
+        emit Tagged(t);
+    }
+    ```
+
+    Someone calls `tag("beans")`. What does the log's topic 1 hold?
+  options:
+    - text: "`keccak256(\"beans\")`, the hash of the string; the log's data part is empty"
+      correct: true
+    - text: "The text `beans`, ABI-encoded, so an app can read it back from the topic"
+    - text: "The first 32 bytes of `beans`, padded with zeros, and the full string in the data part"
+    - text: "Nothing: the declaration does not compile, because only value types may be indexed"
+  explanation: |
+    Each `indexed` parameter becomes one 32-byte **topic** that nodes can filter on. A value
+    type such as an id or an address fits in a topic as it is. A string, `bytes` or array does
+    not, so Solidity stores its **keccak256 hash** instead: apps can still ask "every log tagged
+    beans" by hashing the word themselves, but they can never turn the topic back into the text,
+    and the text is not repeated in the data part. In a test, `entries[0].topics[1] ==
+    keccak256("beans")` and `entries[0].data.length == 0` both hold. Indexing a string is
+    allowed; leave it unindexed when apps must display it.
+
+- key: sol-basic-18
+  type: multiple
+  category: solidity
+  tags: [events, logs, expectEmit]
+  prompt: |
+    Which statements about events are true? Choose all that apply.
+  options:
+    - text: "If the function reverts after its `emit`, the log is discarded along with the other changes"
+      correct: true
+    - text: "A non-anonymous event can have at most three `indexed` parameters, because topic 0 holds the event's signature hash"
+      correct: true
+    - text: "A contract can read the logs it emitted in earlier transactions, which makes events a cheap substitute for storage"
+    - text: "In a Foundry test, `vm.expectEmit` is called after the call that should emit the event"
+  explanation: |
+    A log has up to four topics. For an ordinary event, topic 0 is the keccak256 hash of its
+    signature, which leaves three for `indexed` parameters; a fourth gives `Error (7249): More
+    than 3 indexed arguments for event.` A revert undoes everything the call did, logs included,
+    so an event only describes what really happened. Logs are cheap precisely because the EVM
+    never lets a contract read them: anything a later call needs must stay in storage. In a
+    test, the order is `vm.expectEmit(...)`, then the `emit` you expect, then the call.
+
+- key: sol-basic-19
+  type: single
+  category: solidity
+  tags: [modifiers, order]
+  prompt: |
+    What does calling `run()` log?
+
+    ```solidity
+    modifier announce(string memory name) {
+        console.log(name, "before");
+        _;
+        console.log(name, "after");
+    }
+
+    function run() external announce("outer") announce("inner") {
+        runs += 1;
+        console.log("body");
+    }
+    ```
+  options:
+    - text: "`outer before`, `inner before`, `body`, `inner after`, `outer after`"
+      correct: true
+    - text: "`outer before`, `inner before`, `body`, `outer after`, `inner after`"
+    - text: "`inner before`, `outer before`, `body`, `outer after`, `inner after`"
+    - text: "`outer before`, `outer after`, `inner before`, `inner after`, `body`"
+  explanation: |
+    Modifiers run left to right, and each one wraps everything after it: the function body is
+    placed where the modifier writes `_;`. So `outer` runs its first line, then `inner` runs as
+    the code at `outer`'s `_`, then the body as the code at `inner`'s `_`. The rest unwinds in
+    the opposite order, like nested function calls: `inner after` finishes before `outer after`.
+    This is why a guard such as `onlyOwner` checks *before* `_;`, and why the order you list
+    modifiers in decides which error a caller sees first.
+
+- key: sol-basic-20
+  type: true_false
+  category: solidity
+  tags: [access-control, tx-origin]
+  prompt: |
+    A wallet contract guards its withdrawals with `if (tx.origin != owner) revert NotOwner();`.
+    This is safe, because `tx.origin` is the account that signed the transaction and cannot be
+    faked.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    `tx.origin` cannot be faked, but that is the problem: it stays the owner throughout the
+    whole transaction, through every contract in between. If the owner can be tricked into
+    calling any malicious contract (a fake airdrop, a token with a hook), that contract can call
+    the wallet's withdrawal in the same transaction, and `tx.origin == owner` still passes.
+    `msg.sender` is the direct caller, which here would be the malicious contract, so a
+    `msg.sender` check refuses it. Authorize with `msg.sender`, never with `tx.origin`.
+
+- key: sol-basic-21
+  type: single
+  category: solidity
+  tags: [receive, fallback, ether]
+  prompt: |
+    ```solidity
+    contract Doorbell {
+        receive() external payable {}
+        fallback() external payable {}
+    }
+    ```
+
+    Another account sends `address(bell).call{value: 5}(hex"c0ffee")`. Which function runs?
+  options:
+    - text: "`fallback`, because the call data is not empty and matches no function"
+      correct: true
+    - text: "`receive`, because the call carries ether and `receive` exists"
+    - text: "Neither: a call that carries both ether and data reverts"
+    - text: "`receive` first for the ether, then `fallback` for the data"
+  explanation: |
+    The choice depends on the call data, not on the ether. `receive` runs only when the data is
+    **empty**, as with a plain transfer. When the data is not empty and matches no function,
+    `fallback` runs; because it is `payable`, it may keep the 5 wei. Logging `msg.value` and
+    `msg.data.length` in both functions prints `fallback 5 3` for this call. Exactly one special
+    function runs per call. A contract with neither function refuses a plain transfer.
+
+- key: sol-basic-22
+  type: single
+  category: solidity
+  tags: [ether, transfer, call, gas-stipend]
+  prompt: |
+    ```solidity
+    contract HutLogbook {
+        uint256 public gifts;
+
+        receive() external payable {
+            gifts += 1;
+        }
+    }
+    ```
+
+    A contract pays the logbook with `payable(address(book)).transfer(1 wei)`. What happens?
+  options:
+    - text: "The payment reverts: `transfer` gives `receive` only 2300 gas, and the storage write runs out of gas"
+      correct: true
+    - text: "The payment succeeds and `gifts` becomes 1, because `transfer` forwards all the remaining gas"
+    - text: "`transfer` returns `false`, and the paying contract carries on with the 1 wei still in its balance"
+    - text: "It does not compile: `transfer` cannot send ether to a contract, only to an externally owned account"
+  explanation: |
+    `transfer` and `send` pass a fixed **2300 gas stipend**, enough to log an event but not to
+    write storage. In the trace, `HutLogbook::receive` runs with `[2300]` gas and ends in
+    `[OutOfGas] EvmError: OutOfGas`, and `transfer` then reverts the whole call. (`send` would
+    return `false` instead, which is the third option's behaviour.) The same payment made with
+    `(bool ok, ) = to.call{value: 1 wei}("")` succeeds. Since Solidity 0.8.31 the compiler warns
+    that `transfer` is deprecated and suggests `call{value: <amount>}("")`; check `ok` and
+    revert with a custom error when it is false.
+
+- key: sol-basic-23
+  type: single
+  category: solidity
+  tags: [fuzz-testing, bound, assume]
+  prompt: |
+    A fuzz test needs an amount between 1 wei and 100 ether. Which way of shaping the input is
+    the better choice?
+  options:
+    - text: "`amount = bound(amount, 1, 100 ether);`, because every generated value is mapped into the range and every run counts"
+      correct: true
+    - text: "`vm.assume(amount >= 1 && amount <= 100 ether);`, because it keeps the inputs uniformly random"
+    - text: "`require(amount >= 1 && amount <= 100 ether);` inside the test, so out-of-range runs are skipped"
+    - text: "Neither: a fuzz test must accept every possible `uint256`, or it proves nothing"
+  explanation: |
+    `bound(x, min, max)` from forge-std maps any input into `min..max`, so all 256 runs test
+    something. `vm.assume(condition)` throws a run away when the condition is false; it is meant
+    for rare exclusions. When it rejects most inputs, the test fails with
+    `` `vm.assume` rejected too many inputs (65536 allowed) ``. A `require` that fails inside the
+    test does not skip the run: it fails the test. Restricting inputs to the values the
+    property is about is normal; the fuzzer still tries edge cases inside the range.
+
+- key: sol-basic-24
+  type: single
+  category: solidity
+  tags: [fuzz-testing, counterexample, off-by-one]
+  prompt: |
+    `close()` was written as `state = totalPledged > goal ? State.Succeeded : State.Failed;`,
+    and this fuzz test, with `GOAL = 10 ether`, fails:
+
+    ```solidity
+    function testFuzz_reaching_the_goal_succeeds(uint256 amount) public {
+        amount = bound(amount, GOAL, 100 ether);
+        _pledge(ada, amount);
+        vm.prank(organiser);
+        fund.close();
+        assertEq(uint256(fund.state()), uint256(BenchFund.State.Succeeded), "state after reaching the goal");
+    }
+    ```
+
+    ```text
+    [FAIL: state after reaching the goal: 2 != 1; counterexample: calldata=0x863d13850000000000000000000000000000000000000000000000000000000000000000 args=[0]] testFuzz_reaching_the_goal_succeeds(uint256) (runs: 34, μ: 142742, ~: 142862)
+    ```
+
+    How much did the failing run pledge?
+  options:
+    - text: "Exactly 10 ether: `args` shows the raw input 0, which `bound` mapped to the minimum, `GOAL`"
+      correct: true
+    - text: "0 wei, as `args=[0]` shows, which the fund refused"
+    - text: "100 ether, the largest amount allowed by `bound`"
+    - text: "It cannot be known: a counterexample is a random value and cannot be reproduced"
+  explanation: |
+    The counterexample reports the input **before** the test changed it. `bound(0, GOAL, 100
+    ether)` gives `GOAL`, and only a pledge of exactly the goal can expose this bug: anything
+    larger passes `>`. The assertion's values say the same: the state was 2 (`Failed`) where 1
+    (`Succeeded`) was expected. A pledge of 0 would have reverted with `ZeroAmount()` instead of
+    reaching the assertion. Fuzzing found the boundary on its own, after 34 runs; with a fixed
+    seed the same input comes back on every run, and forge also saves it to try first next time.

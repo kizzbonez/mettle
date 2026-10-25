@@ -1,0 +1,19 @@
+title: Cricket Club Scoreboard
+summary: Write the one missing function of a small contract that updates two state variables, then read what forge's tests report about the scoreboard after every ball.
+language: solidity
+minutes: 10
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Scores the first four balls from the instructions
+    file: 01-first-balls.sol
+    hidden: false
+  - name: Adds up the runs of every ball
+    file: 02-runs.sol
+    hidden: true
+  - name: Counts every ball, dot balls included, and the overs they make
+    file: 03-balls-and-overs.sol
+    hidden: true
+  - name: Leaves the wickets to wicket()
+    file: 04-wickets.sol
+    hidden: true

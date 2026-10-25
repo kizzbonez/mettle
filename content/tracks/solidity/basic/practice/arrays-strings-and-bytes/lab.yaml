@@ -1,0 +1,19 @@
+title: Apiary Hive Roll
+summary: Keep a capped list of names in a storage array, check their length in bytes and their uniqueness by hash, remove with swap-and-pop, filter into a memory array and join strings.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Accepts only short, unique names and caps the roll
+    file: 02-adding.sol
+    hidden: true
+  - name: Removes hives with swap-and-pop
+    file: 03-removing.sol
+    hidden: true
+  - name: Filters names by first letter and writes plaques
+    file: 04-filter-and-plaque.sol
+    hidden: true

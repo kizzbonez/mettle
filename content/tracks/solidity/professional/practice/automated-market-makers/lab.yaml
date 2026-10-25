@@ -1,0 +1,19 @@
+title: Compost and Water Credit Pool
+summary: Finish a constant-product pool between two community credits by writing the fee-adjusted swap formula, a swap with a deadline and a minimum output that defeats a sandwich, and a proportional removal of liquidity, keeping the reserves equal to the balances and k from ever falling.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Prices swaps with the constant-product formula and its fee
+    file: 02-amount-out.sol
+    hidden: true
+  - name: Protects swaps with a deadline and a minimum output
+    file: 03-swap-protection.sol
+    hidden: true
+  - name: Pays out liquidity in proportion and enforces its limits
+    file: 04-remove-liquidity.sol
+    hidden: true

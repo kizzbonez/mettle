@@ -1,0 +1,19 @@
+title: Bandstand Instrument Fund
+summary: Build a town band's ERC-4626 instrument fund on OpenZeppelin 5.7 with a decimals offset against donation attacks, a deposit cap expressed through maxDeposit and maxMint, and a 0.5% exit fee whose previews round in the vault's favour and match what withdraw and redeem really do.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Charges the exit fee exactly as the previews promise
+    file: 02-exit-fee.sol
+    hidden: true
+  - name: Keeps deposits under the cap, even after a donation
+    file: 03-cap.sol
+    hidden: true
+  - name: Makes a donation attack cost the attacker far more than the victim
+    file: 04-inflation-attack.sol
+    hidden: true

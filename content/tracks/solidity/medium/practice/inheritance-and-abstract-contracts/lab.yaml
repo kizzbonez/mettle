@@ -1,0 +1,19 @@
+title: Woodshop Lathe Bookings
+summary: Fill in the hooks of two abstract layers, combine them in one contract with override and super, and let C3 linearization decide which booking rule runs first.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Lets only members book, and passes the booking on
+    file: 02-members-only.sol
+    hidden: true
+  - name: Limits each booker's slots, and passes the booking on
+    file: 03-slot-limit.sol
+    hidden: true
+  - name: Combines both rules in the woodshop in the right order
+    file: 04-woodshop.sol
+    hidden: true

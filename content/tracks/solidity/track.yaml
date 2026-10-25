@@ -1,0 +1,17 @@
+title: Solidity Smart Contracts
+tagline: From your first contract to secure, production-grade Solidity on Ethereum.
+description: >-
+  A full course in four levels on Solidity 0.8.38 and Foundry, for people who already program.
+  It starts from zero on blockchains: what Ethereum, accounts, gas and the EVM are, then types,
+  functions, errors, arrays, mappings and structs, data locations, events, modifiers and
+  payments; then interfaces, inheritance, libraries, ERC-20 and ERC-721 tokens, ABI encoding,
+  gas, time, testing and deployment with Foundry; then the attacks that drain real contracts and
+  how to stop them, from reentrancy and access control to oracle manipulation, signature replay
+  and proxy storage collisions; and finally gas optimisation, assembly, upgrades, ERC-4626
+  vaults, AMMs, account abstraction, governance, audits and the EVM roadmap. Every lab runs in a
+  local EVM with Foundry, and the security labs are attacked by the tests.
+icon: Boxes
+category: solidity
+sortOrder: 10
+format: course
+revision: 1

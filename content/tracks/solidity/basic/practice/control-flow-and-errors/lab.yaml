@@ -1,0 +1,19 @@
+title: Blueberry Field Baskets
+summary: Price an order with a bounded loop and a floor, refuse bad orders with custom errors in a fixed order, and let only the farmer close the day.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Prices every order size, down to the floor
+    file: 02-prices.sol
+    hidden: true
+  - name: Refuses bad orders in the right order and changes nothing
+    file: 03-reserve-errors.sol
+    hidden: true
+  - name: Lets only the farmer close the day and starts it afresh
+    file: 04-close-day.sol
+    hidden: true

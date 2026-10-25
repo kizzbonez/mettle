@@ -1,0 +1,19 @@
+title: Puppet Theatre Seat Refunds
+summary: Threat-model a ticket contract, then fix the three flaws an attacker would use to take ticket money, so that attack tests fail and the box office still works.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example and a stranger's attack
+    file: 01-example.sol
+    hidden: false
+  - name: Refunds each seat once, whatever list a holder sends
+    file: 02-refund-once.sol
+    hidden: true
+  - name: Keeps the organiser to the show's timeline
+    file: 03-show-timeline.sol
+    hidden: true
+  - name: Still sells seats and refunds them by the rules
+    file: 04-box-office-rules.sol
+    hidden: true

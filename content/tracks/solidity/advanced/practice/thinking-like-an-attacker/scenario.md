@@ -1,0 +1,1 @@
+The Larkspur Puppet Theatre sells the 40 seats of its Saturday show as on-chain tickets, refundable if the show is cancelled. Before the box office opens, the theatre has asked you to read its contract as an attacker would.

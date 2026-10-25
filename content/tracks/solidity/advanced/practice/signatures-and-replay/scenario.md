@@ -1,0 +1,1 @@
+At the end of each shift, the community orchard's coordinator signs a voucher for every picker's crates, and pickers cash them at the orchard's pay contract. Last Saturday one 1-ether voucher was cashed eleven times.

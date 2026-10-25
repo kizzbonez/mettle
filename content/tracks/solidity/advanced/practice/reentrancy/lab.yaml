@@ -1,0 +1,19 @@
+title: Beekeepers' Co-op Vault
+summary: Close the reentrancy paths in a member vault with checks-effects-interactions and a reentrancy guard, so a member contract cannot withdraw twice, move a deposit while it is being paid, or collect extra badges from an ERC-721 receiver hook.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example and stops a repeated withdrawal
+    file: 01-example.sol
+    hidden: false
+  - name: Stops a deposit from being moved while it is paid out
+    file: 02-cross-function.sol
+    hidden: true
+  - name: Gives one badge per member, even from a receiver hook
+    file: 03-badge-hook.sol
+    hidden: true
+  - name: Still pays members and keeps the books balanced
+    file: 04-payments.sol
+    hidden: true

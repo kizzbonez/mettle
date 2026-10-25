@@ -1,0 +1,1 @@
+The climbing club's locker-key deposit box was written in 2021 and has not been touched since. This season half the members pay from smart wallets or EIP-7702 accounts, and the box turns them away or fails to pay them back.

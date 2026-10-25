@@ -1,0 +1,1 @@
+The parish council gives small grants from a community fund: lamps for the reading room, repairs to the bell tower. Residents hold CIVIC tokens and vote on each grant, every passed grant waits a day in a timelock, and the parish clerk can freeze the fund in an emergency but must never be able to spend from it.

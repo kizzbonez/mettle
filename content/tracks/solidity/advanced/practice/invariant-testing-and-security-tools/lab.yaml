@@ -1,0 +1,19 @@
+title: Community Kitchen Meal Credits
+summary: Write the invariant-test handler for a meal-credit contract, with actors, bounded inputs and ghost totals, so that Foundry's fuzzer can check its accounting and expose the bugs in faulty versions.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Keeps four invariants true across random call sequences
+    file: 02-invariants.sol
+    hidden: true
+  - name: Bounds wild inputs instead of reverting
+    file: 03-handler-calls.sol
+    hidden: true
+  - name: Exposes the bugs in two faulty contracts
+    file: 04-catches-bugs.sol
+    hidden: true

@@ -1,0 +1,19 @@
+title: Bike Co-op Dues Vault
+summary: Repair an upgradeable vault whose proxy and implementation overwrite each other's storage, then close the two initializer holes that let anyone take it over.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Keeps proxy and vault storage apart through deposits and upgrades
+    file: 02-collisions-and-upgrades.sol
+    hidden: true
+  - name: Cannot be taken over through an initializer
+    file: 03-takeovers.sol
+    hidden: true
+  - name: Records dues and pays withdrawals
+    file: 04-dues.sol
+    hidden: true

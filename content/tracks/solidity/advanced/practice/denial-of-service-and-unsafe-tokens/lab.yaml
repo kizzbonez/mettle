@@ -1,0 +1,19 @@
+title: Ferry Crew Tip Pool
+summary: Turn a tip pool that pays its whole crew in one loop into one where each member collects their own share, with a capped crew, SafeERC20 and amounts measured on arrival.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Keeps paying the crew when one member is frozen
+    file: 02-frozen-member.sol
+    hidden: true
+  - name: Handles tokens without return values, with fees, and that return false
+    file: 03-unusual-tokens.sol
+    hidden: true
+  - name: Caps the crew and shares every token received
+    file: 04-bounded-crew.sol
+    hidden: true

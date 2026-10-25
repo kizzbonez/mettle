@@ -1,0 +1,19 @@
+title: Telescope Loans Test Suite
+summary: Write the tests for a finished loan contract with pranks, ether, warps, an exact expected revert, a mocked dependency and a bounded fuzz test, and prove each one catches the bug it is meant to catch.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Your tests pass against the real contract
+    file: 01-real-contract.sol
+    hidden: false
+  - name: Your access tests catch a missing borrower check and a missing membership check
+    file: 02-access-bugs.sol
+    hidden: true
+  - name: Your due-second test catches a fee charged on time
+    file: 03-due-second.sol
+    hidden: true
+  - name: Your fuzz test catches a late fee without a cap
+    file: 04-fee-cap.sol
+    hidden: true

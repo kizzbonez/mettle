@@ -1,0 +1,1 @@
+The community kitchen sells meal credits that regulars buy, pass to friends, eat or cash back in. Before the kitchen trusts the contract with a winter's worth of credits, its volunteers want the fuzzer to try every order of those actions for them.

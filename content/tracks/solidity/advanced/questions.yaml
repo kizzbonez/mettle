@@ -1,0 +1,537 @@
+- key: sol-advanced-01
+  type: single
+  category: solidity
+  tags: [threat-modelling, testing]
+  prompt: |
+    You suspect a `ClubFund` lets a member move credit to themselves and create value out of
+    nothing. You write a Foundry test where the attacker performs the move and withdraws. Which
+    assertion makes this a good attack test?
+  options:
+    - text: |
+        That the fund's ether and the sum of members' credit still match the invariant, for
+        example `assertEq(address(fund).balance, 5 ether, "the honest deposit is still backed")`
+      correct: true
+    - text: |
+        That the attacker's balance equals the exact amount stolen, for example
+        `assertEq(mallory.balance, 2 ether, "stolen amount")`
+    - text: |
+        That the transaction reverts, with `vm.expectRevert()` around the attacker's call
+    - text: |
+        That gas usage stays under a fixed budget during the attack
+  explanation: |
+    An attack test should assert the **invariant** the contract must keep, here that no member can
+    withdraw more than was deposited for them. Written that way the test fails while the bug
+    exists (red proves it) and passes once you fix it, guarding against its return. Asserting the
+    exact amount stolen does the opposite: it passes on the buggy contract and fails after the
+    fix. The exploit does not revert (that is the problem), and gas is beside the point.
+
+- key: sol-advanced-02
+  type: true_false
+  category: solidity
+  tags: [checks-effects-interactions]
+  prompt: |
+    Checks-effects-interactions says a function should perform its external calls (such as paying
+    ether) first, and only then update its own state.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    It is the reverse. The order is **checks** (validate the caller and arguments), then
+    **effects** (update state), then **interactions** (external calls) last. An external call
+    hands control to code that may call back into your contract, so your state must already be
+    correct before the call. Paying before updating state is exactly the reentrancy bug that
+    emptied The DAO.
+
+- key: sol-advanced-03
+  type: single
+  category: solidity
+  tags: [reentrancy, cross-function]
+  prompt: |
+    A vault's `withdrawAll` carries OpenZeppelin's `nonReentrant` modifier, but it sends ether
+    before it sets the caller's balance to zero. An unguarded `transfer(to, amount)` moves credit
+    between balances. What can an attacker's `receive()` do during the withdrawal?
+  options:
+    - text: |
+        Call `transfer` to move the still-nonzero balance to another account, because the guard
+        only blocks re-entering `withdrawAll`, not the stale state it reads
+      correct: true
+    - text: |
+        Nothing: `nonReentrant` on `withdrawAll` locks the whole contract, so no other function
+        can run until it returns
+    - text: |
+        Call `withdrawAll` again and be paid twice, because the guard does not stop the function
+        that carries it
+    - text: |
+        Nothing, because `receive()` is given only 2300 gas and cannot make a call
+  explanation: |
+    This is **cross-function reentrancy**. The guard stops `withdrawAll` from being re-entered,
+    but the real fault is that the balance is still non-zero during the external call, and the
+    unguarded `transfer` can read and move it. The fix is checks-effects-interactions (zero the
+    balance before paying) and guarding every function that touches the same state. `nonReentrant`
+    is one lock for all guarded functions, but it does not cover unguarded ones; and ether sent
+    with `call` forwards all gas, not 2300.
+
+- key: sol-advanced-04
+  type: single
+  category: solidity
+  tags: [reentrancy, reentrancy-guard]
+  prompt: |
+    With OpenZeppelin 5.x, a contract has two `external` functions that both use the
+    `nonReentrant` modifier, and one of them calls the other directly:
+
+    ```solidity
+    function addTwice(uint256 x) external nonReentrant {
+        add(x);
+    }
+
+    function add(uint256 x) public nonReentrant {
+        total += x;
+    }
+    ```
+
+    What happens when you call `addTwice`?
+  options:
+    - text: "It reverts with `ReentrancyGuardReentrantCall()`"
+      correct: true
+    - text: "It succeeds: the same caller is allowed through the guard twice"
+    - text: "It reverts with the string `\"ReentrancyGuard: reentrant call\"`"
+    - text: "It reverts with a panic `0x01` (assertion failure)"
+  explanation: |
+    There is a single guard for the whole contract. `addTwice` sets it, then calls `add`, which
+    finds it already set and reverts with the custom error `ReentrancyGuardReentrantCall()`.
+    OpenZeppelin 5.x uses custom errors, not the old 4.x revert string. The documented fix is to
+    put the shared work in a `private` function that neither guard wraps, and have both `external`
+    entry points call it.
+
+- key: sol-advanced-05
+  type: single
+  category: solidity
+  tags: [access-control, tx-origin]
+  prompt: |
+    A wallet authorises spending with `if (tx.origin != owner) revert NotOwner(msg.sender);`.
+    Why is this exploitable, and what is the fix?
+  options:
+    - text: |
+        Any contract the owner is tricked into calling can spend the wallet, because `tx.origin`
+        stays the owner through nested calls; check `msg.sender == owner` instead
+      correct: true
+    - text: |
+        `tx.origin` can be spoofed by setting a transaction field, so read `msg.sender`, which
+        cannot be spoofed
+    - text: |
+        `tx.origin` costs more gas than `msg.sender`; the fix is only an optimisation, not a
+        security change
+    - text: |
+        Nothing is wrong: `tx.origin` and `msg.sender` are always the same, so either check works
+  explanation: |
+    `tx.origin` is the externally owned account that started the whole transaction, so it stays
+    the owner even when the owner's transaction calls a malicious contract that then calls the
+    wallet. The attacker's contract passes the `tx.origin == owner` check and drains it (a
+    phishing attack). Checking `msg.sender`, the immediate caller, identifies the attacker's
+    contract instead. `tx.origin` is not spoofable, and it equals `msg.sender` only when an
+    account calls the contract directly.
+
+- key: sol-advanced-06
+  type: multiple
+  category: solidity
+  tags: [access-control, selfdestruct, visibility]
+  prompt: |
+    Which statements about access control on a public chain are correct? Choose all that apply.
+  options:
+    - text: |
+        An `initialize`-style function must refuse to run a second time, or anyone can call it
+        again and seize ownership
+      correct: true
+    - text: |
+        Marking a state variable `private` stops other contracts from reading it in Solidity, but
+        its value is still readable from the chain's storage
+      correct: true
+    - text: |
+        Since EIP-6780 (Cancun), `selfdestruct` no longer deletes a contract's code and storage
+        unless it runs in the same transaction that created the contract
+      correct: true
+    - text: |
+        A function with no visibility keyword defaults to `private`, so it is safe to leave it off
+        privileged functions
+  explanation: |
+    Unprotected initializers are the Parity wallet freeze: guard them to run once. `private` and
+    `internal` restrict which contracts may read a value in the language; they do not hide it,
+    since all storage is public on chain (read it with an RPC call or `vm.load`). EIP-6780 limits
+    `selfdestruct` to transferring ether unless the contract was created in the same transaction.
+    The last option is false twice over: since 0.8 a function with no visibility does not compile
+    at all, and the old default was `public`, never `private`.
+
+- key: sol-advanced-07
+  type: single
+  category: solidity
+  tags: [arithmetic, precision]
+  prompt: |
+    In Solidity 0.8.x, what does this expression evaluate to?
+
+    ```solidity
+    (uint256(3) / 7) * 1e18
+    ```
+  options:
+    - text: "0"
+      correct: true
+    - text: "428571428571428571"
+    - text: "3000000000000000000"
+    - text: "It reverts with a panic 0x12 (division by zero)"
+  explanation: |
+    Integer division truncates toward zero, and it happens first: `3 / 7` is `0`, so
+    `0 * 1e18` is `0`. Multiplying before dividing keeps the precision:
+    `3 * 1e18 / 7` is `428571428571428571`, and `Math.mulDiv(3, 1e18, 7)` gives the same with a
+    512-bit intermediate product. There is no division by zero here (the divisor is 7).
+
+- key: sol-advanced-08
+  type: true_false
+  category: solidity
+  tags: [arithmetic, safecast]
+  prompt: |
+    `uint128(x)` where `x` is a `uint256` larger than `type(uint128).max` reverts the transaction,
+    protecting your accounting from a truncated value.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    A plain narrowing cast never reverts: it keeps only the low 128 bits and silently truncates,
+    so `uint128(type(uint128).max + 5)` is `4`. That corrupts balances without warning. Use
+    OpenZeppelin's `SafeCast.toUint128(x)`, which reverts with
+    `SafeCastOverflowedUintDowncast(128, x)` when the value does not fit.
+
+- key: sol-advanced-09
+  type: single
+  category: solidity
+  tags: [front-running, mev]
+  prompt: |
+    A swap executes `out = amountIn * currentRate` with no other parameters. A searcher sandwiches
+    it to worsen the rate. Which change best protects the caller?
+  options:
+    - text: |
+        Take a caller-chosen `minOut` and a `deadline`, and revert if `out < minOut` or the
+        deadline has passed
+      correct: true
+    - text: |
+        Require `msg.sender == tx.origin` so only externally owned accounts can swap
+    - text: |
+        Store the rate in a `private` variable so searchers cannot read it
+    - text: |
+        Add OpenZeppelin's `nonReentrant` modifier to the swap function
+  explanation: |
+    A **slippage limit** (`minOut`) lets the caller state the worst result they accept, so a
+    sandwich that worsens the price makes the swap revert instead of filling badly; a
+    **deadline** stops a transaction mined much later from executing at a stale price. The
+    contract enforces the limit but never picks it. A `tx.origin` check only locks out
+    smart-contract wallets; a `private` variable is still readable on chain; and a reentrancy
+    guard addresses a different attack.
+
+- key: sol-advanced-10
+  type: multiple
+  category: solidity
+  tags: [front-running, commit-reveal]
+  prompt: |
+    A commit-reveal scheme should resist front-running of the reveal. Which design rules are
+    needed? Choose all that apply.
+  options:
+    - text: |
+        Bind the committer into the commitment, for example
+        `keccak256(abi.encode(value, salt, msg.sender))`, so only its author can open it
+      correct: true
+    - text: |
+        Require a delay (some blocks) between a commit and its reveal, so a searcher cannot commit
+        and reveal the same value in one block after seeing it
+      correct: true
+    - text: |
+        Include a random `salt` in the commitment so equal values do not produce equal hashes
+      correct: true
+    - text: |
+        Store each committed value in a public mapping during the commit phase so it can be
+        audited before the reveal
+  explanation: |
+    Binding `msg.sender` stops anyone from opening someone else's commitment; the reveal delay
+    stops a searcher who learns the value at reveal time from committing and revealing it in the
+    same block ahead of the finder; and a `salt` keeps the commitment from leaking the value to a
+    guesser (equal values would otherwise hash the same). Storing the value in the clear during
+    the commit phase defeats the whole scheme, since on-chain storage is public and the value
+    could be front-run immediately.
+
+- key: sol-advanced-11
+  type: single
+  category: solidity
+  tags: [oracles, flash-loans]
+  prompt: |
+    A lending contract values a member's collateral with the spot price of a constant-product
+    pool, `pool.coin() * 1e18 / pool.grain()`, and lends up to half of that value. The pool
+    holds 1,000 GRAIN and 2,000 COIN. Why can an attacker with no money of their own drain it?
+  options:
+    - text: "A flash loan lends them enough COIN to move the pool's reserves, and the borrow from the lender and the repayment of the loan happen in the same transaction, so the skewed price only has to last an instant"
+      correct: true
+    - text: "A flash loan does not have to be repaid when the transaction fails, so the attacker keeps the borrowed COIN"
+    - text: "The pool updates its spot price only once per block, so the attacker can borrow against the price of the previous block"
+    - text: "The call to the lender comes from the flash lender's contract, which skips the lender's collateral checks"
+  explanation: |
+    Buying GRAIN with a large amount of COIN changes the reserves at once, so the spot price
+    moves inside the same transaction: in the lesson, 18,000 flash-borrowed COIN pushed the price
+    from 2 to 200, the lender allowed 10,000 COIN against 100 GRAIN, and selling the GRAIN back
+    repaid the loan with 9,777 COIN to spare. A flash loan is repaid in the same transaction
+    or the whole transaction reverts, so it costs only its fee: lack of capital is no defence.
+    The spot price is not delayed by a block, and the call to the lender comes from the
+    attacker's own contract, which passes every check a normal borrower passes. Use a checked
+    price feed or a TWAP instead.
+
+- key: sol-advanced-12
+  type: single
+  category: solidity
+  tags: [oracles, decimals]
+  prompt: |
+    ```solidity
+    function price() public view returns (uint256) {
+        (, int256 answer,, uint256 updatedAt,) = feed.latestRoundData();
+        if (answer <= 0) revert BadPrice(answer);
+        if (updatedAt == 0 || block.timestamp - updatedAt > MAX_AGE) {
+            revert StalePrice(updatedAt, block.timestamp);
+        }
+        return uint256(answer) * 10 ** (18 - feed.decimals());
+    }
+    ```
+
+    The feed's `decimals()` is 6 and it has just answered `2_500_000`. What does `price()`
+    return?
+  options:
+    - text: "`2500000000000000000`, which is 2.5 scaled to 18 decimals"
+      correct: true
+    - text: "`2500000`: the answer is returned as the feed reported it"
+    - text: "`2500000000000000000000000000000`, because the answer is multiplied by 10 to the 18 + 6"
+    - text: "It reverts with `panic: arithmetic underflow or overflow (0x11)`"
+  explanation: |
+    The answer means 2.500000 with 6 decimals. `18 - 6` is 12, and `2_500_000 * 10**12` is
+    `2500000000000000000`, the value 2.5 with the 18 decimals the rest of the arithmetic uses;
+    the lesson's test printed exactly that. Returning the raw answer would undervalue the
+    collateral by a factor of 10^12. The panic does happen, but only for a feed with **more**
+    than 18 decimals, where `18 - decimals` underflows; such a feed needs a division instead.
+
+- key: sol-advanced-13
+  type: single
+  category: solidity
+  tags: [signatures, replay, eip712]
+  prompt: |
+    ```solidity
+    function claim(address to, uint256 amount, uint256 nonce, uint256 deadline, bytes calldata signature) external {
+        if (block.timestamp > deadline) revert Expired(deadline);
+        address signer = ECDSA.recover(voucherDigest(to, amount, nonce, deadline), signature);
+        if (signer != owner) revert InvalidSigner(signer);
+        _useCheckedNonce(to, nonce); // OpenZeppelin Nonces
+        (bool ok,) = to.call{value: amount}("");
+        if (!ok) revert PaymentFailed();
+    }
+    ```
+
+    `voucherDigest` returns OpenZeppelin's `_hashTypedDataV4` of the voucher. The owner signs a
+    voucher for Bob with nonce 0 and a deadline a day away. A stranger submits it, it pays Bob,
+    and the stranger submits exactly the same call again a minute later. What happens?
+  options:
+    - text: "It reverts with `InvalidAccountNonce(bob, 1)`: the signature is still valid, but Bob's next nonce is now 1"
+      correct: true
+    - text: "It reverts with `InvalidSigner(...)`, because a signature can be recovered only once"
+    - text: "It reverts with `Expired(deadline)`, because a voucher expires when it is first used"
+    - text: "It pays Bob again: EIP-712 typed data protects against other chains and contracts, not against a second submission"
+  explanation: |
+    Recovering a signature does not consume it: the same digest and signature recover the
+    owner every time, so the signer check passes again. What stops the replay is the nonce
+    inside the signed message: `_useCheckedNonce(bob, 0)` succeeded the first time and moved
+    Bob's counter to 1, so the second call reverts with `InvalidAccountNonce(bob, 1)`, as the
+    lesson's test showed. The deadline has not passed. The last option describes EIP-712
+    correctly, which is why the nonce is needed: EIP-712 itself has no replay protection.
+
+- key: sol-advanced-14
+  type: multiple
+  category: solidity
+  tags: [signatures, ecrecover, ecdsa]
+  prompt: |
+    Which statements about verifying signatures in Solidity are true? Choose all that apply.
+  options:
+    - text: "`ecrecover` returns `address(0)` for an invalid signature instead of reverting"
+      correct: true
+    - text: "Given one valid signature `(v, r, s)`, anyone can compute a second valid signature for the same digest without the private key"
+      correct: true
+    - text: "OpenZeppelin's `ECDSA.recover` also returns `address(0)` for an invalid signature, so you must compare its result with zero"
+    - text: "Marking each used signature in a `mapping(bytes32 => bool)` keyed by `keccak256(signature)` reliably prevents replays"
+  explanation: |
+    `ecrecover` fails silently with `address(0)`, so a check against a signer that is zero
+    (an initializer that never ran, a retired key) accepts garbage. Signatures are malleable:
+    `(v', r, N - s)`, with `v` flipped between 27 and 28, recovers the same address. That is
+    why a "used signatures" mapping fails: the twin is different bytes. OpenZeppelin's
+    `ECDSA.recover` reverts instead, with `ECDSAInvalidSignature()` for garbage and
+    `ECDSAInvalidSignatureS(s)` for the high-`s` twin. Track a nonce inside the signed message.
+
+- key: sol-advanced-15
+  type: single
+  category: solidity
+  tags: [proxies, delegatecall, storage]
+  prompt: |
+    ```solidity
+    contract NaiveProxy is Proxy { // OpenZeppelin's Proxy delegates every call
+        address public implementation; // slot 0
+        // constructor sets implementation; _implementation() returns it
+    }
+
+    contract Vault {
+        uint256 public total; // slot 0
+        mapping(address => uint256) public balanceOf;
+
+        function deposit() external payable {
+            balanceOf[msg.sender] += msg.value;
+            total += msg.value;
+        }
+    }
+    ```
+
+    Users call the proxy through `Vault`'s interface. What happens when the first user
+    deposits 1 ether?
+  options:
+    - text: "The deposit succeeds, but adding 1 ether to slot 0 changes the proxy's implementation address, so every later call delegates to an empty account and fails"
+      correct: true
+    - text: "The deposit reverts, because the proxy and the vault both declare a variable in slot 0"
+    - text: "Nothing goes wrong: `total` is stored in the Vault contract's own storage, the implementation's address in the proxy's"
+    - text: "The compiler rejects the pair, because two contracts that delegatecall each other must have the same layout"
+  explanation: |
+    Under `delegatecall`, Vault's code runs on the **proxy's** storage and knows `total` only as
+    slot 0, which holds the proxy's `implementation`. `total += msg.value` adds 1e18 to the
+    address, which in the lesson turned `0x5615dEB7...B72f` into `0x5615Deb7...7387B72f`. The
+    proxy then delegates to an account with no code, the next call fails with
+    `EvmError: Revert`, and the ether is stuck. Nothing checks layouts across a delegatecall,
+    neither at compile time nor at run time. ERC-1967 slots keep proxy state out of the way.
+
+- key: sol-advanced-16
+  type: multiple
+  category: solidity
+  tags: [storage, erc7201, custom-layout]
+  prompt: |
+    Which statements about ERC-7201 namespaces, solc's `erc7201` builtin (0.8.35+) and custom
+    storage layouts (`layout at`, 0.8.29+) are true? Choose all that apply.
+  options:
+    - text: "`contract Ledger layout at erc7201(\"orchard.ledger\") { ... }` places every state variable of `Ledger` from that namespace's base slot onwards"
+      correct: true
+    - text: "Declaring `contract LedgerV2 is Ledger` when `Ledger` has a custom layout fails with `Cannot inherit from a contract with a custom storage layout.`"
+      correct: true
+    - text: "`layout at` can be put on an abstract base contract, so that every contract that inherits from it uses the same base slot"
+    - text: "A constant `bytes32 constant S = bytes32(erc7201(\"orchard.vault\"));` can be read directly in inline assembly, as in `$.slot := S`"
+  explanation: |
+    `layout at` shifts a contract's whole layout to a base slot that is a compile-time
+    constant, and `erc7201(id)` is allowed there; `forge inspect Ledger storageLayout` shows
+    `owner` and `total` at the namespace's base slot and the next one. Only the most derived
+    contract may have it: inheriting from `Ledger` gives `Error (8894)`, and an abstract
+    contract gives `Error (7587): Storage layout cannot be specified for abstract contracts.`
+    Inline assembly accepts only constants that are direct numbers, so `$.slot := S` fails
+    with `Error (7615)`; copy the constant into a local variable and use that.
+
+- key: sol-advanced-17
+  type: single
+  category: solidity
+  tags: [denial-of-service, gas]
+  prompt: |
+    ```solidity
+    function distribute() external payable {
+        uint256 share = msg.value / members.length;
+        for (uint256 i = 0; i < members.length; i++) {
+            credit[members[i]] += share;
+        }
+    }
+    ```
+
+    Anyone can join `members`. A Foundry test adds 1,000 members, calls `distribute`, and
+    `vm.lastCallGas()` reports 24,897,668 gas. The test passes. What does that mean for the
+    contract on Ethereum mainnet today?
+  options:
+    - text: "`distribute` can no longer be called at all: since Fusaka (EIP-7825) a transaction may use at most 16,777,216 gas, a cap forge's test EVM does not apply"
+      correct: true
+    - text: "Nothing serious: the call fits in a block, whose gas limit is 60 million, so it simply costs more"
+    - text: "Nothing serious: forge would have failed the test if the call needed more gas than a real transaction may use"
+    - text: "The loop stops early when it runs out of gas and the remaining members are paid in the next call"
+  explanation: |
+    Since the Fusaka upgrade (3 December 2025), EIP-7825 caps every transaction at 2^24 =
+    16,777,216 gas, whatever the block gas limit. A call that needs 24.9 million gas cannot be
+    included in any block, so the ether sent to the pot can never be shared again. Forge's test
+    EVM does not enforce that cap, which is why the test passed: measure gas and compare it with
+    the cap yourself. A loop that runs out of gas reverts the whole call; it does not stop
+    halfway and remember where it was. Since `join` is free, an attacker can also grief the pot
+    on purpose by adding entries. Do the work per user, or in bounded pages.
+
+- key: sol-advanced-18
+  type: true_false
+  category: solidity
+  tags: [forced-ether, denial-of-service]
+  prompt: |
+    True or false: a contract that has no `receive()` and no payable `fallback()` function
+    can only gain ether through its own payable functions, so a game that pays out when
+    `address(this).balance == 7 ether` after the seventh 1-ether deposit is safe.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. Ether can arrive without any function running: `selfdestruct(target)` still sends
+    a contract's balance to `target` after EIP-6780 (it only stopped deleting code), validator
+    withdrawals credit an address directly, and ether can be sent to an address before a
+    contract is deployed there. In the lesson, a `ForceSend` contract that self-destructs in
+    its constructor pushed 0.5 ether into the game, the balance went from 6.5 to 7.5 ether and
+    was never exactly 7, so nobody could ever win. Count deposits in a state variable and never
+    test the balance for equality.
+
+- key: sol-advanced-19
+  type: single
+  category: solidity
+  tags: [invariant-testing, handlers]
+  prompt: |
+    ```solidity
+    function transfer(address to, uint256 amount) external {
+        uint256 toBalance = balanceOf[to];
+        balanceOf[msg.sender] -= amount;
+        balanceOf[to] = toBalance + amount;
+    }
+    ```
+
+    An invariant test with a handler (three actors, `from = actors[fromSeed % 3]`,
+    `to = actors[toSeed % 3]`) fails with "the balances against the ether held". Forge shrinks
+    the sequence to a `deposit`, then a `transfer` whose two seeds are equal modulo 3. What is
+    the bug?
+  options:
+    - text: "A transfer to yourself creates money: `toBalance` is read before the debit, so the final write gives the amount back on top of the old balance"
+      correct: true
+    - text: "The handler is wrong: it should never let `from` and `to` be the same actor, so the failure is a false alarm"
+    - text: "`transfer` should check that the bank holds enough ether before moving balances"
+    - text: "The invariant is unsound, because ether can be forced into the bank with `selfdestruct`"
+  explanation: |
+    With `to == msg.sender`, the sender's balance drops by `amount`, then is overwritten with
+    the old balance plus `amount`, so it grows by `amount` while the ether held stays the same.
+    The shrunk sequence points straight at it: one deposit to have a balance, one transfer whose
+    seeds pick the same actor. Excluding self-transfers in the handler would have hidden a real
+    bug; handlers should allow anything a user could do. Internal transfers move no ether, and
+    the test forces none in, so the invariant is sound here. Reading the balance after the debit
+    (`balanceOf[to] += amount`) fixes it.
+
+- key: sol-advanced-20
+  type: multiple
+  category: solidity
+  tags: [invariant-testing, security-tools]
+  prompt: |
+    Which statements about Foundry invariant tests and security tools are true? Choose all that
+    apply.
+  options:
+    - text: "Without `targetContract`, forge calls every contract deployed in `setUp` directly, including the contract under test, with random senders and arguments"
+      correct: true
+    - text: "Ghost variables should count what the handler itself did, not copy the contract's own totals"
+      correct: true
+    - text: "Raising the depth from 32 to 500 makes every invariant test take the same time but check more states"
+    - text: "A clean `forge lint` report shows that a contract has no logic bugs such as a self-transfer that creates balance"
+  explanation: |
+    By default the targets are all contracts deployed in `setUp`; in the lesson an untargeted
+    run called `Bank.transfer` directly and sent 161 wei to an address the handler did not
+    count, failing an invariant on correct code. Target the handler. A ghost copied from the
+    contract can never disagree with it, so it can never expose its bookkeeping bugs. Depth is
+    the number of calls per run, so more depth means proportionally more calls and time (200
+    runs at depth 50 made 10,000 calls). `forge lint` matches known patterns such as
+    `tx-origin`, `unchecked-call` and `divide-before-multiply`; it cannot know your business
+    rules.

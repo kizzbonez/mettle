@@ -1,0 +1,1 @@
+Members of a hillside solar co-op earn WATT tokens for the power they feed in, and the co-op's credit desk lends them COIN against those tokens. Last month one transaction borrowed nearly all of the desk's COIN against a handful of WATT, and the co-op wants the desk's pricing fixed before it reopens.

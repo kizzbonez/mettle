@@ -1,0 +1,19 @@
+title: Rowing Club Boat Log
+summary: Fix a struct update that changes only a memory copy, read batches from calldata, and cap the work done in one transaction with a transient counter.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Saves every outing to the boat's record
+    file: 02-saving-outings.sol
+    hidden: true
+  - name: Logs batches from calldata, all or nothing
+    file: 03-batches.sol
+    hidden: true
+  - name: Allows 25 outings per transaction, every transaction
+    file: 04-per-transaction.sol
+    hidden: true

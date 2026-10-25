@@ -1,0 +1,23 @@
+slug: credit-union-security-hardening
+title: Quayside Credit Union
+summary: Harden a small credit union of three contracts after an audit found four ways to steal from it, so that reentrancy, access control, signature replay and rounding exploits all fail while savings, interest and bonuses keep working.
+language: solidity
+minutes: 55
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Survives a reentrant withdrawal and keeps its books
+    file: 02-reentrancy.sol
+    hidden: true
+  - name: Lets only the board appoint treasurers
+    file: 03-access-control.sol
+    hidden: true
+  - name: Pays each bonus voucher once, here, on this chain and in time
+    file: 04-signature-replay.sol
+    hidden: true
+  - name: Rounds every share calculation in the pool's favour
+    file: 05-rounding.sol
+    hidden: true

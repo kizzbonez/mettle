@@ -1,0 +1,16 @@
+title: Lantern Festival Treasure Hunt
+summary: Harden a commit-reveal prize claim against front-running by enforcing a reveal delay, so a searcher who copies a phrase from the mempool cannot commit and reveal it in the same block ahead of the finder, while the honest first committer still wins.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example and stops a same-block front-run
+    file: 01-example.sol
+    hidden: false
+  - name: Refuses a reveal in the commit block and a stolen commitment
+    file: 02-front-run.sol
+    hidden: true
+  - name: Still runs the hunt by the rules
+    file: 03-hunt-rules.sol
+    hidden: true

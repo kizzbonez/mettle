@@ -1,0 +1,19 @@
+title: Orchard Tree Adoption
+summary: Mint ERC-721 adoption certificates with OpenZeppelin, keep every state change ahead of the onERC721Received hook, serve tokenURIs from a base URI, and cap how many certificates one holder may keep by overriding _update.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Hands out trees in order, once per neighbour, only to receivers that accept NFTs
+    file: 02-adoption-rules.sol
+    hidden: true
+  - name: Has its bookkeeping done before the receiver hook runs
+    file: 03-receiver-hook.sol
+    hidden: true
+  - name: Serves token URIs and enforces the holder limit on every transfer
+    file: 04-metadata-and-limit.sol
+    hidden: true

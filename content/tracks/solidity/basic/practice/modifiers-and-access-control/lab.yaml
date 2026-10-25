@@ -1,0 +1,19 @@
+title: Observatory Telescope Rota
+summary: Write guard modifiers for a role and a pause switch, put the missing guard back on the admin functions, and hand the directorship over in two steps.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Lets only the director manage and only observers book
+    file: 02-guards.sol
+    hidden: true
+  - name: Stops bookings while paused and starts them again
+    file: 03-pause.sol
+    hidden: true
+  - name: Hands the directorship over only when the candidate accepts
+    file: 04-handover.sol
+    hidden: true

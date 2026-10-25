@@ -1,0 +1,19 @@
+title: Harvest Supper Tickets
+summary: Finish a complete ticket sale with a stage machine, a seat limit, change and refunds paid by the pull pattern, and organiser-only cancellation, tested with fuzzing and a buyer that calls back in.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Sells seats within the limit and credits the change
+    file: 02-buying.sol
+    hidden: true
+  - name: Lets only the organiser cancel, and only while tickets are on sale
+    file: 03-cancelling.sol
+    hidden: true
+  - name: Refunds every seat exactly once after a cancellation
+    file: 04-refunds.sol
+    hidden: true

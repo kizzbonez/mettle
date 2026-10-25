@@ -1,0 +1,23 @@
+slug: quayside-fish-auction
+title: Quayside Fish Auction
+summary: Build a fish auction paid in an OpenZeppelin ERC-20, with a basis-points value type and library for fees, Ownable2Step and a transient reentrancy guard, deadlines that a late bid extends, and pull payments for refunds, proceeds and fees, tested with pranks, warps, expected reverts and events, fuzzing and a token that calls back.
+language: solidity
+minutes: 60
+timeLimitMs: 10000
+memoryMb: 512
+tests:
+  - name: Works through the morning at the quayside from the instructions
+    file: 01-quayside-morning.sol
+    hidden: false
+  - name: Mints Harbour Credit and charges the right fee to the right account
+    file: 02-credit-and-fees.sol
+    hidden: true
+  - name: Enforces the bidding rules and credits every outbid bid
+    file: 03-bidding-rules.sol
+    hidden: true
+  - name: Keeps the deadlines, the extension and settlement exactly
+    file: 04-deadlines.sol
+    hidden: true
+  - name: Pays every credit once and refuses a token that calls back
+    file: 05-withdrawals.sol
+    hidden: true

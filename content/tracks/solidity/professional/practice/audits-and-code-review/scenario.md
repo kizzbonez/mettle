@@ -1,0 +1,1 @@
+A small education foundation pays student bursaries from an on-chain pool. Its audit report has just arrived with two High findings, one Medium and one Low, and the pool may not go live until every one is fixed.

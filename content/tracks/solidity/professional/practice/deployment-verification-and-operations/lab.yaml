@@ -1,0 +1,19 @@
+title: Weather Buoy Registry Rollout
+summary: Deploy a registry at the same CREATE2 address on three networks, each owned by its own multisig, predicting the address in advance, refusing unknown networks and repeat deployments, and setting the owner in the deploying transaction.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Gives each network its multisig and refuses unknown networks
+    file: 02-networks.sol
+    hidden: true
+  - name: Predicts the same CREATE2 address on every network
+    file: 03-predictions.sol
+    hidden: true
+  - name: Sets the owner at deployment and refuses a second deployment
+    file: 04-safety.sol
+    hidden: true

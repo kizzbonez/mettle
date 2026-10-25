@@ -1,0 +1,685 @@
+- key: sol-medium-01
+  type: single
+  category: solidity
+  tags: [try-catch, errors, external-calls]
+  prompt: |
+    `Booth.sell` reverts with the custom error `SoldOut(uint256 left, uint256 wanted)` when too
+    many tickets are asked for. The booth has 2 tickets left, and a test calls
+    `agent.onlyStrings(booth, 5)`:
+
+    ```solidity
+    contract Agent {
+        function onlyStrings(IBooth booth, uint256 tickets) external returns (bool) {
+            try booth.sell(tickets) returns (uint256) {
+                return true;
+            } catch Error(string memory) {
+                return false;
+            }
+        }
+    }
+    ```
+
+    What happens?
+  options:
+    - text: "The call reverts with `SoldOut(2, 5)`: no catch clause matches a custom error, so the `try` statement passes the error on"
+      correct: true
+    - text: "It returns `false`, because `catch Error(string memory)` catches every revert of the called contract"
+    - text: "It returns `false` and the booth keeps the 5 tickets sold, because a caught call keeps its changes"
+    - text: "It does not compile: `try` needs a `catch Panic(uint256)` clause as well"
+  explanation: |
+    `catch Error(string memory reason)` only matches errors raised with `revert("...")` or
+    `require(cond, "...")`. A custom error is encoded with its own selector, so it matches no
+    clause here, and when nothing matches, the whole `try` statement reverts with the callee's
+    data: forge reports `[FAIL: SoldOut(2, 5)]`. Add `catch (bytes memory data)` (custom errors
+    and empty reverts) or a bare `catch { ... }` to handle every failure. Even when a clause does
+    catch, the callee's changes are undone; a catch block never keeps a half-finished call. Any
+    subset of clauses is allowed, so the code compiles.
+
+- key: sol-medium-02
+  type: true_false
+  category: solidity
+  tags: [new, factories, msg-sender]
+  prompt: |
+    Alice calls `open{value: 0.25 ether}(bob)` on this factory:
+
+    ```solidity
+    contract Escrow {
+        address public immutable buyer;
+        address public immutable seller;
+
+        constructor(address seller_) payable {
+            buyer = msg.sender;
+            seller = seller_;
+        }
+    }
+
+    contract EscrowFactory {
+        function open(address seller) external payable returns (Escrow) {
+            return new Escrow{value: msg.value}(seller);
+        }
+    }
+    ```
+
+    True or false: the new escrow records Alice as its `buyer`.
+  options:
+    - text: "True"
+    - text: "False"
+      correct: true
+  explanation: |
+    False. `new` is a call from the factory, so inside `Escrow`'s constructor `msg.sender` is
+    the `EscrowFactory`, not Alice; a test that logs both addresses shows the buyer equal to the
+    factory. The ether does arrive (the constructor is `payable` and `{value: ...}` forwards it),
+    which makes the bug easy to miss. Pass the user in explicitly:
+    `new Escrow{value: msg.value}(msg.sender, seller)` with a constructor that stores its
+    arguments. The same care applies to any address you are handed: converting it to a contract
+    type checks nothing, so a contract only trusts addresses it created or verified.
+
+- key: sol-medium-03
+  type: single
+  category: solidity
+  tags: [inheritance, super, linearization]
+  prompt: |
+    ```solidity
+    contract Base {
+        function trail() public pure virtual returns (string memory) {
+            return "Base";
+        }
+    }
+
+    contract Audited is Base {
+        function trail() public pure virtual override returns (string memory) {
+            return string.concat("Audited > ", super.trail());
+        }
+    }
+
+    contract Metered is Base {
+        function trail() public pure virtual override returns (string memory) {
+            return string.concat("Metered > ", super.trail());
+        }
+    }
+
+    contract Final is Audited, Metered {
+        function trail() public pure override(Audited, Metered) returns (string memory) {
+            return string.concat("Final > ", super.trail());
+        }
+    }
+    ```
+
+    What does `new Final().trail()` return?
+  options:
+    - text: "`Final > Metered > Audited > Base`"
+      correct: true
+    - text: "`Final > Audited > Metered > Base`"
+    - text: "`Final > Metered > Base`"
+    - text: "`Final > Audited > Base > Metered > Base`"
+  explanation: |
+    Solidity lists bases from "most base-like" to "most derived", so in `is Audited, Metered`
+    the last one, `Metered`, is closest to `Final`. C3 linearization gives the line `Final,
+    Metered, Audited, Base`, and every `super` call moves one step along it. So `super` inside
+    `Metered` calls `Audited`, a contract `Metered` knows nothing about, and `Base` runs once,
+    at the end. Python's order is the reverse, which is where `Final > Audited > Metered` comes
+    from. Swapping the bases to `is Metered, Audited` gives `Audited` before `Metered`.
+
+- key: sol-medium-04
+  type: single
+  category: solidity
+  tags: [inheritance, linearization, compiler-errors]
+  prompt: |
+    `contract Audited is Base` is declared as usual. What does solc 0.8.38 say about this line?
+
+    ```solidity
+    contract Wrong is Audited, Base {}
+    ```
+  options:
+    - text: "`Error (5005): Linearization of inheritance graph impossible`"
+      correct: true
+    - text: "Nothing: listing `Base` again is redundant but allowed in any position"
+    - text: "`Error (9097): Identifier already declared.`, because `Base` is inherited twice"
+    - text: "`Error (3656): Contract \"Wrong\" should be marked as abstract.`"
+  explanation: |
+    Bases go from most base-like to most derived. Writing `Audited, Base` asks for `Base` to
+    come after (closer to `Wrong` than) `Audited`, but `Audited` already says it comes after
+    `Base`. That contradiction cannot be linearized, so solc stops with error 5005. Write
+    `contract Wrong is Base, Audited {}` or, simpler, `contract Wrong is Audited {}`, since
+    `Audited` brings `Base` along. Inheriting the same base through two paths is normal (it
+    appears once in the line), and nothing here is left unimplemented.
+
+- key: sol-medium-05
+  type: single
+  category: solidity
+  tags: [libraries, delegatecall, storage]
+  prompt: |
+    ```solidity
+    library Tally {
+        function add(mapping(address => uint256) storage totals, address who, uint256 amount) external returns (uint256) {
+            totals[who] += amount;
+            return totals[who];
+        }
+    }
+
+    contract Scoreboard {
+        mapping(address => uint256) public points;
+
+        function score(uint256 amount) external returns (uint256) {
+            return Tally.add(points, msg.sender, amount);
+        }
+    }
+    ```
+
+    `add` is `external`, so `Tally` is deployed as its own contract. When `Scoreboard.score(3)`
+    runs, where does the 3 get stored?
+  options:
+    - text: "In `Scoreboard`'s storage: the library runs by DELEGATECALL in the scoreboard's context and receives the mapping as its slot number"
+      correct: true
+    - text: "In `Tally`'s storage, since the code runs in the library's own contract"
+    - text: "Nowhere: the mapping is copied into memory for the call, so the change is lost"
+    - text: "The call reverts: a library cannot write to storage"
+  explanation: |
+    A `public` or `external` library function is called with DELEGATECALL: the library's code
+    runs with the caller's storage, `msg.sender` and balance. A `storage` parameter is passed as
+    a reference (its slot, here 0), so `totals[who] += amount` writes `Scoreboard`'s `points`.
+    Libraries cannot have state variables of their own, and mappings can never be copied to
+    memory. Internal library functions skip all of this: their code is compiled into the caller.
+
+- key: sol-medium-06
+  type: multiple
+  category: solidity
+  tags: [user-defined-value-types, operators, using-for]
+  prompt: |
+    A file declares `type Grams is uint256;` and nothing else for it yet. Which statements are
+    true? Choose all that apply.
+  options:
+    - text: "`Grams` values are encoded in the ABI exactly like `uint256`"
+      correct: true
+    - text: "To make `a + b` work, the same file needs `using {add as +} for Grams global;` with a `pure` function `add(Grams, Grams) returns (Grams)`"
+      correct: true
+    - text: "`a == b` already compiles, because every type supports equality"
+    - text: "A `Grams` can be passed where a `uint256` parameter is expected, since the underlying type is the same"
+  explanation: |
+    A user-defined value type keeps its underlying type's representation and ABI, but it has no
+    operators at all, not even `==`, and no implicit conversions: use `Grams.wrap(x)` and
+    `Grams.unwrap(g)`. Operators come from `pure` free (or library) functions attached in a
+    `global` using-for directive, which is allowed only in the file that declares the type;
+    without `global`, solc says `Operators can only be defined in a global 'using for'
+    directive.` That strictness is the point: `weight * price` with two different types becomes
+    a compile error instead of a silent bug.
+
+- key: sol-medium-07
+  type: single
+  category: solidity
+  tags: [erc20, approve, front-running]
+  prompt: |
+    Alice has approved Bob to spend 100 of her tokens. She sends `approve(bob, 50)` to lower the
+    allowance. Bob watches pending transactions and gets his own transaction included before
+    hers. With a standard ERC-20, what is the most Bob can end up taking?
+  options:
+    - text: "150: he spends the old 100 first, then the new 50 once Alice's approval lands"
+      correct: true
+    - text: "50: `approve` sets the allowance, so only the newest value ever counts"
+    - text: "100: an allowance can be spent only once, whatever it is later set to"
+    - text: "0: a pending `approve` freezes the allowance until it is included"
+  explanation: |
+    `approve` **replaces** the allowance; it does not know what was already spent. Bob's
+    `transferFrom` of 100 runs first under the old allowance, then Alice's transaction sets a
+    fresh allowance of 50, which he also spends. A Foundry test that replays that order logs
+    `Bob took 150 coupons`. EIP-20 asks clients to set an allowance to 0 before setting a new
+    value, and good habits are approving exact amounts and avoiding unlimited approvals. The
+    token contract itself should not enforce the reset, for compatibility.
+
+- key: sol-medium-08
+  type: multiple
+  category: solidity
+  tags: [erc20, openzeppelin, update-hook]
+  prompt: |
+    Which statements about OpenZeppelin Contracts 5.7's `ERC20` are true? Choose all that apply.
+  options:
+    - text: "To add a rule to every transfer, mint and burn, you override `_update` and call `super._update(from, to, value)`"
+      correct: true
+    - text: "A contract that inherits `ERC20` and `ERC20Capped` and overrides `_update` must write `override(ERC20, ERC20Capped)`"
+      correct: true
+    - text: "You customise transfers by overriding `_beforeTokenTransfer`, which every mint and burn calls"
+    - text: "`transferFrom` lowers an allowance of `type(uint256).max` like any other and emits `Approval`"
+  explanation: |
+    Version 5 replaced the `_beforeTokenTransfer`/`_afterTokenTransfer` hooks with one internal
+    virtual function, `_update`, which `_mint` (`from` is zero), `_burn` (`to` is zero) and
+    `_transfer` all call; those three are not virtual. Forget `super._update` and nothing moves:
+    a test minting 100 tokens then reads a balance and a supply of 0. Because `ERC20Capped` also
+    defines `_update`, a bare `override` fails with `Function needs to specify overridden
+    contracts "ERC20" and "ERC20Capped".` Finally, `_spendAllowance` never lowers an unlimited
+    allowance, and `transferFrom` does not emit `Approval` in 5.x.
+
+- key: sol-medium-09
+  type: single
+  category: solidity
+  tags: [erc721, reentrancy, safe-mint]
+  prompt: |
+    A free badge is limited to one per address. A contract calls `claim()`, and its
+    `onERC721Received` calls `badge.claim()` again whenever it holds fewer than 5 badges, then
+    returns the magic value:
+
+    ```solidity
+    contract OpenDayBadge is ERC721 {
+        mapping(address => bool) public claimed;
+        uint256 public nextId = 1;
+
+        error AlreadyClaimed(address who);
+
+        constructor() ERC721("Open Day", "OPEN") {}
+
+        function claim() external {
+            if (claimed[msg.sender]) revert AlreadyClaimed(msg.sender);
+            _safeMint(msg.sender, nextId++);
+            claimed[msg.sender] = true;
+        }
+    }
+    ```
+
+    How many badges does the contract hold when its first `claim()` returns?
+  options:
+    - text: "5: every nested `claim` runs inside `_safeMint`, before `claimed` is set, so the check passes each time"
+      correct: true
+    - text: "1: the second `claim` reverts with `AlreadyClaimed`, because the first one has already minted"
+    - text: "None: `_safeMint` reverts with `ERC721InvalidReceiver` because the receiver calls back into the token"
+    - text: "1: OpenZeppelin's `ERC721` blocks reentrant calls during `_safeMint`"
+  explanation: |
+    `_safeMint` mints and then calls `onERC721Received` on a contract receiver, so the receiver's
+    code runs in the middle of `claim`, before `claimed[msg.sender] = true`. Each nested `claim`
+    finds the flag still false and mints again; a test of exactly this contract logged
+    `badges held by one address: 5`. OpenZeppelin's `ERC721` has no reentrancy guard, and the
+    receiver returned the magic value, so nothing is rejected. The fix is
+    checks-effects-interactions: set `claimed` before `_safeMint`. Then the nested call reverts
+    with `AlreadyClaimed`, and that revert undoes the whole attempt.
+
+- key: sol-medium-10
+  type: multiple
+  category: solidity
+  tags: [erc721, approvals, safe-transfer]
+  prompt: |
+    Which statements about an OpenZeppelin 5.x `ERC721` token are true? Choose all that apply.
+  options:
+    - text: "After any transfer, `getApproved(id)` returns the zero address"
+      correct: true
+    - text: "An operator set with `setApprovalForAll(operator, true)` may move every token the owner holds in that contract, including ones the owner receives later"
+      correct: true
+    - text: "`safeTransferFrom` to an externally owned account calls its `onERC721Received` and reverts if there is no answer"
+    - text: "`_mint` to a contract without `onERC721Received` reverts with `ERC721InvalidReceiver`"
+  explanation: |
+    Every transfer clears the token's approved address (a test printed
+    `approval after transfer: 0x0000000000000000000000000000000000000000`), so a new owner never
+    inherits someone else's approval. Operator approval covers the whole collection, now and
+    later, which is why phishing sites ask for it. The receiver hook is called only when the
+    recipient has code; an account without code is never called. `_mint` does not call the hook
+    at all: it happily sends a token to a contract that can never move it, which is why
+    OpenZeppelin discourages it in favour of `_safeMint`, which reverts with
+    `ERC721InvalidReceiver` in that case.
+
+- key: sol-medium-11
+  type: single
+  category: solidity
+  tags: [low-level-call, abi, code-check]
+  prompt: |
+    `0xDEAD` is an address with no code. What does this line give in a Foundry test?
+
+    ```solidity
+    (bool ok, bytes memory data) = address(0xDEAD).call(abi.encodeCall(Counter.add, (3)));
+    ```
+  options:
+    - text: "`ok` is `true` and `data` is empty: the EVM treats a call to an address without code as a success"
+      correct: true
+    - text: "`ok` is `false` and `data` is empty, because there is no function to run"
+    - text: "The line reverts, because Solidity checks that the target has code before every call"
+    - text: "`ok` is `false` and `data` holds the error `FunctionNotFound()`"
+  explanation: |
+    A low-level `call` to an address without code succeeds and returns nothing; the test printed
+    `no code: true 0`. Solidity adds a code check only to calls through a contract type or an
+    interface, and those revert on an empty address. The low-level members `call`,
+    `staticcall` and `delegatecall` skip it, so a relay must check `target.code.length`
+    itself, or a payment or command can "succeed" without doing anything. There is no built-in
+    `FunctionNotFound` error: a contract without a matching function and without a fallback
+    reverts with empty data.
+
+- key: sol-medium-12
+  type: single
+  category: solidity
+  tags: [abi-encodepacked, hashing, collisions]
+  prompt: |
+    A raffle gives each entrant a ticket id `keccak256(abi.encodePacked(name, town))`, where
+    `name` and `town` are strings the entrants choose. Two different entrants turn out to get the
+    same id. Which change fixes this?
+  options:
+    - text: "Hash `abi.encode(name, town)` instead"
+      correct: true
+    - text: "Hash with `sha256` instead of `keccak256`"
+    - text: "Put a separator between them: `abi.encodePacked(name, \"|\", town)`"
+    - text: "Swap the arguments: `abi.encodePacked(town, name)`"
+  explanation: |
+    `abi.encodePacked` joins the bytes without lengths, so `("Ann", "abel")` and
+    `("Anna", "bel")` both become `Annabel` and hash the same (a test printed
+    `Annabel Annabel` and `true`). Any hash function of the same bytes collides the same way,
+    and swapping the order only moves the problem. A separator helps until someone puts the
+    separator in a name. `abi.encode` stores each string's offset and length, so different pairs
+    give different bytes: `keccak256(abi.encode("ab", "c")) == keccak256(abi.encode("a", "bc"))`
+    is false. Use packed mode only when at most one value is dynamic.
+
+- key: sol-medium-13
+  type: single
+  category: solidity
+  tags: [gas, sstore, eip-2929]
+  prompt: |
+    A storage slot holds `5`. In a new transaction, a function writes `7` to it; nothing has
+    touched the slot earlier in the transaction. On the `osaka` EVM, about how much gas does
+    the write itself cost?
+  options:
+    - text: "5,000: 2,900 for changing a non-zero value plus 2,100 because the slot is cold"
+      correct: true
+    - text: "22,100, because every write to storage costs the same as creating the slot"
+    - text: "2,900, because cold access is only charged for reads"
+    - text: "100, because the slot already holds a value"
+  explanation: |
+    Changing a non-zero value to another non-zero value costs 2,900, and the first access to a
+    slot in a transaction adds the cold surcharge of 2,100 (EIP-2929), for 5,000 in all; measured
+    with `gasleft()` around the line it came to 5,020, the extra 20 being the measuring itself.
+    22,100 is the price of turning a zero into a non-zero value, the most expensive write. The
+    cold surcharge applies to writes as well as reads. 100 is what a write costs once the slot
+    is warm and has already been written in the same transaction.
+
+- key: sol-medium-14
+  type: multiple
+  category: solidity
+  tags: [gas, refunds, memory, calls]
+  prompt: |
+    Which statements about gas on the sandbox's EVM are true? Choose all that apply.
+  options:
+    - text: "Setting a non-zero slot to zero earns a refund of 4,800, and refunds cannot exceed a fifth of the transaction's gas"
+      correct: true
+    - text: "A call can pass on at most 63/64 of the gas the caller has left"
+      correct: true
+    - text: "Memory costs a fixed 3 gas per word, so allocating ten times the words costs ten times the gas"
+    - text: "`vm.lastFrameGas().gasTotalUsed` already has the refund subtracted"
+  explanation: |
+    EIP-3529 set the clearing refund to 4,800 and capped refunds at one fifth of the gas used.
+    EIP-150's 63/64 rule leaves the caller enough gas to handle a failing callee: a caller with
+    999,536 gas left handed a callee 981,163. Memory adds a quadratic term to its 3 gas per word,
+    so allocating 10,000 words cost 256,282 gas against 8,712 for 1,000. `gasTotalUsed` is
+    counted before refunds, and `gasRefunded` is reported beside it: clearing a slot showed
+    `26606` used and `4800` refunded.
+
+- key: sol-medium-15
+  type: single
+  category: solidity
+  tags: [time, cooldown, testing]
+  prompt: |
+    A sign-up sheet allows one change per address per day:
+
+    ```solidity
+    function book(uint256 n) external {
+        uint256 last = lastChange[msg.sender];
+        if (block.timestamp < last + 1 days) revert TooSoon(last + 1 days);
+        lastChange[msg.sender] = block.timestamp;
+        seats[msg.sender] = n;
+    }
+    ```
+
+    A Foundry test deploys the sheet and calls `book(2)` straight away, without any `vm.warp`.
+    What happens?
+  options:
+    - text: "It reverts with `TooSoon(86400)`: the test chain starts at timestamp 1, and an address that never booked has `last == 0`"
+      correct: true
+    - text: "It books 2 seats: a first booking can never be too soon"
+    - text: "It reverts with `panic: arithmetic underflow or overflow (0x11)`"
+    - text: "It reverts with `TooSoon(86401)`, one day after the current timestamp"
+  explanation: |
+    A mapping returns 0 for an address that never booked, so the check compares the current
+    timestamp, 1 on a fresh test chain, with `0 + 1 days`, and refuses: the run failed with
+    `TooSoon(86400 [8.64e4])`. On mainnet the clock is far past one day, so the same code lets
+    the first booking through: tests and production disagree. Treat a zero timestamp as
+    "never" (`last != 0 && ...`). Nothing is subtracted, so there is no underflow, and the error
+    reports `last + 1 days`, not the current time plus a day.
+
+- key: sol-medium-16
+  type: single
+  category: solidity
+  tags: [block-data, randomness, timestamps]
+  prompt: |
+    Which of these is a sound use of block data?
+  options:
+    - text: "Closing a sale when `block.timestamp >= closesAt`, with `closesAt` set days ahead"
+      correct: true
+    - text: "Picking a raffle winner from `keccak256(abi.encode(block.prevrandao, block.timestamp))`"
+    - text: "A one-day cooldown written as `block.number >= lastBlock + 7200` on any chain"
+    - text: "Seeding a game with `blockhash(block.number)`, the hash of the current block"
+  explanation: |
+    Timestamps are fine for deadlines measured in minutes, hours or days: on Ethereum a block's
+    timestamp is fixed by its 12-second slot, and other chains keep it within known bounds.
+    Anything computed from block data in a transaction can be computed by another contract in
+    the same transaction, and the proposer knows `prevrandao` in advance, so a raffle seeded that
+    way can be gamed. 7,200 blocks is a day only at exactly 12 seconds a block; block times
+    differ between chains, and empty slots stretch them. `blockhash(block.number)` is always
+    zero, because the current block has no hash yet.
+
+- key: sol-medium-17
+  type: single
+  category: solidity
+  tags: [foundry, testing, expectRevert]
+  prompt: |
+    In `RoomBooking`, a day that is already booked makes `book` revert with
+    `AlreadyBooked(day)`. Alice has booked day 20000. This test checks that Bob cannot book it
+    too. Bob has never been given any ether.
+
+    ```solidity
+    function test_RevertWhen_DayTaken() public {
+        hoax(alice, 1 ether);
+        room.book{value: 0.05 ether}(DAY);
+        vm.prank(bob);
+        vm.expectRevert();
+        room.book{value: 0.05 ether}(DAY);
+    }
+    ```
+
+    What does `forge test` report, and what does that tell you?
+  options:
+    - text: "`[PASS]`, but for the wrong reason: the call fails with `EvmError: OutOfFunds` because Bob has no ether, and a bare `expectRevert()` accepts any failure, so the test would pass even without the `AlreadyBooked` check"
+      correct: true
+    - text: "`[PASS]`, and it proves the `AlreadyBooked` check works, because the call reverted after `vm.prank(bob)`"
+    - text: "`[FAIL]`, because `vm.expectRevert()` without arguments expects a revert string and gets a custom error"
+    - text: "`[FAIL]`, because Bob has no ether, so `vm.prank` refuses to make him the caller"
+  explanation: |
+    A bare `vm.expectRevert()` passes for **any** revert. Here the call never even reaches
+    `book`: sending 0.05 ether from an account with nothing fails first with `OutOfFunds`. So
+    the test passes, and it would still pass if someone deleted the `AlreadyBooked` check. With
+    the exact expectation, `vm.expectRevert(abi.encodeWithSelector(RoomBooking.AlreadyBooked.selector, DAY))`,
+    the same test fails with `Error != expected error: EvmError: OutOfFunds != AlreadyBooked(20000 [2e4])`,
+    which reveals the missing `hoax(bob, 1 ether)`. Fund every actor and expect the exact error.
+    `vm.prank` works for any address, funded or not.
+
+- key: sol-medium-18
+  type: multiple
+  category: solidity
+  tags: [foundry, cheatcodes, fuzzing]
+  prompt: |
+    Which statements about Foundry 1.8 tests are true? Choose all that apply.
+  options:
+    - text: "In `vm.prank(alice); room.book{value: room.DEPOSIT()}(DAY);` the prank is used up by the `DEPOSIT()` call, so `book` is called by the test contract"
+      correct: true
+    - text: "`hoax(alice, 1 ether)` gives Alice 1 ether and makes her the caller of the next call"
+      correct: true
+    - text: "After `vm.mockCall(registry, abi.encodeWithSelector(IMembership.isMember.selector), abi.encode(true))`, a second mock with the full calldata `abi.encodeCall(IMembership.isMember, (bob))` decides the answer for Bob"
+      correct: true
+    - text: "A test named `testFail_Cancel` passes when its body reverts, so it is the usual way to test reverts"
+  explanation: |
+    A prank applies to the very next call, and an argument such as `room.DEPOSIT()` is
+    evaluated, as a call, before `book`; the test then fails with `who booked the day:
+    0x7FA9...1496 != 0x3288...dac6`. Read such values into a local variable before the prank.
+    `hoax` from forge-std is `deal` plus `prank`. For `mockCall`, a full calldata match is
+    looked up before a selector-only (prefix) match, so the specific mock wins for Bob while the
+    general one still answers for everyone else. `testFail` tests are gone from Foundry 1.x:
+    forge fails such a test with a message saying that `testFail*` has been removed and
+    suggesting a `test_Revert[If|When]_Condition` test that expects the revert.
+
+- key: sol-medium-19
+  type: single
+  category: solidity
+  tags: [state-machine, modifiers, deadlines]
+  prompt: |
+    In this escrow the stages are `AwaitingPayment` (0), `Paid` (1), `Expired` (2), `Released`
+    (3) and `Refunded` (4). `timedTransitions` moves `Paid` to `Expired` once
+    `block.timestamp > confirmBy`. A developer writes the modifiers in this order:
+
+    ```solidity
+    function claimRefund() external onlyBuyer atStage(Stage.Expired) timedTransitions {
+        _moveTo(Stage.Refunded);
+        owed[buyer] += price;
+    }
+    ```
+
+    The buyer paid, and calls `claimRefund()` one day after the deadline. What happens?
+  options:
+    - text: "It reverts with `WrongStage(2, 1)`: `atStage` runs first and still sees `Paid`, so the refund can never be claimed"
+      correct: true
+    - text: "It succeeds: all modifiers run before the body, so their order does not matter"
+    - text: "It reverts with `WrongStage(1, 2)`, because `timedTransitions` has already moved the stage to `Expired`"
+    - text: "It succeeds the second time it is called, because the first call stored `Expired` before reverting"
+  explanation: |
+    Modifiers run from left to right, each wrapping the rest. `atStage(Stage.Expired)` checks
+    the stored stage, which is still `Paid`, and reverts with `WrongStage(expected 2, actual 1)`
+    before `timedTransitions` can apply the deadline. Nothing is stored by a reverted call, so
+    every later attempt fails the same way and the buyer's money is stuck. Put
+    `timedTransitions` before `atStage`. Even in the right order, a transition made inside a call
+    that then reverts is undone with it.
+
+- key: sol-medium-20
+  type: single
+  category: solidity
+  tags: [payments, pull-payments, denial-of-service]
+  prompt: |
+    A prize contract holds 3 ether and pays three winners in one function:
+
+    ```solidity
+    function payOut() external {
+        uint256 share = address(this).balance / winners.length;
+        for (uint256 i = 0; i < winners.length; i++) {
+            (bool ok,) = winners[i].call{value: share}("");
+            if (!ok) revert TransferFailed(winners[i]);
+        }
+    }
+    ```
+
+    The second winner is a contract whose `receive` function reverts. What happens, and what is
+    the standard fix?
+  options:
+    - text: "`payOut` reverts with `TransferFailed(<second winner>)` every time, so nobody is paid; credit each winner's share in a mapping and let each one withdraw it"
+      correct: true
+    - text: "The first winner is paid and the other two are not; add `nonReentrant` to `payOut`"
+    - text: "The first and third winners are paid and the second share stays in the contract; nothing needs fixing"
+    - text: "It runs out of gas because of the loop; send with `transfer` instead of `call`"
+  explanation: |
+    A revert undoes the whole call, including the payment already made to the first winner, so
+    one refusing recipient blocks everyone, now and on every retry: the test shows
+    `[FAIL: TransferFailed(0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f)]`. Ignoring `ok` instead
+    would hide the failure and leave money behind silently. The **withdrawal (pull) pattern**
+    records `owed[winner] += share` and lets each winner call `withdraw`, so a refuser only
+    fails its own withdrawal. Reentrancy is not the problem here, and `transfer` is deprecated
+    and would revert just the same.
+
+- key: sol-medium-21
+  type: single
+  category: solidity
+  tags: [openzeppelin, access-control, roles]
+  prompt: |
+    ```solidity
+    constructor(IERC20 token_, address admin) {
+        token = token_;
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
+        _setRoleAdmin(GUARDIAN_ROLE, GRANTER_ROLE);
+    }
+    ```
+
+    The admin has granted `GRANTER_ROLE` to Gina. Now the admin calls
+    `grantRole(GUARDIAN_ROLE, admin)` on this OpenZeppelin 5.x `AccessControl` contract. What
+    happens?
+  options:
+    - text: "It reverts with `AccessControlUnauthorizedAccount(admin, GRANTER_ROLE)`: only holders of a role's admin role may grant it"
+      correct: true
+    - text: "It succeeds, because `DEFAULT_ADMIN_ROLE` may grant every role"
+    - text: "It reverts with `AccessControlUnauthorizedAccount(admin, GUARDIAN_ROLE)`"
+    - text: "It reverts with `OwnableUnauthorizedAccount(admin)`"
+  explanation: |
+    `grantRole(role, account)` is guarded by `onlyRole(getRoleAdmin(role))`. `DEFAULT_ADMIN_ROLE`
+    is every role's admin only until `_setRoleAdmin` changes it; here the admin of
+    `GUARDIAN_ROLE` is `GRANTER_ROLE`, which the admin does not hold. The error names the
+    caller and the **missing** role, `keccak256("GRANTER_ROLE")`, as in the real run:
+    `AccessControlUnauthorizedAccount(0xaA10...9ecF, 0x2dee5dd8...ed6a)`. Gina, a granter, can
+    appoint guardians. `AccessControl` has nothing to do with `Ownable`'s errors.
+
+- key: sol-medium-22
+  type: multiple
+  category: solidity
+  tags: [openzeppelin, safeerc20, versions]
+  prompt: |
+    Which statements about OpenZeppelin Contracts 5.x are true? Choose all that apply.
+  options:
+    - text: "`Ownable`'s constructor takes the first owner, so `contract C is Ownable { constructor() {} }` does not compile"
+      correct: true
+    - text: "`SafeERC20.safeTransfer` works with tokens that return nothing, and reverts with `SafeERC20FailedOperation(token)` when a token returns `false`"
+      correct: true
+    - text: "A token that inherits both `ERC20Capped` and `ERC20Pausable` must override `_update` and call `super._update`"
+      correct: true
+    - text: "`ReentrancyGuardTransient` keeps its lock in an ordinary storage slot, so it works on any EVM version"
+  explanation: |
+    5.0 made the first owner a constructor argument; without it solc says `No arguments passed to
+    the base constructor. Specify the arguments or mark "C" as abstract.` `SafeERC20` accepts an
+    empty return value (old tokens) and treats an explicit `false` as failure. Both extensions
+    override `_update`, so solc demands `override(ERC20Capped, ERC20Pausable)` (error 6480), and
+    `super._update` runs both. `ReentrancyGuardTransient` uses transient storage (`tstore`,
+    EIP-1153), so it needs a chain with the Cancun upgrade or later; the storage-based
+    `ReentrancyGuard` is marked deprecated in 5.7's source.
+
+- key: sol-medium-23
+  type: single
+  category: solidity
+  tags: [deployment, create2, scripts]
+  prompt: |
+    A Foundry script deploys inside `vm.startBroadcast()` with a salt:
+
+    ```solidity
+    registry = new Registry{salt: SALT}(admin);
+    ```
+
+    and `Registry`'s constructor stores `msg.sender` as `deployer`. Who is `deployer` after the
+    script runs?
+  options:
+    - text: "The CREATE2 factory at `0x4e59b44847b379578588920cA78FbF26c0B4956C`, because forge sends salted deployments through it when broadcasting"
+      correct: true
+    - text: "The account that signs the broadcast, given with `--account` or `--sender`"
+    - text: "The script contract itself, because it executes `new`"
+    - text: "`admin`, because it is the constructor argument"
+  explanation: |
+    Under a broadcast, forge turns `new X{salt: s}(...)` into a call to the deterministic CREATE2
+    factory, which runs CREATE2. The factory is therefore the creator, both in the address
+    formula and as `msg.sender` in the constructor: the real run logged `salted deployer:
+    0x4e59b44847b379578588920cA78FbF26c0B4956C`. Without a salt the broadcaster deploys and is
+    `msg.sender`. Never set an owner from `msg.sender` in a contract you deploy with a salt: pass
+    the owner as an argument.
+
+- key: sol-medium-24
+  type: single
+  category: solidity
+  tags: [deployment, create2, scripts]
+  prompt: |
+    `DeployLanterns` deploys `new LanternTickets{salt: SALT}(organiser, price)` inside a broadcast,
+    so it goes through forge's CREATE2 factory. Which change gives the tickets contract a
+    **different** address?
+  options:
+    - text: "Running it with `PRICE=20000000000000000` instead of the default 0.01 ether"
+      correct: true
+    - text: "Signing with another account, `--sender 0x...0B0B` instead of `--sender 0x...A11CE`"
+    - text: "Running it on another chain that has the same factory"
+    - text: "Running it a week later, at a higher block number"
+  explanation: |
+    The CREATE2 address is `keccak256(0xff ++ creator ++ salt ++ keccak256(initCode))`, and the
+    init code is the creation code followed by the encoded constructor arguments. A new price
+    changes the init code: the simulation printed `0x13ADb8D0...a336` instead of
+    `0xC5A06Cb1...7cE7`. The creator is the factory, not the signer, so two different
+    `--sender` values gave the same `0xC5A06Cb1...7cE7`, and neither the chain nor the time
+    appears in the formula. That is what makes CREATE2 addresses the same on every chain, as
+    long as the compiler settings are identical.

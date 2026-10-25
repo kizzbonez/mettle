@@ -1,0 +1,19 @@
+title: Bursary Pool Audit Fixes
+summary: Apply an audit report to a bursary pool, fixing missing access control everywhere it occurs, a reentrancy drain, a rounding leak and a silent role change, so that the auditors' proofs of concept fail and honest users are unaffected.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Stops the proof of concept for H-01 in every award function
+    file: 02-access-control.sol
+    hidden: true
+  - name: Stops the reentrancy drain of H-02
+    file: 03-reentrancy.sol
+    hidden: true
+  - name: Fixes the rounding leak of M-01 and the silent change of L-01
+    file: 04-rounding-and-events.sol
+    hidden: true

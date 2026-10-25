@@ -1,0 +1,19 @@
+title: Garden Registry Deployment
+summary: Write a Foundry deploy script that predicts a CREATE2 address through forge's factory, broadcasts the deployment as a chosen account, wires two contracts together, sets them up and starts a two-step handover to the owners, and test it on the local EVM.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Predicts the registry's address with the right creator, salt and init code
+    file: 02-prediction.sol
+    hidden: true
+  - name: Sets everything up as the deployer and hands the registry over
+    file: 03-set-up.sol
+    hidden: true
+  - name: Runs as forge script would, with the council from the environment
+    file: 04-run.sol
+    hidden: true

@@ -1,0 +1,19 @@
+title: Kelp Co-op Share Token
+summary: Write an ERC-20 by hand with minting, transfers, allowances and an unlimited approval, raising OpenZeppelin's standard errors, so that any wallet or contract can use the co-op's shares.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Mints and transfers shares by the rules of ERC-20
+    file: 02-mint-and-transfer.sol
+    hidden: true
+  - name: Approves, spends and refuses allowances
+    file: 03-allowances.sol
+    hidden: true
+  - name: Works as an IERC20 for another contract
+    file: 04-through-the-interface.sol
+    hidden: true

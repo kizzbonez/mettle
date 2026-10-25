@@ -1,0 +1,19 @@
+title: Botanic Garden Season Passes
+summary: Cut the gas of a working pass contract under measured budgets by packing a struct into one slot, making a value immutable, reading each slot once, taking calldata and recording claims in a bitmap, without changing what any function does.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Keeps every rule, error and event of the original
+    file: 02-same-behaviour.sol
+    hidden: true
+  - name: Issues, checks in and cancels within the gas budgets
+    file: 03-budgets.sol
+    hidden: true
+  - name: Checks in groups and records seed claims within budget
+    file: 04-groups-and-seeds.sol
+    hidden: true

@@ -1,0 +1,19 @@
+title: Shearing Shed Tally
+summary: Log every fleece in an event instead of storage, write each running total once per call, reset the day's counters for a refund, and meet gas budgets measured with vm.lastFrameGas.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example and the first gas budget
+    file: 01-example.sol
+    hidden: false
+  - name: Checks every weight and keeps the totals right across runs and days
+    file: 02-rules.sol
+    hidden: true
+  - name: Announces each fleece and each closed day
+    file: 03-events.sol
+    hidden: true
+  - name: Stays within the gas budgets for runs and for closing a day
+    file: 04-gas-budgets.sol
+    hidden: true

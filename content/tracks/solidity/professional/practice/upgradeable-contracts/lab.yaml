@@ -1,0 +1,19 @@
+title: Loyalty Stamps, Version Two
+summary: Put a UUPS stamp card behind an ERC1967Proxy with hand-written ERC-7201 storage, lock its implementation, guard its initializer and its upgrades, then upgrade it to a second version that appends a field and sets it in a reinitializer without losing a stamp.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Runs each initializer once, for the right caller only
+    file: 02-initializers.sol
+    hidden: true
+  - name: Keeps the state in the ERC-7201 namespace across the upgrade
+    file: 03-storage-layout.sol
+    hidden: true
+  - name: Lets only the owner upgrade and keeps every stamp
+    file: 04-upgrades.sol
+    hidden: true

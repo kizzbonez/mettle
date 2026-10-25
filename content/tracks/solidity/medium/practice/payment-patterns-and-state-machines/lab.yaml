@@ -1,0 +1,19 @@
+title: Mural Commission Pot
+summary: Run a crowdfunded mural as a state machine whose deadline moves it to funded or failed, split the pledges among the painters without losing a wei, and pay everyone through withdrawals written as checks, effects, interactions.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Follows the stages and the deadline exactly
+    file: 02-stages-and-deadline.sol
+    hidden: true
+  - name: Splits the pledges so that the shares add up
+    file: 03-fair-split.sol
+    hidden: true
+  - name: Pays through withdrawals that one painter cannot block or repeat
+    file: 04-pull-payments.sol
+    hidden: true

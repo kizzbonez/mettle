@@ -1,0 +1,1 @@
+Ines, the glassworks' treasurer, keeps the studio's ether in her own wallet. With EIP-7702 she wants that wallet to pay the sand supplier and the kiln fixer in one transaction and to accept operations from an ERC-4337 bundler, without anyone else being able to move a single wei.

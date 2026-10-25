@@ -1,0 +1,19 @@
+title: Engine Shed Turntable Relay
+summary: Build calldata with abi.encodeCall, relay only allowed commands with a low-level call, refuse addresses without code, pass a failing turntable's error on unchanged, and read a value with staticcall and abi.decode.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Builds rotate calldata and lets only operators send allowed commands
+    file: 02-encoding-and-allowlist.sol
+    hidden: true
+  - name: Passes failures on unchanged and refuses addresses without code
+    file: 03-failures.sol
+    hidden: true
+  - name: Reads the heading with staticcall and checks the answer
+    file: 04-reading.sol
+    hidden: true

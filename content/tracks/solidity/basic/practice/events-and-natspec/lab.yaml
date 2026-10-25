@@ -1,0 +1,16 @@
+title: Sapling Planting Register
+summary: Declare an event with three indexed parameters, emit events with the right values in the right order, and prove it with vm.expectEmit and vm.recordLogs.
+language: solidity
+minutes: 15
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Announces every planting with the right topics and data
+    file: 02-planted-event.sol
+    hidden: true
+  - name: Reports each measurement with the previous and the new height
+    file: 03-measurements.sol
+    hidden: true

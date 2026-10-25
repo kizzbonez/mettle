@@ -1,0 +1,19 @@
+title: Lavender Harvest Shares
+summary: Work out a lavender picker's share of a day's pay in wei, widening small integers before adding them, using an ether-unit constant, and multiplying before dividing.
+language: solidity
+minutes: 15
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Shares the example day from the instructions
+    file: 01-example-day.sol
+    hidden: false
+  - name: Adds two full shifts without overflowing
+    file: 02-full-shifts.sol
+    hidden: true
+  - name: Multiplies before dividing, so no part of a bundle is lost
+    file: 03-uneven-shares.sol
+    hidden: true
+  - name: Gives the right share for any day and keeps the farm's settings
+    file: 04-any-day.sol
+    hidden: true

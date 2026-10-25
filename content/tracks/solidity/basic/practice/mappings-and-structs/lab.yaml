@@ -1,0 +1,19 @@
+title: Costume Hire Wardrobe
+summary: Keep structs in a mapping with an array of keys, track their state with an enum, check permissions in a nested mapping, update records through storage references and retire them with delete.
+language: solidity
+minutes: 20
+timeLimitMs: 8000
+memoryMb: 512
+tests:
+  - name: Works through the example from the instructions
+    file: 01-example.sol
+    hidden: false
+  - name: Lets only the keeper add new costumes
+    file: 02-adding.sol
+    hidden: true
+  - name: Hires costumes for members and their collectors
+    file: 03-hiring.sol
+    hidden: true
+  - name: Takes costumes back and retires them
+    file: 04-give-back-and-retire.sol
+    hidden: true
