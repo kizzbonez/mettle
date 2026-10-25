@@ -4,6 +4,46 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-10-25
+
+Solidity Smart Contracts, a full course, and Solidity as a lab language.
+
+### Added
+
+- **Solidity Smart Contracts**: 44 lessons in four levels on Solidity 0.8.38 and Foundry 1.8.6,
+  for people who already program, in the same full-course format as the others. It starts from
+  zero on blockchains (accounts, transactions, gas, the EVM) and teaches types and units,
+  functions and visibility, control flow and custom errors, arrays, mappings and structs, data
+  locations and transient storage, events, modifiers and payments; then interfaces,
+  inheritance, libraries and user-defined value types, ERC-20 and ERC-721 tokens, ABI encoding,
+  gas, time and block data, testing and fuzzing with Foundry, payment patterns, OpenZeppelin
+  Contracts and deployment scripts; then smart contract security (reentrancy, access control,
+  rounding, front-running and MEV, oracle manipulation and flash loans, signatures and replay,
+  delegatecall and proxy storage, denial of service and unsafe tokens, invariant testing); and
+  finally gas optimisation, inline assembly and Yul, UUPS upgrades with ERC-7201 storage,
+  ERC-4626 vaults, AMMs, ERC-4337 and EIP-7702, governance, audits, operations and the EVM
+  roadmap. It teaches what is current: custom errors with `require`, `call` instead of the
+  deprecated `send` and `transfer`, and Glamsterdam as upcoming.
+  - Solidity Foundations (12 lessons), Building Contracts (12), Smart Contract Security (10)
+    and Production Solidity (10).
+  - 88 exam questions; each attempt at a level's mock exam draws ten.
+  - An end-of-level lab for each level, from an orchestra's instrument loans to a tea estate's
+    upgradeable fee vault, and a practice lab for every lesson. In the security labs the hidden
+    tests are attacker contracts that must fail against the learner's fix.
+- **Solidity as a lab language**: solc 0.8.38 (pinned by checksum) with Foundry 1.8.6,
+  forge-std 1.17 and OpenZeppelin Contracts 5.7, running on forge's own local EVM: no blockchain,
+  no network, no wallets. Each test is a Solidity file of contracts that inherit `Test`, with the
+  imports added for it; a test passes only when every test function in it succeeded, so a
+  contract cannot skip its own test. Fuzz runs use a fixed seed, and each call a test makes is its
+  own transaction. Hidden tests show an assertion's message without the values it compared, a
+  failed `expectRevert` or `expectEmit` in plain words, the invariant that broke and why, and a
+  starter's unwritten function by name. solc's warning that `send` and `transfer` are deprecated,
+  which Foundry hides by default, is shown. The editor highlights Solidity.
+
+### Changed
+
+- The explanation of an unwritten starter function depends on the lab's language.
+
 ## [1.12.0] - 2026-10-25
 
 Go Development, a full course, and Go as a lab language.
