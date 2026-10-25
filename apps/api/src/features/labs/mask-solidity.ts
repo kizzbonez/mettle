@@ -19,9 +19,29 @@ export function withoutValues(reason: string): string {
   return reason;
 }
 
+/**
+ * forge's own reasons for vm.expectRevert and vm.expectEmit, in plain words. Each also names
+ * what the test expected, which a hidden test must not show; the learner's own revert is kept,
+ * and a starter's "not implemented" stays recognisable as one.
+ */
+function plainReason(reason: string): string {
+  const wrongError = /^Error != expected error: (.*?) != /.exec(reason);
+  if (wrongError) {
+    const actual = wrongError[1] ?? '';
+    return /^not implemented(?::|$)/.test(actual) ? actual : `It reverted with ${actual}, not with the error the test expected.`;
+  }
+  if (/call did not revert as expected$/.test(reason)) return 'A call that should have reverted did not revert.';
+  if (reason === 'log != expected log' || reason.startsWith('expected an emit')) {
+    return 'An event the test expected was not emitted, or not with the values it expected.';
+  }
+  const param = /^(\w+) param mismatch at (\w+)/.exec(reason);
+  if (param) return `The ${param[1]} event was emitted with the wrong ${param[2]}.`;
+  return withoutValues(reason);
+}
+
 export function solidityMessage(stderr: string): string | null {
   const lines = nonEmptyLines(stderr);
   const failed = lines.find((line) => line.startsWith('FAIL:'));
-  if (failed) return withoutValues(failed.replace(/^FAIL:\s*/, ''));
+  if (failed) return plainReason(failed.replace(/^FAIL:\s*/, ''));
   return lines.at(-1) ?? null;
 }

@@ -160,6 +160,21 @@ describe('failureMessage', () => {
     expect(sol('FAIL: not implemented: fee\n  in test_fee()')).toBe('`fee` is not written yet: replace the starter\'s revert("not implemented") with your code.');
   });
 
+  it('puts forge\'s expectRevert and expectEmit reasons in plain words, without what was expected', () => {
+    const sol = (stderr: string) => failureMessage('solidity', result({ stderr }), 5000);
+    expect(sol('FAIL: Error != expected error: ZeroAddress() != NotKeeper(0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496)')).toBe(
+      'It reverted with ZeroAddress(), not with the error the test expected.',
+    );
+    expect(sol('FAIL: Error != expected error: not implemented: write != NotKeeper(0xD720eb464FedBBEaa50D53C47EAe3AeC9BB18301)')).toBe(
+      '`write` is not written yet: replace the starter\'s revert("not implemented") with your code.',
+    );
+    expect(sol('FAIL: next call did not revert as expected')).toBe('A call that should have reverted did not revert.');
+    expect(sol('FAIL: log != expected log')).toBe('An event the test expected was not emitted, or not with the values it expected.');
+    expect(sol('FAIL: KeeperChanged param mismatch at previous: expected=0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496, got=0x0000000000000000000000000000000000000B0b')).toBe(
+      'The KeeperChanged event was emitted with the wrong previous.',
+    );
+  });
+
   it('leaves an ordinary failure message as the author wrote it', () => {
     const stderr = ["thread 'main' (59) panicked at main.rs:11:1:", 'a blank line is skipped, not counted as an error'].join('\n');
     expect(failureMessage('rust', result({ stderr }), 5000)).toBe('a blank line is skipped, not counted as an error');
